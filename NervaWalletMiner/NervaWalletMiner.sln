@@ -1,0 +1,53 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34701.34
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NervaWalletMiner", "NervaWalletMiner.csproj", "{F4EC5535-F8D1-41FB-86F4-3DB704140737}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NervaWalletMiner.Android", "..\NervaWalletMiner.Android\NervaWalletMiner.Android.csproj", "{8F17C9D2-DE0F-46B2-A9C0-61703A37BDBF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NervaWalletMiner.Desktop", "..\NervaWalletMiner.Desktop\NervaWalletMiner.Desktop.csproj", "{9B969F68-98AB-4846-BE47-85EFF46FE414}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NervaWalletMiner.iOS", "..\NervaWalletMiner.iOS\NervaWalletMiner.iOS.csproj", "{A65EFF7F-89A5-4527-9DE2-63500558EFC7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NervaWalletMiner.Browser", "..\NervaWalletMiner.Browser\NervaWalletMiner.Browser.csproj", "{8221573C-F241-4070-B587-B8F0BA942EBA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F4EC5535-F8D1-41FB-86F4-3DB704140737}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4EC5535-F8D1-41FB-86F4-3DB704140737}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4EC5535-F8D1-41FB-86F4-3DB704140737}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4EC5535-F8D1-41FB-86F4-3DB704140737}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F17C9D2-DE0F-46B2-A9C0-61703A37BDBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F17C9D2-DE0F-46B2-A9C0-61703A37BDBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F17C9D2-DE0F-46B2-A9C0-61703A37BDBF}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{8F17C9D2-DE0F-46B2-A9C0-61703A37BDBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F17C9D2-DE0F-46B2-A9C0-61703A37BDBF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F17C9D2-DE0F-46B2-A9C0-61703A37BDBF}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{9B969F68-98AB-4846-BE47-85EFF46FE414}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B969F68-98AB-4846-BE47-85EFF46FE414}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B969F68-98AB-4846-BE47-85EFF46FE414}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B969F68-98AB-4846-BE47-85EFF46FE414}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A65EFF7F-89A5-4527-9DE2-63500558EFC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A65EFF7F-89A5-4527-9DE2-63500558EFC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A65EFF7F-89A5-4527-9DE2-63500558EFC7}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{A65EFF7F-89A5-4527-9DE2-63500558EFC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A65EFF7F-89A5-4527-9DE2-63500558EFC7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A65EFF7F-89A5-4527-9DE2-63500558EFC7}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{8221573C-F241-4070-B587-B8F0BA942EBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8221573C-F241-4070-B587-B8F0BA942EBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8221573C-F241-4070-B587-B8F0BA942EBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8221573C-F241-4070-B587-B8F0BA942EBA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8282C74A-F5E0-40D3-B472-1EE777DA86EA}
+	EndGlobalSection
+EndGlobal
