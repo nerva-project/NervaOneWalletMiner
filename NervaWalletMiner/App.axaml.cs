@@ -32,17 +32,10 @@ public partial class App : Application
             };
         }
 
-        SetupApplication();
-
-        base.OnFrameworkInitializationCompleted();
-    }
-
-    public void SetupApplication()
-    {
         Logger.SetUpLogger();
-        log4net.Config.XmlConfigurator.Configure();
-        Logger.LogDebug("App.IC", "Directories and logger initialized");
-        Logger.LogInfo("App.IC", "App Version: " + GlobalData.Version + " | OS: " + Environment.OSVersion.Platform + " " + Environment.OSVersion.Version + " | CPUs: " + Environment.ProcessorCount);
-        Logger.LogInfo("App.IC", "Using Data Directory: " + GlobalData.DataDir);
+       
+        base.OnFrameworkInitializationCompleted();
+
+        Logger.LogDebug("App.IC", "Initialization completed");
     }
 }
