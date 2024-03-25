@@ -11,6 +11,11 @@
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
     <vm:MainViewModel />
   </Design.DataContext>
-
-  <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+	<Grid>
+		<Button Command="{Binding OpenDebugFolderCommand}"
+				Content="Debug Folder"
+				HorizontalAlignment="Center"
+				VerticalAlignment="Top"/>
+		<TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+	</Grid>  
 </UserControl>

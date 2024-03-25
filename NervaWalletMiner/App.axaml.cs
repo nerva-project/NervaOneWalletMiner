@@ -1,9 +1,10 @@
 ﻿using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-
+using NervaWalletMiner.Helpers;
 using NervaWalletMiner.ViewModels;
 using NervaWalletMiner.Views;
+using System;
 
 namespace NervaWalletMiner;
 
@@ -31,6 +32,16 @@ public partial class App : Application
             };
         }
 
+        SetupApplication();
+
         base.OnFrameworkInitializationCompleted();
+    }
+
+    public void SetupApplication()
+    {
+        Logger.SetUpLogger();
+        log4net.Config.XmlConfigurator.Configure();
+        Logger.LogDebug("App.IC", "Directories and logger initialized");
+        Logger.LogInfo("App.IC", "App Version: " + GlobalData.Version + " | OS: " + Environment.OSVersion.Platform + " " + Environment.OSVersion.Version + " | CPUs: " + Environment.ProcessorCount);
     }
 }
