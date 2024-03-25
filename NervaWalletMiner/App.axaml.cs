@@ -43,5 +43,6 @@ public partial class App : Application
         log4net.Config.XmlConfigurator.Configure();
         Logger.LogDebug("App.IC", "Directories and logger initialized");
         Logger.LogInfo("App.IC", "App Version: " + GlobalData.Version + " | OS: " + Environment.OSVersion.Platform + " " + Environment.OSVersion.Version + " | CPUs: " + Environment.ProcessorCount);
+        Logger.LogInfo("App.IC", "Using Data Directory: " + GlobalData.DataDir);
     }
 }
