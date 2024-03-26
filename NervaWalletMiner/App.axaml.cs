@@ -4,7 +4,6 @@ using Avalonia.Markup.Xaml;
 using NervaWalletMiner.Helpers;
 using NervaWalletMiner.ViewModels;
 using NervaWalletMiner.Views;
-using System;
 
 namespace NervaWalletMiner;
 

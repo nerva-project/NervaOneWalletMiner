@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:NervaWalletMiner.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="450"
              x:Class="NervaWalletMiner.Views.MainView"
              x:DataType="vm:MainViewModel">
   <Design.DataContext>
@@ -11,11 +11,51 @@
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
     <vm:MainViewModel />
   </Design.DataContext>
-	<Grid>
-		<Button Command="{Binding OpenDebugFolderCommand}"
-				Content="Debug Folder"
-				HorizontalAlignment="Center"
-				VerticalAlignment="Top"/>
-		<TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-	</Grid>  
+
+	<SplitView IsPaneOpen="{Binding IsPaneOpen}"
+			   DisplayMode="CompactInline"
+			   OpenPaneLength="180"
+			   CompactPaneLength="46">
+		<SplitView.Pane>
+			<StackPanel Spacing="3" Margin="3">
+				<Button Width="32" Height="32" Margin="4 7" Command="{Binding TriggerPaneCommand}">
+					<PathIcon Height="14" Data="{StaticResource LineHorizontal3Regular}" />
+				</Button>
+				
+				<ListBox Selection="{Binding Selection}">
+					<ListBoxItem Name="home">
+						<StackPanel Spacing="17" Orientation="Horizontal">
+							<PathIcon Height="14" Data="{StaticResource HomeRegular}" />
+							<TextBlock Text="Home" />
+						</StackPanel>										
+					</ListBoxItem>
+					<ListBoxItem Name="wallet">
+						<StackPanel Spacing="17" Orientation="Horizontal">
+							<PathIcon Height="14" Data="{StaticResource MoneyRegular}" />
+							<TextBlock Text="Wallet" />
+						</StackPanel>
+					</ListBoxItem>
+					<ListBoxItem Name="transfers">
+						<StackPanel Spacing="17" Orientation="Horizontal">
+							<PathIcon Height="14" Data="{StaticResource ArrowSortRegular}" />
+							<TextBlock Text="Transfers" />
+						</StackPanel>
+					</ListBoxItem>
+
+					<ListBoxItem VerticalAlignment="Bottom" Name="settings" >
+						<StackPanel Spacing="17" Orientation="Horizontal">
+							<PathIcon Height="14" Data="{StaticResource SettingsRegular}" />
+							<TextBlock Text="Settings" />
+						</StackPanel>
+					</ListBoxItem>
+				</ListBox>
+			</StackPanel>
+		</SplitView.Pane>
+		
+		<SplitView.Content>
+			<Grid RowDefinitions="*,Auto" Margin="10">
+			<TransitioningContentControl Content="{Binding CurrentPage}" />
+			</Grid>
+		</SplitView.Content>
+	</SplitView >
 </UserControl>
