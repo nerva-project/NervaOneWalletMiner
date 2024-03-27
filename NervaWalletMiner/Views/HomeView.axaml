@@ -6,5 +6,12 @@
 			 mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="450"
 			 x:DataType="vm:HomeViewModel"
              x:Class="NervaWalletMiner.Views.HomeView">
-    Home View
+	<Design.DataContext>
+		<vm:HomeViewModel />
+	</Design.DataContext>
+	
+	<StackPanel Spacing="5">
+		<TextBlock>Home View</TextBlock>
+		<TextBox Text="{Binding NetworkInfo}" />
+	</StackPanel>
 </UserControl>
