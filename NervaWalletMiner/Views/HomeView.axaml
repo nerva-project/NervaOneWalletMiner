@@ -12,6 +12,22 @@
 	
 	<StackPanel Spacing="5">
 		<TextBlock>Home View</TextBlock>
-		<TextBox Text="{Binding NetworkInfo}" />
+		<Grid ColumnDefinitions="100,*" Margin="4">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="30" />
+				<RowDefinition Height="30" />
+				<RowDefinition Height="30" />
+				<RowDefinition Height="30" />
+			</Grid.RowDefinitions>
+			
+			<Label Grid.Row="0" Grid.Column="0" Content="Net Height:" />
+			<Label Grid.Row="0" Grid.Column="1" Content="{Binding NetHeight}" Width="150" HorizontalAlignment="Left" />
+			<Label Grid.Row="1" Grid.Column="0">Your Height:</Label>
+			<Label Grid.Row="1" Grid.Column="1" Content="{Binding YourHeight}" Width="150" HorizontalAlignment="Left" />
+			<Label Grid.Row="2" Grid.Column="0">Net Hash:</Label>
+			<Label Grid.Row="2" Grid.Column="1" Content="{Binding NetHash}" Width="150" HorizontalAlignment="Left" />
+			<Label Grid.Row="3" Grid.Column="0">Run Time:</Label>
+			<Label Grid.Row="3" Grid.Column="1" Content="{Binding RunTime}" Width="150" HorizontalAlignment="Left" />
+		</Grid>
 	</StackPanel>
 </UserControl>

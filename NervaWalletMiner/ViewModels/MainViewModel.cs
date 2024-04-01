@@ -72,11 +72,32 @@ public class MainViewModel : ViewModelBase
     }
 
     // TODO: Getting exception when this was in HomeViewModel.cs: Could not find a matching property accessor "NetworkInfo" on ... MainViewModel
-    private string? _NetworkInfo;
-    public string? NetworkInfo
+    private string? _NetHeight;
+    public string? NetHeight
     {
-        get => _NetworkInfo;
-        set => this.RaiseAndSetIfChanged(ref _NetworkInfo, value);
+        get => _NetHeight;
+        set => this.RaiseAndSetIfChanged(ref _NetHeight, value);
+    }
+
+    private string? _YourHeight;
+    public string? YourHeight
+    {
+        get => _YourHeight;
+        set => this.RaiseAndSetIfChanged(ref _YourHeight, value);
+    }
+
+    private string? _NetHash;
+    public string? NetHash
+    {
+        get => _NetHash;
+        set => this.RaiseAndSetIfChanged(ref _NetHash, value);
+    }
+
+    private string? _RunTime;
+    public string? RunTime
+    {
+        get => _RunTime;
+        set => this.RaiseAndSetIfChanged(ref _RunTime, value);
     }
 
     private void TriggerPane()
@@ -96,8 +117,11 @@ public class MainViewModel : ViewModelBase
 
     // TODO: Figure out better way of doing this
     public void UpdateView()
-    {
-        NetworkInfo = "Hash Rate: " + GlobalData.HashRate + ", Height: " + GlobalData.NetHeight + ", In: " + GlobalData.InConnections + ", Out: " + GlobalData.OutConnections;
+    {        
+        NetHeight = GlobalData.NetworkStats.NetHeight.ToString();
+        YourHeight = GlobalData.NetworkStats.YourHeight.ToString();
+        NetHash = GlobalData.NetworkStats.NetHash;
+        RunTime = GlobalData.NetworkStats.RunTime;
     }
 
     // TODO: Move this somewhere else.
@@ -192,10 +216,12 @@ public class MainViewModel : ViewModelBase
         {
             GetInfoResponse response = await GetInfo.CallServiceAsync();
 
-            GlobalData.HashRate = response.cumulative_difficulty.ToString();
-            GlobalData.NetHeight = response.height.ToString();
-            GlobalData.OutConnections = Convert.ToInt32(response.outgoing_connections_count);
-            GlobalData.InConnections = Convert.ToInt32(response.incoming_connections_count);
+            GlobalData.NetworkStats.NetHeight = (response.target_height > response.height ? response.target_height : response.height);
+            GlobalData.NetworkStats.YourHeight = response.height;
+            GlobalData.NetworkStats.NetHash = Math.Round(((response.difficulty / 60.0d) / 1000.0d), 2) + " kH/s";
+
+            DateTime miningStartTime = GlobalMethods.UnixTimeStampToDateTime(response.start_time);
+            GlobalData.NetworkStats.RunTime = (DateTime.Now.ToUniversalTime() - miningStartTime).ToString(@"%d\.hh\:mm\:ss");
 
             Logger.LogDebug("App.DUU", "GetInfo Response Height: " + response.height);
         }

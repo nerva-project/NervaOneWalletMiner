@@ -1,4 +1,6 @@
-﻿namespace NervaWalletMiner.Helpers
+﻿using NervaWalletMiner.Objects;
+
+namespace NervaWalletMiner.Helpers
 {
     public static class GlobalData
     {
@@ -11,9 +13,6 @@
         public static readonly string LogDir = GlobalMethods.GetLogDir();
         public static readonly string WalletDir = GlobalMethods.GetWalletDir();
 
-        public static string? HashRate;
-        public static string? NetHeight;
-        public static int OutConnections;
-        public static int InConnections;
+        public static DaemonStats NetworkStats = new();        
     }
 }
