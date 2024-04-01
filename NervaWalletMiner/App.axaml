@@ -6,6 +6,7 @@
 
     <Application.Styles>
         <FluentTheme />
-		<StyleInclude Source="avares://NervaWalletMiner/Assets/Icons.axaml" />
+		<StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+		<StyleInclude Source="avares://NervaWalletMiner/Assets/Icons.axaml" />		
     </Application.Styles>
 </Application>

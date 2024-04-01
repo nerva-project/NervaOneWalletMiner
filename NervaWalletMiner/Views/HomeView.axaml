@@ -12,7 +12,8 @@
 	
 	<StackPanel Spacing="5">
 		<TextBlock>Home View</TextBlock>
-		<Grid ColumnDefinitions="100,*" Margin="4">
+		
+		<Grid ColumnDefinitions="100,*" Margin="10">
 			<Grid.RowDefinitions>
 				<RowDefinition Height="30" />
 				<RowDefinition Height="30" />
@@ -29,5 +30,17 @@
 			<Label Grid.Row="3" Grid.Column="0">Run Time:</Label>
 			<Label Grid.Row="3" Grid.Column="1" Content="{Binding RunTime}" Width="150" HorizontalAlignment="Left" />
 		</Grid>
+
+		<DataGrid ItemsSource="{Binding Connections}" AutoGenerateColumns="False" IsReadOnly="True" GridLinesVisibility="Horizontal" Margin="10">
+			<DataGrid.Columns>
+				<DataGridTextColumn Header="Incoming?" Binding="{Binding IsIncoming}" />
+				<DataGridTextColumn Header="Address" Binding="{Binding Address}" />
+				<DataGridTextColumn Header="Height" Binding="{Binding Height}" />
+				<DataGridTextColumn Header="Live Time" Binding="{Binding LiveTime}" />
+				<DataGridTextColumn Header="State" Binding="{Binding State}" />
+			</DataGrid.Columns>
+		</DataGrid>
+		
 	</StackPanel>
+
 </UserControl>

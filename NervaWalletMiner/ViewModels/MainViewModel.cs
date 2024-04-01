@@ -1,10 +1,14 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Controls.Selection;
 using NervaWalletMiner.Helpers;
+using NervaWalletMiner.Objects;
 using NervaWalletMiner.Rpc.Daemon;
 using NervaWalletMiner.Views;
 using ReactiveUI;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Data.Common;
 using System.Diagnostics;
 using System.Windows.Input;
 
@@ -23,7 +27,6 @@ public class MainViewModel : ViewModelBase
     public SelectionModel<ListBoxItem> Selection { get; }
     public ICommand TriggerPaneCommand { get; }
     public ICommand OpenDebugFolderCommand { get; }
-
 
     public MainViewModel()
     {
@@ -100,6 +103,13 @@ public class MainViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _RunTime, value);
     }
 
+    private List<Connection> _Connections;
+    public List<Connection> Connections
+    {
+        get => _Connections;
+        set => this.RaiseAndSetIfChanged(ref _Connections, value);
+    }
+
     private void TriggerPane()
     {
         IsPaneOpen = !IsPaneOpen;
@@ -122,6 +132,8 @@ public class MainViewModel : ViewModelBase
         YourHeight = GlobalData.NetworkStats.YourHeight.ToString();
         NetHash = GlobalData.NetworkStats.NetHash;
         RunTime = GlobalData.NetworkStats.RunTime;
+
+        Connections = GlobalData.Connections;       
     }
 
     // TODO: Move this somewhere else.
@@ -214,16 +226,41 @@ public class MainViewModel : ViewModelBase
     {
         try
         {
-            GetInfoResponse response = await GetInfo.CallServiceAsync();
+            GetInfoResponse infoRes = await GetInfo.CallServiceAsync();
 
-            GlobalData.NetworkStats.NetHeight = (response.target_height > response.height ? response.target_height : response.height);
-            GlobalData.NetworkStats.YourHeight = response.height;
-            GlobalData.NetworkStats.NetHash = Math.Round(((response.difficulty / 60.0d) / 1000.0d), 2) + " kH/s";
+            if(!string.IsNullOrEmpty(infoRes.version))
+            {
+                GlobalData.NetworkStats.NetHeight = (infoRes.target_height > infoRes.height ? infoRes.target_height : infoRes.height);
+                GlobalData.NetworkStats.YourHeight = infoRes.height;
+                GlobalData.NetworkStats.NetHash = Math.Round(((infoRes.difficulty / 60.0d) / 1000.0d), 2) + " kH/s";
 
-            DateTime miningStartTime = GlobalMethods.UnixTimeStampToDateTime(response.start_time);
-            GlobalData.NetworkStats.RunTime = (DateTime.Now.ToUniversalTime() - miningStartTime).ToString(@"%d\.hh\:mm\:ss");
+                DateTime miningStartTime = GlobalMethods.UnixTimeStampToDateTime(infoRes.start_time);
+                GlobalData.NetworkStats.RunTime = (DateTime.Now.ToUniversalTime() - miningStartTime).ToString(@"%d\.hh\:mm\:ss");
 
-            Logger.LogDebug("App.DUU", "GetInfo Response Height: " + response.height);
+                GlobalData.NetworkStats.ConnectionsIn = infoRes.incoming_connections_count;
+                GlobalData.NetworkStats.ConnectionsOut = infoRes.outgoing_connections_count;
+
+                Logger.LogDebug("App.DUU", "GetInfo Response Height: " + infoRes.height);
+
+
+                List<GetConnectionsResponse> connectResp = await GetConnections.CallServiceAsync();
+
+                // TODO: Loop through and build Connections object for DataGrid
+                GlobalData.Connections = new();
+
+                foreach(GetConnectionsResponse connection in connectResp)
+                {
+                    GlobalData.Connections.Add(new Objects.Connection
+                    {
+                        Address = connection.address,
+                        Height = connection.height,
+                        LiveTime = connection.live_time.ToString(),
+                        State = connection.state,
+                        IsIncoming = connection.incoming
+                    });
+                }
+            }
+
         }
         catch (Exception ex)
         {
