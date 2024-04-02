@@ -1,4 +1,6 @@
-﻿namespace NervaWalletMiner.Objects
+﻿using Avalonia.Media.Imaging;
+
+namespace NervaWalletMiner.Objects
 {
     public class Connection
     {
@@ -7,5 +9,6 @@
         public string? LiveTime { get; set; }
         public string? State { get; set; }
         public bool IsIncoming { get; set; }
+        public Bitmap? InOutIcon { get; set; }
     }
 }

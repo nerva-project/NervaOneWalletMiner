@@ -1,5 +1,9 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Controls.Selection;
+using Avalonia.Markup.Xaml.MarkupExtensions;
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 using NervaWalletMiner.Helpers;
 using NervaWalletMiner.Objects;
 using NervaWalletMiner.Rpc.Daemon;
@@ -22,6 +26,9 @@ public class MainViewModel : ViewModelBase
     public static DateTime _cliToolsRunningLastCheck = DateTime.MinValue;
     private bool isInitialDaemonConnectionSuccess = false;
 
+    public static readonly Bitmap _inImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaWalletMiner/Assets/transfer_in.png")));
+    public static readonly Bitmap _outImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaWalletMiner/Assets/transfer_out.png")));
+
     private bool? _isPaneOpen = true;
     private UserControl _CurrentPage;
     public SelectionModel<ListBoxItem> Selection { get; }
@@ -40,6 +47,8 @@ public class MainViewModel : ViewModelBase
         Selection.SelectionChanged += SelectionChanged;
 
         StartMasterUpdateProcess();
+
+        _Connections = [];
     }
 
     public bool? IsPaneOpen
@@ -245,22 +254,22 @@ public class MainViewModel : ViewModelBase
 
                 List<GetConnectionsResponse> connectResp = await GetConnections.CallServiceAsync();
 
-                // TODO: Loop through and build Connections object for DataGrid
+                // TODO: For now just recreate items in grid. Consider, removing disconnected and adding new ones to List instead.
                 GlobalData.Connections = new();
 
-                foreach(GetConnectionsResponse connection in connectResp)
+                foreach (GetConnectionsResponse connection in connectResp)
                 {
                     GlobalData.Connections.Add(new Objects.Connection
                     {
                         Address = connection.address,
                         Height = connection.height,
-                        LiveTime = connection.live_time.ToString(),
+                        LiveTime = TimeSpan.FromSeconds(connection.live_time).ToString(@"hh\:mm\:ss"),
                         State = connection.state,
-                        IsIncoming = connection.incoming
+                        IsIncoming = connection.incoming,
+                        InOutIcon = connection.incoming ? _inImage : _outImage
                     });
                 }
             }
-
         }
         catch (Exception ex)
         {
