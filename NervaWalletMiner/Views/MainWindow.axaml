@@ -8,7 +8,7 @@
 		Height="600"
         mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="450"
         x:Class="NervaWalletMiner.Views.MainWindow"
-        Icon="/Assets/avalonia-logo.ico"
+        Icon="/Assets/nerva-logo.ico"
         Title="Nerva Wallet and Miner">
 
 	<Grid>
