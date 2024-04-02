@@ -1,7 +1,5 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Controls.Selection;
-using Avalonia.Markup.Xaml.MarkupExtensions;
-using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using NervaWalletMiner.Helpers;
@@ -11,8 +9,6 @@ using NervaWalletMiner.Views;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Data.Common;
 using System.Diagnostics;
 using System.Windows.Input;
 
@@ -37,7 +33,7 @@ public class MainViewModel : ViewModelBase
 
     public MainViewModel()
     {
-        OpenDebugFolderCommand = ReactiveCommand.Create(OpenDebugFolder);
+        OpenDebugFolderCommand = ReactiveCommand.Create(OpenDebugFolder);        
 
         TriggerPaneCommand = ReactiveCommand.Create(TriggerPane);
 
@@ -49,6 +45,8 @@ public class MainViewModel : ViewModelBase
         StartMasterUpdateProcess();
 
         _Connections = [];
+
+        UpdateView();
     }
 
     public bool? IsPaneOpen
@@ -112,6 +110,34 @@ public class MainViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _RunTime, value);
     }
 
+    private string? _MinerStatus;
+    public string? MinerStatus
+    {
+        get => _MinerStatus;
+        set => this.RaiseAndSetIfChanged(ref _MinerStatus, value);
+    }
+
+    private string? _YourHash;
+    public string? YourHash
+    {
+        get => _YourHash;
+        set => this.RaiseAndSetIfChanged(ref _YourHash, value);
+    }
+
+    private string? _BlockTime;
+    public string? BlockTime
+    {
+        get => _BlockTime;
+        set => this.RaiseAndSetIfChanged(ref _BlockTime, value);
+    }
+
+    private string? _MiningAddress;
+    public string? MiningAddress
+    {
+        get => _MiningAddress;
+        set => this.RaiseAndSetIfChanged(ref _MiningAddress, value);
+    }
+
     private List<Connection> _Connections;
     public List<Connection> Connections
     {
@@ -126,12 +152,19 @@ public class MainViewModel : ViewModelBase
 
     private void OpenDebugFolder()
     {
-        ProcessStartInfo psi = new ProcessStartInfo
+        try
         {
-            FileName = GlobalData.LogDir,
-            UseShellExecute = true
-        };
-        Process.Start(psi);
+            ProcessStartInfo psi = new ProcessStartInfo
+            {
+                FileName = GlobalData.LogDir,
+                UseShellExecute = true
+            };
+            Process.Start(psi);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException("App.ODF", ex);
+        }
     }
 
     // TODO: Figure out better way of doing this
@@ -141,6 +174,11 @@ public class MainViewModel : ViewModelBase
         YourHeight = GlobalData.NetworkStats.YourHeight.ToString();
         NetHash = GlobalData.NetworkStats.NetHash;
         RunTime = GlobalData.NetworkStats.RunTime;
+
+        MinerStatus = GlobalData.NetworkStats.MinerStatus;
+        YourHash = GlobalData.NetworkStats.YourHash;
+        BlockTime = GlobalData.NetworkStats.BlockTime;
+        MiningAddress = GlobalData.NetworkStats.MiningAddress;
 
         Connections = GlobalData.Connections;       
     }

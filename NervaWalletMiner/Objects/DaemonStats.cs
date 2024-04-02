@@ -2,13 +2,19 @@
 {
     public class DaemonStats
     {
-        public ulong NetHeight { get; set; }
-        public ulong YourHeight { get; set; }
-        public string? NetHash { get; set; }
-        public string? RunTime { get; set; }
-        public ulong ConnectionsIn { get; set; }
-        public ulong ConnectionsOut { get; set; }
-        public string? StatusSync { get; set; }
-        public string? Version { get; set; }
+        public ulong NetHeight { get; set; } = 0;
+        public ulong YourHeight { get; set; } = 0;
+        public string NetHash { get; set; } = "0 kH/s";
+        public string RunTime { get; set; } = "00:00:00";
+
+        public string MinerStatus { get; set; } = "Inactive";
+        public string YourHash { get; set; } = "0 kH/s";
+        public string BlockTime { get; set; } = "∞";
+        public string MiningAddress { get; set; } = "None";
+
+        public string Version { get; set; } = "0";
+        public ulong ConnectionsIn { get; set; } = 0;
+        public ulong ConnectionsOut { get; set; } = 0;
+        public string StatusSync { get; set; } = "None";
     }
 }

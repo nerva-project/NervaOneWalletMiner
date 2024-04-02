@@ -1,4 +1,5 @@
 ﻿using NervaWalletMiner.Objects;
+using System;
 using System.Collections.Generic;
 
 namespace NervaWalletMiner.Helpers
@@ -16,5 +17,8 @@ namespace NervaWalletMiner.Helpers
 
         public static DaemonStats NetworkStats = new();        
         public static List<Connection> Connections = new List<Connection>();
+
+        public static int CpuThreadCount = Environment.ProcessorCount;
+        public static int DefaultMiningThreads = CpuThreadCount > 1 ? Convert.ToInt32(Math.Floor(CpuThreadCount / 2.00)) : 1;
     }
 }

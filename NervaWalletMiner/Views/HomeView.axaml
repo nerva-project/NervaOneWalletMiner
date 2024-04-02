@@ -10,27 +10,61 @@
 		<vm:HomeViewModel />
 	</Design.DataContext>
 	
-	<StackPanel Spacing="5">
-		<TextBlock>Home View</TextBlock>
-		
-		<Grid ColumnDefinitions="100,*" Margin="10">
-			<Grid.RowDefinitions>
-				<RowDefinition Height="30" />
-				<RowDefinition Height="30" />
-				<RowDefinition Height="30" />
-				<RowDefinition Height="30" />
-			</Grid.RowDefinitions>
-			
-			<Label Grid.Row="0" Grid.Column="0" Content="Net Height:" />
-			<Label Grid.Row="0" Grid.Column="1" Content="{Binding NetHeight}" Width="150" HorizontalAlignment="Left" />
-			<Label Grid.Row="1" Grid.Column="0">Your Height:</Label>
-			<Label Grid.Row="1" Grid.Column="1" Content="{Binding YourHeight}" Width="150" HorizontalAlignment="Left" />
-			<Label Grid.Row="2" Grid.Column="0">Net Hash:</Label>
-			<Label Grid.Row="2" Grid.Column="1" Content="{Binding NetHash}" Width="150" HorizontalAlignment="Left" />
-			<Label Grid.Row="3" Grid.Column="0">Run Time:</Label>
-			<Label Grid.Row="3" Grid.Column="1" Content="{Binding RunTime}" Width="150" HorizontalAlignment="Left" />
+	<StackPanel Spacing="5" HorizontalAlignment="Stretch" MaxWidth="600">
+		<Grid ColumnDefinitions="100,*,100" Margin="10">
+			<TextBlock Grid.Row="0" Grid.Column="0">Daemon</TextBlock>
+			<DockPanel Grid.Row="0" Grid.Column="1" Margin="0,0,10,0" MinWidth="200" MaxWidth="250">
+				<Label>Threads:</Label>
+				<NumericUpDown Name="nupThreads"
+								Minimum="1"
+								FormatString="0"
+								MaxWidth="130" />
+			</DockPanel>
+			<Button Name="btnStartStopMining"
+					Grid.Row="0"
+					Grid.Column="2"
+					Content="Start Mining"
+					DockPanel.Dock="Right"
+					Click="StartStopMiningClicked"/>
 		</Grid>
 
+		<Grid ColumnDefinitions="200,*,200" Margin="10">
+			<Grid ColumnDefinitions="100,100" Margin="10" Grid.Row="0" Grid.Column="0">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="30" />
+					<RowDefinition Height="30" />
+					<RowDefinition Height="30" />
+					<RowDefinition Height="30" />
+				</Grid.RowDefinitions>
+			
+				<Label Grid.Row="0" Grid.Column="0" Content="Net Height:" />
+				<Label Grid.Row="0" Grid.Column="1" Content="{Binding NetHeight}" Width="150" HorizontalAlignment="Left" />
+				<Label Grid.Row="1" Grid.Column="0" Content="Your Height:" />
+				<Label Grid.Row="1" Grid.Column="1" Content="{Binding YourHeight}" Width="150" HorizontalAlignment="Left" />
+				<Label Grid.Row="2" Grid.Column="0" Content="Net Hash:" />
+				<Label Grid.Row="2" Grid.Column="1" Content="{Binding NetHash}" Width="150" HorizontalAlignment="Left" />
+				<Label Grid.Row="3" Grid.Column="0" Content="Run Time:" />
+				<Label Grid.Row="3" Grid.Column="1" Content="{Binding RunTime}" Width="150" HorizontalAlignment="Left" />
+			</Grid>
+		
+			<Grid ColumnDefinitions="100,100" Margin="10" Grid.Row="0" Grid.Column="2">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="30" />
+					<RowDefinition Height="30" />
+					<RowDefinition Height="30" />
+					<RowDefinition Height="30" />
+				</Grid.RowDefinitions>
+			
+				<Label Grid.Row="0" Grid.Column="0" Content="Miner:" />
+				<Label Grid.Row="0" Grid.Column="1" Content="{Binding MinerStatus}" Width="150" HorizontalAlignment="Left" />
+				<Label Grid.Row="1" Grid.Column="0" Content="Hash Rate:" />
+				<Label Grid.Row="1" Grid.Column="1" Content="{Binding YourHash}" Width="150" HorizontalAlignment="Left" />
+				<Label Grid.Row="2" Grid.Column="0" Content="Block Time:" />
+				<Label Grid.Row="2" Grid.Column="1" Content="{Binding BlockTime}" Width="150" HorizontalAlignment="Left" />
+				<Label Grid.Row="3" Grid.Column="0" Content="Address:" />
+				<Label Grid.Row="3" Grid.Column="1" Content="{Binding MiningAddress}" Width="150" HorizontalAlignment="Left" />
+			</Grid>
+		</Grid>
 		<DataGrid ItemsSource="{Binding Connections}" 
 				  AutoGenerateColumns="False"				  			  
 				  GridLinesVisibility="Horizontal"
@@ -42,7 +76,7 @@
 						<Image Source="{Binding InOutIcon}" Height="15"></Image>
 					</DataTemplate>
 				</DataGridTemplateColumn>
-				<DataGridTextColumn Header="Address" Binding="{Binding Address}" />
+				<DataGridTextColumn Header="Address" MinWidth="100" Width="*" Binding="{Binding Address}" />
 				<DataGridTextColumn Header="Height" Binding="{Binding Height}" />
 				<DataGridTextColumn Header="Live Time" Binding="{Binding LiveTime}" />
 				<DataGridTextColumn Header="State" Binding="{Binding State}" />
