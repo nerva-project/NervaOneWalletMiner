@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Input;
+using static NervaWalletMiner.Rpc.Daemon.MiningStatus;
 
 namespace NervaWalletMiner.ViewModels;
 
@@ -286,9 +287,52 @@ public class MainViewModel : ViewModelBase
 
                 GlobalData.NetworkStats.ConnectionsIn = infoRes.incoming_connections_count;
                 GlobalData.NetworkStats.ConnectionsOut = infoRes.outgoing_connections_count;
+                GlobalData.NetworkStats.Difficulty = infoRes.difficulty;
 
                 Logger.LogDebug("App.DUU", "GetInfo Response Height: " + infoRes.height);
 
+
+                MiningStatusResponse miningRes = await MiningStatus.CallServiceAsync();                
+                if (miningRes.active)
+                {
+                    GlobalData.NetworkStats.MinerStatus = "Mining";
+                    GlobalData.NetworkStats.MiningAddress = GlobalMethods.WalletAddressShortForm(miningRes.address);
+
+                    if (miningRes.speed > 1000)
+                    {
+                        GlobalData.NetworkStats.YourHash = miningRes.speed / 1000.0d + " kH/s";
+                    }
+                    else
+                    {
+                        GlobalData.NetworkStats.YourHash = miningRes.speed + " h/s";
+                    }
+
+                    if (GlobalData.NetworkStats.Difficulty > 0)
+                    {
+                        double blockMinutes = ((GlobalData.NetworkStats.Difficulty / 60.0d) / miningRes.speed);
+
+                        if ((blockMinutes / 1440d) > 1)
+                        {
+                            GlobalData.NetworkStats.BlockTime = String.Format("{0:F1}", Math.Round(blockMinutes, 1) / 1440d) + " days (est)";
+                        }
+                        else if ((blockMinutes / 60.0d) > 1)
+                        {
+                            GlobalData.NetworkStats.BlockTime = String.Format("{0:F1}", Math.Round(blockMinutes, 1) / 60.0d) + " hours (est)";
+                        }
+                        else
+                        {
+                            GlobalData.NetworkStats.BlockTime = String.Format("{0:F0}", Math.Round(blockMinutes, 0)) + " minutes (est)";
+                        }
+                    }
+                }
+                else
+                {
+                    GlobalData.NetworkStats.MinerStatus = "Inactive";
+                    GlobalData.NetworkStats.MiningAddress = "None";
+                    GlobalData.NetworkStats.YourHash = "0 h/s";
+                    GlobalData.NetworkStats.BlockTime = "∞";
+                }
+              
 
                 List<GetConnectionsResponse> connectResp = await GetConnections.CallServiceAsync();
 

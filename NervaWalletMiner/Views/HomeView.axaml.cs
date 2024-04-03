@@ -1,7 +1,9 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using NervaWalletMiner.Helpers;
+using NervaWalletMiner.Rpc.Daemon;
 using System;
+using static NervaWalletMiner.Rpc.Daemon.StartMining;
 
 namespace NervaWalletMiner.Views
 {
@@ -40,21 +42,38 @@ namespace NervaWalletMiner.Views
                 if (btnStartStopMining.Content.ToString().ToLower().Equals("stop mining"))
                 {
                     // Stop mining
+                    StopMiningAsync(Convert.ToUInt32(nupThreads.Value));
+
+                    // TODO: Do below based on MiningStatus!
                     btnStartStopMining.Content = "Start Mining";
                     nupThreads.IsEnabled = true;
                 }
                 else
                 {
                     // Start mining
+                    StartMiningAsync(Convert.ToUInt32(nupThreads.Value));
+
+                    // TODO: Do below based on MiningStatus!
                     btnStartStopMining.Content = "Stop Mining";
                     nupThreads.IsEnabled = false;
-                }
-                
+                }                
             }
             catch (Exception ex)
             {
-                Logger.LogException("App.SSM", ex);
+                Logger.LogException("HomV.SSMC", ex);
             }
+        }
+
+        public static async void StartMiningAsync(uint threads)
+        {
+            // TODO: Check response and alert user in case of issues
+            MiningResponse response = await StartMining.CallServiceAsync(GlobalData.ApplicationSettings.MiningAddress, threads);
+        }
+
+        public static async void StopMiningAsync(uint threads)
+        {
+            // TODO: Check response and alert user in case of issues
+            MiningResponse response = await StopMining.CallServiceAsync();
         }
     }
 }

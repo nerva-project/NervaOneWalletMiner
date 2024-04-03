@@ -35,6 +35,8 @@ public partial class App : Application
        
         base.OnFrameworkInitializationCompleted();
 
+        GlobalMethods.LoadConfig();
+
         Logger.LogDebug("App.IC", "Initialization completed");
     }
 }

@@ -18,5 +18,11 @@
 			VerticalAlignment="Top">
 			Debug Folder
 		</Button>
+		<Label Content="Mining Address:" />
+		<TextBox Name="tbxMiningAddress" />
+		<Button Name="btnSaveSettings"
+				Content="Save Settings"
+				Click="SaveSettingsClicked"/>
+		
 	</StackPanel>
 </UserControl>
