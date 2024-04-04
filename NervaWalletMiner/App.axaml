@@ -10,7 +10,7 @@
 				<!-- Palette for Light theme variant -->
 				<ColorPaletteResources x:Key="Light"  Accent="Green" RegionColor="White" ErrorText="Red" />
 				<!-- Palette for Dark theme variant -->
-				<ColorPaletteResources x:Key="Dark" RegionColor="#1E1E1E" AltHigh="#171717" AltLow="#C0C0C0" AltMedium="#C0C0C0" BaseHigh="#C0C0C0"  />
+				<ColorPaletteResources x:Key="Dark" RegionColor="#1E1E1E" AltHigh="#171717" BaseHigh="#C0C0C0" />
 			</FluentTheme.Palettes>
 		</FluentTheme>
 		<StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>

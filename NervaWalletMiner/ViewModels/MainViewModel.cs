@@ -26,7 +26,7 @@ public class MainViewModel : ViewModelBase
     public static readonly Bitmap _inImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaWalletMiner/Assets/transfer_in.png")));
     public static readonly Bitmap _outImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaWalletMiner/Assets/transfer_out.png")));
 
-    private bool? _isPaneOpen = true;
+    private bool? _isPaneOpen = false;
     private UserControl _CurrentPage;
     public SelectionModel<ListBoxItem> Selection { get; }
     public ICommand TriggerPaneCommand { get; }

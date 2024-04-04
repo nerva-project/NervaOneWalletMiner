@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:NervaWalletMiner.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="550"
              x:Class="NervaWalletMiner.Views.MainView"
              x:DataType="vm:MainViewModel">
   <Design.DataContext>
@@ -14,37 +14,37 @@
 
 	<SplitView IsPaneOpen="{Binding IsPaneOpen}"
 			   DisplayMode="CompactInline"
-			   OpenPaneLength="180"
+			   OpenPaneLength="150"
 			   CompactPaneLength="46">
 		<SplitView.Pane>
-			<StackPanel Spacing="3" Margin="3">
+			<StackPanel Spacing="3" Margin="2">
 				<Button Width="32" Height="32" Margin="4 7" Command="{Binding TriggerPaneCommand}">
 					<PathIcon Height="14" Data="{StaticResource LineHorizontal3Regular}" />
 				</Button>
 				
 				<ListBox Selection="{Binding Selection}">
-					<ListBoxItem Name="home">
-						<StackPanel Spacing="17" Orientation="Horizontal">
-							<PathIcon Height="14" Data="{StaticResource HomeRegular}" />
+					<ListBoxItem Name="home" IsSelected="True">
+						<StackPanel Spacing="12" Orientation="Horizontal">
+							<PathIcon Height="20" Data="{StaticResource HomeRegular}" />
 							<TextBlock Text="Home" />
 						</StackPanel>										
 					</ListBoxItem>
 					<ListBoxItem Name="wallet">
-						<StackPanel Spacing="17" Orientation="Horizontal">
-							<PathIcon Height="14" Data="{StaticResource MoneyRegular}" />
+						<StackPanel Spacing="12" Orientation="Horizontal">
+							<PathIcon Height="20" Data="{StaticResource MoneyRegular}" />
 							<TextBlock Text="Wallet" />
 						</StackPanel>
 					</ListBoxItem>
 					<ListBoxItem Name="transfers">
-						<StackPanel Spacing="17" Orientation="Horizontal">
-							<PathIcon Height="14" Data="{StaticResource ArrowSortRegular}" />
+						<StackPanel Spacing="12" Orientation="Horizontal">
+							<PathIcon Height="20" Data="{StaticResource ArrowSortRegular}" />
 							<TextBlock Text="Transfers" />
 						</StackPanel>
 					</ListBoxItem>
 
 					<ListBoxItem VerticalAlignment="Bottom" Name="settings" >
-						<StackPanel Spacing="17" Orientation="Horizontal">
-							<PathIcon Height="14" Data="{StaticResource SettingsRegular}" />
+						<StackPanel Spacing="12" Orientation="Horizontal">
+							<PathIcon Height="20" Data="{StaticResource SettingsRegular}" />
 							<TextBlock Text="Settings" />
 						</StackPanel>
 					</ListBoxItem>
