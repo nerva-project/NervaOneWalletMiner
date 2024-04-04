@@ -10,10 +10,10 @@ namespace NervaWalletMiner.Rpc.Daemon
 {
     public static class StartMining
     {
-        public const string DaemonUrl = "http://localhost:17566/start_mining";
+        public const string DaemonUrl = "http://127.0.0.1:17566/start_mining";
 
         // TODO: Make something reusable out of this
-        public static async Task<MiningResponse> CallServiceAsync(string address, uint threads)
+        public static async Task<MiningResponse> CallServiceAsync(string address, int threads)
         {
             MiningResponse resp = new();
             try
@@ -32,6 +32,8 @@ namespace NervaWalletMiner.Rpc.Daemon
                     Logger.LogDebug("StM.CS", "Calling POST: " + DaemonUrl + " | " + threads + " | " + address);
 
                     response = await client.SendAsync(request);
+
+                    Logger.LogDebug("StM.CS", "Call returned: " + DaemonUrl);
 
                     if (response.IsSuccessStatusCode)
                     {

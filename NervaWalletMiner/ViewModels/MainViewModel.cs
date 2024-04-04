@@ -17,11 +17,11 @@ namespace NervaWalletMiner.ViewModels;
 
 public class MainViewModel : ViewModelBase
 {
-    public static System.Timers.Timer? _masterTimer;
-    public const int _masterTimerInterval = 5000;      // TODO: Change to 2000
+    public static System.Timers.Timer? _daemonUpdateTimer;
+    public const int _daemonTimerInterval = 5000;      // TODO: Change to 2000
     public static bool _killMasterProcess = false;
     public static DateTime _cliToolsRunningLastCheck = DateTime.MinValue;
-    private bool isInitialDaemonConnectionSuccess = false;
+    private bool _isInitialDaemonConnectionSuccess = false;
 
     public static readonly Bitmap _inImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaWalletMiner/Assets/transfer_in.png")));
     public static readonly Bitmap _outImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaWalletMiner/Assets/transfer_out.png")));
@@ -65,7 +65,7 @@ public class MainViewModel : ViewModelBase
     void SelectionChanged(object sender, SelectionModelSelectionChangedEventArgs e)
     {
         // TODO: Figoure out better way of doing this
-        switch(((ListBoxItem)e.SelectedItems[0]).Name)
+        switch(((ListBoxItem)e.SelectedItems[0]!).Name)
         {
             case "wallet":
                 CurrentPage = new WalletView();
@@ -82,7 +82,6 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    // TODO: Getting exception when this was in HomeViewModel.cs: Could not find a matching property accessor "NetworkInfo" on ... MainViewModel
     private string? _NetHeight;
     public string? NetHeight
     {
@@ -164,13 +163,12 @@ public class MainViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            Logger.LogException("App.ODF", ex);
+            Logger.LogException("Mai.ODF", ex);
         }
     }
 
-    // TODO: Figure out better way of doing this
     public void UpdateView()
-    {        
+    {
         NetHeight = GlobalData.NetworkStats.NetHeight.ToString();
         YourHeight = GlobalData.NetworkStats.YourHeight.ToString();
         NetHash = GlobalData.NetworkStats.NetHash;
@@ -181,7 +179,7 @@ public class MainViewModel : ViewModelBase
         BlockTime = GlobalData.NetworkStats.BlockTime;
         MiningAddress = GlobalData.NetworkStats.MiningAddress;
 
-        Connections = GlobalData.Connections;       
+        Connections = GlobalData.Connections;
     }
 
     // TODO: Move this somewhere else.
@@ -189,32 +187,32 @@ public class MainViewModel : ViewModelBase
     {
         try
         {
-            Logger.LogDebug("App.SMUP", "Start Master Update Process");
+            Logger.LogDebug("Mai.SMUP", "Start Master Update Process");
 
-            if (_masterTimer == null)
+            if (_daemonUpdateTimer == null)
             {
-                _masterTimer = new System.Timers.Timer();
-                _masterTimer.Interval = _masterTimerInterval;
-                _masterTimer.Elapsed += (s, e) => MasterUpdateProcess();
-                _masterTimer.Start();
+                _daemonUpdateTimer = new System.Timers.Timer();
+                _daemonUpdateTimer.Interval = _daemonTimerInterval;
+                _daemonUpdateTimer.Elapsed += (s, e) => MasterUpdateProcess();
+                _daemonUpdateTimer.Start();
 
-                Logger.LogDebug("App.SMUP", "Master timer will start in 2 seconds");
+                Logger.LogDebug("Mai.SMUP", "Master timer will start in " + _daemonTimerInterval / 1000 + " seconds");
             }
         }
         catch (Exception ex)
         {
-            Logger.LogException("App.SMUP", ex);
+            Logger.LogException("Mai.SMUP", ex);
         }
     }
 
-    private void MasterUpdateProcess()
+    public void MasterUpdateProcess()
     {
         try
         {
-            if (_masterTimer != null)
+            if (_daemonUpdateTimer != null)
             {
-                _masterTimer.Stop();
-            }            
+                _daemonUpdateTimer.Stop();
+            }
 
             // If kill master process is issued at any point, skip everything else and do not restrt master timer
 
@@ -240,43 +238,36 @@ public class MainViewModel : ViewModelBase
             {
                 DaemonUiUpdate();
             }
-
-            if (!_killMasterProcess && isInitialDaemonConnectionSuccess)
-            {
-                //WalletUiUpdate();
-            }
-
-            UpdateView();
         }
         catch (Exception ex)
         {
-            Logger.LogException("App.MUP", ex);
+            Logger.LogException("Mai.MUP", ex);
         }
         finally
         {
             // Restart timer
-            if (_masterTimer == null)
+            if (_daemonUpdateTimer == null)
             {
-                Logger.LogError("App.MUP", "Timer is NULL. Recreating. Why?");
-                _masterTimer = new System.Timers.Timer();
-                _masterTimer.Interval = _masterTimerInterval;
-                _masterTimer.Elapsed += (s, e) => MasterUpdateProcess();
+                Logger.LogError("Mai.MUP", "Timer is NULL. Recreating. Why?");
+                _daemonUpdateTimer = new System.Timers.Timer();
+                _daemonUpdateTimer.Interval = _daemonTimerInterval;
+                _daemonUpdateTimer.Elapsed += (s, e) => MasterUpdateProcess();
             }
 
             if (!_killMasterProcess)
             {
-                _masterTimer.Start();
+                _daemonUpdateTimer.Start();
             }
         }
     }
 
-    public static async void DaemonUiUpdate()
+    public async void DaemonUiUpdate()
     {
         try
         {
             GetInfoResponse infoRes = await GetInfo.CallServiceAsync();
 
-            if(!string.IsNullOrEmpty(infoRes.version))
+            if (!string.IsNullOrEmpty(infoRes.version))
             {
                 GlobalData.NetworkStats.NetHeight = (infoRes.target_height > infoRes.height ? infoRes.target_height : infoRes.height);
                 GlobalData.NetworkStats.YourHeight = infoRes.height;
@@ -289,10 +280,10 @@ public class MainViewModel : ViewModelBase
                 GlobalData.NetworkStats.ConnectionsOut = infoRes.outgoing_connections_count;
                 GlobalData.NetworkStats.Difficulty = infoRes.difficulty;
 
-                Logger.LogDebug("App.DUU", "GetInfo Response Height: " + infoRes.height);
+                Logger.LogDebug("Mai.DUU", "GetInfo Response Height: " + infoRes.height);
 
 
-                MiningStatusResponse miningRes = await MiningStatus.CallServiceAsync();                
+                MiningStatusResponse miningRes = await MiningStatus.CallServiceAsync();
                 if (miningRes.active)
                 {
                     GlobalData.NetworkStats.MinerStatus = "Mining";
@@ -332,7 +323,7 @@ public class MainViewModel : ViewModelBase
                     GlobalData.NetworkStats.YourHash = "0 h/s";
                     GlobalData.NetworkStats.BlockTime = "∞";
                 }
-              
+
 
                 List<GetConnectionsResponse> connectResp = await GetConnections.CallServiceAsync();
 
@@ -351,11 +342,13 @@ public class MainViewModel : ViewModelBase
                         InOutIcon = connection.incoming ? _inImage : _outImage
                     });
                 }
+
+                UpdateView();
             }
         }
         catch (Exception ex)
         {
-            Logger.LogException("App.DUU", ex);
+            Logger.LogException("Mai.DUU", ex);
         }
-    }
+    }    
 }

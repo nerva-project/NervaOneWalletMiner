@@ -11,7 +11,7 @@ namespace NervaWalletMiner.Rpc.Daemon
     public static class GetInfo
     {
         public const string MethodName = "get_info";
-        public const string DaemonUrl = "http://localhost:17566/json_rpc";
+        public const string DaemonUrl = "http://127.0.0.1:17566/json_rpc";
 
         // TODO: Make something reusable out of this
         public static async Task<GetInfoResponse> CallServiceAsync()
@@ -31,12 +31,12 @@ namespace NervaWalletMiner.Rpc.Daemon
                     request.Content = new StringContent("{\"jsonrpc\":\"2.0\",\"id\":\"0\",\"method\":\"" + MethodName + "\"}");
                     request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
                     
-
-
                     Logger.LogDebug("RDGI.CS", "Calling POST: " + DaemonUrl + " | " + MethodName);
 
                     response = await client.SendAsync(request);
-              
+
+                    Logger.LogDebug("RDGI.CS", "Call returned: " + DaemonUrl + " | " + MethodName);
+
                     if (response.IsSuccessStatusCode)
                     {
                         var dataObjects = response.Content.ReadAsStringAsync();

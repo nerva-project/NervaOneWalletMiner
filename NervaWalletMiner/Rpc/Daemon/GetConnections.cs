@@ -12,7 +12,7 @@ namespace NervaWalletMiner.Rpc.Daemon
     public static class GetConnections
     {
         public const string MethodName = "get_connections";
-        public const string DaemonUrl = "http://localhost:17566/json_rpc";
+        public const string DaemonUrl = "http://127.0.0.1:17566/json_rpc";
 
         // TODO: Make something reusable out of this
         public static async Task<List<GetConnectionsResponse>> CallServiceAsync()
@@ -35,6 +35,8 @@ namespace NervaWalletMiner.Rpc.Daemon
                     Logger.LogDebug("RDGC.CSA", "Calling POST: " + DaemonUrl + " | " + MethodName);
 
                     response = await client.SendAsync(request);
+
+                    Logger.LogDebug("RDGC.CSA", "Call returned: " + DaemonUrl + " | " + MethodName);
 
                     if (response.IsSuccessStatusCode)
                     {
