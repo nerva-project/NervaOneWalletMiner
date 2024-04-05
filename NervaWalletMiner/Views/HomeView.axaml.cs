@@ -1,6 +1,7 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
 using NervaWalletMiner.Helpers;
+using NervaWalletMiner.Objects;
 using NervaWalletMiner.Rpc.Daemon;
 using System;
 using static NervaWalletMiner.Rpc.Daemon.StartMining;
@@ -25,13 +26,11 @@ namespace NervaWalletMiner.Views
                 var btnStartStopMining = this.Get<Button>("btnStartStopMining");
                 var nupThreads = this.Get<NumericUpDown>("nupThreads");
 
-                if (btnStartStopMining.Content!.ToString()!.ToLower().Equals("stop mining"))
+                if (btnStartStopMining.Content!.ToString()!.Equals(MinerStatus.StopMining))
                 {
                     // Stop mining
                     StopMiningAsync();
-
-                    // TODO: Do below based on MiningStatus!
-                    btnStartStopMining.Content = "Start Mining";
+                    btnStartStopMining.Content = MinerStatus.StartMining;
                     nupThreads.IsEnabled = true;
                 }
                 else
@@ -44,9 +43,7 @@ namespace NervaWalletMiner.Views
                     }
 
                     StartMiningAsync(GlobalData.ApplicationSettings.MiningThreads);
-
-                    // TODO: Do below based on MiningStatus!
-                    btnStartStopMining.Content = "Stop Mining";
+                    btnStartStopMining.Content = MinerStatus.StopMining;
                     nupThreads.IsEnabled = false;
                 }                
             }

@@ -19,12 +19,13 @@
 								Minimum="1"
 								Value="1"
 								FormatString="0"
-								MaxWidth="130" />
+								MaxWidth="130"
+								IsEnabled="{Binding IsNumThreadsEnabled}"/>
 			</DockPanel>
 			<Button Name="btnStartStopMining"
 					Grid.Row="0"
 					Grid.Column="2"
-					Content="Start Mining"
+					Content="{Binding StartStopMining}"
 					DockPanel.Dock="Right"
 					Click="StartStopMiningClicked"/>
 		</Grid>
@@ -57,7 +58,7 @@
 				</Grid.RowDefinitions>
 			
 				<Label Grid.Row="0" Grid.Column="0" Content="Miner:" />
-				<Label Grid.Row="0" Grid.Column="1" Content="{Binding MinerStatus}" Width="150" HorizontalAlignment="Left" />
+				<Label Grid.Row="0" Grid.Column="1" Content="{Binding MinerMessage}" Width="150" HorizontalAlignment="Left" />
 				<Label Grid.Row="1" Grid.Column="0" Content="Hash Rate:" />
 				<Label Grid.Row="1" Grid.Column="1" Content="{Binding YourHash}" Width="150" HorizontalAlignment="Left" />
 				<Label Grid.Row="2" Grid.Column="0" Content="Block Time:" />

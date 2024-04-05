@@ -82,6 +82,20 @@ public class MainViewModel : ViewModelBase
         }
     }
 
+    private string _StartStopMining = MinerStatus.StartMining;
+    public string StartStopMining
+    {
+        get => _StartStopMining;
+        set => this.RaiseAndSetIfChanged(ref _StartStopMining, value);
+    }
+
+    private bool _IsNumThreadsEnabled = true;
+    public bool IsNumThreadsEnabled
+    {
+        get => _IsNumThreadsEnabled;
+        set => this.RaiseAndSetIfChanged(ref _IsNumThreadsEnabled, value);
+    }
+
     private string? _NetHeight;
     public string? NetHeight
     {
@@ -110,11 +124,11 @@ public class MainViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _RunTime, value);
     }
 
-    private string? _MinerStatus;
-    public string? MinerStatus
+    private string? _MinerMessage;
+    public string? MinerMessage
     {
-        get => _MinerStatus;
-        set => this.RaiseAndSetIfChanged(ref _MinerStatus, value);
+        get => _MinerMessage;
+        set => this.RaiseAndSetIfChanged(ref _MinerMessage, value);
     }
 
     private string? _YourHash;
@@ -174,12 +188,37 @@ public class MainViewModel : ViewModelBase
         NetHash = GlobalData.NetworkStats.NetHash;
         RunTime = GlobalData.NetworkStats.RunTime;
 
-        MinerStatus = GlobalData.NetworkStats.MinerStatus;
+        MinerMessage = GlobalData.NetworkStats.MinerStatus;
         YourHash = GlobalData.NetworkStats.YourHash;
         BlockTime = GlobalData.NetworkStats.BlockTime;
         MiningAddress = GlobalData.NetworkStats.MiningAddress;
 
         Connections = GlobalData.Connections;
+
+        if(GlobalData.NetworkStats.MinerStatus.Equals(MinerStatus.Mining))
+        {
+            // Mining so disable number of threads and show Stop Mining
+            if (StartStopMining.Equals(MinerStatus.StartMining))
+            {
+                StartStopMining = MinerStatus.StopMining;                
+            }
+            if(IsNumThreadsEnabled)
+            {
+                IsNumThreadsEnabled = false;
+            }
+        }
+        else
+        {
+            // Not mining so enable number of threads and set Start Mining
+            if (StartStopMining.Equals(MinerStatus.StopMining))
+            {
+                StartStopMining = MinerStatus.StartMining;
+            }
+            if (!IsNumThreadsEnabled)
+            {
+                IsNumThreadsEnabled = true;
+            }
+        }
     }
 
     // TODO: Move this somewhere else.
@@ -283,10 +322,10 @@ public class MainViewModel : ViewModelBase
                 Logger.LogDebug("Mai.DUU", "GetInfo Response Height: " + infoRes.height);
 
 
-                MiningStatusResponse miningRes = await MiningStatus.CallServiceAsync();
+                MiningStatusResponse miningRes = await Rpc.Daemon.MiningStatus.CallServiceAsync();
                 if (miningRes.active)
                 {
-                    GlobalData.NetworkStats.MinerStatus = "Mining";
+                    GlobalData.NetworkStats.MinerStatus = MinerStatus.Mining;
                     GlobalData.NetworkStats.MiningAddress = GlobalMethods.WalletAddressShortForm(miningRes.address);
 
                     if (miningRes.speed > 1000)
@@ -318,7 +357,7 @@ public class MainViewModel : ViewModelBase
                 }
                 else
                 {
-                    GlobalData.NetworkStats.MinerStatus = "Inactive";
+                    GlobalData.NetworkStats.MinerStatus = MinerStatus.Inactive;
                     GlobalData.NetworkStats.MiningAddress = "None";
                     GlobalData.NetworkStats.YourHash = "0 h/s";
                     GlobalData.NetworkStats.BlockTime = "∞";
