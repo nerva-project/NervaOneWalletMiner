@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 
 namespace NervaWalletMiner.Views
 {
@@ -7,6 +8,11 @@ namespace NervaWalletMiner.Views
         public WalletView()
         {
             InitializeComponent();
+        }
+
+        public void OpenCloseWalletClicked(object sender, RoutedEventArgs args)
+        {
+
         }
     }
 }

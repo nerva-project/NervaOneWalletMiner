@@ -9,6 +9,62 @@
 	<Design.DataContext>
 		<vm:WalletViewModel />
 	</Design.DataContext>
-	
-    Wallet view
+
+	<StackPanel Spacing="5" HorizontalAlignment="Stretch" MaxWidth="600">
+		<Grid ColumnDefinitions="200,*,120" Margin="10">
+			<TextBlock Name="tbkWallet" Grid.Row="0" Grid.Column="0">Wallet</TextBlock>
+
+			<Button Name="btnOpenCloseWallet"
+					Grid.Row="0"
+					Grid.Column="2"
+					Content="{Binding OpenCloseWallet}"
+					DockPanel.Dock="Right"
+					Width="120"
+					Click="OpenCloseWalletClicked"/>
+		</Grid>
+
+		<Grid ColumnDefinitions="200,*,200" Margin="10">
+			<Grid ColumnDefinitions="100,100" Grid.Row="0" Grid.Column="0">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="30" />
+					<RowDefinition Height="30" />
+				</Grid.RowDefinitions>
+
+				<Label Grid.Row="0" Grid.Column="0" Content="Total XNV:" />
+				<Label Grid.Row="0" Grid.Column="1" Content="{Binding TotalXnv}" Width="160" HorizontalAlignment="Left" />
+				<Label Grid.Row="1" Grid.Column="0" Content="Unlocked XNV:" />
+				<Label Grid.Row="1" Grid.Column="1" Content="{Binding UnlockedXnv}" Width="160" HorizontalAlignment="Left" />
+			</Grid>
+
+			<Grid ColumnDefinitions="120" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="35" />
+					<RowDefinition Height="35" />
+				</Grid.RowDefinitions>
+
+				<Button Grid.Row="0" Grid.Column="0" Content="Transfer Funds" HorizontalAlignment="Stretch"></Button>
+				<Button Grid.Row="1" Grid.Column="0" Content="Address Info" HorizontalAlignment="Stretch"></Button>
+			</Grid>
+		</Grid>
+		<DataGrid ItemsSource="{Binding WalletAddresses}"
+				  AutoGenerateColumns="False"
+				  GridLinesVisibility="Horizontal"
+				  IsReadOnly="True"
+				  Height="300"
+				  Margin="10">
+			<DataGrid.Columns>
+				<DataGridTemplateColumn Header="">
+					<DataTemplate DataType="Bitmap">
+						<Image Source="{Binding WalletIcon}" Height="15"></Image>
+					</DataTemplate>
+				</DataGridTemplateColumn>
+				<DataGridTextColumn Header="Id" MinWidth="20" Width="*" Binding="{Binding Id}" />
+				<DataGridTextColumn Header="Label" MinWidth="100" Width="*" Binding="{Binding Label}" />
+				<DataGridTextColumn Header="Address" Binding="{Binding Address}" />
+				<DataGridTextColumn Header="Balance" Binding="{Binding LockedBalance}" />
+				<DataGridTextColumn Header="Unlocked" Binding="{Binding UnlockedBalance}" />
+			</DataGrid.Columns>
+		</DataGrid>
+
+	</StackPanel>
 </UserControl>

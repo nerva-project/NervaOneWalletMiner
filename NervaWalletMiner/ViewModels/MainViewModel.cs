@@ -45,8 +45,6 @@ public class MainViewModel : ViewModelBase
 
         StartMasterUpdateProcess();
 
-        _Connections = [];
-
         UpdateView();
     }
 
@@ -82,6 +80,7 @@ public class MainViewModel : ViewModelBase
         }
     }
 
+    // Daemon View
     private string _StartStopMining = MinerStatus.StartMining;
     public string StartStopMining
     {
@@ -96,82 +95,112 @@ public class MainViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _IsNumThreadsEnabled, value);
     }
 
-    private string? _NetHeight;
-    public string? NetHeight
+    private string _NetHeight = "0";
+    public string NetHeight
     {
         get => _NetHeight;
         set => this.RaiseAndSetIfChanged(ref _NetHeight, value);
     }
 
-    private string? _YourHeight;
-    public string? YourHeight
+    private string _YourHeight = "0";
+    public string YourHeight
     {
         get => _YourHeight;
         set => this.RaiseAndSetIfChanged(ref _YourHeight, value);
     }
 
-    private string? _NetHash;
-    public string? NetHash
+    private string _NetHash = "0";
+    public string NetHash
     {
         get => _NetHash;
         set => this.RaiseAndSetIfChanged(ref _NetHash, value);
     }
 
-    private string? _RunTime;
-    public string? RunTime
+    private string _RunTime = "0:0:0";
+    public string RunTime
     {
         get => _RunTime;
         set => this.RaiseAndSetIfChanged(ref _RunTime, value);
     }
 
-    private string? _MinerMessage;
-    public string? MinerMessage
+    private string _MinerMessage = "";
+    public string MinerMessage
     {
         get => _MinerMessage;
         set => this.RaiseAndSetIfChanged(ref _MinerMessage, value);
     }
 
-    private string? _YourHash;
-    public string? YourHash
+    private string _YourHash = "0";
+    public string YourHash
     {
         get => _YourHash;
         set => this.RaiseAndSetIfChanged(ref _YourHash, value);
     }
 
-    private string? _BlockTime;
-    public string? BlockTime
+    private string _BlockTime = "∞";
+    public string BlockTime
     {
         get => _BlockTime;
         set => this.RaiseAndSetIfChanged(ref _BlockTime, value);
     }
 
-    private string? _MiningAddress;
-    public string? MiningAddress
+    private string _MiningAddress = "";
+    public string MiningAddress
     {
         get => _MiningAddress;
         set => this.RaiseAndSetIfChanged(ref _MiningAddress, value);
     }
 
-    private List<Connection> _Connections;
+    private List<Connection> _Connections = new();
     public List<Connection> Connections
     {
         get => _Connections;
         set => this.RaiseAndSetIfChanged(ref _Connections, value);
     }
 
-    private string? _DaemonStatus;
-    public string? DaemonStatus
+    private string _DaemonStatus = "";
+    public string DaemonStatus
     {
         get => _DaemonStatus;
         set => this.RaiseAndSetIfChanged(ref _DaemonStatus, value);
     }
 
-    private string? _DaemonVersion;
-    public string? DaemonVersion
+    private string _DaemonVersion = "";
+    public string DaemonVersion
     {
         get => _DaemonVersion;
         set => this.RaiseAndSetIfChanged(ref _DaemonVersion, value);
     }
+
+    // Wallet View
+    private string _OpenCloseWallet = "Open Wallet";
+    public string OpenCloseWallet
+    {
+        get => _OpenCloseWallet;
+        set => this.RaiseAndSetIfChanged(ref _OpenCloseWallet, value);
+    }
+
+    private string _TotalXnv = "";
+    public string TotalXnv
+    {
+        get => _TotalXnv;
+        set => this.RaiseAndSetIfChanged(ref _TotalXnv, value);
+    }
+
+    private string _UnlockedXnv = "";
+    public string UnlockedXnv
+    {
+        get => _UnlockedXnv;
+        set => this.RaiseAndSetIfChanged(ref _UnlockedXnv, value);
+    }
+
+    private List<Wallet> _WalletAddresses = new();
+    public List<Wallet> WalletAddresses
+    {
+        get => _WalletAddresses;
+        set => this.RaiseAndSetIfChanged(ref _WalletAddresses, value);
+    }
+
 
     private void TriggerPane()
     {
