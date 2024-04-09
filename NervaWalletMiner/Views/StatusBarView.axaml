@@ -1,0 +1,24 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="clr-namespace:NervaWalletMiner.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="50"
+			 x:DataType="vm:StatusBarViewModel"
+             x:Class="NervaWalletMiner.Views.StatusBarView">
+
+	<Design.DataContext>
+		<vm:StatusBarViewModel />
+	</Design.DataContext>
+	
+	<Grid ColumnDefinitions="*,120" Margin="10" Height="50">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="25" />
+			<RowDefinition Height="25" />
+		</Grid.RowDefinitions>
+
+		<Label Grid.Row="0" Grid.Column="0" Content="{Binding DaemonStatus}"/>
+		<Label Grid.Row="0" Grid.Column="1" Content="{Binding DaemonVersion}" HorizontalAlignment="Right"/>
+		<Label Grid.Row="1" Grid.Column="0">Wallet offline - see Wallet to open, create or import wallet</Label>
+	</Grid>
+</UserControl>

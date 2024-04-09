@@ -159,6 +159,20 @@ public class MainViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _Connections, value);
     }
 
+    private string? _DaemonStatus;
+    public string? DaemonStatus
+    {
+        get => _DaemonStatus;
+        set => this.RaiseAndSetIfChanged(ref _DaemonStatus, value);
+    }
+
+    private string? _DaemonVersion;
+    public string? DaemonVersion
+    {
+        get => _DaemonVersion;
+        set => this.RaiseAndSetIfChanged(ref _DaemonVersion, value);
+    }
+
     private void TriggerPane()
     {
         IsPaneOpen = !IsPaneOpen;
@@ -192,7 +206,7 @@ public class MainViewModel : ViewModelBase
         YourHash = GlobalData.NetworkStats.YourHash;
         BlockTime = GlobalData.NetworkStats.BlockTime;
         MiningAddress = GlobalData.NetworkStats.MiningAddress;
-
+        
         Connections = GlobalData.Connections;
 
         if(GlobalData.NetworkStats.MinerStatus.Equals(MinerStatus.Mining))
@@ -219,6 +233,10 @@ public class MainViewModel : ViewModelBase
                 IsNumThreadsEnabled = true;
             }
         }
+
+        // Status Bar
+        DaemonStatus = "Connections: " + GlobalData.NetworkStats.ConnectionsOut + "(out) + " + GlobalData.NetworkStats.ConnectionsIn + "(in) " + GlobalData.NetworkStats.StatusSync;
+        DaemonVersion = "Version: " + GlobalData.NetworkStats.Version;
     }
 
     // TODO: Move this somewhere else.
@@ -318,6 +336,20 @@ public class MainViewModel : ViewModelBase
                 GlobalData.NetworkStats.ConnectionsIn = infoRes.incoming_connections_count;
                 GlobalData.NetworkStats.ConnectionsOut = infoRes.outgoing_connections_count;
                 GlobalData.NetworkStats.Difficulty = infoRes.difficulty;
+
+                GlobalData.NetworkStats.Version = infoRes.version;
+                GlobalData.NetworkStats.StatusSync = "";
+                if (infoRes.target_height != 0 && infoRes.height < infoRes.target_height)
+                {
+                    GlobalData.NetworkStats.StatusSync += " | Synchronizing (Height " + infoRes.height + " of " + infoRes.target_height + ")";
+                }
+                else
+                {
+                    GlobalData.NetworkStats.StatusSync += "  |  Sync OK";
+                }
+
+                GlobalData.NetworkStats.StatusSync += "  |  Status " + infoRes.status;
+
 
                 Logger.LogDebug("Mai.DUU", "GetInfo Response Height: " + infoRes.height);
 

@@ -95,5 +95,6 @@ namespace NervaWalletMiner.Rpc.Daemon
         public ulong database_size { get; set; }
         public bool update_available { get; set; }
         public string? version { get; set; }
+        public string? status { get; set; }
     }
 }

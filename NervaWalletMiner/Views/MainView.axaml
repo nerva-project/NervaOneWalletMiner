@@ -2,8 +2,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:uc="clr-namespace:NervaWalletMiner.Views"
              xmlns:vm="clr-namespace:NervaWalletMiner.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="550"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="600"
              x:Class="NervaWalletMiner.Views.MainView"
              x:DataType="vm:MainViewModel">
   <Design.DataContext>
@@ -11,51 +12,55 @@
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
     <vm:MainViewModel />
   </Design.DataContext>
-
-	<SplitView IsPaneOpen="{Binding IsPaneOpen}"
-			   DisplayMode="CompactInline"
-			   OpenPaneLength="150"
-			   CompactPaneLength="46">
-		<SplitView.Pane>
-			<StackPanel Spacing="3" Margin="2">
-				<Button Width="32" Height="32" Margin="4 7" Command="{Binding TriggerPaneCommand}">
-					<PathIcon Height="14" Data="{StaticResource LineHorizontal3Regular}" />
-				</Button>
+	<Grid RowDefinitions="*,50">
+		<SplitView IsPaneOpen="{Binding IsPaneOpen}"
+				   DisplayMode="CompactInline"
+				   OpenPaneLength="150"
+				   CompactPaneLength="46"
+				   Grid.Row="0">
+			<SplitView.Pane>
+				<StackPanel Spacing="3" Margin="2">
+					<Button Width="32" Height="32" Margin="4 7" Command="{Binding TriggerPaneCommand}">
+						<PathIcon Height="14" Data="{StaticResource LineHorizontal3Regular}" />
+					</Button>
 				
-				<ListBox Selection="{Binding Selection}">
-					<ListBoxItem Name="home" IsSelected="True">
-						<StackPanel Spacing="12" Orientation="Horizontal">
-							<PathIcon Height="20" Data="{StaticResource HomeRegular}" />
-							<TextBlock Text="Home" />
-						</StackPanel>										
-					</ListBoxItem>
-					<ListBoxItem Name="wallet">
-						<StackPanel Spacing="12" Orientation="Horizontal">
-							<PathIcon Height="20" Data="{StaticResource MoneyRegular}" />
-							<TextBlock Text="Wallet" />
-						</StackPanel>
-					</ListBoxItem>
-					<ListBoxItem Name="transfers">
-						<StackPanel Spacing="12" Orientation="Horizontal">
-							<PathIcon Height="20" Data="{StaticResource ArrowSortRegular}" />
-							<TextBlock Text="Transfers" />
-						</StackPanel>
-					</ListBoxItem>
+					<ListBox Selection="{Binding Selection}">
+						<ListBoxItem Name="home" IsSelected="True">
+							<StackPanel Spacing="12" Orientation="Horizontal">
+								<PathIcon Height="20" Data="{StaticResource HomeRegular}" />
+								<TextBlock Text="Home" />
+							</StackPanel>										
+						</ListBoxItem>
+						<ListBoxItem Name="wallet">
+							<StackPanel Spacing="12" Orientation="Horizontal">
+								<PathIcon Height="20" Data="{StaticResource MoneyRegular}" />
+								<TextBlock Text="Wallet" />
+							</StackPanel>
+						</ListBoxItem>
+						<ListBoxItem Name="transfers">
+							<StackPanel Spacing="12" Orientation="Horizontal">
+								<PathIcon Height="20" Data="{StaticResource ArrowSortRegular}" />
+								<TextBlock Text="Transfers" />
+							</StackPanel>
+						</ListBoxItem>
 
-					<ListBoxItem VerticalAlignment="Bottom" Name="settings" >
-						<StackPanel Spacing="12" Orientation="Horizontal">
-							<PathIcon Height="20" Data="{StaticResource SettingsRegular}" />
-							<TextBlock Text="Settings" />
-						</StackPanel>
-					</ListBoxItem>
-				</ListBox>
-			</StackPanel>
-		</SplitView.Pane>
+						<ListBoxItem VerticalAlignment="Bottom" Name="settings" >
+							<StackPanel Spacing="12" Orientation="Horizontal">
+								<PathIcon Height="20" Data="{StaticResource SettingsRegular}" />
+								<TextBlock Text="Settings" />
+							</StackPanel>
+						</ListBoxItem>
+					</ListBox>
+				</StackPanel>
+			</SplitView.Pane>
 		
-		<SplitView.Content>
-			<Grid RowDefinitions="*,Auto" Margin="10">
-			<TransitioningContentControl Content="{Binding CurrentPage}" />
-			</Grid>
-		</SplitView.Content>
-	</SplitView >
+			<SplitView.Content>
+				<Grid RowDefinitions="*,Auto" Margin="10">
+				<TransitioningContentControl Content="{Binding CurrentPage}" />
+				</Grid>
+			</SplitView.Content>
+		</SplitView >
+
+		<uc:StatusBarView Grid.Row="1"></uc:StatusBarView>
+	</Grid>
 </UserControl>
