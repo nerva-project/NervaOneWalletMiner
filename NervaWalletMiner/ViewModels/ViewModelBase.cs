@@ -2,6 +2,6 @@
 
 namespace NervaWalletMiner.ViewModels;
 
-public class ViewModelBase : ReactiveObject
+public partial class ViewModelBase : ReactiveObject
 {
 }

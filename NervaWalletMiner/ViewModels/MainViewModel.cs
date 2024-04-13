@@ -5,11 +5,9 @@ using Avalonia.Platform;
 using NervaWalletMiner.Helpers;
 using NervaWalletMiner.Objects;
 using NervaWalletMiner.Rpc.Daemon;
-using NervaWalletMiner.Views;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Windows.Input;
 using static NervaWalletMiner.Rpc.Daemon.MiningStatus;
 
@@ -18,27 +16,32 @@ namespace NervaWalletMiner.ViewModels;
 public class MainViewModel : ViewModelBase
 {
     public static System.Timers.Timer? _daemonUpdateTimer;
-    public const int _daemonTimerInterval = 5000;      // TODO: Change to 2000
+    public const int _daemonTimerInterval = 5000;
     public static bool _killMasterProcess = false;
     public static DateTime _cliToolsRunningLastCheck = DateTime.MinValue;
-    private bool _isInitialDaemonConnectionSuccess = false;
+
+    public static Dictionary<string, ViewModelBase> ViewModelPagesDictionary = new();
 
     public static readonly Bitmap _inImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaWalletMiner/Assets/transfer_in.png")));
     public static readonly Bitmap _outImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaWalletMiner/Assets/transfer_out.png")));
 
     private bool? _isPaneOpen = false;
-    private UserControl _CurrentPage;
+    private ViewModelBase _CurrentPage;
     public SelectionModel<ListBoxItem> Selection { get; }
     public ICommand TriggerPaneCommand { get; }
-    public ICommand OpenDebugFolderCommand { get; }
+    
 
     public MainViewModel()
     {
-        OpenDebugFolderCommand = ReactiveCommand.Create(OpenDebugFolder);        
+        // Set up split view pages
+        ViewModelPagesDictionary.Add(SplitViewPages.Home, new HomeViewModel());
+        ViewModelPagesDictionary.Add(SplitViewPages.Wallet, new WalletViewModel());
+        ViewModelPagesDictionary.Add(SplitViewPages.Transfers, new TransfersViewModel());
+        ViewModelPagesDictionary.Add(SplitViewPages.Settings, new SettingsViewModel());              
 
         TriggerPaneCommand = ReactiveCommand.Create(TriggerPane);
 
-        _CurrentPage = new HomeView();
+        _CurrentPage = ViewModelPagesDictionary[SplitViewPages.Home];
 
         Selection = new SelectionModel<ListBoxItem>();
         Selection.SelectionChanged += SelectionChanged;
@@ -54,108 +57,10 @@ public class MainViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _isPaneOpen, value);
     }
 
-    public UserControl CurrentPage
+    public ViewModelBase CurrentPage
     {
         get { return _CurrentPage; }
         private set { this.RaiseAndSetIfChanged(ref _CurrentPage, value); }
-    }
-
-    void SelectionChanged(object sender, SelectionModelSelectionChangedEventArgs e)
-    {
-        // TODO: Figoure out better way of doing this
-        switch(((ListBoxItem)e.SelectedItems[0]!).Name)
-        {
-            case "wallet":
-                CurrentPage = new WalletView();
-                break;
-            case "transfers":
-                CurrentPage = new TransfersView();
-                break;
-            case "settings":
-                CurrentPage = new SettingsView();
-                break;
-            default:
-                CurrentPage = new HomeView();
-                break;
-        }
-    }
-
-    // Daemon View
-    private string _StartStopMining = MinerStatus.StartMining;
-    public string StartStopMining
-    {
-        get => _StartStopMining;
-        set => this.RaiseAndSetIfChanged(ref _StartStopMining, value);
-    }
-
-    private bool _IsNumThreadsEnabled = true;
-    public bool IsNumThreadsEnabled
-    {
-        get => _IsNumThreadsEnabled;
-        set => this.RaiseAndSetIfChanged(ref _IsNumThreadsEnabled, value);
-    }
-
-    private string _NetHeight = "0";
-    public string NetHeight
-    {
-        get => _NetHeight;
-        set => this.RaiseAndSetIfChanged(ref _NetHeight, value);
-    }
-
-    private string _YourHeight = "0";
-    public string YourHeight
-    {
-        get => _YourHeight;
-        set => this.RaiseAndSetIfChanged(ref _YourHeight, value);
-    }
-
-    private string _NetHash = "0";
-    public string NetHash
-    {
-        get => _NetHash;
-        set => this.RaiseAndSetIfChanged(ref _NetHash, value);
-    }
-
-    private string _RunTime = "0:0:0";
-    public string RunTime
-    {
-        get => _RunTime;
-        set => this.RaiseAndSetIfChanged(ref _RunTime, value);
-    }
-
-    private string _MinerMessage = "";
-    public string MinerMessage
-    {
-        get => _MinerMessage;
-        set => this.RaiseAndSetIfChanged(ref _MinerMessage, value);
-    }
-
-    private string _YourHash = "0";
-    public string YourHash
-    {
-        get => _YourHash;
-        set => this.RaiseAndSetIfChanged(ref _YourHash, value);
-    }
-
-    private string _BlockTime = "∞";
-    public string BlockTime
-    {
-        get => _BlockTime;
-        set => this.RaiseAndSetIfChanged(ref _BlockTime, value);
-    }
-
-    private string _MiningAddress = "";
-    public string MiningAddress
-    {
-        get => _MiningAddress;
-        set => this.RaiseAndSetIfChanged(ref _MiningAddress, value);
-    }
-
-    private List<Connection> _Connections = new();
-    public List<Connection> Connections
-    {
-        get => _Connections;
-        set => this.RaiseAndSetIfChanged(ref _Connections, value);
     }
 
     private string _DaemonStatus = "";
@@ -172,94 +77,67 @@ public class MainViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _DaemonVersion, value);
     }
 
-    // Wallet View
-    private string _OpenCloseWallet = "Open Wallet";
-    public string OpenCloseWallet
+    void SelectionChanged(object sender, SelectionModelSelectionChangedEventArgs e)
     {
-        get => _OpenCloseWallet;
-        set => this.RaiseAndSetIfChanged(ref _OpenCloseWallet, value);
+        // TODO: Figoure out better way of doing this
+        switch(((ListBoxItem)e.SelectedItems[0]!).Name)
+        {
+            case SplitViewPages.Wallet:
+                CurrentPage = ViewModelPagesDictionary[SplitViewPages.Wallet];
+                break;
+            case SplitViewPages.Transfers:
+                CurrentPage = ViewModelPagesDictionary[SplitViewPages.Transfers];
+                break;
+            case SplitViewPages.Settings:
+                CurrentPage = ViewModelPagesDictionary[SplitViewPages.Settings];
+                break;
+            default:
+                CurrentPage = ViewModelPagesDictionary[SplitViewPages.Home];
+                break;
+        }
     }
-
-    private string _TotalXnv = "";
-    public string TotalXnv
-    {
-        get => _TotalXnv;
-        set => this.RaiseAndSetIfChanged(ref _TotalXnv, value);
-    }
-
-    private string _UnlockedXnv = "";
-    public string UnlockedXnv
-    {
-        get => _UnlockedXnv;
-        set => this.RaiseAndSetIfChanged(ref _UnlockedXnv, value);
-    }
-
-    private List<Wallet> _WalletAddresses = new();
-    public List<Wallet> WalletAddresses
-    {
-        get => _WalletAddresses;
-        set => this.RaiseAndSetIfChanged(ref _WalletAddresses, value);
-    }
-
 
     private void TriggerPane()
     {
         IsPaneOpen = !IsPaneOpen;
     }
 
-    private void OpenDebugFolder()
-    {
-        try
-        {
-            ProcessStartInfo psi = new ProcessStartInfo
-            {
-                FileName = GlobalData.LogDir,
-                UseShellExecute = true
-            };
-            Process.Start(psi);
-        }
-        catch (Exception ex)
-        {
-            Logger.LogException("Mai.ODF", ex);
-        }
-    }
-
     public void UpdateView()
     {
-        NetHeight = GlobalData.NetworkStats.NetHeight.ToString();
-        YourHeight = GlobalData.NetworkStats.YourHeight.ToString();
-        NetHash = GlobalData.NetworkStats.NetHash;
-        RunTime = GlobalData.NetworkStats.RunTime;
+        ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).NetHeight = GlobalData.NetworkStats.NetHeight.ToString();
+        ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).YourHeight = GlobalData.NetworkStats.YourHeight.ToString();
+        ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).NetHash = GlobalData.NetworkStats.NetHash;
+        ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).RunTime = GlobalData.NetworkStats.RunTime;
 
-        MinerMessage = GlobalData.NetworkStats.MinerStatus;
-        YourHash = GlobalData.NetworkStats.YourHash;
-        BlockTime = GlobalData.NetworkStats.BlockTime;
-        MiningAddress = GlobalData.NetworkStats.MiningAddress;
-        
-        Connections = GlobalData.Connections;
+        ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).MinerMessage = GlobalData.NetworkStats.MinerStatus;
+        ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).YourHash = GlobalData.NetworkStats.YourHash;
+        ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).BlockTime = GlobalData.NetworkStats.BlockTime;
+        ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).MiningAddress = GlobalData.NetworkStats.MiningAddress;
+
+        ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).Connections = GlobalData.Connections;
 
         if(GlobalData.NetworkStats.MinerStatus.Equals(MinerStatus.Mining))
         {
             // Mining so disable number of threads and show Stop Mining
-            if (StartStopMining.Equals(MinerStatus.StartMining))
+            if (((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).StartStopMining.Equals(MinerStatus.StartMining))
             {
-                StartStopMining = MinerStatus.StopMining;                
+                ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).StartStopMining = MinerStatus.StopMining;                
             }
-            if(IsNumThreadsEnabled)
+            if(((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).IsNumThreadsEnabled)
             {
-                IsNumThreadsEnabled = false;
+                ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).IsNumThreadsEnabled = false;
             }
         }
         else
         {
             // Not mining so enable number of threads and set Start Mining
-            if (StartStopMining.Equals(MinerStatus.StopMining))
+            if (((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).StartStopMining.Equals(MinerStatus.StopMining))
             {
-                StartStopMining = MinerStatus.StartMining;
+                ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).StartStopMining = MinerStatus.StartMining;
             }
-            if (!IsNumThreadsEnabled)
+            if (!((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).IsNumThreadsEnabled)
             {
-                IsNumThreadsEnabled = true;
+                ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).IsNumThreadsEnabled = true;
             }
         }
 
