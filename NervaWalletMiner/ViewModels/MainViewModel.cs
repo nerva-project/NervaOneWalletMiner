@@ -2,12 +2,16 @@
 using Avalonia.Controls.Selection;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using log4net.Core;
 using NervaWalletMiner.Helpers;
 using NervaWalletMiner.Objects;
+using NervaWalletMiner.Rpc;
 using NervaWalletMiner.Rpc.Daemon;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Diagnostics;
 using System.Windows.Input;
 using static NervaWalletMiner.Rpc.Daemon.MiningStatus;
 
@@ -19,6 +23,8 @@ public class MainViewModel : ViewModelBase
     public const int _daemonTimerInterval = 5000;
     public static bool _killMasterProcess = false;
     public static DateTime _cliToolsRunningLastCheck = DateTime.MinValue;
+    public DateTime _lastDaemonResponseTime = DateTime.Now;
+
 
     public static Dictionary<string, ViewModelBase> ViewModelPagesDictionary = new();
 
@@ -186,7 +192,7 @@ public class MainViewModel : ViewModelBase
 
                 if (!_killMasterProcess)
                 {
-                    //KeepDaemonRunning();
+                    KeepDaemonRunning();
                 }
 
 
@@ -224,6 +230,40 @@ public class MainViewModel : ViewModelBase
             }
         }
     }
+
+    private void KeepDaemonRunning()
+    {
+        try
+        {
+            bool forceRestart = false;
+            if (_lastDaemonResponseTime.AddMinutes(5) < DateTime.Now)
+            {
+                // Daemon not responding.  Kill and restart
+                forceRestart = true;
+                _lastDaemonResponseTime = DateTime.Now;
+                Logger.LogDebug("Mai.KDR", "No response from daemon since: " + _lastDaemonResponseTime.ToLongTimeString() + " . Forcing restart...");
+            }
+
+            Process process = null;
+            if (!ProcessManager.IsRunning(FileNames.NERVAD, out process) || forceRestart)
+            {
+                if (FileNames.DirectoryContainsCliTools(GlobalData.CliToolsDir))
+                {
+                    DaemonProcess.ForceClose();
+                    Logger.LogDebug("MF.KDR", "Starting daemon process");
+                    ProcessManager.StartExternalProcess(GlobalMethods.GetDaemonPath(), DaemonProcess.GenerateCommandLine());
+                }
+                else
+                {
+                    Logger.LogDebug("Mai.KDR", "CLI tools not found");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException("MF.KDR", ex);
+        }
+    }    
 
     public async void DaemonUiUpdate()
     {

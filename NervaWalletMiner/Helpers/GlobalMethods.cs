@@ -93,6 +93,32 @@ namespace NervaWalletMiner.Helpers
             return walletDirectory;
         }
 
+        public static string GetCliToolsDir()
+        {
+            string cliToolsDirectory;
+
+            if (Directory.Exists(GlobalData.DataDir))
+            {
+                // Create logs directory if it does not exist
+                cliToolsDirectory = Path.Combine(GlobalData.DataDir, GlobalData.CliToolsDirName);
+                if (!Directory.Exists(cliToolsDirectory))
+                {
+                    Directory.CreateDirectory(cliToolsDirectory);
+                }
+            }
+            else
+            {
+                throw new Exception("Data directory not set up. Application cannot continue");
+            }
+
+            return cliToolsDirectory;
+        }
+
+        public static string GetDaemonPath()
+        {
+            return Path.Combine(GlobalData.CliToolsDir, FileNames.NERVAD);
+        }
+
         public static string GetConfigFilePath()
         {           
             string dataDir = GetDataDir();
@@ -156,6 +182,46 @@ namespace NervaWalletMiner.Helpers
             {
                 Logger.LogException("GM.LC", ex);
             }
+        }
+
+        public static string GenerateRandomString(int length)
+        {
+            Random random = new Random();
+
+            char[] charArray = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
+            string text = string.Empty;
+            for (int i = 0; i < length; i++)
+            {
+                text += charArray[random.Next(0, charArray.Length)];
+            }
+
+            return text;
+        }
+
+        public static string CycleLogFile(string path)
+        {
+            string logFile = path + ".log";
+            string oldLogFile = logFile + ".old";
+
+            try
+            {
+                if (File.Exists(oldLogFile))
+                {
+                    File.Delete(oldLogFile);
+                }
+
+                if (File.Exists(logFile))
+                {
+                    File.Move(logFile, oldLogFile);
+                }
+            }
+            catch (Exception)
+            {
+                Logger.LogError("PM.CLF", $"Cannot cycle log file. New log will be written to {logFile}");
+                return logFile;
+            }
+
+            return logFile;
         }
     }
 }
