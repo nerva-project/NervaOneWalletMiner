@@ -10,26 +10,13 @@ using System.Threading.Tasks;
 
 namespace NervaWalletMiner.Views
 {
-    //public partial class WalletView : ReactiveWindow<WalletViewModel>
     public partial class WalletView : UserControl
     {
         public WalletView()
         {
             InitializeComponent();
 
-            //this.WhenActivated(action => action(ViewModel!.ShowDialog.RegisterHandler(DoShowDialogAsync)));
         }
-
-        /*
-        private async Task DoShowDialogAsync(InteractionContext<OpenWalletViewModel, SelectedWalletViewModel?> interaction)
-        {
-            var dialog = new OpenWalletView();
-            dialog.DataContext = interaction.Input;
-
-            var result = await dialog.ShowDialog<SelectedWalletViewModel?>(this);
-            interaction.SetOutput(result);
-        }
-        */
 
         public void OpenCloseWalletClicked(object sender, RoutedEventArgs args)
         {
@@ -40,6 +27,8 @@ namespace NervaWalletMiner.Views
                 if (btnOpenCloseWallet.Content!.ToString()!.Equals(WalletStatus.OpenWallet))
                 {
                     // Open wallet
+                    var window = new OpenWalletView();
+                    var response = window.ShowDialog(GetWindow());
 
                 }
                 else
@@ -53,5 +42,7 @@ namespace NervaWalletMiner.Views
                 Logger.LogException("Hom.SSMC", ex);
             }
         }
+
+        Window GetWindow() => TopLevel.GetTopLevel(this) as Window ?? throw new NullReferenceException("Invalid Owner");
     }
 }

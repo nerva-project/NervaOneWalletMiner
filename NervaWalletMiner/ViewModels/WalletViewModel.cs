@@ -34,23 +34,6 @@ namespace NervaWalletMiner.ViewModels
         {
             get => _WalletAddresses;
             set => this.RaiseAndSetIfChanged(ref _WalletAddresses, value);
-        }
-
-
-        public ICommand OpenWalletCommand { get; }
-
-        public Interaction<OpenWalletViewModel, SelectedWalletViewModel?> ShowDialog { get; }
-
-        public WalletViewModel()
-        {
-            ShowDialog = new Interaction<OpenWalletViewModel, SelectedWalletViewModel?>();
-
-            OpenWalletCommand = ReactiveCommand.CreateFromTask(async () =>
-            {
-                var store = new OpenWalletViewModel();
-
-                var result = await ShowDialog.Handle(store);
-            });
-        }        
+        }       
     }
 }

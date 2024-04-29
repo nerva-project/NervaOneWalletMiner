@@ -16,11 +16,11 @@
 
 			<Button Name="btnOpenCloseWallet"
 					Grid.Row="0"
-					Grid.Column="2"
+					Grid.Column="2"					
 					Content="{Binding OpenCloseWallet}"
-					Command="{Binding OpenWalletCommand}"
 					DockPanel.Dock="Right"
-					Width="120"/>
+					Width="120"
+					Click="OpenCloseWalletClicked"/>
 		</Grid>
 
 		<Grid ColumnDefinitions="200,*,200" Margin="10">

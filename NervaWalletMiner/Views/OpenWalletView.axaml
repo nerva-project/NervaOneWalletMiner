@@ -2,8 +2,28 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	    Width="600"
+		Height="250"
         mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="250"
         x:Class="NervaWalletMiner.Views.OpenWalletView"
         Title="Open Wallet">
-  Welcome to Avalonia!
+	
+	<StackPanel Spacing="5">
+		<Label Content="Wallet Name" />
+		<ComboBox Name="cbxWalletName" HorizontalAlignment="Stretch"/>
+
+		<Label Content="Password" Margin="0,15,0,0" />
+		<DockPanel>
+			<TextBox Name="tbxPassword" />
+			<Button Name="btnShowPassword" Content="Show" Margin="10,0,0,0" />
+		</DockPanel>
+
+		<DockPanel Margin="0,15,0,0" >
+			<Button Name="btnOk" Content="OK" />
+			<Button Name="btnCancel" Content="Cancel" Margin="10,0,0,0" />
+		</DockPanel>
+		
+
+
+	</StackPanel>
 </Window>
