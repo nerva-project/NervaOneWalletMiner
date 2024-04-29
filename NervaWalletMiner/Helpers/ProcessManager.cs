@@ -134,11 +134,11 @@ namespace NervaWalletMiner.Helpers
             });
         }
 
-        public static string GenerateCommandLine(string exePath, RpcDetails d)
+        public static string GenerateCommandLine(string exePath, SettingsRpc d)
         {
             string arg = $"--log-file \"{GlobalMethods.CycleLogFile(exePath)}\"";
 
-            if (GlobalData.ApplicationSettings.IsTestnet)
+            if (GlobalData.ApplicationSettings.Daemon.IsTestnet)
             {
                 Logger.LogDebug("PM.GCL", "Connecting to testnet");
                 arg += " --testnet";

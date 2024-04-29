@@ -12,9 +12,11 @@ namespace NervaWalletMiner.Helpers
         public const string CliToolsDirName = "cli";
         public const string WalletDirName = "wallets";
         public const string LogsDirName = "logs";
-                
+
+        public static Random RandomGenerator = new Random();
+
+        // Those will be saved to and read from app.config
         public static AppSettings ApplicationSettings = new();
-        public static DaemonSettings DaemonSettings = new();
 
         public static readonly string DataDir = GlobalMethods.GetDataDir();
         public static readonly string CliToolsDir = GlobalMethods.GetCliToolsDir();

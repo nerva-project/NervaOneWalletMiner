@@ -16,7 +16,7 @@ namespace NervaWalletMiner.Views
 
             var nupThreads = this.Get<NumericUpDown>("nupThreads");
             nupThreads.Maximum = GlobalData.CpuThreadCount;
-            nupThreads.Value = GlobalData.ApplicationSettings.MiningThreads;
+            nupThreads.Value = GlobalData.ApplicationSettings.Daemon.MiningThreads;
         }
 
         public void StartStopMiningClicked(object sender, RoutedEventArgs args)
@@ -36,13 +36,13 @@ namespace NervaWalletMiner.Views
                 else
                 {
                     // Start mining
-                    if(GlobalData.ApplicationSettings.MiningThreads != nupThreads.Value)
+                    if(GlobalData.ApplicationSettings.Daemon.MiningThreads != nupThreads.Value)
                     {
-                        GlobalData.ApplicationSettings.MiningThreads = Convert.ToInt32(nupThreads.Value);
+                        GlobalData.ApplicationSettings.Daemon.MiningThreads = Convert.ToInt32(nupThreads.Value);
                         GlobalMethods.SaveConfig();
                     }
 
-                    StartMiningAsync(GlobalData.ApplicationSettings.MiningThreads);
+                    StartMiningAsync(GlobalData.ApplicationSettings.Daemon.MiningThreads);
                     btnStartStopMining.Content = MinerStatus.StopMining;
                     nupThreads.IsEnabled = false;
                 }                
@@ -56,7 +56,7 @@ namespace NervaWalletMiner.Views
         public static async void StartMiningAsync(int threads)
         {
             // TODO: Check response and alert user in case of issues
-            MiningResponse response = await StartMining.CallServiceAsync(GlobalData.ApplicationSettings.MiningAddress, threads);
+            MiningResponse response = await StartMining.CallServiceAsync(GlobalData.ApplicationSettings.Daemon.MiningAddress, threads);
         }
 
         public static async void StopMiningAsync()

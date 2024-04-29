@@ -34,21 +34,21 @@ namespace NervaWalletMiner.Rpc
 
         public static string GenerateCommandLine(string extraParams)
         {
-            string parameters = ProcessManager.GenerateCommandLine(GlobalMethods.GetDaemonPath(), GlobalData.DaemonSettings.Rpc);
+            string parameters = ProcessManager.GenerateCommandLine(GlobalMethods.GetDaemonPath(), GlobalData.ApplicationSettings.Daemon.Rpc);
 
-            if (GlobalData.ApplicationSettings.AutoStartMining)
+            if (GlobalData.ApplicationSettings.Daemon.AutoStartMining)
             {
-                string ma = GlobalData.ApplicationSettings.MiningAddress;
+                string ma = GlobalData.ApplicationSettings.Daemon.MiningAddress;
 
                 Logger.LogDebug("DP.GCL", $"Enabling startup mining @ {ma}");
-                parameters += $" --start-mining {ma} --mining-threads {GlobalData.ApplicationSettings.MiningThreads}";
+                parameters += $" --start-mining {ma} --mining-threads {GlobalData.ApplicationSettings.Daemon.MiningThreads}";
             }
 
 #if UNIX
             parameters += " --detach";
 #endif
 
-            parameters += $" {GlobalData.ApplicationSettings.AdditionalDaemonArguments}";
+            parameters += $" {GlobalData.ApplicationSettings.Daemon.AdditionalArguments}";
 
             if (!string.IsNullOrEmpty(extraParams))
             {
