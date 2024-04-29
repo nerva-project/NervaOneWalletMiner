@@ -116,7 +116,7 @@ namespace NervaWalletMiner.Helpers
 
         public static string GetDaemonPath()
         {
-            return Path.Combine(GlobalData.CliToolsDir, FileNames.NERVAD);
+            return Path.Combine(GlobalData.CliToolsDir, FileNames.NERVA_DAEMON);
         }
 
         public static string GetConfigFilePath()
@@ -222,6 +222,16 @@ namespace NervaWalletMiner.Helpers
             }
 
             return logFile;
+        }
+
+        public static bool IsWindows()
+        {
+            return RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+        }
+
+        public static bool IsLinux()
+        {
+            return RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
         }
     }
 }

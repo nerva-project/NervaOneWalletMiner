@@ -2,7 +2,6 @@
 using Avalonia.Controls.Selection;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
-using log4net.Core;
 using NervaWalletMiner.Helpers;
 using NervaWalletMiner.Objects;
 using NervaWalletMiner.Rpc;
@@ -10,7 +9,6 @@ using NervaWalletMiner.Rpc.Daemon;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Diagnostics;
 using System.Windows.Input;
 using static NervaWalletMiner.Rpc.Daemon.MiningStatus;
@@ -157,7 +155,7 @@ public class MainViewModel : ViewModelBase
     {
         try
         {
-            Logger.LogDebug("Mai.SMUP", "Start Master Update Process");
+            Logger.LogDebug("Main.SMUP", "Start Master Update Process");
 
             if (_daemonUpdateTimer == null)
             {
@@ -166,12 +164,12 @@ public class MainViewModel : ViewModelBase
                 _daemonUpdateTimer.Elapsed += (s, e) => MasterUpdateProcess();
                 _daemonUpdateTimer.Start();
 
-                Logger.LogDebug("Mai.SMUP", "Master timer will start in " + _daemonTimerInterval / 1000 + " seconds");
+                Logger.LogDebug("Main.SMUP", "Master timer will start in " + _daemonTimerInterval / 1000 + " seconds");
             }
         }
         catch (Exception ex)
         {
-            Logger.LogException("Mai.SMUP", ex);
+            Logger.LogException("Main.SMUP", ex);
         }
     }
 
@@ -211,14 +209,14 @@ public class MainViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            Logger.LogException("Mai.MUP", ex);
+            Logger.LogException("Main.MUP", ex);
         }
         finally
         {
             // Restart timer
             if (_daemonUpdateTimer == null)
             {
-                Logger.LogError("Mai.MUP", "Timer is NULL. Recreating. Why?");
+                Logger.LogError("Main.MUP", "Timer is NULL. Recreating. Why?");
                 _daemonUpdateTimer = new System.Timers.Timer();
                 _daemonUpdateTimer.Interval = _daemonTimerInterval;
                 _daemonUpdateTimer.Elapsed += (s, e) => MasterUpdateProcess();
@@ -241,27 +239,26 @@ public class MainViewModel : ViewModelBase
                 // Daemon not responding.  Kill and restart
                 forceRestart = true;
                 _lastDaemonResponseTime = DateTime.Now;
-                Logger.LogDebug("Mai.KDR", "No response from daemon since: " + _lastDaemonResponseTime.ToLongTimeString() + " . Forcing restart...");
+                Logger.LogDebug("Main.KDR", "No response from daemon since: " + _lastDaemonResponseTime.ToLongTimeString() + " . Forcing restart...");
             }
 
-            Process process = null;
-            if (!ProcessManager.IsRunning(FileNames.NERVAD, out process) || forceRestart)
+            if (!ProcessManager.IsRunning(FileNames.NERVA_DAEMON, out Process? process) || forceRestart)
             {
                 if (FileNames.DirectoryContainsCliTools(GlobalData.CliToolsDir))
                 {
                     DaemonProcess.ForceClose();
-                    Logger.LogDebug("MF.KDR", "Starting daemon process");
+                    Logger.LogDebug("Main.KDR", "Starting daemon process");
                     ProcessManager.StartExternalProcess(GlobalMethods.GetDaemonPath(), DaemonProcess.GenerateCommandLine());
                 }
                 else
                 {
-                    Logger.LogDebug("Mai.KDR", "CLI tools not found");
+                    Logger.LogDebug("Main.KDR", "CLI tools not found");
                 }
             }
         }
         catch (Exception ex)
         {
-            Logger.LogException("MF.KDR", ex);
+            Logger.LogException("Main.KDR", ex);
         }
     }    
 
@@ -298,7 +295,7 @@ public class MainViewModel : ViewModelBase
                 GlobalData.NetworkStats.StatusSync += "  |  Status " + infoRes.status;
 
 
-                Logger.LogDebug("Mai.DUU", "GetInfo Response Height: " + infoRes.height);
+                Logger.LogDebug("Main.DUU", "GetInfo Response Height: " + infoRes.height);
 
 
                 MiningStatusResponse miningRes = await Rpc.Daemon.MiningStatus.CallServiceAsync();
@@ -366,7 +363,7 @@ public class MainViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            Logger.LogException("Mai.DUU", ex);
+            Logger.LogException("Main.DUU", ex);
         }
     }    
 }

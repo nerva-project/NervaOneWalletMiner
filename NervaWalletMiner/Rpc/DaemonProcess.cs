@@ -1,6 +1,5 @@
 ﻿using NervaWalletMiner.Helpers;
 using NervaWalletMiner.Objects;
-using System.Configuration;
 using System.Diagnostics;
 
 namespace NervaWalletMiner.Rpc
@@ -9,13 +8,12 @@ namespace NervaWalletMiner.Rpc
     {
         public static void ForceClose()
         {
-            ProcessManager.Kill(FileNames.NERVAD);
+            ProcessManager.Kill(FileNames.NERVA_DAEMON);
         }
 
         public static bool IsRunning()
         {
-            Process process = null;
-            ProcessManager.IsRunning(FileNames.NERVAD, out process);
+            ProcessManager.IsRunning(FileNames.NERVA_DAEMON, out Process? process);
 
             if (process != null)
             {
@@ -44,9 +42,10 @@ namespace NervaWalletMiner.Rpc
                 parameters += $" --start-mining {ma} --mining-threads {GlobalData.ApplicationSettings.Daemon.MiningThreads}";
             }
 
-#if UNIX
-            parameters += " --detach";
-#endif
+            if(GlobalMethods.IsLinux())
+            {
+                parameters += " --detach";
+            }
 
             parameters += $" {GlobalData.ApplicationSettings.Daemon.AdditionalArguments}";
 

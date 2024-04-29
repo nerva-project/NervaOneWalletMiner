@@ -1,17 +1,12 @@
-﻿using System.IO;
+﻿using NervaWalletMiner.Helpers;
+using System.IO;
 
 namespace NervaWalletMiner.Objects
 {
     public static class FileNames
     {
-
-#if WINDOWS
-        public const string NERVAD = "nervad.exe";
-        public const string RPC_WALLET = "nerva-wallet-rpc.exe";
-#else
-        public const string NERVAD = "nervad";
-        public const string RPC_WALLET = "nerva-wallet-rpc";
-#endif
+        public static string NERVA_DAEMON = GlobalMethods.IsWindows() ?  "nervad.exe" : "nervad";
+        public static string NERVA_WALLET = GlobalMethods.IsWindows() ? "nerva-wallet-rpc.exe" : "nerva-wallet-rpc";
 
         public static bool DirectoryContainsCliTools(string path)
         {
@@ -20,8 +15,8 @@ namespace NervaWalletMiner.Objects
                 return false;
             }
 
-            bool hasDaemon = File.Exists(Path.Combine(path, NERVAD));
-            bool hasRpcWallet = File.Exists(Path.Combine(path, RPC_WALLET));
+            bool hasDaemon = File.Exists(Path.Combine(path, NERVA_DAEMON));
+            bool hasRpcWallet = File.Exists(Path.Combine(path, NERVA_WALLET));
 
             return (hasRpcWallet && hasDaemon);
         }

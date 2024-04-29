@@ -26,21 +26,28 @@ namespace NervaWalletMiner.Helpers
                 foreach (Process process in processList)
                 {
                     Logger.LogDebug("PM.KIL", $"Killing running instance of {exe} with id {process.Id}");
+
+/*
 #if UNIX
                     UnixNative.Kill(process.Id, Signum.SIGABRT);
 #else
                     process.Kill();
 #endif
+*/
+
+                    // TODO: Need to test this on Linux and MacOS!
+                    process.Kill();
+
                     Logger.LogDebug("PM.KIL", $"Process {process.Id} killed");
                 }
             }
             catch (Exception ex)
             {
-                Logger.LogException("PM.IR", "Could not kill process", ex);
+                Logger.LogException("PM.KIL", "Could not kill process", ex);
             }
         }
 
-        public static bool IsRunning(string exe, out Process process)
+        public static bool IsRunning(string exe, out Process? process)
         {
             process = null;
 
@@ -77,7 +84,7 @@ namespace NervaWalletMiner.Helpers
 
         public static List<Process> GetRunningByName(string exe)
         {
-            List<Process> processList = new List<Process>();
+            List<Process> processList = [];
 
             try
             {
