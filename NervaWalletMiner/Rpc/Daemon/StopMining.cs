@@ -30,11 +30,11 @@ namespace NervaWalletMiner.Rpc.Daemon
                     request.Content = new StringContent("");
                     request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-                    Logger.LogDebug("SpM.CS", "Calling POST: " + DaemonUrl);
+                    //Logger.LogDebug("SpM.CS", "Calling POST: " + DaemonUrl);
 
                     response = await client.SendAsync(request);
 
-                    Logger.LogDebug("SpM.CS", "Call returned: " + DaemonUrl);
+                    //Logger.LogDebug("SpM.CS", "Call returned: " + DaemonUrl);
 
                     if (response.IsSuccessStatusCode)
                     {

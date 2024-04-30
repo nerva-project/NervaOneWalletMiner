@@ -32,11 +32,11 @@ namespace NervaWalletMiner.Rpc.Daemon
                     request.Content = new StringContent("{\"jsonrpc\":\"2.0\",\"id\":\"0\",\"method\":\"" + MethodName + "\"}");
                     request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-                    Logger.LogDebug("RDGC.CSA", "Calling POST: " + DaemonUrl + " | " + MethodName);
+                    //Logger.LogDebug("RDGC.CSA", "Calling POST: " + DaemonUrl + " | " + MethodName);
 
                     response = await client.SendAsync(request);
 
-                    Logger.LogDebug("RDGC.CSA", "Call returned: " + DaemonUrl + " | " + MethodName);
+                    //Logger.LogDebug("RDGC.CSA", "Call returned: " + DaemonUrl + " | " + MethodName);
 
                     if (response.IsSuccessStatusCode)
                     {

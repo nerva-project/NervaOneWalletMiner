@@ -2,6 +2,7 @@
 using Avalonia.Controls.Selection;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using log4net.Core;
 using NervaWalletMiner.Helpers;
 using NervaWalletMiner.Objects;
 using NervaWalletMiner.Rpc;
@@ -9,6 +10,7 @@ using NervaWalletMiner.Rpc.Daemon;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Windows.Input;
 using static NervaWalletMiner.Rpc.Daemon.MiningStatus;
@@ -21,7 +23,7 @@ public class MainViewModel : ViewModelBase
     public const int _daemonTimerInterval = 5000;
     public static bool _killMasterProcess = false;
     public static DateTime _cliToolsRunningLastCheck = DateTime.MinValue;
-    public DateTime _lastDaemonResponseTime = DateTime.Now;
+    public static DateTime _lastDaemonResponseTime = DateTime.Now;
 
 
     public static Dictionary<string, ViewModelBase> ViewModelPagesDictionary = new();
@@ -151,6 +153,7 @@ public class MainViewModel : ViewModelBase
     }
 
     // TODO: Move this somewhere else.
+    #region Master Process Methods    
     public void StartMasterUpdateProcess()
     {
         try
@@ -196,7 +199,7 @@ public class MainViewModel : ViewModelBase
 
                 if (!_killMasterProcess)
                 {
-                    //KeepWalletProcessRunning();
+                    KeepWalletProcessRunning();
                 }
             }
 
@@ -229,7 +232,7 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    private void KeepDaemonRunning()
+    private static void KeepDaemonRunning()
     {
         try
         {
@@ -260,7 +263,31 @@ public class MainViewModel : ViewModelBase
         {
             Logger.LogException("Main.KDR", ex);
         }
-    }    
+    }
+
+    private static void KeepWalletProcessRunning()
+    {
+        try
+        {
+            if (!ProcessManager.IsRunning(FileNames.NERVA_WALLET_RPC, out Process? process))
+            {
+                if (FileNames.DirectoryContainsCliTools(GlobalData.CliToolsDir))
+                {
+                    WalletProcess.ForceClose();
+                    Logger.LogDebug("Main.KWPR", "Starting wallet process");
+                    ProcessManager.StartExternalProcess(GlobalMethods.GetRpcWalletPath(), WalletProcess.GenerateCommandLine());
+                }
+                else
+                {
+                    Logger.LogDebug("Main.KWPR", "CLI tools not found");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException("Main.KWPR", ex);
+        }
+    }
 
     public async void DaemonUiUpdate()
     {
@@ -295,7 +322,7 @@ public class MainViewModel : ViewModelBase
                 GlobalData.NetworkStats.StatusSync += "  |  Status " + infoRes.status;
 
 
-                Logger.LogDebug("Main.DUU", "GetInfo Response Height: " + infoRes.height);
+                //Logger.LogDebug("Main.DUU", "GetInfo Response Height: " + infoRes.height);
 
 
                 MiningStatusResponse miningRes = await Rpc.Daemon.MiningStatus.CallServiceAsync();
@@ -365,5 +392,6 @@ public class MainViewModel : ViewModelBase
         {
             Logger.LogException("Main.DUU", ex);
         }
-    }    
+    }
+    #endregion // Master Process Methods
 }

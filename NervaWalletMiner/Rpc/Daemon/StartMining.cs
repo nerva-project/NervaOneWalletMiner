@@ -29,11 +29,11 @@ namespace NervaWalletMiner.Rpc.Daemon
                     request.Content = new StringContent("{\"miner_address\":\"" + address + "\",\"threads_count\":\"" + threads + "\"}");
                     request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-                    Logger.LogDebug("StM.CS", "Calling POST: " + DaemonUrl + " | " + threads + " | " + address);
+                    //Logger.LogDebug("StM.CS", "Calling POST: " + DaemonUrl + " | " + threads + " | " + address);
 
                     response = await client.SendAsync(request);
 
-                    Logger.LogDebug("StM.CS", "Call returned: " + DaemonUrl);
+                    //Logger.LogDebug("StM.CS", "Call returned: " + DaemonUrl);
 
                     if (response.IsSuccessStatusCode)
                     {

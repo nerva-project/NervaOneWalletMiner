@@ -2,9 +2,11 @@
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using NervaWalletMiner.Helpers;
+using NervaWalletMiner.Rpc;
 using NervaWalletMiner.ViewModels;
 using NervaWalletMiner.Views;
 using System;
+using System.Configuration;
 
 namespace NervaWalletMiner;
 
@@ -26,6 +28,7 @@ public partial class App : Application
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            desktop.Exit += OnExit;
             desktop.MainWindow = new MainWindow
             {
                 DataContext = new MainViewModel()
@@ -41,6 +44,30 @@ public partial class App : Application
 
         base.OnFrameworkInitializationCompleted();
         Logger.LogDebug("App.IC", "Initialization completed");
+    }
+
+    private void OnExit(object? sender, ControlledApplicationLifetimeExitEventArgs e)
+    {
+        Logger.LogDebug("App.AE", "Exiting...");
+
+        Shutdown();
+    }
+
+    public static void Shutdown()
+    {
+        // Prevent the daemon restarting automatically before telling it to stop
+        if (GlobalData.ApplicationSettings.Daemon.StopOnExit)
+        {
+            //TODO: Call daemon method to exit
+            //Daemon.StopDaemon();
+            DaemonProcess.ForceClose();
+        }
+
+        WalletProcess.ForceClose();
+
+        Logger.LogError("App.SD", "PROGRAM TERMINATED");
+
+        Environment.Exit(0);
     }
 
     public static void SetUpDefaults()

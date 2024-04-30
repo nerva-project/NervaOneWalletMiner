@@ -119,6 +119,11 @@ namespace NervaWalletMiner.Helpers
             return Path.Combine(GlobalData.CliToolsDir, FileNames.NERVA_DAEMON);
         }
 
+        public static string GetRpcWalletPath()
+        {
+            return Path.Combine(GlobalData.CliToolsDir, FileNames.NERVA_WALLET_RPC);
+        }
+
         public static string GetConfigFilePath()
         {           
             string dataDir = GetDataDir();
