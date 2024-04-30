@@ -19,13 +19,13 @@
 
 		<Label Content="Password" Margin="0,15,0,0" />
 		<DockPanel>
-			<TextBox Name="tbxPassword" />
+			<TextBox Name="tbxPassword" PasswordChar="*" Watermark="Enter wallet password" />
 			<Button Name="btnShowPassword" Content="Show" Margin="10,0,0,0" />
 		</DockPanel>
 
 		<DockPanel Margin="0,15,0,0" >
-			<Button Name="btnOk" Content="OK" />
-			<Button Name="btnCancel" Content="Cancel" Margin="10,0,0,0" />
+			<Button Name="btnOk" Content="OK" Click="OkButtonClicked" />
+			<Button Name="btnCancel" Content="Cancel" Click="CancelButtonClicked" Margin="10,0,0,0" />
 		</DockPanel>
 		
 

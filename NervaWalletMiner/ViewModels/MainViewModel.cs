@@ -21,10 +21,11 @@ public class MainViewModel : ViewModelBase
 {
     public static System.Timers.Timer? _daemonUpdateTimer;
     public const int _daemonTimerInterval = 5000;
+    public static int _daemonTimerCount = 0;
     public static bool _killMasterProcess = false;
     public static DateTime _cliToolsRunningLastCheck = DateTime.MinValue;
     public static DateTime _lastDaemonResponseTime = DateTime.Now;
-
+    public static bool _isInitialDaemonConnectionSuccess = false;
 
     public static Dictionary<string, ViewModelBase> ViewModelPagesDictionary = new();
 
@@ -185,7 +186,8 @@ public class MainViewModel : ViewModelBase
                 _daemonUpdateTimer.Stop();
             }
 
-            // If kill master process is issued at any point, skip everything else and do not restrt master timer
+            // If kill master process is issued at any point, skip everything else and do not restrt master timer            
+
 
             if (_cliToolsRunningLastCheck.AddSeconds(5) < DateTime.Now)
             {
@@ -209,6 +211,15 @@ public class MainViewModel : ViewModelBase
             {
                 DaemonUiUpdate();
             }
+
+            if (!_killMasterProcess && _isInitialDaemonConnectionSuccess)
+            {
+                if(_daemonTimerCount % 3 == 0)
+                {
+                    // Update wallet every 3rd call because you do not need to do it more often
+                    //WalletUiUpdate();
+                }                
+            }
         }
         catch (Exception ex)
         {
@@ -227,6 +238,7 @@ public class MainViewModel : ViewModelBase
 
             if (!_killMasterProcess)
             {
+                _daemonTimerCount++;
                 _daemonUpdateTimer.Start();
             }
         }
@@ -252,6 +264,7 @@ public class MainViewModel : ViewModelBase
                     DaemonProcess.ForceClose();
                     Logger.LogDebug("Main.KDR", "Starting daemon process");
                     ProcessManager.StartExternalProcess(GlobalMethods.GetDaemonPath(), DaemonProcess.GenerateCommandLine());
+                    _isInitialDaemonConnectionSuccess = false;
                 }
                 else
                 {
@@ -293,10 +306,21 @@ public class MainViewModel : ViewModelBase
     {
         try
         {
+            if (!_isInitialDaemonConnectionSuccess)
+            {
+                GlobalData.NetworkStats.StatusSync = "Trying to establish connection with daemon...";
+            }
+
             GetInfoResponse infoRes = await GetInfo.CallServiceAsync();
 
             if (!string.IsNullOrEmpty(infoRes.version))
             {
+                if (_isInitialDaemonConnectionSuccess == false)
+                {
+                    // This will be used to get rid of establishing connection message and to StartWalletUiUpdate 
+                    _isInitialDaemonConnectionSuccess = true;
+                }
+
                 GlobalData.NetworkStats.NetHeight = (infoRes.target_height > infoRes.height ? infoRes.target_height : infoRes.height);
                 GlobalData.NetworkStats.YourHeight = infoRes.height;
                 GlobalData.NetworkStats.NetHash = Math.Round(((infoRes.difficulty / 60.0d) / 1000.0d), 2) + " kH/s";
@@ -393,5 +417,71 @@ public class MainViewModel : ViewModelBase
             Logger.LogException("Main.DUU", ex);
         }
     }
+
+    /*
+    public void WalletUiUpdate()
+    {
+        try
+        {
+            WalletRpc.GetAccounts((GetAccountsResponseData ra) =>
+            {
+                Application.Instance.AsyncInvoke(() =>
+                {
+                    string message = "Account(s): " + ra.Accounts.Count + "  |  Balance: " + Conversions.FromAtomicUnits4Places(ra.TotalBalance) + " XNV";
+                    if (!lblWalletStatus.Text.Equals(message)) { lblWalletStatus.Text = message; }
+                    balancesPage.Update(ra);
+                });
+            }, WalletUpdateFailed);
+
+            WalletRpc.GetTransfers(lastTxHeight, 0, true, (GetTransfersResponseData rt) =>
+            {
+                Application.Instance.AsyncInvoke(() =>
+                {
+                    uint i = 0, o = 0, l = 0;
+                    lastTxHeight = 0;
+
+                    if (rt.Incoming != null && rt.Incoming.Count > 0)
+                        i = rt.Incoming[rt.Incoming.Count - 1].Height;
+
+                    if (rt.Outgoing != null && rt.Outgoing.Count > 0)
+                        o = rt.Outgoing[rt.Outgoing.Count - 1].Height;
+
+                    l = Math.Max(i, o);
+
+                    lastTxHeight = l;
+                    transfersPage.Update(rt);
+                });
+            }, WalletUpdateFailed);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException("Main.WUU", ex);
+        }
+    }
+
+    void WalletUpdateFailed(RequestError e)
+    {
+        try
+        {
+            if (e.Code != -13) //skip messages about not having a wallet open
+            {
+                Logger.LogError("MF.WUF", $"Wallet update failed, Code {e.Code}: {e.Message}");
+            }
+
+            Application.Instance.AsyncInvoke(() =>
+            {
+                string message = "Wallet offline - see Wallet menu to open, create or import wallet";
+                if (!lblWalletStatus.Text.Equals(message)) { lblWalletStatus.Text = message; }
+                lastTxHeight = 0;
+                balancesPage.Update(null);
+                transfersPage.Update(null);
+            });
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException("Main.WUF", ex);
+        }
+    }
+    */
     #endregion // Master Process Methods
 }

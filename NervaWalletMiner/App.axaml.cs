@@ -65,7 +65,7 @@ public partial class App : Application
 
         WalletProcess.ForceClose();
 
-        Logger.LogError("App.SD", "PROGRAM TERMINATED");
+        Logger.LogInfo("App.SD", "PROGRAM TERMINATED");
 
         Environment.Exit(0);
     }

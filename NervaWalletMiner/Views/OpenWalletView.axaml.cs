@@ -1,5 +1,7 @@
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using NervaWalletMiner.Helpers;
+using NervaWalletMiner.Objects;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -42,6 +44,32 @@ namespace NervaWalletMiner.Views
             }
 
             return walletFiles;
+        }
+
+        public void OkButtonClicked(object sender, RoutedEventArgs args)
+        {
+            var cbxWallet = this.Get<ComboBox>("cbxWalletName");
+            var tbxPassword = this.Get<TextBox>("tbxPassword");
+
+            DialogResult result = new()
+            {
+                IsOk = true,
+                WalletName = cbxWallet.SelectedValue?.ToString(),
+                WalletPassword = tbxPassword.Text
+            };
+
+            Close(result);
+        }
+
+        public void CancelButtonClicked(object sender, RoutedEventArgs args)
+        {
+            DialogResult result = new()
+            {
+                IsCancel = true
+            };
+
+            Close(result);
+
         }
     }
 }

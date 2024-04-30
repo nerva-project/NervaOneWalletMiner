@@ -1,10 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.ReactiveUI;
 using NervaWalletMiner.Helpers;
 using NervaWalletMiner.Objects;
-using NervaWalletMiner.ViewModels;
-using ReactiveUI;
 using System;
 using System.Threading.Tasks;
 
@@ -26,10 +23,9 @@ namespace NervaWalletMiner.Views
 
                 if (btnOpenCloseWallet.Content!.ToString()!.Equals(WalletStatus.OpenWallet))
                 {
-                    // Open wallet
+                    // Open wallet dialog
                     var window = new OpenWalletView();
-                    var response = window.ShowDialog(GetWindow());
-
+                    window.ShowDialog(GetWindow()).ContinueWith(DialogClosed);                   
                 }
                 else
                 {
@@ -40,6 +36,19 @@ namespace NervaWalletMiner.Views
             catch (Exception ex)
             {
                 Logger.LogException("Hom.SSMC", ex);
+            }
+        }
+
+        private void DialogClosed(Task task)
+        {
+            DialogResult result = ((DialogResult)((Task<object>)task).Result);
+            if(result.IsOk)
+            {
+                // Open wallet
+            }
+            else
+            {
+                // Cancelled or closed
             }
         }
 
