@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using NervaWalletMiner.Helpers;
 using NervaWalletMiner.Objects;
+using NervaWalletMiner.Rpc.Wallet;
 using System;
 using System.Threading.Tasks;
 
@@ -45,10 +46,26 @@ namespace NervaWalletMiner.Views
             if(result.IsOk)
             {
                 // Open wallet
+                if (!string.IsNullOrEmpty(result.WalletName) && !string.IsNullOrEmpty(result.WalletPassword))
+                {
+                    OpenUserWallet(result.WalletName, result.WalletPassword);
+                }
             }
             else
             {
-                // Cancelled or closed
+                // Cancelled or closed. Don't need to do anything
+
+            }
+        }
+
+        private async void OpenUserWallet(string walletName, string walletPassword)
+        {
+            OpenWalletResponse response = await OpenWallet.CallAsync(GlobalData.ApplicationSettings.Wallet.Rpc, walletName, walletPassword);
+
+            if (response.IsError)
+            {
+                // TODO: Report error to user
+
             }
         }
 

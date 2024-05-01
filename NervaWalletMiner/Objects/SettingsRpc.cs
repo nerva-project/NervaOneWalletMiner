@@ -5,6 +5,7 @@ namespace NervaWalletMiner.Objects
     public class SettingsRpc(uint port)
     {
         public bool IsPublic { get; set; } = false;
+        public string HTProtocol { get; set; } = "http";
 
         public string Host { get; set; } = "127.0.0.1";
 
