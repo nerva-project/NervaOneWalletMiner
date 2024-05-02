@@ -19,6 +19,6 @@
 
 		<Label Grid.Row="0" Grid.Column="0" Content="{Binding DaemonStatus}"/>
 		<Label Grid.Row="0" Grid.Column="1" Content="{Binding DaemonVersion}" HorizontalAlignment="Right"/>
-		<Label Grid.Row="1" Grid.Column="0">Wallet offline - see Wallet to open, create or import wallet</Label>
+		<Label Grid.Row="1" Grid.Column="0" Content="{Binding WalletStatus}" />
 	</Grid>
 </UserControl>

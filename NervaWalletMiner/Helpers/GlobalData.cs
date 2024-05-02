@@ -27,6 +27,7 @@ namespace NervaWalletMiner.Helpers
         public static bool IsWalletOpen = false;
 
         public static StatsDaemon NetworkStats = new();
+        public static StatsWallet WalletStats = new();
         public static List<Connection> Connections = new List<Connection>();
 
         public static int CpuThreadCount = Environment.ProcessorCount;

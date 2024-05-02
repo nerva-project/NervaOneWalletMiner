@@ -1,23 +1,25 @@
 ﻿using NervaWalletMiner.Helpers;
 using NervaWalletMiner.Objects;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
+using System.Linq;
 using System.Net.Http.Headers;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace NervaWalletMiner.Rpc.Wallet
 {
-    public static class GetAccounts
+    public static class GetTransfers
     {
-        public const string MethodName = "get_accounts";
+        public const string MethodName = "get_transfers";
 
-        // TODO: Pass optional tag
-        public static async Task<GetAccountsResponse> CallAsync(SettingsRpc rpc)
+        // TODO: This is just copied from another class
+        public static async Task<GetTransfersResponse> CallAsync(SettingsRpc rpc)
         {
-            GetAccountsResponse resp = new();
+            GetTransfersResponse resp = new();
 
             try
             {
@@ -56,7 +58,7 @@ namespace NervaWalletMiner.Rpc.Wallet
                         }
                         else
                         {
-                            resp = JsonConvert.DeserializeObject<GetAccountsResponse>(jsonObject.SelectToken("result").ToString());
+                            resp = JsonConvert.DeserializeObject<GetTransfersResponse>(jsonObject.SelectToken("result").ToString());
                             resp.Error.IsError = false;
                         }
                     }
@@ -79,13 +81,22 @@ namespace NervaWalletMiner.Rpc.Wallet
         }
     }
 
-
-    public class GetAccountsResponse
+    public class GetTransfersResponse
     {
         public RpcError Error { get; set; } = new();
 
-        public ulong total_balance { get; set; }
-        public ulong total_unlocked_balance { get; set; }
-        public List<SubaddressAccount> subaddress_accounts { get; set; } = [];
+        // TODO: Not sure if this will work as those are reserved keywords. Might need to use: [JsonProperty("in")]
+        public bool In { get; set; }
+        public bool Out { get; set; }
+
+        public bool pending { get; set; }
+        public bool failed { get; set; }
+        public bool pool { get; set; }
+        public bool filter_by_height { get; set; }
+        public ulong min_height { get; set; }
+        public ulong max_height { get; set; }
+        public uint account_index { get; set; }
+        public List<uint>? subaddr_indices { get; set; }
+        public bool all_accounts { get; set; }
     }
 }

@@ -85,6 +85,14 @@ public class MainViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _DaemonVersion, value);
     }
 
+    private string _WalletStatus = "Wallet offline - see Wallet tab to open";
+    public string WalletStatus
+    {
+        get => _WalletStatus;
+        set => this.RaiseAndSetIfChanged(ref _WalletStatus, value);
+    }
+
+
     void SelectionChanged(object sender, SelectionModelSelectionChangedEventArgs e)
     {
         // TODO: Figoure out better way of doing this
@@ -152,6 +160,7 @@ public class MainViewModel : ViewModelBase
         // Status Bar
         DaemonStatus = "Connections: " + GlobalData.NetworkStats.ConnectionsOut + "(out) + " + GlobalData.NetworkStats.ConnectionsIn + "(in) " + GlobalData.NetworkStats.StatusSync;
         DaemonVersion = "Version: " + GlobalData.NetworkStats.Version;
+        WalletStatus = "Account(s): " + GlobalData.WalletStats.Subaddresses.Count + " | Balance: " + GlobalData.WalletStats.TotalBalanceLocked + "XNV";
     }
 
     // TODO: Move this somewhere else.
@@ -218,7 +227,7 @@ public class MainViewModel : ViewModelBase
                 if(_daemonTimerCount % 3 == 0)
                 {
                     // Update wallet every 3rd call because you do not need to do it more often
-                    //WalletUiUpdate();
+                    WalletUiUpdate();
                 }                
             }
         }
@@ -427,24 +436,21 @@ public class MainViewModel : ViewModelBase
 
             if(response.Error.IsError)
             {
+                Logger.LogError("Main.WUU", "Error Code: " + response.Error.Code + ", Message: " + response.Error.Message);
 
             }
             else
             {
+                // TODO: Convert balances from atomic units
+                GlobalData.WalletStats.TotalBalanceLocked = response.total_balance;
+                GlobalData.WalletStats.TotalBalanceUnlocked = response.total_unlocked_balance;
 
+                GlobalData.WalletStats.Subaddresses = response.subaddress_accounts;
             }
 
-            /*
-            WalletRpc.GetAccounts((GetAccountsResponseData ra) =>
-            {
-                Application.Instance.AsyncInvoke(() =>
-                {
-                    string message = "Account(s): " + ra.Accounts.Count + "  |  Balance: " + Conversions.FromAtomicUnits4Places(ra.TotalBalance) + " XNV";
-                    if (!lblWalletStatus.Text.Equals(message)) { lblWalletStatus.Text = message; }
-                    balancesPage.Update(ra);
-                });
-            }, WalletUpdateFailed);
+            
 
+            /*
             WalletRpc.GetTransfers(lastTxHeight, 0, true, (GetTransfersResponseData rt) =>
             {
                 Application.Instance.AsyncInvoke(() =>
