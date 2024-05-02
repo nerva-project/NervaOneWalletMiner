@@ -7,6 +7,7 @@ using NervaWalletMiner.Helpers;
 using NervaWalletMiner.Objects;
 using NervaWalletMiner.Rpc;
 using NervaWalletMiner.Rpc.Daemon;
+using NervaWalletMiner.Rpc.Wallet;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
@@ -123,12 +124,12 @@ public class MainViewModel : ViewModelBase
 
         ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).Connections = GlobalData.Connections;
 
-        if(GlobalData.NetworkStats.MinerStatus.Equals(MinerStatus.Mining))
+        if(GlobalData.NetworkStats.MinerStatus.Equals(StatusMiner.Mining))
         {
             // Mining so disable number of threads and show Stop Mining
-            if (((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).StartStopMining.Equals(MinerStatus.StartMining))
+            if (((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).StartStopMining.Equals(StatusMiner.StartMining))
             {
-                ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).StartStopMining = MinerStatus.StopMining;                
+                ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).StartStopMining = StatusMiner.StopMining;                
             }
             if(((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).IsNumThreadsEnabled)
             {
@@ -138,9 +139,9 @@ public class MainViewModel : ViewModelBase
         else
         {
             // Not mining so enable number of threads and set Start Mining
-            if (((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).StartStopMining.Equals(MinerStatus.StopMining))
+            if (((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).StartStopMining.Equals(StatusMiner.StopMining))
             {
-                ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).StartStopMining = MinerStatus.StartMining;
+                ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).StartStopMining = StatusMiner.StartMining;
             }
             if (!((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).IsNumThreadsEnabled)
             {
@@ -212,7 +213,7 @@ public class MainViewModel : ViewModelBase
                 DaemonUiUpdate();
             }
 
-            if (!_killMasterProcess && _isInitialDaemonConnectionSuccess)
+            if (!_killMasterProcess && _isInitialDaemonConnectionSuccess && GlobalData.IsWalletOpen)
             {
                 if(_daemonTimerCount % 3 == 0)
                 {
@@ -352,7 +353,7 @@ public class MainViewModel : ViewModelBase
                 MiningStatusResponse miningRes = await Rpc.Daemon.MiningStatus.CallServiceAsync();
                 if (miningRes.active)
                 {
-                    GlobalData.NetworkStats.MinerStatus = MinerStatus.Mining;
+                    GlobalData.NetworkStats.MinerStatus = StatusMiner.Mining;
                     GlobalData.NetworkStats.MiningAddress = GlobalMethods.WalletAddressShortForm(miningRes.address);
 
                     if (miningRes.speed > 1000)
@@ -384,7 +385,7 @@ public class MainViewModel : ViewModelBase
                 }
                 else
                 {
-                    GlobalData.NetworkStats.MinerStatus = MinerStatus.Inactive;
+                    GlobalData.NetworkStats.MinerStatus = StatusMiner.Inactive;
                     GlobalData.NetworkStats.MiningAddress = "None";
                     GlobalData.NetworkStats.YourHash = "0 h/s";
                     GlobalData.NetworkStats.BlockTime = "∞";
@@ -418,11 +419,22 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    /*
-    public void WalletUiUpdate()
+    public static async void WalletUiUpdate()
     {
         try
         {
+            GetAccountsResponse response = await GetAccounts.CallAsync(GlobalData.ApplicationSettings.Wallet.Rpc);
+
+            if(response.Error.IsError)
+            {
+
+            }
+            else
+            {
+
+            }
+
+            /*
             WalletRpc.GetAccounts((GetAccountsResponseData ra) =>
             {
                 Application.Instance.AsyncInvoke(() =>
@@ -452,6 +464,7 @@ public class MainViewModel : ViewModelBase
                     transfersPage.Update(rt);
                 });
             }, WalletUpdateFailed);
+            */
         }
         catch (Exception ex)
         {
@@ -459,6 +472,7 @@ public class MainViewModel : ViewModelBase
         }
     }
 
+    /*
     void WalletUpdateFailed(RequestError e)
     {
         try

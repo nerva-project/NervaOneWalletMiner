@@ -1,6 +1,6 @@
 ﻿namespace NervaWalletMiner.Objects
 {
-    public static class MinerStatus
+    public static class StatusMiner
     {
         public const string Inactive = "Inactive";
         public const string Mining = "Mining";

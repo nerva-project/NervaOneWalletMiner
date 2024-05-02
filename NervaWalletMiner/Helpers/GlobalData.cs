@@ -21,10 +21,12 @@ namespace NervaWalletMiner.Helpers
         public static readonly string DataDir = GlobalMethods.GetDataDir();
         public static readonly string CliToolsDir = GlobalMethods.GetCliToolsDir();
         public static readonly string WalletDir = GlobalMethods.GetWalletDir();
-        public static readonly string LogDir = GlobalMethods.GetLogDir();        
-        public static readonly string ConfigFilePath = GlobalMethods.GetConfigFilePath();        
+        public static readonly string LogDir = GlobalMethods.GetLogDir();
+        public static readonly string ConfigFilePath = GlobalMethods.GetConfigFilePath();
 
-        public static DaemonStats NetworkStats = new();        
+        public static bool IsWalletOpen = false;
+
+        public static StatsDaemon NetworkStats = new();
         public static List<Connection> Connections = new List<Connection>();
 
         public static int CpuThreadCount = Environment.ProcessorCount;

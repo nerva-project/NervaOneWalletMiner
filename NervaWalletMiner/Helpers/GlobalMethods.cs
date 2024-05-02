@@ -238,5 +238,18 @@ namespace NervaWalletMiner.Helpers
         {
             return RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
         }
+
+        public static string GetServiceUrl(SettingsRpc rpc)
+        {
+            if(string.IsNullOrEmpty(rpc.HTProtocol) || string.IsNullOrEmpty(rpc.Host) || rpc.Port < 1)
+            {
+                Logger.LogError("PM.GSU", "Rpc missing. Protocol: " + rpc.HTProtocol + ", Host: " + rpc.Host + ", Port: " + rpc.Port);
+                return string.Empty;
+            }
+            else
+            {
+                return rpc.HTProtocol + "://" + rpc.Host + ":" + rpc.Port + "/json_rpc";
+            }            
+        }
     }
 }

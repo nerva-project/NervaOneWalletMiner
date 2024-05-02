@@ -20,7 +20,7 @@ namespace NervaWalletMiner.Rpc.Wallet
             {
                 using (HttpClient client = new HttpClient())
                 {
-                    string serviceUrl = rpc.HTProtocol + "://" + rpc.Host + ":" + rpc.Port + "/json_rpc";
+                    string serviceUrl = GlobalMethods.GetServiceUrl(rpc);
 
                     client.Timeout = TimeSpan.FromSeconds(30);
                     HttpResponseMessage response;
@@ -46,22 +46,21 @@ namespace NervaWalletMiner.Rpc.Wallet
                         var error = JObject.Parse(jsonObject.ToString())["error"];
                         if(error != null)
                         {
-                            resp.IsError = true;
-                            resp.ErrorCode = error["code"].ToString();
-                            resp.ErrorMessage = error["message"].ToString();
-                            Logger.LogError("RWGA.CSA", "Error from service. Code: " + resp.ErrorCode + ", Message: " + resp.ErrorMessage);
+                            resp.Error.IsError = true;
+                            resp.Error.Code = error["code"].ToString();
+                            resp.Error.Message = error["message"].ToString();
+                            Logger.LogError("RWGA.CSA", "Error from service. Code: " + resp.Error.Code + ", Message: " + resp.Error.Message);
                         }
                         else
                         {
-                            resp.IsError = false;
-
+                            resp.Error.IsError = false;
                         }
                     }
                     else
                     {
-                        resp.IsError = true;
-                        resp.ErrorCode = response.StatusCode.ToString();
-                        resp.ErrorMessage = response.ReasonPhrase;
+                        resp.Error.IsError = true;
+                        resp.Error.Code = response.StatusCode.ToString();
+                        resp.Error.Message = response.ReasonPhrase;
 
                         Logger.LogError("RWGA.CSA", "Response failed. Code: " + response.StatusCode + ", Phrase: " + response.ReasonPhrase);
                     }
@@ -78,8 +77,6 @@ namespace NervaWalletMiner.Rpc.Wallet
 
     public class OpenWalletResponse
     {
-        public bool IsError { get; set; } = true;
-        public string? ErrorCode { get; set; }
-        public string? ErrorMessage { get; set; }
+        public RpcError Error { get; set; } = new();
     }
 }

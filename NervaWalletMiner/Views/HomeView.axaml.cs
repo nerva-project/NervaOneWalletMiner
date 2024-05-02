@@ -26,11 +26,11 @@ namespace NervaWalletMiner.Views
                 var btnStartStopMining = this.Get<Button>("btnStartStopMining");
                 var nupThreads = this.Get<NumericUpDown>("nupThreads");
 
-                if (btnStartStopMining.Content!.ToString()!.Equals(MinerStatus.StopMining))
+                if (btnStartStopMining.Content!.ToString()!.Equals(StatusMiner.StopMining))
                 {
                     // Stop mining
                     StopMiningAsync();
-                    btnStartStopMining.Content = MinerStatus.StartMining;
+                    btnStartStopMining.Content = StatusMiner.StartMining;
                     nupThreads.IsEnabled = true;
                 }
                 else
@@ -43,7 +43,7 @@ namespace NervaWalletMiner.Views
                     }
 
                     StartMiningAsync(GlobalData.ApplicationSettings.Daemon.MiningThreads);
-                    btnStartStopMining.Content = MinerStatus.StopMining;
+                    btnStartStopMining.Content = StatusMiner.StopMining;
                     nupThreads.IsEnabled = false;
                 }                
             }

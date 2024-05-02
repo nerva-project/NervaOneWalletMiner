@@ -1,4 +1,5 @@
 ﻿using NervaWalletMiner.Helpers;
+using NervaWalletMiner.Objects;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -11,10 +12,9 @@ namespace NervaWalletMiner.Rpc.Wallet
     public static class GetAccounts
     {
         public const string MethodName = "get_accounts";
-        public const string DaemonUrl = "http://127.0.0.1:17566/json_rpc";
 
         // TODO: This is just copied from another class
-        public static async Task<GetAccountsResponse> CallServiceAsync()
+        public static async Task<GetAccountsResponse> CallAsync(SettingsRpc rpc)
         {
             GetAccountsResponse resp = new();
 
@@ -22,10 +22,12 @@ namespace NervaWalletMiner.Rpc.Wallet
             {
                 using (HttpClient client = new HttpClient())
                 {
+                    string serviceUrl = GlobalMethods.GetServiceUrl(rpc);
+
                     client.Timeout = TimeSpan.FromSeconds(30);
                     HttpResponseMessage response;
 
-                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, DaemonUrl);
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, serviceUrl);
 
                     // TODO: Change this
                     request.Content = new StringContent("{\"jsonrpc\":\"2.0\",\"id\":\"0\",\"method\":\"" + MethodName + "\"}");
@@ -42,11 +44,26 @@ namespace NervaWalletMiner.Rpc.Wallet
                         var dataObjects = response.Content.ReadAsStringAsync();
                         dynamic jsonObject = JObject.Parse(dataObjects.Result);
 
-                        // TODO: Change the way this is done. Do not want to depend on "result"
-                        resp = JsonConvert.DeserializeObject<GetAccountsResponse>(jsonObject.SelectToken("result.connections").ToString());
+                        // Check for errors
+                        var error = JObject.Parse(jsonObject.ToString())["error"];
+                        if (error != null)
+                        {
+                            resp.Error.IsError = true;
+                            resp.Error.Code = error["code"].ToString();
+                            resp.Error.Message = error["message"].ToString();
+                            Logger.LogError("RWGA.CSA", "Error from service. Code: " + resp.Error.Code + ", Message: " + resp.Error.Message);
+                        }
+                        else
+                        {
+                            resp.Error.IsError = false;
+                        }
                     }
                     else
                     {
+                        resp.Error.IsError = true;
+                        resp.Error.Code = response.StatusCode.ToString();
+                        resp.Error.Message = response.ReasonPhrase;
+
                         Logger.LogError("RWGA.CSA", "Response failed. Code: " + response.StatusCode + ", Phrase: " + response.ReasonPhrase);
                     }
                 }
@@ -63,6 +80,8 @@ namespace NervaWalletMiner.Rpc.Wallet
 
     public class GetAccountsResponse
     {
+        public RpcError Error { get; set; } = new();
+
         // TODO: Replace this with actual fields
         public ulong height { get; set; }
         public ulong target_height { get; set; }

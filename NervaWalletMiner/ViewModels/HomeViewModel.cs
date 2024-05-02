@@ -6,7 +6,7 @@ namespace NervaWalletMiner.ViewModels
 {
     internal class HomeViewModel : ViewModelBase
     {
-        private string _StartStopMining = MinerStatus.StartMining;
+        private string _StartStopMining = StatusMiner.StartMining;
         public string StartStopMining
         {
             get => _StartStopMining;

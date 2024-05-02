@@ -13,7 +13,6 @@ namespace NervaWalletMiner.Views
         public WalletView()
         {
             InitializeComponent();
-
         }
 
         public void OpenCloseWalletClicked(object sender, RoutedEventArgs args)
@@ -22,7 +21,7 @@ namespace NervaWalletMiner.Views
             {
                 var btnOpenCloseWallet = this.Get<Button>("btnOpenCloseWallet");
 
-                if (btnOpenCloseWallet.Content!.ToString()!.Equals(WalletStatus.OpenWallet))
+                if (btnOpenCloseWallet.Content!.ToString()!.Equals(StatusWallet.OpenWallet))
                 {
                     // Open wallet dialog
                     var window = new OpenWalletView();
@@ -30,8 +29,8 @@ namespace NervaWalletMiner.Views
                 }
                 else
                 {
-                    // Close wallet
-
+                    // TODO: Close wallet
+                    GlobalData.IsWalletOpen = false;
                 }
             }
             catch (Exception ex)
@@ -58,14 +57,18 @@ namespace NervaWalletMiner.Views
             }
         }
 
-        private async void OpenUserWallet(string walletName, string walletPassword)
+        private static async void OpenUserWallet(string walletName, string walletPassword)
         {
             OpenWalletResponse response = await OpenWallet.CallAsync(GlobalData.ApplicationSettings.Wallet.Rpc, walletName, walletPassword);
 
-            if (response.IsError)
+            if (response.Error.IsError)
             {
                 // TODO: Report error to user
 
+            }
+            else
+            {
+                GlobalData.IsWalletOpen = true;
             }
         }
 

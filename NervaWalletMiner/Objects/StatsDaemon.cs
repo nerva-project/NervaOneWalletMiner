@@ -1,6 +1,6 @@
 ﻿namespace NervaWalletMiner.Objects
 {
-    public class DaemonStats
+    public class StatsDaemon
     {
         public ulong NetHeight { get; set; } = 0;
         public ulong YourHeight { get; set; } = 0;
@@ -8,7 +8,7 @@
         public string RunTime { get; set; } = "00:00:00";
         public ulong Difficulty { get; set; } = 0;
 
-        public string MinerStatus { get; set; } = NervaWalletMiner.Objects.MinerStatus.Inactive;
+        public string MinerStatus { get; set; } = NervaWalletMiner.Objects.StatusMiner.Inactive;
         public string YourHash { get; set; } = "0 h/s";
         public string BlockTime { get; set; } = "∞";
         public string MiningAddress { get; set; } = "None";
