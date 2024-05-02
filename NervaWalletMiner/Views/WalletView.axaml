@@ -10,7 +10,7 @@
 		<vm:WalletViewModel />
 	</Design.DataContext>
 
-	<StackPanel Spacing="5" HorizontalAlignment="Stretch" MaxWidth="600">
+	<StackPanel Spacing="5" HorizontalAlignment="Stretch" MaxWidth="650">
 		<Grid ColumnDefinitions="200,*,120" Margin="10">
 			<TextBlock Name="tbkWallet" Grid.Row="0" Grid.Column="0">Wallet</TextBlock>
 
@@ -58,9 +58,9 @@
 						<Image Source="{Binding WalletIcon}" Height="15"></Image>
 					</DataTemplate>
 				</DataGridTemplateColumn>
-				<DataGridTextColumn Header="Id" MinWidth="20" Width="*" Binding="{Binding Index}" />
-				<DataGridTextColumn Header="Label" MinWidth="100" Width="*" Binding="{Binding Label}" />
-				<DataGridTextColumn Header="Address" Binding="{Binding Address}" />
+				<DataGridTextColumn Header="Id" Binding="{Binding Index}" />
+				<DataGridTextColumn Header="Label" MinWidth="120" Width="*" Binding="{Binding Label}" />
+				<DataGridTextColumn Header="Address" MinWidth="120" Width="*" Binding="{Binding Address}" />
 				<DataGridTextColumn Header="Balance" Binding="{Binding BalanceLocked}" />
 				<DataGridTextColumn Header="Unlocked" Binding="{Binding BalanceUnlocked}" />
 			</DataGrid.Columns>

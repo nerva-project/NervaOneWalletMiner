@@ -68,7 +68,8 @@ namespace NervaWalletMiner.Views
             }
             else
             {
-                GlobalData.IsWalletOpen = true;
+                GlobalData.IsWalletOpen = true;       
+                GlobalData.IsWalletJustOpened = true;
             }
         }
 

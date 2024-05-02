@@ -4,5 +4,7 @@
     {
         public SettingsDaemon Daemon = new(false);
         public SettingsWallet Wallet = new();
+
+        public SettingsMisc Misc = new();
     }
 }

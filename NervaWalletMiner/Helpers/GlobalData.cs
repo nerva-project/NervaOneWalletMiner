@@ -25,6 +25,7 @@ namespace NervaWalletMiner.Helpers
         public static readonly string ConfigFilePath = GlobalMethods.GetConfigFilePath();
 
         public static bool IsWalletOpen = false;
+        public static bool IsWalletJustOpened = true;
 
         public static StatsDaemon NetworkStats = new();
         public static StatsWallet WalletStats = new();

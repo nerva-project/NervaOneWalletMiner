@@ -140,9 +140,9 @@ namespace NervaWalletMiner.Helpers
             return address.Length > 20 ? address.Substring(0, 6) + "..." + address.Substring(address.Length - 6, 6) : address;
         }
 
-        public static double FromAtomicUnits4Places(ulong balanceAtomic)
+        public static double XnvFromAtomicUnits(ulong balanceAtomic, int decimalPlaces)
         {
-            return Math.Round((double)balanceAtomic / 1000000000000.0d, 4);
+            return Math.Round(balanceAtomic / 1000000000000.0d, decimalPlaces);
         }
 
         public static DateTime UnixTimeStampToDateTime(ulong utcTimeStamp)

@@ -2,7 +2,6 @@
 using Avalonia.Controls.Selection;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
-using log4net.Core;
 using NervaWalletMiner.Helpers;
 using NervaWalletMiner.Objects;
 using NervaWalletMiner.Rpc;
@@ -11,7 +10,6 @@ using NervaWalletMiner.Rpc.Wallet;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Diagnostics;
 using System.Windows.Input;
 using static NervaWalletMiner.Rpc.Daemon.MiningStatus;
@@ -20,10 +18,11 @@ namespace NervaWalletMiner.ViewModels;
 
 public class MainViewModel : ViewModelBase
 {
-    public static System.Timers.Timer? _daemonUpdateTimer;
-    public const int _daemonTimerInterval = 5000;
-    public static int _daemonTimerCount = 0;
+    public static System.Timers.Timer? _masterUpdateTimer;
+    public const int _masterTimerInterval = 1000;
+    public static int _masterTimerCount = 0;
     public static bool _killMasterProcess = false;
+
     public static DateTime _cliToolsRunningLastCheck = DateTime.MinValue;
     public static DateTime _lastDaemonResponseTime = DateTime.Now;
     public static bool _isInitialDaemonConnectionSuccess = false;
@@ -46,7 +45,7 @@ public class MainViewModel : ViewModelBase
         ViewModelPagesDictionary.Add(SplitViewPages.Home, new HomeViewModel());
         ViewModelPagesDictionary.Add(SplitViewPages.Wallet, new WalletViewModel());
         ViewModelPagesDictionary.Add(SplitViewPages.Transfers, new TransfersViewModel());
-        ViewModelPagesDictionary.Add(SplitViewPages.Settings, new SettingsViewModel());              
+        ViewModelPagesDictionary.Add(SplitViewPages.Settings, new SettingsViewModel());
 
         TriggerPaneCommand = ReactiveCommand.Create(TriggerPane);
 
@@ -57,7 +56,7 @@ public class MainViewModel : ViewModelBase
 
         StartMasterUpdateProcess();
 
-        UpdateView();
+        UpdateMainView();
     }
 
     public bool? IsPaneOpen
@@ -93,8 +92,7 @@ public class MainViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _WalletStatus, value);
     }
 
-
-    void SelectionChanged(object sender, SelectionModelSelectionChangedEventArgs e)
+    void SelectionChanged(object? sender, SelectionModelSelectionChangedEventArgs e)
     {
         // TODO: Figoure out better way of doing this
         switch(((ListBoxItem)e.SelectedItems[0]!).Name)
@@ -119,7 +117,7 @@ public class MainViewModel : ViewModelBase
         IsPaneOpen = !IsPaneOpen;
     }
 
-    public void UpdateView()
+    public void UpdateMainView()
     {
         // Daemon (HomeView)
         ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).NetHeight = GlobalData.NetworkStats.NetHeight.ToString();
@@ -159,15 +157,20 @@ public class MainViewModel : ViewModelBase
             }
         }
 
+        // Status Bar
+        DaemonStatus = "Connections: " + GlobalData.NetworkStats.ConnectionsOut + "(out) + " + GlobalData.NetworkStats.ConnectionsIn + "(in) " + GlobalData.NetworkStats.StatusSync;
+        DaemonVersion = "Version: " + GlobalData.NetworkStats.Version;
+    }
+
+    public void UpdateWalletView()
+    {       
         // Wallet
         ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).TotalXnv = GlobalData.WalletStats.TotalBalanceLocked.ToString();
         ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).UnlockedXnv = GlobalData.WalletStats.TotalBalanceUnlocked.ToString();
         ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses = GlobalData.WalletStats.Subaddresses;
 
         // Status Bar
-        DaemonStatus = "Connections: " + GlobalData.NetworkStats.ConnectionsOut + "(out) + " + GlobalData.NetworkStats.ConnectionsIn + "(in) " + GlobalData.NetworkStats.StatusSync;
-        DaemonVersion = "Version: " + GlobalData.NetworkStats.Version;
-        WalletStatus = "Account(s): " + GlobalData.WalletStats.Subaddresses.Count + " | Balance: " + GlobalData.WalletStats.TotalBalanceLocked + " XNV";
+        WalletStatus = "Account(s): " + GlobalData.WalletStats.Subaddresses.Count + " | Balance: " + GlobalData.WalletStats.TotalBalanceLocked + " XNV";        
     }
 
     // TODO: Move this somewhere else.
@@ -178,14 +181,14 @@ public class MainViewModel : ViewModelBase
         {
             Logger.LogDebug("Main.SMUP", "Start Master Update Process");
 
-            if (_daemonUpdateTimer == null)
+            if (_masterUpdateTimer == null)
             {
-                _daemonUpdateTimer = new System.Timers.Timer();
-                _daemonUpdateTimer.Interval = _daemonTimerInterval;
-                _daemonUpdateTimer.Elapsed += (s, e) => MasterUpdateProcess();
-                _daemonUpdateTimer.Start();
+                _masterUpdateTimer = new System.Timers.Timer();
+                _masterUpdateTimer.Interval = _masterTimerInterval;
+                _masterUpdateTimer.Elapsed += (s, e) => MasterUpdateProcess();
+                _masterUpdateTimer.Start();
 
-                Logger.LogDebug("Main.SMUP", "Master timer will start in " + _daemonTimerInterval / 1000 + " seconds");
+                Logger.LogDebug("Main.SMUP", "Master timer running every " + _masterTimerInterval / 1000 + " seconds. Update every " + (_masterTimerInterval / 1000) * GlobalData.ApplicationSettings.Misc.TimerIntervalMultiplier + " seconds.");
             }
         }
         catch (Exception ex)
@@ -198,15 +201,13 @@ public class MainViewModel : ViewModelBase
     {
         try
         {
-            if (_daemonUpdateTimer != null)
+            if (_masterUpdateTimer != null)
             {
-                _daemonUpdateTimer.Stop();
+                _masterUpdateTimer.Stop();
             }
 
             // If kill master process is issued at any point, skip everything else and do not restrt master timer            
-
-
-            if (_cliToolsRunningLastCheck.AddSeconds(5) < DateTime.Now)
+            if (_cliToolsRunningLastCheck.AddSeconds(10) < DateTime.Now)
             {
                 _cliToolsRunningLastCheck = DateTime.Now;
 
@@ -226,12 +227,20 @@ public class MainViewModel : ViewModelBase
             // Update UI
             if (!_killMasterProcess)
             {
-                DaemonUiUpdate();
+                if (_masterTimerCount % GlobalData.ApplicationSettings.Misc.TimerIntervalMultiplier == 0)
+                {
+                    DaemonUiUpdate();
+                }
             }
 
             if (!_killMasterProcess && _isInitialDaemonConnectionSuccess && GlobalData.IsWalletOpen)
             {
-                if(_daemonTimerCount % 3 == 0)
+                if(GlobalData.IsWalletJustOpened)
+                {
+                    GlobalData.IsWalletJustOpened = false;
+                    WalletUiUpdate();
+                }
+                else if(_masterTimerCount % (GlobalData.ApplicationSettings.Misc.TimerIntervalMultiplier * 3) == 0)
                 {
                     // Update wallet every 3rd call because you do not need to do it more often
                     WalletUiUpdate();
@@ -245,18 +254,18 @@ public class MainViewModel : ViewModelBase
         finally
         {
             // Restart timer
-            if (_daemonUpdateTimer == null)
+            if (_masterUpdateTimer == null)
             {
                 Logger.LogError("Main.MUP", "Timer is NULL. Recreating. Why?");
-                _daemonUpdateTimer = new System.Timers.Timer();
-                _daemonUpdateTimer.Interval = _daemonTimerInterval;
-                _daemonUpdateTimer.Elapsed += (s, e) => MasterUpdateProcess();
+                _masterUpdateTimer = new System.Timers.Timer();
+                _masterUpdateTimer.Interval = _masterTimerInterval;
+                _masterUpdateTimer.Elapsed += (s, e) => MasterUpdateProcess();
             }
 
             if (!_killMasterProcess)
             {
-                _daemonTimerCount++;
-                _daemonUpdateTimer.Start();
+                _masterTimerCount++;
+                _masterUpdateTimer.Start();
             }
         }
     }
@@ -426,7 +435,7 @@ public class MainViewModel : ViewModelBase
                     });
                 }
 
-                UpdateView();
+                UpdateMainView();
             }
         }
         catch (Exception ex)
@@ -435,7 +444,7 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    public static async void WalletUiUpdate()
+    public async void WalletUiUpdate()
     {
         try
         {
@@ -447,8 +456,8 @@ public class MainViewModel : ViewModelBase
             }
             else
             {
-                GlobalData.WalletStats.TotalBalanceLocked = GlobalMethods.FromAtomicUnits4Places(response.total_balance);
-                GlobalData.WalletStats.TotalBalanceUnlocked = GlobalMethods.FromAtomicUnits4Places(response.total_unlocked_balance);
+                GlobalData.WalletStats.TotalBalanceLocked = GlobalMethods.XnvFromAtomicUnits(response.total_balance, 4);
+                GlobalData.WalletStats.TotalBalanceUnlocked = GlobalMethods.XnvFromAtomicUnits(response.total_unlocked_balance, 4);
 
                 // TODO: Change this. Update instead of recreating after each call
                 GlobalData.WalletStats.Subaddresses = [];
@@ -458,13 +467,15 @@ public class MainViewModel : ViewModelBase
                     GlobalData.WalletStats.Subaddresses.Add(new Wallet
                     {
                         Index = account.account_index,
-                        BalanceLocked = GlobalMethods.FromAtomicUnits4Places(account.balance),
-                        BalanceUnlocked = GlobalMethods.FromAtomicUnits4Places(account.unlocked_balance),
+                        BalanceLocked = GlobalMethods.XnvFromAtomicUnits(account.balance, 1),
+                        BalanceUnlocked = GlobalMethods.XnvFromAtomicUnits(account.unlocked_balance, 1),
                         Address = GlobalMethods.WalletAddressShortForm(account.base_address),
                         Label = account.label,
                         WalletIcon = _walletImage
                     });
-                }               
+                }
+
+                UpdateWalletView();
             }
 
             

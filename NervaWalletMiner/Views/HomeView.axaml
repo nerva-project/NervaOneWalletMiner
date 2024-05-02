@@ -10,7 +10,7 @@
 		<vm:HomeViewModel />
 	</Design.DataContext>
 	
-	<StackPanel Spacing="5" HorizontalAlignment="Stretch" MaxWidth="600">
+	<StackPanel Spacing="5" HorizontalAlignment="Stretch" MaxWidth="650">
 		<Grid ColumnDefinitions="100,*,100" Margin="10">
 			<TextBlock Grid.Row="0" Grid.Column="0">Daemon</TextBlock>
 			<DockPanel Grid.Row="0" Grid.Column="1" Margin="0,0,10,0" MinWidth="200" MaxWidth="250">
