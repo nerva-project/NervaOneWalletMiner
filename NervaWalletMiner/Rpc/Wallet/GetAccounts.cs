@@ -86,6 +86,16 @@ namespace NervaWalletMiner.Rpc.Wallet
 
         public ulong total_balance { get; set; }
         public ulong total_unlocked_balance { get; set; }
-        public List<SubaddressAccount> subaddress_accounts { get; set; } = [];
+        public List<Account> subaddress_accounts { get; set; } = [];
+    }
+
+    public class Account
+    {
+        public int account_index { get; set; }
+        public string? base_address { get; set; }
+        public ulong balance { get; set; }
+        public ulong unlocked_balance { get; set; }        
+        public string? label { get; set; }
+        public string? tag { get; set; }
     }
 }

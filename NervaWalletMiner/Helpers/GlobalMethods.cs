@@ -140,6 +140,11 @@ namespace NervaWalletMiner.Helpers
             return address.Length > 20 ? address.Substring(0, 6) + "..." + address.Substring(address.Length - 6, 6) : address;
         }
 
+        public static double FromAtomicUnits4Places(ulong balanceAtomic)
+        {
+            return Math.Round((double)balanceAtomic / 1000000000000.0d, 4);
+        }
+
         public static DateTime UnixTimeStampToDateTime(ulong utcTimeStamp)
         {
             return new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddSeconds(utcTimeStamp);

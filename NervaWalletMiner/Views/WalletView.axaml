@@ -24,7 +24,7 @@
 		</Grid>
 
 		<Grid ColumnDefinitions="200,*,200" Margin="10">
-			<Grid ColumnDefinitions="100,100" Grid.Row="0" Grid.Column="0">
+			<Grid ColumnDefinitions="110,100" Grid.Row="0" Grid.Column="0">
 				<Grid.RowDefinitions>
 					<RowDefinition Height="30" />
 					<RowDefinition Height="30" />
@@ -58,11 +58,11 @@
 						<Image Source="{Binding WalletIcon}" Height="15"></Image>
 					</DataTemplate>
 				</DataGridTemplateColumn>
-				<DataGridTextColumn Header="Id" MinWidth="20" Width="*" Binding="{Binding Id}" />
+				<DataGridTextColumn Header="Id" MinWidth="20" Width="*" Binding="{Binding Index}" />
 				<DataGridTextColumn Header="Label" MinWidth="100" Width="*" Binding="{Binding Label}" />
 				<DataGridTextColumn Header="Address" Binding="{Binding Address}" />
-				<DataGridTextColumn Header="Balance" Binding="{Binding LockedBalance}" />
-				<DataGridTextColumn Header="Unlocked" Binding="{Binding UnlockedBalance}" />
+				<DataGridTextColumn Header="Balance" Binding="{Binding BalanceLocked}" />
+				<DataGridTextColumn Header="Unlocked" Binding="{Binding BalanceUnlocked}" />
 			</DataGrid.Columns>
 		</DataGrid>
 

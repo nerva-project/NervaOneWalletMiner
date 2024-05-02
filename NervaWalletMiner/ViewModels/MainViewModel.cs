@@ -32,6 +32,7 @@ public class MainViewModel : ViewModelBase
 
     public static readonly Bitmap _inImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaWalletMiner/Assets/transfer_in.png")));
     public static readonly Bitmap _outImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaWalletMiner/Assets/transfer_out.png")));
+    public static readonly Bitmap _walletImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaWalletMiner/Assets/wallet.png")));
 
     private bool? _isPaneOpen = false;
     private ViewModelBase _CurrentPage;
@@ -120,6 +121,7 @@ public class MainViewModel : ViewModelBase
 
     public void UpdateView()
     {
+        // Daemon (HomeView)
         ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).NetHeight = GlobalData.NetworkStats.NetHeight.ToString();
         ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).YourHeight = GlobalData.NetworkStats.YourHeight.ToString();
         ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).NetHash = GlobalData.NetworkStats.NetHash;
@@ -157,10 +159,15 @@ public class MainViewModel : ViewModelBase
             }
         }
 
+        // Wallet
+        ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).TotalXnv = GlobalData.WalletStats.TotalBalanceLocked.ToString();
+        ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).UnlockedXnv = GlobalData.WalletStats.TotalBalanceUnlocked.ToString();
+        ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses = GlobalData.WalletStats.Subaddresses;
+
         // Status Bar
         DaemonStatus = "Connections: " + GlobalData.NetworkStats.ConnectionsOut + "(out) + " + GlobalData.NetworkStats.ConnectionsIn + "(in) " + GlobalData.NetworkStats.StatusSync;
         DaemonVersion = "Version: " + GlobalData.NetworkStats.Version;
-        WalletStatus = "Account(s): " + GlobalData.WalletStats.Subaddresses.Count + " | Balance: " + GlobalData.WalletStats.TotalBalanceLocked + "XNV";
+        WalletStatus = "Account(s): " + GlobalData.WalletStats.Subaddresses.Count + " | Balance: " + GlobalData.WalletStats.TotalBalanceLocked + " XNV";
     }
 
     // TODO: Move this somewhere else.
@@ -404,7 +411,7 @@ public class MainViewModel : ViewModelBase
                 List<GetConnectionsResponse> connectResp = await GetConnections.CallServiceAsync();
 
                 // TODO: For now just recreate items in grid. Consider, removing disconnected and adding new ones to List instead.
-                GlobalData.Connections = new();
+                GlobalData.Connections = [];
 
                 foreach (GetConnectionsResponse connection in connectResp)
                 {
@@ -437,15 +444,27 @@ public class MainViewModel : ViewModelBase
             if(response.Error.IsError)
             {
                 Logger.LogError("Main.WUU", "Error Code: " + response.Error.Code + ", Message: " + response.Error.Message);
-
             }
             else
             {
-                // TODO: Convert balances from atomic units
-                GlobalData.WalletStats.TotalBalanceLocked = response.total_balance;
-                GlobalData.WalletStats.TotalBalanceUnlocked = response.total_unlocked_balance;
+                GlobalData.WalletStats.TotalBalanceLocked = GlobalMethods.FromAtomicUnits4Places(response.total_balance);
+                GlobalData.WalletStats.TotalBalanceUnlocked = GlobalMethods.FromAtomicUnits4Places(response.total_unlocked_balance);
 
-                GlobalData.WalletStats.Subaddresses = response.subaddress_accounts;
+                // TODO: Change this. Update instead of recreating after each call
+                GlobalData.WalletStats.Subaddresses = [];
+
+                foreach (Account account in response.subaddress_accounts)
+                {
+                    GlobalData.WalletStats.Subaddresses.Add(new Wallet
+                    {
+                        Index = account.account_index,
+                        BalanceLocked = GlobalMethods.FromAtomicUnits4Places(account.balance),
+                        BalanceUnlocked = GlobalMethods.FromAtomicUnits4Places(account.unlocked_balance),
+                        Address = GlobalMethods.WalletAddressShortForm(account.base_address),
+                        Label = account.label,
+                        WalletIcon = _walletImage
+                    });
+                }               
             }
 
             
