@@ -25,12 +25,16 @@ namespace NervaWalletMiner.Views
                 {
                     // Open wallet dialog
                     var window = new OpenWalletView();
-                    window.ShowDialog(GetWindow()).ContinueWith(DialogClosed);                   
+                    window.ShowDialog(GetWindow()).ContinueWith(DialogClosed);
+
+                    // TODO: Need to do this after wallet opens from non-ui thread
+                    btnOpenCloseWallet.Content = StatusWallet.CloseWallet;
                 }
                 else
                 {
                     // TODO: Close wallet
                     GlobalData.IsWalletOpen = false;
+                    btnOpenCloseWallet.Content = StatusWallet.OpenWallet;
                 }
             }
             catch (Exception ex)
@@ -42,7 +46,7 @@ namespace NervaWalletMiner.Views
         private void DialogClosed(Task task)
         {
             DialogResult result = ((DialogResult)((Task<object>)task).Result);
-            if(result.IsOk)
+            if(result != null && result.IsOk)
             {
                 // Open wallet
                 if (!string.IsNullOrEmpty(result.WalletName) && !string.IsNullOrEmpty(result.WalletPassword))
@@ -64,12 +68,11 @@ namespace NervaWalletMiner.Views
             if (response.Error.IsError)
             {
                 // TODO: Report error to user
-
             }
             else
             {
                 GlobalData.IsWalletOpen = true;       
-                GlobalData.IsWalletJustOpened = true;
+                GlobalData.IsWalletJustOpened = true;                
             }
         }
 

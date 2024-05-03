@@ -26,8 +26,8 @@
 		<Grid ColumnDefinitions="200,*,200" Margin="10">
 			<Grid ColumnDefinitions="110,100" Grid.Row="0" Grid.Column="0">
 				<Grid.RowDefinitions>
-					<RowDefinition Height="30" />
-					<RowDefinition Height="30" />
+					<RowDefinition Height="35" />
+					<RowDefinition Height="35" />
 				</Grid.RowDefinitions>
 
 				<Label Grid.Row="0" Grid.Column="0" Content="Total XNV:" />
@@ -38,8 +38,8 @@
 
 			<Grid ColumnDefinitions="120" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right">
 				<Grid.RowDefinitions>
-					<RowDefinition Height="35" />
-					<RowDefinition Height="35" />
+					<RowDefinition Height="30" />
+					<RowDefinition Height="30" />
 				</Grid.RowDefinitions>
 
 				<Button Grid.Row="0" Grid.Column="0" Content="Transfer Funds" HorizontalAlignment="Stretch"></Button>
@@ -50,8 +50,8 @@
 				  AutoGenerateColumns="False"
 				  GridLinesVisibility="Horizontal"
 				  IsReadOnly="True"
-				  Height="300"
-				  Margin="10">
+				  Height="365"
+				  Margin="10,20,10,10">
 			<DataGrid.Columns>
 				<DataGridTemplateColumn Header="">
 					<DataTemplate DataType="Bitmap">

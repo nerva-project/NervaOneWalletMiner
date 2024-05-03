@@ -6,9 +6,9 @@ using System.Windows.Input;
 
 namespace NervaWalletMiner.ViewModels
 {
-    public class WalletViewModel : ViewModelBase
+    internal class WalletViewModel : ViewModelBase
     {
-        private string _OpenCloseWallet = "Open Wallet";
+        private string _OpenCloseWallet = StatusWallet.OpenWallet;
         public string OpenCloseWallet
         {
             get => _OpenCloseWallet;

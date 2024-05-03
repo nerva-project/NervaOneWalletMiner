@@ -169,6 +169,15 @@ public class MainViewModel : ViewModelBase
         ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).UnlockedXnv = GlobalData.WalletStats.TotalBalanceUnlocked.ToString();
         ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses = GlobalData.WalletStats.Subaddresses;
 
+        if(GlobalData.IsWalletOpen)
+        {
+            ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).OpenCloseWallet = StatusWallet.CloseWallet;
+        }
+        else
+        {
+            ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).OpenCloseWallet = StatusWallet.OpenWallet;
+        }
+
         // Status Bar
         WalletStatus = "Account(s): " + GlobalData.WalletStats.Subaddresses.Count + " | Balance: " + GlobalData.WalletStats.TotalBalanceLocked + " XNV";        
     }
@@ -341,6 +350,7 @@ public class MainViewModel : ViewModelBase
 
             if (!string.IsNullOrEmpty(infoRes.version))
             {
+                _lastDaemonResponseTime = DateTime.Now;
                 if (_isInitialDaemonConnectionSuccess == false)
                 {
                     // This will be used to get rid of establishing connection message and to StartWalletUiUpdate 
