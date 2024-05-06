@@ -2,6 +2,7 @@
 using Avalonia.Controls.Selection;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using DynamicData;
 using NervaWalletMiner.Helpers;
 using NervaWalletMiner.Objects;
 using NervaWalletMiner.Rpc;
@@ -11,6 +12,7 @@ using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows.Input;
 using static NervaWalletMiner.Rpc.Daemon.MiningStatus;
 
@@ -165,9 +167,74 @@ public class MainViewModel : ViewModelBase
     public void UpdateWalletView()
     {       
         // Wallet
-        ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).TotalXnv = GlobalData.WalletStats.TotalBalanceLocked.ToString();
-        ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).UnlockedXnv = GlobalData.WalletStats.TotalBalanceUnlocked.ToString();
-        ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses = GlobalData.WalletStats.Subaddresses;
+        if(!((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).TotalXnv.Equals(GlobalData.WalletStats.TotalBalanceLocked.ToString()))
+        {
+            ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).TotalXnv = GlobalData.WalletStats.TotalBalanceLocked.ToString();
+        }
+        
+        if(!((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).UnlockedXnv.Equals(GlobalData.WalletStats.TotalBalanceUnlocked.ToString()))
+        {
+            ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).UnlockedXnv = GlobalData.WalletStats.TotalBalanceUnlocked.ToString();
+        }        
+
+        if(((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses.Count == 0)
+        {
+            ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses = GlobalData.WalletStats.Subaddresses.Values.ToList<Wallet>();
+        }
+        else
+        {
+            // TODO: ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses RaiseAndSetIfChanged not firing on updates. Find another way
+
+
+            // Trying to avoid loop within a loop
+            List<Wallet> deleteWallets = [];
+            HashSet<int> checkedIndexes = [];
+
+            foreach (Wallet wallet in ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses)
+            {
+                checkedIndexes.Add(wallet.Index);
+
+                if (GlobalData.WalletStats.Subaddresses.ContainsKey(wallet.Index))
+                {
+                    // Update, only if value changed
+                    if (!wallet.Label.Equals(GlobalData.WalletStats.Subaddresses[wallet.Index].Label))
+                    {
+                        wallet.Label = GlobalData.WalletStats.Subaddresses[wallet.Index].Label;
+                    }
+                    if (!wallet.Address.Equals(GlobalData.WalletStats.Subaddresses[wallet.Index].Address))
+                    {
+                        wallet.Address = GlobalData.WalletStats.Subaddresses[wallet.Index].Address;
+                    }
+                    if (wallet.BalanceLocked != (GlobalData.WalletStats.Subaddresses[wallet.Index].BalanceLocked))
+                    {
+                        wallet.BalanceLocked = GlobalData.WalletStats.Subaddresses[wallet.Index].BalanceLocked;
+                    }
+                    if (wallet.BalanceUnlocked != (GlobalData.WalletStats.Subaddresses[wallet.Index].BalanceUnlocked))
+                    {
+                        wallet.BalanceUnlocked = GlobalData.WalletStats.Subaddresses[wallet.Index].BalanceUnlocked;
+                    }
+                }
+                else
+                {
+                    // Wallets to remove
+                    deleteWallets.Add(wallet);
+                }
+            }
+
+            foreach (Wallet wallet in deleteWallets)
+            {
+                ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses.Remove(wallet);
+            }
+
+            foreach (int index in GlobalData.WalletStats.Subaddresses.Keys)
+            {
+                if (!checkedIndexes.Contains(index))
+                {
+                    // Need to add new wallet
+                    ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses.Add(GlobalData.WalletStats.Subaddresses[index]);
+                }
+            }
+        }       
 
         if(GlobalData.IsWalletOpen)
         {
@@ -474,7 +541,7 @@ public class MainViewModel : ViewModelBase
 
                 foreach (Account account in response.subaddress_accounts)
                 {
-                    GlobalData.WalletStats.Subaddresses.Add(new Wallet
+                    Wallet newWallet = new()
                     {
                         Index = account.account_index,
                         BalanceLocked = GlobalMethods.XnvFromAtomicUnits(account.balance, 1),
@@ -482,7 +549,9 @@ public class MainViewModel : ViewModelBase
                         Address = GlobalMethods.WalletAddressShortForm(account.base_address),
                         Label = account.label,
                         WalletIcon = _walletImage
-                    });
+                    };
+
+                    GlobalData.WalletStats.Subaddresses.Add(newWallet.Index, newWallet);
                 }
 
                 UpdateWalletView();
