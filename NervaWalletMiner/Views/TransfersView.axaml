@@ -9,6 +9,38 @@
 	<Design.DataContext>
 		<vm:TransfersViewModel />
 	</Design.DataContext>
-	
-    Transfers View
+
+	<StackPanel Spacing="5" HorizontalAlignment="Stretch" MaxWidth="650">
+		<Grid ColumnDefinitions="200,*,120" Margin="10">
+			<TextBlock Name="tbkTransfers" Grid.Row="0" Grid.Column="0">Transfers</TextBlock>
+
+			<Button Name="btnOpenCloseWallet"
+					Grid.Row="0"
+					Grid.Column="2"
+					Content="{Binding OpenCloseWallet}"
+					DockPanel.Dock="Right"
+					Width="120"
+					Click="OpenCloseWalletClicked" />
+		</Grid>
+
+		<DataGrid ItemsSource="{Binding WalletAddresses}"
+				  AutoGenerateColumns="False"
+				  GridLinesVisibility="Horizontal"
+				  IsReadOnly="True"
+				  Height="365"
+				  Margin="10,20,10,10">
+			<DataGrid.Columns>
+				<DataGridTemplateColumn Header="">
+					<DataTemplate DataType="Bitmap">
+						<Image Source="{Binding TransferIcon}" Height="15"></Image>
+					</DataTemplate>
+				</DataGridTemplateColumn>				
+				<DataGridTextColumn Header="Height" Binding="{Binding Height}" />
+				<DataGridTextColumn Header="Time" MinWidth="120" Width="*" Binding="{Binding Time}" />
+				<DataGridTextColumn Header="Amount" Binding="{Binding Amount}" />
+				<DataGridTextColumn Header="Transaction Id" Binding="{Binding TransactionId}" />				
+			</DataGrid.Columns>
+		</DataGrid>
+	</StackPanel>
+    
 </UserControl>

@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:uc="clr-namespace:NervaWalletMiner.Views"
              xmlns:vm="clr-namespace:NervaWalletMiner.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="600"
+             mc:Ignorable="d" d:DesignWidth="650" d:DesignHeight="600"
              x:Class="NervaWalletMiner.Views.MainView"
              x:DataType="vm:MainViewModel">
   <Design.DataContext>
