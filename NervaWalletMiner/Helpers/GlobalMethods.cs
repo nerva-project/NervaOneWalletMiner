@@ -130,14 +130,15 @@ namespace NervaWalletMiner.Helpers
             return Path.Combine(dataDir, "app.config");
         }
 
-        public static string WalletAddressShortForm(string? address)
+        public static string GetShorterString(string? text, int shorterLength)
         {
-            if (string.IsNullOrEmpty(address))
+            if (string.IsNullOrEmpty(text))
             {
-                return "";
+                return string.Empty;
             }
 
-            return address.Length > 20 ? address.Substring(0, 6) + "..." + address.Substring(address.Length - 6, 6) : address;
+            int charsOnEachSide = shorterLength / 2;
+            return text.Length > shorterLength ? text.Substring(0, charsOnEachSide) + "..." + text.Substring(text.Length - charsOnEachSide, charsOnEachSide) : text;
         }
 
         public static double XnvFromAtomicUnits(ulong balanceAtomic, int decimalPlaces)

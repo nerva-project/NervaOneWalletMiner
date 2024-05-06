@@ -29,7 +29,10 @@ namespace NervaWalletMiner.Helpers
 
         public static StatsDaemon NetworkStats = new();
         public static StatsWallet WalletStats = new();
+        public static StatsTransfers TransfersStats = new();
         public static List<Connection> Connections = new List<Connection>();
+
+        public static ulong NewestTransactionHeight = 0;
 
         public static int CpuThreadCount = Environment.ProcessorCount;
     }

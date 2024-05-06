@@ -1,5 +1,6 @@
 ﻿using NervaWalletMiner.Objects;
 using ReactiveUI;
+using System.Collections.Generic;
 
 namespace NervaWalletMiner.ViewModels
 {
@@ -10,6 +11,13 @@ namespace NervaWalletMiner.ViewModels
         {
             get => _OpenCloseWallet;
             set => this.RaiseAndSetIfChanged(ref _OpenCloseWallet, value);
+        }
+
+        private List<Transfer> _Transactions = new();
+        public List<Transfer> Transactions
+        {
+            get => _Transactions;
+            set => this.RaiseAndSetIfChanged(ref _Transactions, value);
         }
     }
 }

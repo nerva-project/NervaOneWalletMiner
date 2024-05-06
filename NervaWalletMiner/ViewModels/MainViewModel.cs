@@ -32,6 +32,7 @@ public class MainViewModel : ViewModelBase
 
     public static readonly Bitmap _inImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaWalletMiner/Assets/transfer_in.png")));
     public static readonly Bitmap _outImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaWalletMiner/Assets/transfer_out.png")));
+    public static readonly Bitmap _blockImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaWalletMiner/Assets/transfer_block.png")));
     public static readonly Bitmap _walletImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaWalletMiner/Assets/wallet.png")));
 
     private bool? _isPaneOpen = false;
@@ -250,8 +251,14 @@ public class MainViewModel : ViewModelBase
 
     public void UpdateTransfersView()
     {
-        // TODO: Populate Transfers
-        
+        if (((TransfersViewModel)ViewModelPagesDictionary[SplitViewPages.Transfers]).Transactions.Count == 0)
+        {
+            ((TransfersViewModel)ViewModelPagesDictionary[SplitViewPages.Transfers]).Transactions = GlobalData.TransfersStats.Transactions.Values.ToList<Transfer>();
+        }
+        else
+        {
+            // TODO: Add new transactions
+        }
     }
 
     // TODO: Move this somewhere else.
@@ -461,7 +468,7 @@ public class MainViewModel : ViewModelBase
                 if (miningRes.active)
                 {
                     GlobalData.NetworkStats.MinerStatus = StatusMiner.Mining;
-                    GlobalData.NetworkStats.MiningAddress = GlobalMethods.WalletAddressShortForm(miningRes.address);
+                    GlobalData.NetworkStats.MiningAddress = GlobalMethods.GetShorterString(miningRes.address, 12);
 
                     if (miningRes.speed > 1000)
                     {
@@ -551,7 +558,7 @@ public class MainViewModel : ViewModelBase
                         Index = account.account_index,
                         BalanceLocked = GlobalMethods.XnvFromAtomicUnits(account.balance, 1),
                         BalanceUnlocked = GlobalMethods.XnvFromAtomicUnits(account.unlocked_balance, 1),
-                        Address = GlobalMethods.WalletAddressShortForm(account.base_address),
+                        Address = GlobalMethods.GetShorterString(account.base_address, 12),
                         Label = account.label,
                         WalletIcon = _walletImage
                     };
@@ -568,16 +575,17 @@ public class MainViewModel : ViewModelBase
 
             // Get transactions for Transfers view
             GetTransfersRequest reqTransfers = new GetTransfersRequest();
-            reqTransfers.In = true;
-            reqTransfers.Out = true;
-            reqTransfers.pending = true;
-            reqTransfers.failed = false;
-            reqTransfers.pool = false;
-            reqTransfers.filter_by_height = false;
-            reqTransfers.min_height = 0;
-            reqTransfers.account_index = 0;
-            reqTransfers.subaddr_indices = [];
-            reqTransfers.all_accounts = true;
+            reqTransfers.IncludeIn = true;
+            reqTransfers.IncludeOut = true;
+            reqTransfers.IncludePending = true;
+            reqTransfers.IncludeFailed = false;
+            reqTransfers.IncludePool = false;
+            reqTransfers.IsFilterByHeight = true;
+            reqTransfers.MinHeight = GlobalData.NewestTransactionHeight;
+            //reqTransfers.MaxHeight = ulong.MaxValue;
+            reqTransfers.AccountIndex = 0;
+            reqTransfers.SubaddressIndices = [];
+            reqTransfers.IsAllAccounts = true;
 
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -590,8 +598,38 @@ public class MainViewModel : ViewModelBase
             }
             else
             {
-                // TODO: Process data
+                GlobalData.TransfersStats.Transactions = [];
 
+                foreach (Transfer transfer in resTransfers.Transfers)
+                {
+                    if(transfer.Type.Equals("in"))
+                    {
+                        transfer.Icon = _inImage;
+                    }
+                    else if(transfer.Type.Equals("out"))
+                    {
+                        transfer.Icon = _outImage;
+                    }
+                    else if(transfer.Type.Equals("block"))
+                    {
+                        transfer.Icon = _blockImage;
+                    }
+
+                    if(GlobalData.TransfersStats.Transactions.ContainsKey(transfer.TransactionId))
+                    {
+                        // TODO: Figure out why you have duplicates. Maybe TransactionId is not unique on its own
+                    }
+                    else
+                    {
+                        GlobalData.TransfersStats.Transactions.Add(transfer.TransactionId, transfer);
+
+                        // TODO: Maybe do this in a different way
+                        if(transfer.Height > GlobalData.NewestTransactionHeight)
+                        {
+                            GlobalData.NewestTransactionHeight = transfer.Height;
+                        }
+                    }
+                }
 
                 UpdateTransfersView();
             }
@@ -601,31 +639,5 @@ public class MainViewModel : ViewModelBase
             Logger.LogException("Main.WUU", ex);
         }
     }
-
-    /*
-    void WalletUpdateFailed(RequestError e)
-    {
-        try
-        {
-            if (e.Code != -13) //skip messages about not having a wallet open
-            {
-                Logger.LogError("MF.WUF", $"Wallet update failed, Code {e.Code}: {e.Message}");
-            }
-
-            Application.Instance.AsyncInvoke(() =>
-            {
-                string message = "Wallet offline - see Wallet menu to open, create or import wallet";
-                if (!lblWalletStatus.Text.Equals(message)) { lblWalletStatus.Text = message; }
-                lastTxHeight = 0;
-                balancesPage.Update(null);
-                transfersPage.Update(null);
-            });
-        }
-        catch (Exception ex)
-        {
-            Logger.LogException("Main.WUF", ex);
-        }
-    }
-    */
     #endregion // Master Process Methods
 }

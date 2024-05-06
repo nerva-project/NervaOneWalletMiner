@@ -10,6 +10,27 @@ using System.Threading.Tasks;
 
 namespace NervaWalletMiner.Rpc.Wallet
 {
+    public class GetTransfersRequest
+    {
+        public bool IncludeIn { get; set; }
+        public bool IncludeOut { get; set; }
+        public bool IncludePending { get; set; }
+        public bool IncludeFailed { get; set; }
+        public bool IncludePool { get; set; }
+        public bool IsFilterByHeight { get; set; }
+        public ulong MinHeight { get; set; }
+        public ulong MaxHeight { get; set; }
+        public uint AccountIndex { get; set; }
+        public List<uint> SubaddressIndices { get; set; } = [];
+        public bool IsAllAccounts { get; set; }
+    }
+
+    public class GetTransfersResponse
+    {
+        public RpcError Error { get; set; } = new();
+        public List<Transfer> Transfers { get; set; } = [];
+    }
+
     public static class GetTransfers
     {
         // TODO: Make Wallet methods interfaces. Implement here for given coin.
@@ -29,33 +50,37 @@ namespace NervaWalletMiner.Rpc.Wallet
 
                     HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, serviceUrl);
 
-                    var requestParams = new JObject();
-                    requestParams["in"] = transfersRequest.In;
-                    requestParams["out"] = transfersRequest.Out;
-                    requestParams["pending"] = transfersRequest.pending;
-                    requestParams["failed"] = transfersRequest.failed;
-                    requestParams["pool"] = transfersRequest.pool;
-                    requestParams["filter_by_height"] = transfersRequest.filter_by_height;
-                    requestParams["min_height"] = transfersRequest.min_height;
-                    requestParams["account_index"] = transfersRequest.account_index;
-                    requestParams["subaddr_indices"] = new JArray(transfersRequest.subaddr_indices);
-                    requestParams["all_accounts"] = transfersRequest.all_accounts;
+                    var requestParams = new JObject
+                    {
+                        ["in"] = transfersRequest.IncludeIn,
+                        ["out"] = transfersRequest.IncludeOut,
+                        ["pending"] = transfersRequest.IncludePending,
+                        ["failed"] = transfersRequest.IncludeFailed,
+                        ["pool"] = transfersRequest.IncludePool,
+                        ["filter_by_height"] = transfersRequest.IsFilterByHeight,
+                        ["min_height"] = transfersRequest.MinHeight,
+                        ["account_index"] = transfersRequest.AccountIndex,
+                        ["subaddr_indices"] = new JArray(transfersRequest.SubaddressIndices),
+                        ["all_accounts"] = transfersRequest.IsAllAccounts
+                    };
 
-                    var requestJson = new JObject();
-                    requestJson["jsonrpc"] = "2.0";
-                    requestJson["id"] = "0";
-                    requestJson["method"] = "get_transfers";
-                    requestJson["params"] = requestParams;                   
+                    var requestJson = new JObject
+                    {
+                        ["jsonrpc"] = "2.0",
+                        ["id"] = "0",
+                        ["method"] = "get_transfers",
+                        ["params"] = requestParams
+                    };
 
 
                     request.Content = new StringContent(requestJson.ToString());
                     request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-                    //Logger.LogDebug("RWGA.CSA", "Calling POST: " + DaemonUrl + " | " + MethodName);
+                    //Logger.LogDebug("GetTransfers.CA", "Calling POST: " + serviceUrl);
 
                     response = await client.SendAsync(request);
 
-                    //Logger.LogDebug("RWGA.CSA", "Call returned: " + DaemonUrl + " | " + MethodName);
+                    //Logger.LogDebug("GetTransfers.CA", "Call returned: " + serviceUrl);
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -73,7 +98,56 @@ namespace NervaWalletMiner.Rpc.Wallet
                         }
                         else
                         {
-                            resp = JsonConvert.DeserializeObject<GetTransfersResponse>(jsonObject.SelectToken("result").ToString());
+                            GetTransfersRpc getTransfersResponse = JsonConvert.DeserializeObject<GetTransfersRpc>(jsonObject.SelectToken("result").ToString());
+                            foreach(TransferEntry entry in getTransfersResponse.In)
+                            {
+                                Transfer newTransfer = new()
+                                {
+                                    TransactionId = entry.txid,
+                                    TransactionIdShort = GlobalMethods.GetShorterString(entry.txid, 12),
+                                    PaymentId = entry.payment_id,
+                                    Height = entry.height,
+                                    Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp),
+                                    Amount = GlobalMethods.XnvFromAtomicUnits(entry.amount, 2),
+                                    Type = entry.type
+                                };
+
+                                resp.Transfers.Add(newTransfer);
+                            }
+
+                            foreach (TransferEntry entry in getTransfersResponse.Out)
+                            {
+                                Transfer newTransfer = new()
+                                {
+                                    TransactionId = entry.txid,
+                                    TransactionIdShort = GlobalMethods.GetShorterString(entry.txid, 12),
+                                    PaymentId = entry.payment_id,
+                                    Height = entry.height,
+                                    Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp),
+                                    Amount = GlobalMethods.XnvFromAtomicUnits(entry.amount, 2),
+                                    Type = entry.type
+                                };
+
+                                resp.Transfers.Add(newTransfer);
+                            }
+
+                            foreach (TransferEntry entry in getTransfersResponse.pending)
+                            {
+                                Transfer newTransfer = new()
+                                {
+                                    TransactionId = entry.txid,
+                                    TransactionIdShort = GlobalMethods.GetShorterString(entry.txid, 12),
+                                    PaymentId = entry.payment_id,
+                                    Height = entry.height,
+                                    Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp),
+                                    Amount = GlobalMethods.XnvFromAtomicUnits(entry.amount, 2),
+                                    Type = entry.type
+                                };
+
+                                resp.Transfers.Add(newTransfer);
+                            }
+
+
                             resp.Error.IsError = false;
                         }
                     }
@@ -94,69 +168,48 @@ namespace NervaWalletMiner.Rpc.Wallet
 
             return resp;
         }
-    }
 
-    public class GetTransfersRequest
-    {
-        // TODO: Not sure if this will work as those are reserved keywords. Might need to use: [JsonProperty("in")]
-        public bool In { get; set; }
-        public bool Out { get; set; }
+        // Internal structures
+        private class GetTransfersRpc
+        {
+            public List<TransferEntry> In { get; set; } = [];
+            public List<TransferEntry> Out { get; set; } = [];
+            public List<TransferEntry> pending { get; set; } = [];
+            public List<TransferEntry> failed { get; set; } = [];
+            public List<TransferEntry> pool { get; set; } = [];
+        }
 
-        public bool pending { get; set; }
-        public bool failed { get; set; }
-        public bool pool { get; set; }
-        public bool filter_by_height { get; set; }
-        public ulong min_height { get; set; }
-        public ulong max_height { get; set; }
-        public uint account_index { get; set; }
-        public List<uint> subaddr_indices { get; set; } = [];
-        public bool all_accounts { get; set; }
-    }
+        private class TransferEntry
+        {
+            public string txid { get; set; } = string.Empty;
+            public string payment_id { get; set; } = string.Empty;
+            public ulong height { get; set; }
+            public ulong timestamp { get; set; }
+            public ulong amount { get; set; }
+            public ulong fee { get; set; }
+            public string note { get; set; } = string.Empty;
+            public List<TransferDestination> destinations { get; set; } = [];
+            public string type { get; set; } = string.Empty;
+            public ulong unlock_time { get; set; }
+            public bool locked { get; set; }
+            public SubaddressIndex subaddr_index { get; set; } = new();
+            public List<SubaddressIndex> subaddr_indices { get; set; } = [];
+            public string address { get; set; } = string.Empty;
+            public bool double_spend_seen { get; set; }
+            public ulong confirmations { get; set; }
+            public ulong suggested_confirmations_threshold { get; set; }
+        }
 
-    public class GetTransfersResponse
-    {
-        public RpcError Error { get; set; } = new();
+        private class TransferDestination
+        {
+            public ulong amount { get; set; }
+            public string address { get; set; } = string.Empty;
+        }
 
-
-        public List<TransferEntry> In { get; set; } = [];
-        public List<TransferEntry> Out { get; set; } = [];
-        public List<TransferEntry> pending { get; set; } = [];
-        public List<TransferEntry> failed { get; set; } = [];
-        public List<TransferEntry> pool { get; set; } = [];
-    }
-
-    public class TransferEntry
-    {
-        public string txid { get; set; }
-        public string payment_id { get; set; }
-        public ulong height { get; set; }
-        public ulong timestamp { get; set; }
-        public ulong amount { get; set; }
-        public ulong fee { get; set; }
-        public string note { get; set; }
-        public List<TransferDestination> destinations { get; set; }
-        public string type { get; set; }
-        public ulong unlock_time { get; set; }
-        public bool locked { get; set; }
-        public SubaddressIndex subaddr_index { get; set; }
-        public List<SubaddressIndex> subaddr_indices { get; set; }
-        public string address { get; set; }
-        public bool double_spend_seen { get; set; }
-        public ulong confirmations { get; set; }
-        public ulong suggested_confirmations_threshold { get; set; }
-    }
-
-    public class TransferDestination
-    {
-        public ulong amount { get; set; }
-
-        public string address { get; set; }
-    }
-
-    public class SubaddressIndex
-    {
-        public uint major { get; set; }
-
-        public uint minor { get; set; }
+        private class SubaddressIndex
+        {
+            public uint major { get; set; }
+            public uint minor { get; set; }
+        }
     }
 }
