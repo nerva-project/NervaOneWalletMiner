@@ -2,7 +2,6 @@
 using Avalonia.Controls.Selection;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
-using DynamicData;
 using NervaWalletMiner.Helpers;
 using NervaWalletMiner.Objects;
 using NervaWalletMiner.Rpc;
@@ -247,6 +246,12 @@ public class MainViewModel : ViewModelBase
 
         // Status Bar
         WalletStatus = "Account(s): " + GlobalData.WalletStats.Subaddresses.Count + " | Balance: " + GlobalData.WalletStats.TotalBalanceLocked + " XNV";        
+    }
+
+    public void UpdateTransfersView()
+    {
+        // TODO: Populate Transfers
+        
     }
 
     // TODO: Move this somewhere else.
@@ -525,21 +530,21 @@ public class MainViewModel : ViewModelBase
     {
         try
         {
-            GetAccountsResponse response = await GetAccounts.CallAsync(GlobalData.ApplicationSettings.Wallet.Rpc);
+            // Get accounts for Wallets view
+            GetAccountsResponse resGetAccounts = await GetAccounts.CallAsync(GlobalData.ApplicationSettings.Wallet.Rpc);
 
-            if(response.Error.IsError)
+            if(resGetAccounts.Error.IsError)
             {
-                Logger.LogError("Main.WUU", "Error Code: " + response.Error.Code + ", Message: " + response.Error.Message);
+                Logger.LogError("Main.WUU", "GetAccounts Error Code: " + resGetAccounts.Error.Code + ", Message: " + resGetAccounts.Error.Message);
             }
             else
             {
-                GlobalData.WalletStats.TotalBalanceLocked = GlobalMethods.XnvFromAtomicUnits(response.total_balance, 4);
-                GlobalData.WalletStats.TotalBalanceUnlocked = GlobalMethods.XnvFromAtomicUnits(response.total_unlocked_balance, 4);
+                GlobalData.WalletStats.TotalBalanceLocked = GlobalMethods.XnvFromAtomicUnits(resGetAccounts.total_balance, 4);
+                GlobalData.WalletStats.TotalBalanceUnlocked = GlobalMethods.XnvFromAtomicUnits(resGetAccounts.total_unlocked_balance, 4);
 
-                // TODO: Change this. Update instead of recreating after each call
                 GlobalData.WalletStats.Subaddresses = [];
 
-                foreach (Account account in response.subaddress_accounts)
+                foreach (Account account in resGetAccounts.subaddress_accounts)
                 {
                     Wallet newWallet = new()
                     {
@@ -557,29 +562,39 @@ public class MainViewModel : ViewModelBase
                 UpdateWalletView();
             }
 
-            
 
-            /*
-            WalletRpc.GetTransfers(lastTxHeight, 0, true, (GetTransfersResponseData rt) =>
+            // TODO: Kepp track of latest transaction height and set min_hight
+            // Scanning from height 0 can take 15+ seconds and is CPU intensive
+
+            // Get transactions for Transfers view
+            GetTransfersRequest reqTransfers = new GetTransfersRequest();
+            reqTransfers.In = true;
+            reqTransfers.Out = true;
+            reqTransfers.pending = true;
+            reqTransfers.failed = false;
+            reqTransfers.pool = false;
+            reqTransfers.filter_by_height = false;
+            reqTransfers.min_height = 0;
+            reqTransfers.account_index = 0;
+            reqTransfers.subaddr_indices = [];
+            reqTransfers.all_accounts = true;
+
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            GetTransfersResponse resTransfers = await GetTransfers.CallAsync(GlobalData.ApplicationSettings.Wallet.Rpc, reqTransfers);
+            stopwatch.Stop();
+
+            if (resTransfers.Error.IsError)
             {
-                Application.Instance.AsyncInvoke(() =>
-                {
-                    uint i = 0, o = 0, l = 0;
-                    lastTxHeight = 0;
+                Logger.LogError("Main.WUU", "GetTransfers Error Code: " + resTransfers.Error.Code + ", Message: " + resTransfers.Error.Message);
+            }
+            else
+            {
+                // TODO: Process data
 
-                    if (rt.Incoming != null && rt.Incoming.Count > 0)
-                        i = rt.Incoming[rt.Incoming.Count - 1].Height;
 
-                    if (rt.Outgoing != null && rt.Outgoing.Count > 0)
-                        o = rt.Outgoing[rt.Outgoing.Count - 1].Height;
-
-                    l = Math.Max(i, o);
-
-                    lastTxHeight = l;
-                    transfersPage.Update(rt);
-                });
-            }, WalletUpdateFailed);
-            */
+                UpdateTransfersView();
+            }
         }
         catch (Exception ex)
         {
