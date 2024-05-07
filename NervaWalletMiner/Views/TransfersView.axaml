@@ -13,21 +13,13 @@
 	<StackPanel Spacing="5" HorizontalAlignment="Stretch" MaxWidth="650">
 		<Grid ColumnDefinitions="200,*,120" Margin="10">
 			<TextBlock Name="tbkTransfers" Grid.Row="0" Grid.Column="0">Transfers</TextBlock>
-
-			<Button Name="btnOpenCloseWallet"
-					Grid.Row="0"
-					Grid.Column="2"
-					Content="{Binding OpenCloseWallet}"
-					DockPanel.Dock="Right"
-					Width="120"
-					Click="OpenCloseWalletClicked" />
 		</Grid>
 
 		<DataGrid ItemsSource="{Binding Transactions}"
 				  AutoGenerateColumns="False"
 				  GridLinesVisibility="Horizontal"
 				  IsReadOnly="True"
-				  Height="450"
+				  Height="455"
 				  Margin="10,20,10,10">
 			<DataGrid.Columns>
 				<DataGridTemplateColumn Header="">
