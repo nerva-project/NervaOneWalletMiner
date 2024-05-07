@@ -2,7 +2,7 @@
 
 namespace NervaWalletMiner.Objects.DataGrid
 {
-    public class Wallet
+    public class Account
     {
         public int Index { get; set; }
         public string Label { get; set; } = string.Empty;

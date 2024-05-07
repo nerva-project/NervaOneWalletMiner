@@ -183,7 +183,7 @@ public class MainViewModel : ViewModelBase
 
         if(((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses.Count == 0)
         {
-            ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses = GlobalData.WalletStats.Subaddresses.Values.ToList<Wallet>();
+            ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses = GlobalData.WalletStats.Subaddresses.Values.ToList<Account>();
         }
         else
         {
@@ -191,10 +191,10 @@ public class MainViewModel : ViewModelBase
 
 
             // Trying to avoid loop within a loop
-            List<Wallet> deleteWallets = [];
+            List<Account> deleteWallets = [];
             HashSet<int> checkedIndexes = [];
 
-            foreach (Wallet wallet in ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses)
+            foreach (Account wallet in ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses)
             {
                 checkedIndexes.Add(wallet.Index);
 
@@ -225,7 +225,7 @@ public class MainViewModel : ViewModelBase
                 }
             }
 
-            foreach (Wallet wallet in deleteWallets)
+            foreach (Account wallet in deleteWallets)
             {
                 ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses.Remove(wallet);
             }
@@ -557,7 +557,7 @@ public class MainViewModel : ViewModelBase
         try
         {
             // Get accounts for Wallets view
-            GetAccountsResponse resGetAccounts = await GetAccounts.CallAsync(GlobalData.ApplicationSettings.Wallet.Rpc);
+            GetAccountsResponse resGetAccounts = await GetAccounts.CallAsync(GlobalData.ApplicationSettings.Wallet.Rpc, new GetAccountsRequest());
 
             if(resGetAccounts.Error.IsError)
             {
@@ -565,24 +565,17 @@ public class MainViewModel : ViewModelBase
             }
             else
             {
-                GlobalData.WalletStats.TotalBalanceLocked = GlobalMethods.XnvFromAtomicUnits(resGetAccounts.total_balance, 4);
-                GlobalData.WalletStats.TotalBalanceUnlocked = GlobalMethods.XnvFromAtomicUnits(resGetAccounts.total_unlocked_balance, 4);
+                GlobalData.WalletStats.TotalBalanceLocked = resGetAccounts.BalanceLocked;
+                GlobalData.WalletStats.TotalBalanceUnlocked = resGetAccounts.BalanceUnlocked;
 
                 GlobalData.WalletStats.Subaddresses = [];
 
-                foreach (Account account in resGetAccounts.subaddress_accounts)
+                // TODO: Set icon inside CallAsync method above?
+                foreach (Account account in resGetAccounts.SubAccounts)
                 {
-                    Wallet newWallet = new()
-                    {
-                        Index = account.account_index,
-                        BalanceLocked = GlobalMethods.XnvFromAtomicUnits(account.balance, 1),
-                        BalanceUnlocked = GlobalMethods.XnvFromAtomicUnits(account.unlocked_balance, 1),
-                        Address = GlobalMethods.GetShorterString(account.base_address, 12),
-                        Label = account.label,
-                        WalletIcon = _walletImage
-                    };
+                    account.WalletIcon = _walletImage;
 
-                    GlobalData.WalletStats.Subaddresses.Add(newWallet.Index, newWallet);
+                    GlobalData.WalletStats.Subaddresses.Add(account.Index, account);
                 }
 
                 UpdateWalletView();

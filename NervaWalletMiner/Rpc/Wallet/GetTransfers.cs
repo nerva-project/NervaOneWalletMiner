@@ -62,7 +62,7 @@ namespace NervaWalletMiner.Rpc.Wallet
                     else
                     {
                         // Create success response object
-                        GetTransfersRpc getTransfersResponse = JsonConvert.DeserializeObject<GetTransfersRpc>(jsonObject.SelectToken("result").ToString());
+                        RpcResponse getTransfersResponse = JsonConvert.DeserializeObject<RpcResponse>(jsonObject.SelectToken("result").ToString());
                         foreach (TransferEntry entry in getTransfersResponse.In)
                         {
                             Transfer newTransfer = new()
@@ -133,7 +133,7 @@ namespace NervaWalletMiner.Rpc.Wallet
         }
 
         // Internal helper obejcts used to interact with service
-        private class GetTransfersRpc
+        private class RpcResponse
         {
             public List<TransferEntry> In { get; set; } = [];
             public List<TransferEntry> Out { get; set; } = [];

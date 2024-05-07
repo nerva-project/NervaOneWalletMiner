@@ -30,8 +30,8 @@ namespace NervaWalletMiner.ViewModels
             set => this.RaiseAndSetIfChanged(ref _UnlockedXnv, value);
         }
 
-        private List<Wallet> _WalletAddresses = new();
-        public List<Wallet> WalletAddresses
+        private List<Account> _WalletAddresses = new();
+        public List<Account> WalletAddresses
         {
             get => _WalletAddresses;
             set => this.RaiseAndSetIfChanged(ref _WalletAddresses, value);
