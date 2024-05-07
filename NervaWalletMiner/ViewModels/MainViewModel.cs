@@ -253,11 +253,26 @@ public class MainViewModel : ViewModelBase
     {
         if (((TransfersViewModel)ViewModelPagesDictionary[SplitViewPages.Transfers]).Transactions.Count == 0)
         {
-            ((TransfersViewModel)ViewModelPagesDictionary[SplitViewPages.Transfers]).Transactions = GlobalData.TransfersStats.Transactions.Values.ToList<Transfer>();
+            ((TransfersViewModel)ViewModelPagesDictionary[SplitViewPages.Transfers]).Transactions = GlobalData.TransfersStats.Transactions.Values.ToList<Transfer>().OrderByDescending(tr=>tr.Height).ToList();
         }
         else
         {
-            // TODO: Add new transactions
+            List<Transfer> newTransfers = [];
+
+            foreach(string transactionId in GlobalData.TransfersStats.Transactions.Keys)
+            {
+                // Check if transaction already exists in datagrid and add it to the top if it does not
+                if(!((TransfersViewModel)ViewModelPagesDictionary[SplitViewPages.Transfers]).Transactions.Any(transfer => transfer.TransactionId == transactionId))
+                {
+                    newTransfers.Add(GlobalData.TransfersStats.Transactions[transactionId]);                    
+                }
+            }
+
+            if (newTransfers.Count > 0)
+            {
+                // TODO: If you scroll in the datagrid, new rows show up, otherwise, they do not. Figure out how to force refresh
+                ((TransfersViewModel)ViewModelPagesDictionary[SplitViewPages.Transfers]).Transactions.InsertRange(0, newTransfers.OrderByDescending(tr => tr.Height).ToList());
+            }
         }
     }
 
@@ -582,7 +597,6 @@ public class MainViewModel : ViewModelBase
             reqTransfers.IncludePool = false;
             reqTransfers.IsFilterByHeight = true;
             reqTransfers.MinHeight = GlobalData.NewestTransactionHeight;
-            //reqTransfers.MaxHeight = ulong.MaxValue;
             reqTransfers.AccountIndex = 0;
             reqTransfers.SubaddressIndices = [];
             reqTransfers.IsAllAccounts = true;

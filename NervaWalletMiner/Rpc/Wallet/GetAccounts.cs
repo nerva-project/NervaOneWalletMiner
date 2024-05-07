@@ -92,10 +92,10 @@ namespace NervaWalletMiner.Rpc.Wallet
     public class Account
     {
         public int account_index { get; set; }
-        public string? base_address { get; set; }
+        public string base_address { get; set; } = string.Empty;
         public ulong balance { get; set; }
         public ulong unlocked_balance { get; set; }        
-        public string? label { get; set; }
-        public string? tag { get; set; }
+        public string label { get; set; } = string.Empty;
+        public string tag { get; set; } = string.Empty;
     }
 }
