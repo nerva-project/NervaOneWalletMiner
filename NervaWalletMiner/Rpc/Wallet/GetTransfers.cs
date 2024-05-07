@@ -15,25 +15,25 @@ namespace NervaWalletMiner.Rpc.Wallet
     public static class GetTransfers
     {
         // TODO: Make Wallet methods interfaces. Implement here for given coin.
-        public static async Task<GetTransfersResponse> CallAsync(RpcSettings rpc, GetTransfersRequest transfersRequest)
+        public static async Task<GetTransfersResponse> CallAsync(RpcSettings rpc, GetTransfersRequest requestObj)
         {
-            GetTransfersResponse resp = new();
+            GetTransfersResponse responseObj = new();
 
             try
             {
                 // Build request content json
                 var requestParams = new JObject
                 {
-                    ["in"] = transfersRequest.IncludeIn,
-                    ["out"] = transfersRequest.IncludeOut,
-                    ["pending"] = transfersRequest.IncludePending,
-                    ["failed"] = transfersRequest.IncludeFailed,
-                    ["pool"] = transfersRequest.IncludePool,
-                    ["filter_by_height"] = transfersRequest.IsFilterByHeight,
-                    ["min_height"] = transfersRequest.MinHeight,
-                    ["account_index"] = transfersRequest.AccountIndex,
-                    ["subaddr_indices"] = new JArray(transfersRequest.SubaddressIndices),
-                    ["all_accounts"] = transfersRequest.IsAllAccounts
+                    ["in"] = requestObj.IncludeIn,
+                    ["out"] = requestObj.IncludeOut,
+                    ["pending"] = requestObj.IncludePending,
+                    ["failed"] = requestObj.IncludeFailed,
+                    ["pool"] = requestObj.IncludePool,
+                    ["filter_by_height"] = requestObj.IsFilterByHeight,
+                    ["min_height"] = requestObj.MinHeight,
+                    ["account_index"] = requestObj.AccountIndex,
+                    ["subaddr_indices"] = new JArray(requestObj.SubaddressIndices),
+                    ["all_accounts"] = requestObj.IsAllAccounts
                 };
 
                 var requestJson = new JObject
@@ -45,20 +45,19 @@ namespace NervaWalletMiner.Rpc.Wallet
                 };
 
                 // Call service and process response
-                HttpResponseMessage response = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc), requestJson.ToString());
-                if (response.IsSuccessStatusCode)
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc), requestJson.ToString());
+                if (httpResponse.IsSuccessStatusCode)
                 {
-                    var dataObjects = response.Content.ReadAsStringAsync();
-                    dynamic jsonObject = JObject.Parse(dataObjects.Result);
+                    dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
                     
                     var error = JObject.Parse(jsonObject.ToString())["error"];
                     if (error != null)
                     {
                         // Set Service error
-                        resp.Error.IsError = true;
-                        resp.Error.Code = error["code"].ToString();
-                        resp.Error.Message = error["message"].ToString();
-                        Logger.LogError("RWGT.CA", "Error from service. Code: " + resp.Error.Code + ", Message: " + resp.Error.Message);
+                        responseObj.Error.IsError = true;
+                        responseObj.Error.Code = error["code"].ToString();
+                        responseObj.Error.Message = error["message"].ToString();
+                        Logger.LogError("RWGT.CA", "Error from service. Code: " + responseObj.Error.Code + ", Message: " + responseObj.Error.Message);
                     }
                     else
                     {
@@ -77,7 +76,7 @@ namespace NervaWalletMiner.Rpc.Wallet
                                 Type = entry.type
                             };
 
-                            resp.Transfers.Add(newTransfer);
+                            responseObj.Transfers.Add(newTransfer);
                         }
 
                         foreach (TransferEntry entry in getTransfersResponse.Out)
@@ -93,7 +92,7 @@ namespace NervaWalletMiner.Rpc.Wallet
                                 Type = entry.type
                             };
 
-                            resp.Transfers.Add(newTransfer);
+                            responseObj.Transfers.Add(newTransfer);
                         }
 
                         foreach (TransferEntry entry in getTransfersResponse.pending)
@@ -109,20 +108,20 @@ namespace NervaWalletMiner.Rpc.Wallet
                                 Type = entry.type
                             };
 
-                            resp.Transfers.Add(newTransfer);
+                            responseObj.Transfers.Add(newTransfer);
                         }
 
-                        resp.Error.IsError = false;
+                        responseObj.Error.IsError = false;
                     }
                 }
                 else
                 {
                     // Set HTTP error
-                    resp.Error.IsError = true;
-                    resp.Error.Code = response.StatusCode.ToString();
-                    resp.Error.Message = response.ReasonPhrase;
+                    responseObj.Error.IsError = true;
+                    responseObj.Error.Code = httpResponse.StatusCode.ToString();
+                    responseObj.Error.Message = httpResponse.ReasonPhrase;
 
-                    Logger.LogError("RWGT.CA", "Response failed. Code: " + response.StatusCode + ", Phrase: " + response.ReasonPhrase);
+                    Logger.LogError("RWGT.CA", "Response failed. Code: " + httpResponse.StatusCode + ", Phrase: " + httpResponse.ReasonPhrase);
                 }
             }
             catch (Exception ex)
@@ -130,7 +129,7 @@ namespace NervaWalletMiner.Rpc.Wallet
                 Logger.LogException("RWGT.CA", ex);
             }
 
-            return resp;
+            return responseObj;
         }
 
         // Internal helper obejcts used to interact with service

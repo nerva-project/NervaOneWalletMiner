@@ -4,6 +4,8 @@ using NervaWalletMiner.Helpers;
 using NervaWalletMiner.Objects;
 using NervaWalletMiner.Objects.Constants;
 using NervaWalletMiner.Rpc.Wallet;
+using NervaWalletMiner.Rpc.Wallet.Requests;
+using NervaWalletMiner.Rpc.Wallet.Responses;
 using System;
 using System.Threading.Tasks;
 
@@ -64,7 +66,13 @@ namespace NervaWalletMiner.Views
 
         private static async void OpenUserWallet(string walletName, string walletPassword)
         {
-            OpenWalletResponse response = await OpenWallet.CallAsync(GlobalData.ApplicationSettings.Wallet.Rpc, walletName, walletPassword);
+            OpenWalletRequest request = new()
+            {
+                WalletName = walletName,
+                Password = walletPassword
+            };
+
+            OpenWalletResponse response = await OpenWallet.CallAsync(GlobalData.ApplicationSettings.Wallet.Rpc, request);
 
             if (response.Error.IsError)
             {
