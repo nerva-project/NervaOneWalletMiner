@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using NervaWalletMiner.Helpers;
 using NervaWalletMiner.Objects;
+using NervaWalletMiner.Objects.Constants;
 using NervaWalletMiner.Rpc.Wallet;
 using System;
 using System.Threading.Tasks;

@@ -1,4 +1,4 @@
-﻿namespace NervaWalletMiner.Objects
+﻿namespace NervaWalletMiner.Rpc.Common
 {
     public class RpcError
     {

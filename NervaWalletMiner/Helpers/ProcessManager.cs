@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using NervaWalletMiner.Objects;
+using NervaWalletMiner.Rpc.Common;
 
 namespace NervaWalletMiner.Helpers
 {
@@ -141,7 +141,7 @@ namespace NervaWalletMiner.Helpers
             });
         }
 
-        public static string GenerateCommandLine(string exePath, SettingsRpc d)
+        public static string GenerateCommandLine(string exePath, RpcSettings d)
         {
             string arg = $"--log-file \"{GlobalMethods.CycleLogFile(exePath)}\"";
 

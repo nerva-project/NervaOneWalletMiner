@@ -1,5 +1,5 @@
 ﻿using NervaWalletMiner.Helpers;
-using NervaWalletMiner.Objects;
+using NervaWalletMiner.Rpc.Common;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -15,7 +15,7 @@ namespace NervaWalletMiner.Rpc.Wallet
         public const string MethodName = "get_accounts";
 
         // TODO: Pass optional tag
-        public static async Task<GetAccountsResponse> CallAsync(SettingsRpc rpc)
+        public static async Task<GetAccountsResponse> CallAsync(RpcSettings rpc)
         {
             GetAccountsResponse resp = new();
 

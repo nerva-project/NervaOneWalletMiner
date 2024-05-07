@@ -1,4 +1,6 @@
-﻿using NervaWalletMiner.Objects;
+﻿using NervaWalletMiner.Objects.DataGrid;
+using NervaWalletMiner.Objects.Settings;
+using NervaWalletMiner.Objects.Stats;
 using System;
 using System.Collections.Generic;
 

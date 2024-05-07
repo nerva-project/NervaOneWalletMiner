@@ -4,9 +4,13 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using NervaWalletMiner.Helpers;
 using NervaWalletMiner.Objects;
+using NervaWalletMiner.Objects.Constants;
+using NervaWalletMiner.Objects.DataGrid;
 using NervaWalletMiner.Rpc;
 using NervaWalletMiner.Rpc.Daemon;
 using NervaWalletMiner.Rpc.Wallet;
+using NervaWalletMiner.Rpc.Wallet.Requests;
+using NervaWalletMiner.Rpc.Wallet.Responses;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
@@ -528,7 +532,7 @@ public class MainViewModel : ViewModelBase
 
                 foreach (GetConnectionsResponse connection in connectResp)
                 {
-                    GlobalData.Connections.Add(new Objects.Connection
+                    GlobalData.Connections.Add(new Connection
                     {
                         Address = connection.address,
                         Height = connection.height,

@@ -1,4 +1,5 @@
-﻿using NervaWalletMiner.Objects;
+﻿using NervaWalletMiner.Objects.Constants;
+using NervaWalletMiner.Objects.DataGrid;
 using ReactiveUI;
 using System.Collections.Generic;
 using System.Reactive.Linq;

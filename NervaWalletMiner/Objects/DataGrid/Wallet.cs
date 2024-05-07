@@ -1,6 +1,6 @@
 ﻿using Avalonia.Media.Imaging;
 
-namespace NervaWalletMiner.Objects
+namespace NervaWalletMiner.Objects.DataGrid
 {
     public class Wallet
     {

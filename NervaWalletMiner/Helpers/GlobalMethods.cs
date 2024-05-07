@@ -1,4 +1,6 @@
 ﻿using NervaWalletMiner.Objects;
+using NervaWalletMiner.Objects.Settings;
+using NervaWalletMiner.Rpc.Common;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -245,7 +247,7 @@ namespace NervaWalletMiner.Helpers
             return RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
         }
 
-        public static string GetServiceUrl(SettingsRpc rpc)
+        public static string GetServiceUrl(RpcSettings rpc)
         {
             if(string.IsNullOrEmpty(rpc.HTProtocol) || string.IsNullOrEmpty(rpc.Host) || rpc.Port < 1)
             {

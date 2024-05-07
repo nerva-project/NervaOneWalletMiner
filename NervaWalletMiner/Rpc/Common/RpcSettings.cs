@@ -1,8 +1,8 @@
 ﻿using NervaWalletMiner.Helpers;
 
-namespace NervaWalletMiner.Objects
+namespace NervaWalletMiner.Rpc.Common
 {
-    public class SettingsRpc(uint port)
+    public class RpcSettings(uint port)
     {
         public bool IsPublic { get; set; } = false;
         public string HTProtocol { get; set; } = "http";

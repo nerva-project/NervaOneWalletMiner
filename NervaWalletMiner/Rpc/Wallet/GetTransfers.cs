@@ -1,5 +1,4 @@
 ﻿using NervaWalletMiner.Helpers;
-using NervaWalletMiner.Objects;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System;
@@ -7,35 +6,18 @@ using System.Collections.Generic;
 using System.Net.Http.Headers;
 using System.Net.Http;
 using System.Threading.Tasks;
+using NervaWalletMiner.Rpc.Wallet.Requests;
+using NervaWalletMiner.Rpc.Wallet.Responses;
+using NervaWalletMiner.Objects.DataGrid;
+using NervaWalletMiner.Rpc.Common;
 
 namespace NervaWalletMiner.Rpc.Wallet
 {
-    public class GetTransfersRequest
-    {
-        public bool IncludeIn { get; set; }
-        public bool IncludeOut { get; set; }
-        public bool IncludePending { get; set; }
-        public bool IncludeFailed { get; set; }
-        public bool IncludePool { get; set; }
-        public bool IsFilterByHeight { get; set; }
-        public ulong MinHeight { get; set; }
-        public ulong MaxHeight { get; set; }
-        public uint AccountIndex { get; set; }
-        public List<uint> SubaddressIndices { get; set; } = [];
-        public bool IsAllAccounts { get; set; }
-    }
-
-    public class GetTransfersResponse
-    {
-        public RpcError Error { get; set; } = new();
-        public List<Transfer> Transfers { get; set; } = [];
-    }
-
     public static class GetTransfers
     {
         // TODO: Make Wallet methods interfaces. Implement here for given coin.
         // Change Request and Response objects to generic, UI specific objects and build them here
-        public static async Task<GetTransfersResponse> CallAsync(SettingsRpc rpc, GetTransfersRequest transfersRequest)
+        public static async Task<GetTransfersResponse> CallAsync(RpcSettings rpc, GetTransfersRequest transfersRequest)
         {
             GetTransfersResponse resp = new();
 

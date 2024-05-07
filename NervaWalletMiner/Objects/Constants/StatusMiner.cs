@@ -1,4 +1,4 @@
-﻿namespace NervaWalletMiner.Objects
+﻿namespace NervaWalletMiner.Objects.Constants
 {
     public static class StatusMiner
     {

@@ -1,4 +1,4 @@
-﻿namespace NervaWalletMiner.Objects
+﻿namespace NervaWalletMiner.Objects.Settings
 {
     public class SettingsMisc
     {

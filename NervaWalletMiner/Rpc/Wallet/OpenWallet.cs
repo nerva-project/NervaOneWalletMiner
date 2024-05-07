@@ -4,7 +4,7 @@ using System.Net.Http.Headers;
 using System.Net.Http;
 using System.Threading.Tasks;
 using NervaWalletMiner.Helpers;
-using NervaWalletMiner.Objects;
+using NervaWalletMiner.Rpc.Common;
 
 namespace NervaWalletMiner.Rpc.Wallet
 {
@@ -12,7 +12,7 @@ namespace NervaWalletMiner.Rpc.Wallet
     {
         public const string MethodName = "open_wallet";
 
-        public static async Task<OpenWalletResponse> CallAsync(SettingsRpc rpc, string walletName, string walletPassword)
+        public static async Task<OpenWalletResponse> CallAsync(RpcSettings rpc, string walletName, string walletPassword)
         {
             OpenWalletResponse resp = new();
 

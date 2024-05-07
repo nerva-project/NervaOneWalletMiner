@@ -1,8 +1,10 @@
-﻿namespace NervaWalletMiner.Objects
+﻿using NervaWalletMiner.Rpc.Common;
+
+namespace NervaWalletMiner.Objects.Settings
 {
     public class SettingsDaemon(bool isTestnet)
     {
-        public SettingsRpc Rpc { get; set; } = new SettingsRpc(17566);
+        public RpcSettings Rpc { get; set; } = new RpcSettings(17566);
 
         public bool StopOnExit { get; set; } = false;
 
@@ -13,7 +15,7 @@
         public int MiningThreads { get; set; } = 0;
 
         public string AdditionalArguments { get; set; } = string.Empty;
-        
-        public bool IsTestnet {  get; set; } = isTestnet;
+
+        public bool IsTestnet { get; set; } = isTestnet;
     }
 }
