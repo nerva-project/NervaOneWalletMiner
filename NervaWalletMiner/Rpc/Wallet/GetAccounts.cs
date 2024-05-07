@@ -23,7 +23,7 @@ namespace NervaWalletMiner.Rpc.Wallet
             {
                 using (HttpClient client = new HttpClient())
                 {
-                    string serviceUrl = GlobalMethods.GetServiceUrl(rpc);
+                    string serviceUrl = HttpHelper.GetServiceUrl(rpc);
 
                     client.Timeout = TimeSpan.FromSeconds(30);
                     HttpResponseMessage response;

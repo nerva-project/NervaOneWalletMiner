@@ -3,7 +3,6 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Net.Http.Headers;
 using System.Net.Http;
 using System.Threading.Tasks;
 using NervaWalletMiner.Rpc.Wallet.Requests;
@@ -16,142 +15,125 @@ namespace NervaWalletMiner.Rpc.Wallet
     public static class GetTransfers
     {
         // TODO: Make Wallet methods interfaces. Implement here for given coin.
-        // Change Request and Response objects to generic, UI specific objects and build them here
         public static async Task<GetTransfersResponse> CallAsync(RpcSettings rpc, GetTransfersRequest transfersRequest)
         {
             GetTransfersResponse resp = new();
 
             try
             {
-                using (HttpClient client = new HttpClient())
+                // Build request content json
+                var requestParams = new JObject
                 {
-                    string serviceUrl = GlobalMethods.GetServiceUrl(rpc);
+                    ["in"] = transfersRequest.IncludeIn,
+                    ["out"] = transfersRequest.IncludeOut,
+                    ["pending"] = transfersRequest.IncludePending,
+                    ["failed"] = transfersRequest.IncludeFailed,
+                    ["pool"] = transfersRequest.IncludePool,
+                    ["filter_by_height"] = transfersRequest.IsFilterByHeight,
+                    ["min_height"] = transfersRequest.MinHeight,
+                    ["account_index"] = transfersRequest.AccountIndex,
+                    ["subaddr_indices"] = new JArray(transfersRequest.SubaddressIndices),
+                    ["all_accounts"] = transfersRequest.IsAllAccounts
+                };
 
-                    client.Timeout = TimeSpan.FromSeconds(30);
-                    HttpResponseMessage response;
+                var requestJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = "0",
+                    ["method"] = "get_transfers",
+                    ["params"] = requestParams
+                };
 
-                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, serviceUrl);
-
-                    var requestParams = new JObject
+                // Call service and process response
+                HttpResponseMessage response = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc), requestJson.ToString());
+                if (response.IsSuccessStatusCode)
+                {
+                    var dataObjects = response.Content.ReadAsStringAsync();
+                    dynamic jsonObject = JObject.Parse(dataObjects.Result);
+                    
+                    var error = JObject.Parse(jsonObject.ToString())["error"];
+                    if (error != null)
                     {
-                        ["in"] = transfersRequest.IncludeIn,
-                        ["out"] = transfersRequest.IncludeOut,
-                        ["pending"] = transfersRequest.IncludePending,
-                        ["failed"] = transfersRequest.IncludeFailed,
-                        ["pool"] = transfersRequest.IncludePool,
-                        ["filter_by_height"] = transfersRequest.IsFilterByHeight,
-                        ["min_height"] = transfersRequest.MinHeight,
-                        ["account_index"] = transfersRequest.AccountIndex,
-                        ["subaddr_indices"] = new JArray(transfersRequest.SubaddressIndices),
-                        ["all_accounts"] = transfersRequest.IsAllAccounts
-                    };
-
-                    var requestJson = new JObject
-                    {
-                        ["jsonrpc"] = "2.0",
-                        ["id"] = "0",
-                        ["method"] = "get_transfers",
-                        ["params"] = requestParams
-                    };
-
-
-                    request.Content = new StringContent(requestJson.ToString());
-                    request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-
-                    //Logger.LogDebug("GetTransfers.CA", "Calling POST: " + serviceUrl);
-
-                    response = await client.SendAsync(request);
-
-                    //Logger.LogDebug("GetTransfers.CA", "Call returned: " + serviceUrl);
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var dataObjects = response.Content.ReadAsStringAsync();
-                        dynamic jsonObject = JObject.Parse(dataObjects.Result);
-
-                        // Check for errors
-                        var error = JObject.Parse(jsonObject.ToString())["error"];
-                        if (error != null)
-                        {
-                            resp.Error.IsError = true;
-                            resp.Error.Code = error["code"].ToString();
-                            resp.Error.Message = error["message"].ToString();
-                            Logger.LogError("RWGA.CSA", "Error from service. Code: " + resp.Error.Code + ", Message: " + resp.Error.Message);
-                        }
-                        else
-                        {
-                            GetTransfersRpc getTransfersResponse = JsonConvert.DeserializeObject<GetTransfersRpc>(jsonObject.SelectToken("result").ToString());
-                            foreach(TransferEntry entry in getTransfersResponse.In)
-                            {
-                                Transfer newTransfer = new()
-                                {
-                                    TransactionId = entry.txid,
-                                    TransactionIdShort = GlobalMethods.GetShorterString(entry.txid, 12),
-                                    PaymentId = entry.payment_id,
-                                    Height = entry.height,
-                                    Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp),
-                                    Amount = GlobalMethods.XnvFromAtomicUnits(entry.amount, 2),
-                                    Type = entry.type
-                                };
-
-                                resp.Transfers.Add(newTransfer);
-                            }
-
-                            foreach (TransferEntry entry in getTransfersResponse.Out)
-                            {
-                                Transfer newTransfer = new()
-                                {
-                                    TransactionId = entry.txid,
-                                    TransactionIdShort = GlobalMethods.GetShorterString(entry.txid, 12),
-                                    PaymentId = entry.payment_id,
-                                    Height = entry.height,
-                                    Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp),
-                                    Amount = GlobalMethods.XnvFromAtomicUnits(entry.amount, 2),
-                                    Type = entry.type
-                                };
-
-                                resp.Transfers.Add(newTransfer);
-                            }
-
-                            foreach (TransferEntry entry in getTransfersResponse.pending)
-                            {
-                                Transfer newTransfer = new()
-                                {
-                                    TransactionId = entry.txid,
-                                    TransactionIdShort = GlobalMethods.GetShorterString(entry.txid, 12),
-                                    PaymentId = entry.payment_id,
-                                    Height = entry.height,
-                                    Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp),
-                                    Amount = GlobalMethods.XnvFromAtomicUnits(entry.amount, 2),
-                                    Type = entry.type
-                                };
-
-                                resp.Transfers.Add(newTransfer);
-                            }
-
-
-                            resp.Error.IsError = false;
-                        }
+                        // Set Service error
+                        resp.Error.IsError = true;
+                        resp.Error.Code = error["code"].ToString();
+                        resp.Error.Message = error["message"].ToString();
+                        Logger.LogError("RWGT.CA", "Error from service. Code: " + resp.Error.Code + ", Message: " + resp.Error.Message);
                     }
                     else
                     {
-                        resp.Error.IsError = true;
-                        resp.Error.Code = response.StatusCode.ToString();
-                        resp.Error.Message = response.ReasonPhrase;
+                        // Create success response object
+                        GetTransfersRpc getTransfersResponse = JsonConvert.DeserializeObject<GetTransfersRpc>(jsonObject.SelectToken("result").ToString());
+                        foreach (TransferEntry entry in getTransfersResponse.In)
+                        {
+                            Transfer newTransfer = new()
+                            {
+                                TransactionId = entry.txid,
+                                TransactionIdShort = GlobalMethods.GetShorterString(entry.txid, 12),
+                                PaymentId = entry.payment_id,
+                                Height = entry.height,
+                                Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp),
+                                Amount = GlobalMethods.XnvFromAtomicUnits(entry.amount, 2),
+                                Type = entry.type
+                            };
 
-                        Logger.LogError("RWGA.CSA", "Response failed. Code: " + response.StatusCode + ", Phrase: " + response.ReasonPhrase);
+                            resp.Transfers.Add(newTransfer);
+                        }
+
+                        foreach (TransferEntry entry in getTransfersResponse.Out)
+                        {
+                            Transfer newTransfer = new()
+                            {
+                                TransactionId = entry.txid,
+                                TransactionIdShort = GlobalMethods.GetShorterString(entry.txid, 12),
+                                PaymentId = entry.payment_id,
+                                Height = entry.height,
+                                Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp),
+                                Amount = GlobalMethods.XnvFromAtomicUnits(entry.amount, 2),
+                                Type = entry.type
+                            };
+
+                            resp.Transfers.Add(newTransfer);
+                        }
+
+                        foreach (TransferEntry entry in getTransfersResponse.pending)
+                        {
+                            Transfer newTransfer = new()
+                            {
+                                TransactionId = entry.txid,
+                                TransactionIdShort = GlobalMethods.GetShorterString(entry.txid, 12),
+                                PaymentId = entry.payment_id,
+                                Height = entry.height,
+                                Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp),
+                                Amount = GlobalMethods.XnvFromAtomicUnits(entry.amount, 2),
+                                Type = entry.type
+                            };
+
+                            resp.Transfers.Add(newTransfer);
+                        }
+
+                        resp.Error.IsError = false;
                     }
+                }
+                else
+                {
+                    // Set HTTP error
+                    resp.Error.IsError = true;
+                    resp.Error.Code = response.StatusCode.ToString();
+                    resp.Error.Message = response.ReasonPhrase;
+
+                    Logger.LogError("RWGT.CA", "Response failed. Code: " + response.StatusCode + ", Phrase: " + response.ReasonPhrase);
                 }
             }
             catch (Exception ex)
             {
-                Logger.LogException("RWGA.CSA", ex);
+                Logger.LogException("RWGT.CA", ex);
             }
 
             return resp;
         }
 
-        // Internal structures
+        // Internal helper obejcts used to interact with service
         private class GetTransfersRpc
         {
             public List<TransferEntry> In { get; set; } = [];
