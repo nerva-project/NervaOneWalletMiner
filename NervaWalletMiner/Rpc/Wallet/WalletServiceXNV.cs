@@ -1,17 +1,18 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using NervaWalletMiner.Helpers;
+using NervaWalletMiner.Rpc.Common;
+using NervaWalletMiner.Rpc.Wallet.Requests;
+using NervaWalletMiner.Rpc.Wallet.Responses;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using NervaWalletMiner.Helpers;
-using NervaWalletMiner.Rpc.Common;
-using NervaWalletMiner.Rpc.Wallet.Responses;
-using NervaWalletMiner.Rpc.Wallet.Requests;
 
 namespace NervaWalletMiner.Rpc.Wallet
 {
-    public static class OpenWallet
+    public class WalletServiceXNV : IWalletService
     {
-        public static async Task<OpenWalletResponse> CallAsync(RpcSettings rpc, OpenWalletRequest requestObj)
+        #region OpenWallet        
+        public async Task<OpenWalletResponse> OpenWallet(RpcSettings rpc, OpenWalletRequest requestObj)
         {
             OpenWalletResponse responseObj = new();
 
@@ -70,5 +71,6 @@ namespace NervaWalletMiner.Rpc.Wallet
 
             return responseObj;
         }
+        #endregion // OpenWallet
     }
 }

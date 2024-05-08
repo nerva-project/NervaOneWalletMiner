@@ -1,6 +1,7 @@
 ﻿using NervaWalletMiner.Objects.DataGrid;
 using NervaWalletMiner.Objects.Settings;
 using NervaWalletMiner.Objects.Stats;
+using NervaWalletMiner.Rpc.Wallet;
 using System;
 using System.Collections.Generic;
 
@@ -37,5 +38,7 @@ namespace NervaWalletMiner.Helpers
         public static ulong NewestTransactionHeight = 0;
 
         public static int CpuThreadCount = Environment.ProcessorCount;
+
+        public static IWalletService WalletService = new WalletServiceXNV();
     }
 }
