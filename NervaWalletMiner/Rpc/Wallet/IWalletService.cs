@@ -8,5 +8,10 @@ namespace NervaWalletMiner.Rpc.Wallet
     public interface IWalletService
     {
         Task<OpenWalletResponse> OpenWallet(RpcSettings rpc, OpenWalletRequest requestObj);
+
+        // TODO: Pass optional tag
+        Task<GetAccountsResponse> GetAccounts(RpcSettings rpc, GetAccountsRequest requestObj);
+
+        Task<GetTransfersResponse> GetTransfers(RpcSettings rpc, GetTransfersRequest requestObj);
     }
 }

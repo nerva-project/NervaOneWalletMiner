@@ -557,7 +557,7 @@ public class MainViewModel : ViewModelBase
         try
         {
             // Get accounts for Wallets view
-            GetAccountsResponse resGetAccounts = await GetAccounts.CallAsync(GlobalData.ApplicationSettings.Wallet.Rpc, new GetAccountsRequest());
+            GetAccountsResponse resGetAccounts = await GlobalData.WalletService.GetAccounts(GlobalData.ApplicationSettings.Wallet.Rpc, new GetAccountsRequest());
 
             if(resGetAccounts.Error.IsError)
             {
@@ -598,9 +598,10 @@ public class MainViewModel : ViewModelBase
             reqTransfers.SubaddressIndices = [];
             reqTransfers.IsAllAccounts = true;
 
+            // TODO: Remove stopwatch when no longer needed
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-            GetTransfersResponse resTransfers = await GetTransfers.CallAsync(GlobalData.ApplicationSettings.Wallet.Rpc, reqTransfers);
+            GetTransfersResponse resTransfers = await GlobalData.WalletService.GetTransfers(GlobalData.ApplicationSettings.Wallet.Rpc, reqTransfers);
             stopwatch.Stop();
 
             if (resTransfers.Error.IsError)
