@@ -10,5 +10,11 @@ namespace NervaWalletMiner.Rpc.Daemon
         Task<StartMiningResponse> StartMining(RpcSettings rpc, StartMiningRequest requestObj);
 
         Task<StopMiningResponse> StopMining(RpcSettings rpc, StopMiningRequest requestObj);
+
+        Task<GetInfoResponse> GetInfo(RpcSettings rpc, GetInfoRequest requestObj);
+
+        Task<GetConnectionsResponse> GetConnections(RpcSettings rpc, GetConnectionsRequest requestObj);
+
+        Task<MiningStatusResponse> MiningStatus(RpcSettings rpc, MiningStatusRequest requestObj);
     }
 }

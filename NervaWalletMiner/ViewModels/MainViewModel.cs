@@ -7,8 +7,8 @@ using NervaWalletMiner.Objects;
 using NervaWalletMiner.Objects.Constants;
 using NervaWalletMiner.Objects.DataGrid;
 using NervaWalletMiner.Rpc;
-using NervaWalletMiner.Rpc.Daemon;
-using NervaWalletMiner.Rpc.Wallet;
+using NervaWalletMiner.Rpc.Daemon.Requests;
+using NervaWalletMiner.Rpc.Daemon.Responses;
 using NervaWalletMiner.Rpc.Wallet.Requests;
 using NervaWalletMiner.Rpc.Wallet.Responses;
 using ReactiveUI;
@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Input;
-using static NervaWalletMiner.Rpc.Daemon.MiningStatus;
 
 namespace NervaWalletMiner.ViewModels;
 
@@ -444,9 +443,9 @@ public class MainViewModel : ViewModelBase
                 GlobalData.NetworkStats.StatusSync = "Trying to establish connection with daemon...";
             }
 
-            GetInfoResponse infoRes = await GetInfo.CallServiceAsync();
+            GetInfoResponse infoRes = await GlobalData.DaemonService.GetInfo(GlobalData.ApplicationSettings.Daemon.Rpc, new GetInfoRequest());
 
-            if (!string.IsNullOrEmpty(infoRes.version))
+            if (!infoRes.Error.IsError)
             {
                 _lastDaemonResponseTime = DateTime.Now;
                 if (_isInitialDaemonConnectionSuccess == false)
@@ -455,52 +454,52 @@ public class MainViewModel : ViewModelBase
                     _isInitialDaemonConnectionSuccess = true;
                 }
 
-                GlobalData.NetworkStats.NetHeight = (infoRes.target_height > infoRes.height ? infoRes.target_height : infoRes.height);
-                GlobalData.NetworkStats.YourHeight = infoRes.height;
-                GlobalData.NetworkStats.NetHash = Math.Round(((infoRes.difficulty / 60.0d) / 1000.0d), 2) + " kH/s";
+                GlobalData.NetworkStats.NetHeight = (infoRes.TargetHeight > infoRes.Height ? infoRes.TargetHeight : infoRes.Height);
+                GlobalData.NetworkStats.YourHeight = infoRes.Height;
+                GlobalData.NetworkStats.NetHash = Math.Round(((infoRes.Difficulty / 60.0d) / 1000.0d), 2) + " kH/s";
 
-                DateTime miningStartTime = GlobalMethods.UnixTimeStampToDateTime(infoRes.start_time);
+                DateTime miningStartTime = infoRes.StartTime;
                 GlobalData.NetworkStats.RunTime = (DateTime.Now.ToUniversalTime() - miningStartTime).ToString(@"%d\.hh\:mm\:ss");
 
-                GlobalData.NetworkStats.ConnectionsIn = infoRes.incoming_connections_count;
-                GlobalData.NetworkStats.ConnectionsOut = infoRes.outgoing_connections_count;
-                GlobalData.NetworkStats.Difficulty = infoRes.difficulty;
+                GlobalData.NetworkStats.ConnectionsIn = infoRes.ConnectionCountIn;
+                GlobalData.NetworkStats.ConnectionsOut = infoRes.ConnectionCountOut;
+                GlobalData.NetworkStats.Difficulty = infoRes.Difficulty;
 
-                GlobalData.NetworkStats.Version = infoRes.version;
+                GlobalData.NetworkStats.Version = infoRes.Version;
                 GlobalData.NetworkStats.StatusSync = "";
-                if (infoRes.target_height != 0 && infoRes.height < infoRes.target_height)
+                if (infoRes.TargetHeight != 0 && infoRes.Height < infoRes.TargetHeight)
                 {
-                    GlobalData.NetworkStats.StatusSync += " | Synchronizing (Height " + infoRes.height + " of " + infoRes.target_height + ")";
+                    GlobalData.NetworkStats.StatusSync += " | Synchronizing (Height " + infoRes.Height + " of " + infoRes.TargetHeight + ")";
                 }
                 else
                 {
                     GlobalData.NetworkStats.StatusSync += "  |  Sync OK";
                 }
 
-                GlobalData.NetworkStats.StatusSync += "  |  Status " + infoRes.status;
+                GlobalData.NetworkStats.StatusSync += "  |  Status " + infoRes.Status;
 
 
                 //Logger.LogDebug("Main.DUU", "GetInfo Response Height: " + infoRes.height);
 
 
-                MiningStatusResponse miningRes = await Rpc.Daemon.MiningStatus.CallServiceAsync();
-                if (miningRes.active)
+                MiningStatusResponse miningRes = await GlobalData.DaemonService.MiningStatus(GlobalData.ApplicationSettings.Daemon.Rpc, new MiningStatusRequest());
+                if (miningRes.IsActive)
                 {
                     GlobalData.NetworkStats.MinerStatus = StatusMiner.Mining;
-                    GlobalData.NetworkStats.MiningAddress = GlobalMethods.GetShorterString(miningRes.address, 12);
+                    GlobalData.NetworkStats.MiningAddress = GlobalMethods.GetShorterString(miningRes.Address, 12);
 
-                    if (miningRes.speed > 1000)
+                    if (miningRes.Speed > 1000)
                     {
-                        GlobalData.NetworkStats.YourHash = miningRes.speed / 1000.0d + " kH/s";
+                        GlobalData.NetworkStats.YourHash = miningRes.Speed / 1000.0d + " kH/s";
                     }
                     else
                     {
-                        GlobalData.NetworkStats.YourHash = miningRes.speed + " h/s";
+                        GlobalData.NetworkStats.YourHash = miningRes.Speed + " h/s";
                     }
 
                     if (GlobalData.NetworkStats.Difficulty > 0)
                     {
-                        double blockMinutes = ((GlobalData.NetworkStats.Difficulty / 60.0d) / miningRes.speed);
+                        double blockMinutes = ((GlobalData.NetworkStats.Difficulty / 60.0d) / miningRes.Speed);
 
                         if ((blockMinutes / 1440d) > 1)
                         {
@@ -525,25 +524,19 @@ public class MainViewModel : ViewModelBase
                 }
 
 
-                List<GetConnectionsResponse> connectResp = await GetConnections.CallServiceAsync();
+                GetConnectionsResponse connectResp = await GlobalData.DaemonService.GetConnections(GlobalData.ApplicationSettings.Daemon.Rpc, new GetConnectionsRequest());
 
-                // TODO: For now just recreate items in grid. Consider, removing disconnected and adding new ones to List instead.
-                GlobalData.Connections = [];
-
-                foreach (GetConnectionsResponse connection in connectResp)
+                if(!connectResp.Error.IsError)
                 {
-                    GlobalData.Connections.Add(new Connection
+                    // TODO: For now just recreate items in grid. Consider, removing disconnected and adding new ones to List instead.
+                    GlobalData.Connections = connectResp.Connections;
+                    foreach (Connection connection in GlobalData.Connections)
                     {
-                        Address = connection.address,
-                        Height = connection.height,
-                        LiveTime = TimeSpan.FromSeconds(connection.live_time).ToString(@"hh\:mm\:ss"),
-                        State = connection.state,
-                        IsIncoming = connection.incoming,
-                        InOutIcon = connection.incoming ? _inImage : _outImage
-                    });
-                }
+                        connection.InOutIcon = connection.IsIncoming ? _inImage : _outImage;
+                    }
 
-                UpdateMainView();
+                    UpdateMainView();
+                }
             }
         }
         catch (Exception ex)
