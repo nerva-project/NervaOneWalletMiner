@@ -37,7 +37,7 @@ namespace NervaWalletMiner.Rpc.Wallet
                 };
 
                 // Call service and process response
-                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc), requestJson.ToString());
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
                 if (httpResponse.IsSuccessStatusCode)
                 {
                     dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
@@ -85,7 +85,7 @@ namespace NervaWalletMiner.Rpc.Wallet
                 };
 
                 // Call service and process response
-                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc), requestJson.ToString());
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
                 if (httpResponse.IsSuccessStatusCode)
                 {
                     dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
@@ -183,7 +183,7 @@ namespace NervaWalletMiner.Rpc.Wallet
                 };
 
                 // Call service and process response
-                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc), requestJson.ToString());
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
                 if (httpResponse.IsSuccessStatusCode)
                 {
                     dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);

@@ -1,6 +1,7 @@
 ﻿using NervaWalletMiner.Objects.DataGrid;
 using NervaWalletMiner.Objects.Settings;
 using NervaWalletMiner.Objects.Stats;
+using NervaWalletMiner.Rpc.Daemon;
 using NervaWalletMiner.Rpc.Wallet;
 using System;
 using System.Collections.Generic;
@@ -40,5 +41,6 @@ namespace NervaWalletMiner.Helpers
         public static int CpuThreadCount = Environment.ProcessorCount;
 
         public static IWalletService WalletService = new WalletServiceXNV();
+        public static IDaemonService DaemonService = new DaemonServiceXNV();
     }
 }

@@ -58,7 +58,7 @@ namespace NervaWalletMiner.Rpc.Common
             return httpError;
         }
 
-        public static string GetServiceUrl(RpcSettings rpc)
+        public static string GetServiceUrl(RpcSettings rpc, string path)
         {
             string serviceUrl = string.Empty;
 
@@ -70,7 +70,7 @@ namespace NervaWalletMiner.Rpc.Common
                 }
                 else
                 {
-                    serviceUrl =  rpc.HTProtocol + "://" + rpc.Host + ":" + rpc.Port + "/json_rpc";
+                    serviceUrl =  rpc.HTProtocol + "://" + rpc.Host + ":" + rpc.Port + "/" + path;
                 }
             }
             catch (Exception ex)

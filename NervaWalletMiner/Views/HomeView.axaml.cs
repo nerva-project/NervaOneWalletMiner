@@ -2,9 +2,9 @@
 using Avalonia.Interactivity;
 using NervaWalletMiner.Helpers;
 using NervaWalletMiner.Objects.Constants;
-using NervaWalletMiner.Rpc.Daemon;
+using NervaWalletMiner.Rpc.Daemon.Requests;
+using NervaWalletMiner.Rpc.Daemon.Responses;
 using System;
-using static NervaWalletMiner.Rpc.Daemon.StartMining;
 
 namespace NervaWalletMiner.Views
 {
@@ -49,20 +49,48 @@ namespace NervaWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("Hom.SSMC", ex);
+                Logger.LogException("HomV.SSMC", ex);
             }
         }
 
         public static async void StartMiningAsync(int threads)
         {
-            // TODO: Check response and alert user in case of issues
-            MiningResponse response = await StartMining.CallServiceAsync(GlobalData.ApplicationSettings.Daemon.MiningAddress, threads);
+            try
+            {                
+                StartMiningRequest request = new()
+                {
+                    MiningAddress = GlobalData.ApplicationSettings.Daemon.MiningAddress,
+                    ThreadCount = threads
+                };
+
+                StartMiningResponse response = await GlobalData.DaemonService.StartMining(GlobalData.ApplicationSettings.Daemon.Rpc, request);
+                if(response.Error.IsError)
+                {
+                    // TODO: Error so alert user
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("HomV.SMA", ex);
+            }
         }
 
         public static async void StopMiningAsync()
         {
-            // TODO: Check response and alert user in case of issues
-            MiningResponse response = await StopMining.CallServiceAsync();
+            try
+            {
+                StopMiningRequest request = new();
+
+                StopMiningResponse response = await GlobalData.DaemonService.StopMining(GlobalData.ApplicationSettings.Daemon.Rpc, request);
+                if (response.Error.IsError)
+                {
+                    // TODO: Error so alert user
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("HomV.SMA", ex);
+            }
         }
     }
 }
