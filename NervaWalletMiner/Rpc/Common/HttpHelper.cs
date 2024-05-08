@@ -1,5 +1,4 @@
-﻿
-using NervaWalletMiner.Helpers;
+﻿using NervaWalletMiner.Helpers;
 using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -41,29 +40,45 @@ namespace NervaWalletMiner.Rpc.Common
 
         public static ServiceError GetHttpError(string source, HttpResponseMessage httpResponse)
         {
-            ServiceError httpError = new ServiceError
-            {
-                IsError = true,
-                Code = httpResponse.StatusCode.ToString(),
-                Message = httpResponse.ReasonPhrase
-            };
+            ServiceError httpError = new();
 
-            Logger.LogError("HTTP.GHE", source + " - response failed. Code: " + httpResponse.StatusCode + ", Phrase: " + httpResponse.ReasonPhrase);
+            try
+            {
+                httpError.IsError = true;
+                httpError.Code = httpResponse.StatusCode.ToString();
+                httpError.Message = httpResponse.ReasonPhrase;
+
+                Logger.LogError("HTTP.GHE", source + " - response failed. Code: " + httpResponse.StatusCode + ", Phrase: " + httpResponse.ReasonPhrase);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("HTTP.GHE", ex);
+            }
 
             return httpError;
         }
 
         public static string GetServiceUrl(RpcSettings rpc)
         {
-            if (string.IsNullOrEmpty(rpc.HTProtocol) || string.IsNullOrEmpty(rpc.Host) || rpc.Port < 1)
+            string serviceUrl = string.Empty;
+
+            try
             {
-                Logger.LogError("HTTP.GSU", "Rpc missing. Protocol: " + rpc.HTProtocol + ", Host: " + rpc.Host + ", Port: " + rpc.Port);
-                return string.Empty;
+                if (string.IsNullOrEmpty(rpc.HTProtocol) || string.IsNullOrEmpty(rpc.Host) || rpc.Port < 1)
+                {
+                    Logger.LogError("HTTP.GSU", "Rpc missing. Protocol: " + rpc.HTProtocol + ", Host: " + rpc.Host + ", Port: " + rpc.Port);
+                }
+                else
+                {
+                    serviceUrl =  rpc.HTProtocol + "://" + rpc.Host + ":" + rpc.Port + "/json_rpc";
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return rpc.HTProtocol + "://" + rpc.Host + ":" + rpc.Port + "/json_rpc";
+                Logger.LogException("HTTP.GSU", ex);
             }
+
+            return serviceUrl;
         }
     }
 }
