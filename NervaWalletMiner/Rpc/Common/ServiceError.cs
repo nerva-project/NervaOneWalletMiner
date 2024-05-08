@@ -1,6 +1,6 @@
 ﻿namespace NervaWalletMiner.Rpc.Common
 {
-    public class RpcError
+    public class ServiceError
     {
         public bool IsError { get; set; } = true;
         public string? Code { get; set; }

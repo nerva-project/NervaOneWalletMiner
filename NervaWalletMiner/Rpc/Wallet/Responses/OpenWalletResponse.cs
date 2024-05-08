@@ -4,6 +4,6 @@ namespace NervaWalletMiner.Rpc.Wallet.Responses
 {
     public class OpenWalletResponse
     {
-        public RpcError Error { get; set; } = new();
+        public ServiceError Error { get; set; } = new();
     }
 }

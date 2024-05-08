@@ -6,7 +6,7 @@ namespace NervaWalletMiner.Rpc.Wallet.Responses
 {
     public class GetAccountsResponse
     {
-        public RpcError Error { get; set; } = new();
+        public ServiceError Error { get; set; } = new();
 
         public double BalanceUnlocked { get; set; }
         public double BalanceLocked { get; set; }

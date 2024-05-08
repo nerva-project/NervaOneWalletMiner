@@ -39,6 +39,20 @@ namespace NervaWalletMiner.Rpc.Common
             return response;
         }
 
+        public static ServiceError GetHttpError(string source, HttpResponseMessage httpResponse)
+        {
+            ServiceError httpError = new ServiceError
+            {
+                IsError = true,
+                Code = httpResponse.StatusCode.ToString(),
+                Message = httpResponse.ReasonPhrase
+            };
+
+            Logger.LogError("HTTP.GHE", source + " - response failed. Code: " + httpResponse.StatusCode + ", Phrase: " + httpResponse.ReasonPhrase);
+
+            return httpError;
+        }
+
         public static string GetServiceUrl(RpcSettings rpc)
         {
             if (string.IsNullOrEmpty(rpc.HTProtocol) || string.IsNullOrEmpty(rpc.Host) || rpc.Port < 1)

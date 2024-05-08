@@ -46,10 +46,7 @@ namespace NervaWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error.IsError = true;
-                        responseObj.Error.Code = error["code"].ToString();
-                        responseObj.Error.Message = error["message"].ToString();
-                        Logger.LogError("RWOW.CA", "Error from service. Code: " + responseObj.Error.Code + ", Message: " + responseObj.Error.Message);
+                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -60,11 +57,7 @@ namespace NervaWalletMiner.Rpc.Wallet
                 else
                 {
                     // Set HTTP error
-                    responseObj.Error.IsError = true;
-                    responseObj.Error.Code = httpResponse.StatusCode.ToString();
-                    responseObj.Error.Message = httpResponse.ReasonPhrase;
-
-                    Logger.LogError("RWOW.CA", "Response failed. Code: " + httpResponse.StatusCode + ", Phrase: " + httpResponse.ReasonPhrase);
+                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
                 }
             }
             catch (Exception ex)
@@ -101,10 +94,7 @@ namespace NervaWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error.IsError = true;
-                        responseObj.Error.Code = error["code"].ToString();
-                        responseObj.Error.Message = error["message"].ToString();
-                        Logger.LogError("RWGA.CA", "Error from service. Code: " + responseObj.Error.Code + ", Message: " + responseObj.Error.Message);
+                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -132,11 +122,7 @@ namespace NervaWalletMiner.Rpc.Wallet
                 else
                 {
                     // Set HTTP error
-                    responseObj.Error.IsError = true;
-                    responseObj.Error.Code = httpResponse.StatusCode.ToString();
-                    responseObj.Error.Message = httpResponse.ReasonPhrase;
-
-                    Logger.LogError("RWGA.CA", "Response failed. Code: " + httpResponse.StatusCode + ", Phrase: " + httpResponse.ReasonPhrase);
+                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
                 }
             }
             catch (Exception ex)
@@ -206,10 +192,7 @@ namespace NervaWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error.IsError = true;
-                        responseObj.Error.Code = error["code"].ToString();
-                        responseObj.Error.Message = error["message"].ToString();
-                        Logger.LogError("RWGT.CA", "Error from service. Code: " + responseObj.Error.Code + ", Message: " + responseObj.Error.Message);
+                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -269,11 +252,7 @@ namespace NervaWalletMiner.Rpc.Wallet
                 else
                 {
                     // Set HTTP error
-                    responseObj.Error.IsError = true;
-                    responseObj.Error.Code = httpResponse.StatusCode.ToString();
-                    responseObj.Error.Message = httpResponse.ReasonPhrase;
-
-                    Logger.LogError("RWGT.CA", "Response failed. Code: " + httpResponse.StatusCode + ", Phrase: " + httpResponse.ReasonPhrase);
+                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
                 }
             }
             catch (Exception ex)
