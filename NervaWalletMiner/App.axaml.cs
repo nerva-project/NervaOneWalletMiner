@@ -56,7 +56,7 @@ public partial class App : Application
     public static void Shutdown()
     {
         // Prevent the daemon restarting automatically before telling it to stop
-        if (GlobalData.ApplicationSettings.Daemon.StopOnExit)
+        if (GlobalData.ApplicationSettings.Daemon[GlobalData.ApplicationSettings.ActiveCoin].StopOnExit)
         {
             //TODO: Call daemon method to exit
             //Daemon.StopDaemon();
@@ -74,10 +74,10 @@ public partial class App : Application
     {
         try
         {
-            if(GlobalData.ApplicationSettings.Daemon.MiningThreads == 0)
+            if (GlobalData.ApplicationSettings.Daemon[GlobalData.ApplicationSettings.ActiveCoin].MiningThreads == 0)
             {
                 // By default use 50% of threads
-                GlobalData.ApplicationSettings.Daemon.MiningThreads = GlobalData.CpuThreadCount > 1 ? Convert.ToInt32(Math.Floor(GlobalData.CpuThreadCount / 2.00)) : 1;
+                GlobalData.ApplicationSettings.Daemon[GlobalData.ApplicationSettings.ActiveCoin].MiningThreads = GlobalData.CpuThreadCount > 1 ? Convert.ToInt32(Math.Floor(GlobalData.CpuThreadCount / 2.00)) : 1;
             }
 
             // TODO: Might need to set up other defaults

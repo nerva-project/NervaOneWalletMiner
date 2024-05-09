@@ -145,7 +145,7 @@ namespace NervaWalletMiner.Helpers
         {
             string arg = $"--log-file \"{GlobalMethods.CycleLogFile(exePath)}\"";
 
-            if (GlobalData.ApplicationSettings.Daemon.IsTestnet)
+            if (GlobalData.ApplicationSettings.Daemon[GlobalData.ApplicationSettings.ActiveCoin].IsTestnet)
             {
                 Logger.LogDebug("PM.GCL", "Connecting to testnet");
                 arg += " --testnet";

@@ -12,7 +12,7 @@ namespace NervaWalletMiner.Views
             InitializeComponent();
 
             var tbxMiningAddress = this.Get<TextBox>("tbxMiningAddress");
-            tbxMiningAddress.Text = GlobalData.ApplicationSettings.Daemon.MiningAddress;
+            tbxMiningAddress.Text = GlobalData.ApplicationSettings.Daemon[GlobalData.ApplicationSettings.ActiveCoin].MiningAddress;
         }
 
         public void SaveSettingsClicked(object sender, RoutedEventArgs args)
@@ -23,7 +23,7 @@ namespace NervaWalletMiner.Views
 
                 if (!string.IsNullOrEmpty(tbxMiningAddress.Text))
                 {
-                    GlobalData.ApplicationSettings.Daemon.MiningAddress = tbxMiningAddress.Text;
+                    GlobalData.ApplicationSettings.Daemon[GlobalData.ApplicationSettings.ActiveCoin].MiningAddress = tbxMiningAddress.Text;
                     GlobalMethods.SaveConfig();
                 }
             }

@@ -389,9 +389,9 @@ public class MainViewModel : ViewModelBase
                 Logger.LogDebug("Main.KDR", "No response from daemon since: " + _lastDaemonResponseTime.ToLongTimeString() + " . Forcing restart...");
             }
 
-            if (!ProcessManager.IsRunning(FileNames.NERVA_DAEMON, out Process? process) || forceRestart)
+            if (!ProcessManager.IsRunning(GlobalData.ApplicationSettings.Daemon[GlobalData.ApplicationSettings.ActiveCoin].DaemonProcessName, out Process? process) || forceRestart)
             {
-                if (FileNames.DirectoryContainsCliTools(GlobalData.CliToolsDir))
+                if (GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
                 {
                     DaemonProcess.ForceClose();
                     Logger.LogDebug("Main.KDR", "Starting daemon process");
@@ -414,9 +414,9 @@ public class MainViewModel : ViewModelBase
     {
         try
         {
-            if (!ProcessManager.IsRunning(FileNames.NERVA_WALLET_RPC, out Process? process))
+            if (!ProcessManager.IsRunning(GlobalData.ApplicationSettings.Wallet[GlobalData.ApplicationSettings.ActiveCoin].WalletProcessName, out Process? process))
             {
-                if (FileNames.DirectoryContainsCliTools(GlobalData.CliToolsDir))
+                if (GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
                 {
                     WalletProcess.ForceClose();
                     Logger.LogDebug("Main.KWPR", "Starting wallet process");
@@ -443,7 +443,7 @@ public class MainViewModel : ViewModelBase
                 GlobalData.NetworkStats.StatusSync = "Trying to establish connection with daemon...";
             }
 
-            GetInfoResponse infoRes = await GlobalData.DaemonService.GetInfo(GlobalData.ApplicationSettings.Daemon.Rpc, new GetInfoRequest());
+            GetInfoResponse infoRes = await GlobalData.DaemonService.GetInfo(GlobalData.ApplicationSettings.Daemon[GlobalData.ApplicationSettings.ActiveCoin].Rpc, new GetInfoRequest());
 
             if (!infoRes.Error.IsError)
             {
@@ -482,7 +482,7 @@ public class MainViewModel : ViewModelBase
                 //Logger.LogDebug("Main.DUU", "GetInfo Response Height: " + infoRes.height);
 
 
-                MiningStatusResponse miningRes = await GlobalData.DaemonService.MiningStatus(GlobalData.ApplicationSettings.Daemon.Rpc, new MiningStatusRequest());
+                MiningStatusResponse miningRes = await GlobalData.DaemonService.MiningStatus(GlobalData.ApplicationSettings.Daemon[GlobalData.ApplicationSettings.ActiveCoin].Rpc, new MiningStatusRequest());
                 if (miningRes.IsActive)
                 {
                     GlobalData.NetworkStats.MinerStatus = StatusMiner.Mining;
@@ -524,7 +524,7 @@ public class MainViewModel : ViewModelBase
                 }
 
 
-                GetConnectionsResponse connectResp = await GlobalData.DaemonService.GetConnections(GlobalData.ApplicationSettings.Daemon.Rpc, new GetConnectionsRequest());
+                GetConnectionsResponse connectResp = await GlobalData.DaemonService.GetConnections(GlobalData.ApplicationSettings.Daemon[GlobalData.ApplicationSettings.ActiveCoin].Rpc, new GetConnectionsRequest());
 
                 if(!connectResp.Error.IsError)
                 {
@@ -550,7 +550,7 @@ public class MainViewModel : ViewModelBase
         try
         {
             // Get accounts for Wallets view
-            GetAccountsResponse resGetAccounts = await GlobalData.WalletService.GetAccounts(GlobalData.ApplicationSettings.Wallet.Rpc, new GetAccountsRequest());
+            GetAccountsResponse resGetAccounts = await GlobalData.WalletService.GetAccounts(GlobalData.ApplicationSettings.Wallet[GlobalData.ApplicationSettings.ActiveCoin].Rpc, new GetAccountsRequest());
 
             if(resGetAccounts.Error.IsError)
             {
@@ -594,7 +594,7 @@ public class MainViewModel : ViewModelBase
             // TODO: Remove stopwatch when no longer needed
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-            GetTransfersResponse resTransfers = await GlobalData.WalletService.GetTransfers(GlobalData.ApplicationSettings.Wallet.Rpc, reqTransfers);
+            GetTransfersResponse resTransfers = await GlobalData.WalletService.GetTransfers(GlobalData.ApplicationSettings.Wallet[GlobalData.ApplicationSettings.ActiveCoin].Rpc, reqTransfers);
             stopwatch.Stop();
 
             if (resTransfers.Error.IsError)

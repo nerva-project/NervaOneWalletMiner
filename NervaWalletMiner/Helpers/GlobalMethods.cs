@@ -1,7 +1,7 @@
-﻿using NervaWalletMiner.Objects;
+﻿using NervaWalletMiner.Objects.Constants;
 using NervaWalletMiner.Objects.Settings;
-using NervaWalletMiner.Rpc.Common;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 
@@ -9,6 +9,7 @@ namespace NervaWalletMiner.Helpers
 {
     public static class GlobalMethods
     {
+        #region Directories, Paths and Names
         public static string GetDataDir()
         {
             string dataDirectory;
@@ -81,7 +82,7 @@ namespace NervaWalletMiner.Helpers
             if (Directory.Exists(GlobalData.DataDir))
             {
                 // Create logs directory if it does not exist
-                walletDirectory = Path.Combine(GlobalData.DataDir, GlobalData.WalletDirName);
+                walletDirectory = Path.Combine(GlobalData.DataDir, GlobalData.MainCoinsDirName, GlobalData.CoinDirName, GlobalData.WalletDirName);
                 if (!Directory.Exists(walletDirectory))
                 {
                     Directory.CreateDirectory(walletDirectory);
@@ -102,7 +103,7 @@ namespace NervaWalletMiner.Helpers
             if (Directory.Exists(GlobalData.DataDir))
             {
                 // Create logs directory if it does not exist
-                cliToolsDirectory = Path.Combine(GlobalData.DataDir, GlobalData.CliToolsDirName);
+                cliToolsDirectory = Path.Combine(GlobalData.DataDir, GlobalData.MainCoinsDirName, GlobalData.CoinDirName, GlobalData.CliToolsDirName);
                 if (!Directory.Exists(cliToolsDirectory))
                 {
                     Directory.CreateDirectory(cliToolsDirectory);
@@ -118,12 +119,12 @@ namespace NervaWalletMiner.Helpers
 
         public static string GetDaemonPath()
         {
-            return Path.Combine(GlobalData.CliToolsDir, FileNames.NERVA_DAEMON);
+            return Path.Combine(GlobalData.CliToolsDir, GlobalData.ApplicationSettings.Daemon[GlobalData.ApplicationSettings.ActiveCoin].DaemonProcessName);
         }
 
         public static string GetRpcWalletPath()
         {
-            return Path.Combine(GlobalData.CliToolsDir, FileNames.NERVA_WALLET_RPC);
+            return Path.Combine(GlobalData.CliToolsDir, GlobalData.ApplicationSettings.Wallet[GlobalData.ApplicationSettings.ActiveCoin].WalletProcessName);
         }
 
         public static string GetConfigFilePath()
@@ -131,7 +132,27 @@ namespace NervaWalletMiner.Helpers
             string dataDir = GetDataDir();
             return Path.Combine(dataDir, "app.config");
         }
+        #endregion // Directories, Paths and Names
 
+        #region Coins Setup
+        public static Dictionary<string, SettingsDaemon> GetDaemonSettings()
+        {
+            Dictionary<string, SettingsDaemon> daemonSettings = [];
+
+            daemonSettings.Add(Coin.XNV, new SettingsDaemon(17566, false));
+
+            return daemonSettings;
+        }
+
+        public static Dictionary<string, SettingsWallet> GetWalletSettings()
+        {
+            Dictionary<string, SettingsWallet> daemonSettings = [];
+
+            daemonSettings.Add(Coin.XNV, new SettingsWallet());
+
+            return daemonSettings;
+        }
+        #endregion // Coins Setup
         public static string GetShorterString(string? text, int shorterLength)
         {
             if (string.IsNullOrEmpty(text))
@@ -245,6 +266,19 @@ namespace NervaWalletMiner.Helpers
         public static bool IsLinux()
         {
             return RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+        }
+
+        public static bool DirectoryContainsCliTools(string path)
+        {
+            if (!Directory.Exists(path))
+            {
+                return false;
+            }
+
+            bool hasDaemon = File.Exists(Path.Combine(path, GlobalData.ApplicationSettings.Daemon[GlobalData.ApplicationSettings.ActiveCoin].DaemonProcessName));
+            bool hasRpcWallet = File.Exists(Path.Combine(path, GlobalData.ApplicationSettings.Wallet[GlobalData.ApplicationSettings.ActiveCoin].WalletProcessName));
+
+            return (hasRpcWallet && hasDaemon);
         }
     }
 }

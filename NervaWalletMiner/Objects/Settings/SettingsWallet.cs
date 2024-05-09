@@ -7,6 +7,8 @@ namespace NervaWalletMiner.Objects.Settings
     {
         public RpcSettings Rpc { get; set; } = new RpcSettings((uint)GlobalData.RandomGenerator.Next(10000, 50000));
 
+        public string WalletProcessName { get; set; } = GlobalMethods.IsWindows() ? "nerva-wallet-rpc.exe" : "nerva-wallet-rpc";
+
         public int NumTransfersToDisplay { get; set; } = 50;
     }
 }

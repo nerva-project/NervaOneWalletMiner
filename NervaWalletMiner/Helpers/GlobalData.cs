@@ -16,6 +16,8 @@ namespace NervaWalletMiner.Helpers
         public const string CliToolsDirName = "cli";
         public const string WalletDirName = "wallets";
         public const string LogsDirName = "logs";
+        public const string MainCoinsDirName = "coins";
+        public static string CoinDirName = "xnv";
 
         public static Random RandomGenerator = new Random();
 

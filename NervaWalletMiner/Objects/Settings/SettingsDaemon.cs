@@ -1,10 +1,11 @@
-﻿using NervaWalletMiner.Rpc.Common;
+﻿using NervaWalletMiner.Helpers;
+using NervaWalletMiner.Rpc.Common;
 
 namespace NervaWalletMiner.Objects.Settings
 {
-    public class SettingsDaemon(bool isTestnet)
+    public class SettingsDaemon(uint rcpPort, bool isTestnet)
     {
-        public RpcSettings Rpc { get; set; } = new RpcSettings(17566);
+        public RpcSettings Rpc { get; set; } = new RpcSettings(rcpPort);
 
         public bool StopOnExit { get; set; } = false;
 
@@ -17,5 +18,7 @@ namespace NervaWalletMiner.Objects.Settings
         public string AdditionalArguments { get; set; } = string.Empty;
 
         public bool IsTestnet { get; set; } = isTestnet;
+
+        public string DaemonProcessName { get; set; } = GlobalMethods.IsWindows() ? "nervad.exe" : "nervad";
     }
 }

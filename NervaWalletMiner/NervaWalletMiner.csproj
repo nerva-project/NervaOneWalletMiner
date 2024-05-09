@@ -32,4 +32,8 @@
       <SubType>Designer</SubType>
     </AvaloniaXaml>
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Assets\xnv\" />
+  </ItemGroup>
 </Project>
