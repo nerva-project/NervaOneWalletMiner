@@ -12,9 +12,13 @@
 	
 	<StackPanel Spacing="5" HorizontalAlignment="Stretch" MaxWidth="650">
 		<Grid ColumnDefinitions="100,*,100" Margin="10">
-			<TextBlock Grid.Row="0" Grid.Column="0">Daemon</TextBlock>
+			<Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="24,*">
+				<Image Grid.Row="0" Grid.Column="0" Source="{Binding CoinIcon}"></Image>
+				<Label Grid.Row="0" Grid.Column="1" Height="24">Daemon</Label>
+			</Grid>
+
 			<DockPanel Grid.Row="0" Grid.Column="1" Margin="0,0,10,0" MinWidth="200" MaxWidth="250">
-				<Label>Threads:</Label>
+				<Label Height="24">Threads:</Label>
 				<NumericUpDown Name="nupThreads"
 								Minimum="1"
 								Value="1"

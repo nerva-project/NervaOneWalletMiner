@@ -3,7 +3,6 @@ using Avalonia.Controls.Selection;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using NervaWalletMiner.Helpers;
-using NervaWalletMiner.Objects;
 using NervaWalletMiner.Objects.Constants;
 using NervaWalletMiner.Objects.DataGrid;
 using NervaWalletMiner.Rpc;
@@ -294,7 +293,7 @@ public class MainViewModel : ViewModelBase
                 _masterUpdateTimer.Elapsed += (s, e) => MasterUpdateProcess();
                 _masterUpdateTimer.Start();
 
-                Logger.LogDebug("Main.SMUP", "Master timer running every " + _masterTimerInterval / 1000 + " seconds. Update every " + (_masterTimerInterval / 1000) * GlobalData.AppSettings.Misc.TimerIntervalMultiplier + " seconds.");
+                Logger.LogDebug("Main.SMUP", "Master timer running every " + _masterTimerInterval / 1000 + " seconds. Update every " + (_masterTimerInterval / 1000) * GlobalData.AppSettings.TimerIntervalMultiplier + " seconds.");
             }
         }
         catch (Exception ex)
@@ -333,7 +332,7 @@ public class MainViewModel : ViewModelBase
             // Update UI
             if (!_killMasterProcess)
             {
-                if (_masterTimerCount % GlobalData.AppSettings.Misc.TimerIntervalMultiplier == 0)
+                if (_masterTimerCount % GlobalData.AppSettings.TimerIntervalMultiplier == 0)
                 {
                     DaemonUiUpdate();
                 }
@@ -346,7 +345,7 @@ public class MainViewModel : ViewModelBase
                     GlobalData.IsWalletJustOpened = false;
                     WalletUiUpdate();
                 }
-                else if(_masterTimerCount % (GlobalData.AppSettings.Misc.TimerIntervalMultiplier * 3) == 0)
+                else if(_masterTimerCount % (GlobalData.AppSettings.TimerIntervalMultiplier * 3) == 0)
                 {
                     // Update wallet every 3rd call because you do not need to do it more often
                     WalletUiUpdate();

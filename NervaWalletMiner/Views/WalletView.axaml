@@ -12,7 +12,11 @@
 
 	<StackPanel Spacing="5" HorizontalAlignment="Stretch" MaxWidth="650">
 		<Grid ColumnDefinitions="200,*,120" Margin="10">
-			<TextBlock Name="tbkWallet" Grid.Row="0" Grid.Column="0">Wallet</TextBlock>
+			
+			<Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="24,*">
+				<Image Grid.Row="0" Grid.Column="0" Source="{Binding CoinIcon}"></Image>
+				<Label Grid.Row="0" Grid.Column="1" Height="24">Wallet</Label>
+			</Grid>
 
 			<Button Name="btnOpenCloseWallet"
 					Grid.Row="0"

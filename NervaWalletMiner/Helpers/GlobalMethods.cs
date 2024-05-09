@@ -152,6 +152,15 @@ namespace NervaWalletMiner.Helpers
 
             return daemonSettings;
         }
+
+        public static Dictionary<string, SettingsMisc> GetMiscSettings()
+        {
+            Dictionary<string, SettingsMisc> daemonSettings = [];
+
+            daemonSettings.Add(Coin.XNV, new SettingsMisc());
+
+            return daemonSettings;
+        }
         #endregion // Coins Setup
         public static string GetShorterString(string? text, int shorterLength)
         {

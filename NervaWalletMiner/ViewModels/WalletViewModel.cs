@@ -1,14 +1,22 @@
-﻿using NervaWalletMiner.Objects.Constants;
+﻿using Avalonia.Media.Imaging;
+using NervaWalletMiner.Helpers;
+using NervaWalletMiner.Objects.Constants;
 using NervaWalletMiner.Objects.DataGrid;
 using ReactiveUI;
 using System.Collections.Generic;
-using System.Reactive.Linq;
-using System.Windows.Input;
 
 namespace NervaWalletMiner.ViewModels
 {
     internal class WalletViewModel : ViewModelBase
     {
+        // TODO: Figure out how to do this in one place instead of on each view
+        private Bitmap _CoinIcon = GlobalData.AppSettings.Misc[GlobalData.AppSettings.ActiveCoin].Logo;
+        public Bitmap CoinIcon
+        {
+            get => _CoinIcon;
+            set => this.RaiseAndSetIfChanged(ref _CoinIcon, value);
+        }
+
         private string _OpenCloseWallet = StatusWallet.OpenWallet;
         public string OpenCloseWallet
         {

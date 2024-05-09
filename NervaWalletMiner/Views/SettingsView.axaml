@@ -12,7 +12,11 @@
 	</Design.DataContext>
 	
 	<StackPanel Spacing="5">
-		<TextBlock>Settings</TextBlock>
+		<Grid ColumnDefinitions="24,*">
+			<Image Grid.Row="0" Grid.Column="0" Source="{Binding CoinIcon}"></Image>
+			<Label Grid.Row="0" Grid.Column="1" Height="24">Settings</Label>
+		</Grid>
+		
 		<Button Command="{Binding OpenDebugFolderCommand}"
 			HorizontalAlignment="Center"
 			VerticalAlignment="Top">
