@@ -294,7 +294,7 @@ public class MainViewModel : ViewModelBase
                 _masterUpdateTimer.Elapsed += (s, e) => MasterUpdateProcess();
                 _masterUpdateTimer.Start();
 
-                Logger.LogDebug("Main.SMUP", "Master timer running every " + _masterTimerInterval / 1000 + " seconds. Update every " + (_masterTimerInterval / 1000) * GlobalData.ApplicationSettings.Misc.TimerIntervalMultiplier + " seconds.");
+                Logger.LogDebug("Main.SMUP", "Master timer running every " + _masterTimerInterval / 1000 + " seconds. Update every " + (_masterTimerInterval / 1000) * GlobalData.AppSettings.Misc.TimerIntervalMultiplier + " seconds.");
             }
         }
         catch (Exception ex)
@@ -333,7 +333,7 @@ public class MainViewModel : ViewModelBase
             // Update UI
             if (!_killMasterProcess)
             {
-                if (_masterTimerCount % GlobalData.ApplicationSettings.Misc.TimerIntervalMultiplier == 0)
+                if (_masterTimerCount % GlobalData.AppSettings.Misc.TimerIntervalMultiplier == 0)
                 {
                     DaemonUiUpdate();
                 }
@@ -346,7 +346,7 @@ public class MainViewModel : ViewModelBase
                     GlobalData.IsWalletJustOpened = false;
                     WalletUiUpdate();
                 }
-                else if(_masterTimerCount % (GlobalData.ApplicationSettings.Misc.TimerIntervalMultiplier * 3) == 0)
+                else if(_masterTimerCount % (GlobalData.AppSettings.Misc.TimerIntervalMultiplier * 3) == 0)
                 {
                     // Update wallet every 3rd call because you do not need to do it more often
                     WalletUiUpdate();
@@ -389,7 +389,7 @@ public class MainViewModel : ViewModelBase
                 Logger.LogDebug("Main.KDR", "No response from daemon since: " + _lastDaemonResponseTime.ToLongTimeString() + " . Forcing restart...");
             }
 
-            if (!ProcessManager.IsRunning(GlobalData.ApplicationSettings.Daemon[GlobalData.ApplicationSettings.ActiveCoin].DaemonProcessName, out Process? process) || forceRestart)
+            if (!ProcessManager.IsRunning(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].DaemonProcessName, out Process? process) || forceRestart)
             {
                 if (GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
                 {
@@ -414,7 +414,7 @@ public class MainViewModel : ViewModelBase
     {
         try
         {
-            if (!ProcessManager.IsRunning(GlobalData.ApplicationSettings.Wallet[GlobalData.ApplicationSettings.ActiveCoin].WalletProcessName, out Process? process))
+            if (!ProcessManager.IsRunning(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].WalletProcessName, out Process? process))
             {
                 if (GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
                 {
@@ -443,7 +443,7 @@ public class MainViewModel : ViewModelBase
                 GlobalData.NetworkStats.StatusSync = "Trying to establish connection with daemon...";
             }
 
-            GetInfoResponse infoRes = await GlobalData.DaemonService.GetInfo(GlobalData.ApplicationSettings.Daemon[GlobalData.ApplicationSettings.ActiveCoin].Rpc, new GetInfoRequest());
+            GetInfoResponse infoRes = await GlobalData.DaemonService.GetInfo(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new GetInfoRequest());
 
             if (!infoRes.Error.IsError)
             {
@@ -482,7 +482,7 @@ public class MainViewModel : ViewModelBase
                 //Logger.LogDebug("Main.DUU", "GetInfo Response Height: " + infoRes.height);
 
 
-                MiningStatusResponse miningRes = await GlobalData.DaemonService.MiningStatus(GlobalData.ApplicationSettings.Daemon[GlobalData.ApplicationSettings.ActiveCoin].Rpc, new MiningStatusRequest());
+                MiningStatusResponse miningRes = await GlobalData.DaemonService.MiningStatus(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new MiningStatusRequest());
                 if (miningRes.IsActive)
                 {
                     GlobalData.NetworkStats.MinerStatus = StatusMiner.Mining;
@@ -524,7 +524,7 @@ public class MainViewModel : ViewModelBase
                 }
 
 
-                GetConnectionsResponse connectResp = await GlobalData.DaemonService.GetConnections(GlobalData.ApplicationSettings.Daemon[GlobalData.ApplicationSettings.ActiveCoin].Rpc, new GetConnectionsRequest());
+                GetConnectionsResponse connectResp = await GlobalData.DaemonService.GetConnections(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new GetConnectionsRequest());
 
                 if(!connectResp.Error.IsError)
                 {
@@ -550,7 +550,7 @@ public class MainViewModel : ViewModelBase
         try
         {
             // Get accounts for Wallets view
-            GetAccountsResponse resGetAccounts = await GlobalData.WalletService.GetAccounts(GlobalData.ApplicationSettings.Wallet[GlobalData.ApplicationSettings.ActiveCoin].Rpc, new GetAccountsRequest());
+            GetAccountsResponse resGetAccounts = await GlobalData.WalletService.GetAccounts(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new GetAccountsRequest());
 
             if(resGetAccounts.Error.IsError)
             {
@@ -594,7 +594,7 @@ public class MainViewModel : ViewModelBase
             // TODO: Remove stopwatch when no longer needed
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-            GetTransfersResponse resTransfers = await GlobalData.WalletService.GetTransfers(GlobalData.ApplicationSettings.Wallet[GlobalData.ApplicationSettings.ActiveCoin].Rpc, reqTransfers);
+            GetTransfersResponse resTransfers = await GlobalData.WalletService.GetTransfers(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, reqTransfers);
             stopwatch.Stop();
 
             if (resTransfers.Error.IsError)

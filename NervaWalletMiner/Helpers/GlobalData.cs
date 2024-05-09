@@ -22,7 +22,7 @@ namespace NervaWalletMiner.Helpers
         public static Random RandomGenerator = new Random();
 
         // Those will be saved to and read from app.config
-        public static AppSettings ApplicationSettings = new();
+        public static ApplicationSettings AppSettings = new();
 
         public static readonly string DataDir = GlobalMethods.GetDataDir();
         public static readonly string CliToolsDir = GlobalMethods.GetCliToolsDir();

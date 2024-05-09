@@ -72,7 +72,7 @@ namespace NervaWalletMiner.Views
                 Password = walletPassword
             };
 
-            OpenWalletResponse response = await GlobalData.WalletService.OpenWallet(GlobalData.ApplicationSettings.Wallet[GlobalData.ApplicationSettings.ActiveCoin].Rpc, request);
+            OpenWalletResponse response = await GlobalData.WalletService.OpenWallet(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
 
             if (response.Error.IsError)
             {

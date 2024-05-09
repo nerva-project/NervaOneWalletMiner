@@ -119,12 +119,12 @@ namespace NervaWalletMiner.Helpers
 
         public static string GetDaemonPath()
         {
-            return Path.Combine(GlobalData.CliToolsDir, GlobalData.ApplicationSettings.Daemon[GlobalData.ApplicationSettings.ActiveCoin].DaemonProcessName);
+            return Path.Combine(GlobalData.CliToolsDir, GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].DaemonProcessName);
         }
 
         public static string GetRpcWalletPath()
         {
-            return Path.Combine(GlobalData.CliToolsDir, GlobalData.ApplicationSettings.Wallet[GlobalData.ApplicationSettings.ActiveCoin].WalletProcessName);
+            return Path.Combine(GlobalData.CliToolsDir, GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].WalletProcessName);
         }
 
         public static string GetConfigFilePath()
@@ -183,7 +183,7 @@ namespace NervaWalletMiner.Helpers
         {
             try
             {
-                var contentsToWriteToFile = Newtonsoft.Json.JsonConvert.SerializeObject(GlobalData.ApplicationSettings);
+                var contentsToWriteToFile = Newtonsoft.Json.JsonConvert.SerializeObject(GlobalData.AppSettings);
                 using (TextWriter writer = new StreamWriter(GlobalData.ConfigFilePath))
                 {
                     writer.Write(contentsToWriteToFile);
@@ -204,10 +204,10 @@ namespace NervaWalletMiner.Helpers
                     using (TextReader reader = new StreamReader(GlobalData.ConfigFilePath))
                     {
                         var fileContents = reader.ReadToEnd();
-                        AppSettings settings = Newtonsoft.Json.JsonConvert.DeserializeObject<AppSettings>(fileContents)!;
+                        ApplicationSettings settings = Newtonsoft.Json.JsonConvert.DeserializeObject<ApplicationSettings>(fileContents)!;
                         if (settings != null)
                         {
-                            GlobalData.ApplicationSettings = settings;
+                            GlobalData.AppSettings = settings;
                         }
                     }
                 }            
@@ -275,8 +275,8 @@ namespace NervaWalletMiner.Helpers
                 return false;
             }
 
-            bool hasDaemon = File.Exists(Path.Combine(path, GlobalData.ApplicationSettings.Daemon[GlobalData.ApplicationSettings.ActiveCoin].DaemonProcessName));
-            bool hasRpcWallet = File.Exists(Path.Combine(path, GlobalData.ApplicationSettings.Wallet[GlobalData.ApplicationSettings.ActiveCoin].WalletProcessName));
+            bool hasDaemon = File.Exists(Path.Combine(path, GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].DaemonProcessName));
+            bool hasRpcWallet = File.Exists(Path.Combine(path, GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].WalletProcessName));
 
             return (hasRpcWallet && hasDaemon);
         }

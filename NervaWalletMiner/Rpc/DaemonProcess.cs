@@ -8,12 +8,12 @@ namespace NervaWalletMiner.Rpc
     {
         public static void ForceClose()
         {
-            ProcessManager.Kill(GlobalData.ApplicationSettings.Daemon[GlobalData.ApplicationSettings.ActiveCoin].DaemonProcessName);
+            ProcessManager.Kill(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].DaemonProcessName);
         }
 
         public static bool IsRunning()
         {
-            ProcessManager.IsRunning(GlobalData.ApplicationSettings.Daemon[GlobalData.ApplicationSettings.ActiveCoin].DaemonProcessName, out Process? process);
+            ProcessManager.IsRunning(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].DaemonProcessName, out Process? process);
 
             if (process != null)
             {
@@ -32,14 +32,14 @@ namespace NervaWalletMiner.Rpc
 
         public static string GenerateCommandLine(string extraParams)
         {
-            string appCommand = ProcessManager.GenerateCommandLine(GlobalMethods.GetDaemonPath(), GlobalData.ApplicationSettings.Daemon[GlobalData.ApplicationSettings.ActiveCoin].Rpc);
+            string appCommand = ProcessManager.GenerateCommandLine(GlobalMethods.GetDaemonPath(), GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc);
 
-            if (GlobalData.ApplicationSettings.Daemon[GlobalData.ApplicationSettings.ActiveCoin].AutoStartMining)
+            if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AutoStartMining)
             {
-                string ma = GlobalData.ApplicationSettings.Daemon[GlobalData.ApplicationSettings.ActiveCoin].MiningAddress;
+                string ma = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress;
 
                 Logger.LogDebug("DP.GCL", $"Enabling startup mining @ {ma}");
-                appCommand += $" --start-mining {ma} --mining-threads {GlobalData.ApplicationSettings.Daemon[GlobalData.ApplicationSettings.ActiveCoin].MiningThreads}";
+                appCommand += $" --start-mining {ma} --mining-threads {GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads}";
             }
 
             if(GlobalMethods.IsLinux())
@@ -47,7 +47,7 @@ namespace NervaWalletMiner.Rpc
                 appCommand += " --detach";
             }
 
-            appCommand += $" {GlobalData.ApplicationSettings.Daemon[GlobalData.ApplicationSettings.ActiveCoin].AdditionalArguments}";
+            appCommand += $" {GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AdditionalArguments}";
 
             if (!string.IsNullOrEmpty(extraParams))
             {

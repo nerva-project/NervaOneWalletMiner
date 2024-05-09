@@ -8,12 +8,12 @@ namespace NervaWalletMiner.Rpc
     {
         public static void ForceClose()
         {
-            ProcessManager.Kill(GlobalData.ApplicationSettings.Wallet[GlobalData.ApplicationSettings.ActiveCoin].WalletProcessName);
+            ProcessManager.Kill(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].WalletProcessName);
         }
 
         public static bool IsRunning()
         {
-            ProcessManager.IsRunning(GlobalData.ApplicationSettings.Wallet[GlobalData.ApplicationSettings.ActiveCoin].WalletProcessName, out Process? process);
+            ProcessManager.IsRunning(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].WalletProcessName, out Process? process);
 
             if (process != null)
             {
@@ -27,10 +27,10 @@ namespace NervaWalletMiner.Rpc
 
         public static string GenerateCommandLine()
         {
-            string appCommand = ProcessManager.GenerateCommandLine(GlobalMethods.GetRpcWalletPath(), GlobalData.ApplicationSettings.Wallet[GlobalData.ApplicationSettings.ActiveCoin].Rpc);
+            string appCommand = ProcessManager.GenerateCommandLine(GlobalMethods.GetRpcWalletPath(), GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc);
             appCommand += " --disable-rpc-login";
             appCommand += $" --wallet-dir \"{GlobalData.WalletDir}\"";
-            appCommand += $" --daemon-address 127.0.0.1:{GlobalData.ApplicationSettings.Daemon[GlobalData.ApplicationSettings.ActiveCoin].Rpc.Port}";
+            appCommand += $" --daemon-address 127.0.0.1:{GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc.Port}";
 
             // TODO: Uncomment to enable rpc user:pass.
             // string ip = d.IsPublic ? $" --rpc-bind-ip 0.0.0.0 --confirm-external-bind" : $" --rpc-bind-ip 127.0.0.1";

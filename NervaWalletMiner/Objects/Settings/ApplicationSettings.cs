@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace NervaWalletMiner.Objects.Settings
 {
-    public class AppSettings
+    public class ApplicationSettings
     {
         public Dictionary<string, SettingsDaemon> Daemon = GlobalMethods.GetDaemonSettings();
         public Dictionary<string, SettingsWallet> Wallet = GlobalMethods.GetWalletSettings();

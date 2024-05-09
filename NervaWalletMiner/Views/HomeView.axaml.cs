@@ -16,7 +16,7 @@ namespace NervaWalletMiner.Views
 
             var nupThreads = this.Get<NumericUpDown>("nupThreads");
             nupThreads.Maximum = GlobalData.CpuThreadCount;
-            nupThreads.Value = GlobalData.ApplicationSettings.Daemon[GlobalData.ApplicationSettings.ActiveCoin].MiningThreads;
+            nupThreads.Value = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads;
         }
 
         public void StartStopMiningClicked(object sender, RoutedEventArgs args)
@@ -36,13 +36,13 @@ namespace NervaWalletMiner.Views
                 else
                 {
                     // Start mining
-                    if(GlobalData.ApplicationSettings.Daemon[GlobalData.ApplicationSettings.ActiveCoin].MiningThreads != nupThreads.Value)
+                    if(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads != nupThreads.Value)
                     {
-                        GlobalData.ApplicationSettings.Daemon[GlobalData.ApplicationSettings.ActiveCoin].MiningThreads = Convert.ToInt32(nupThreads.Value);
+                        GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads = Convert.ToInt32(nupThreads.Value);
                         GlobalMethods.SaveConfig();
                     }
 
-                    StartMiningAsync(GlobalData.ApplicationSettings.Daemon[GlobalData.ApplicationSettings.ActiveCoin].MiningThreads);
+                    StartMiningAsync(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
                     btnStartStopMining.Content = StatusMiner.StopMining;
                     nupThreads.IsEnabled = false;
                 }                
@@ -59,11 +59,11 @@ namespace NervaWalletMiner.Views
             {                
                 StartMiningRequest request = new()
                 {
-                    MiningAddress = GlobalData.ApplicationSettings.Daemon[GlobalData.ApplicationSettings.ActiveCoin].MiningAddress,
+                    MiningAddress = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress,
                     ThreadCount = threads
                 };
 
-                StartMiningResponse response = await GlobalData.DaemonService.StartMining(GlobalData.ApplicationSettings.Daemon[GlobalData.ApplicationSettings.ActiveCoin].Rpc, request);
+                StartMiningResponse response = await GlobalData.DaemonService.StartMining(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, request);
                 if(response.Error.IsError)
                 {
                     // TODO: Error so alert user
@@ -81,7 +81,7 @@ namespace NervaWalletMiner.Views
             {
                 StopMiningRequest request = new();
 
-                StopMiningResponse response = await GlobalData.DaemonService.StopMining(GlobalData.ApplicationSettings.Daemon[GlobalData.ApplicationSettings.ActiveCoin].Rpc, request);
+                StopMiningResponse response = await GlobalData.DaemonService.StopMining(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, request);
                 if (response.Error.IsError)
                 {
                     // TODO: Error so alert user
