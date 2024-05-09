@@ -6,7 +6,6 @@ using NervaWalletMiner.Rpc;
 using NervaWalletMiner.ViewModels;
 using NervaWalletMiner.Views;
 using System;
-using System.Configuration;
 
 namespace NervaWalletMiner;
 
@@ -80,8 +79,9 @@ public partial class App : Application
                 GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads = GlobalData.CpuThreadCount > 1 ? Convert.ToInt32(Math.Floor(GlobalData.CpuThreadCount / 2.00)) : 1;
             }
 
-            // TODO: Might need to set up other defaults
+            GlobalMethods.SetCoin(GlobalData.AppSettings.ActiveCoin);
 
+            // TODO: Might need to set up other defaults
         }
         catch (Exception ex)
         {

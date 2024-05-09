@@ -1,5 +1,9 @@
-﻿using NervaWalletMiner.Objects.Constants;
+﻿using Avalonia.Media.Imaging;
+using Avalonia.Platform;
+using NervaWalletMiner.Objects.Constants;
 using NervaWalletMiner.Objects.Settings;
+using NervaWalletMiner.Rpc.Daemon;
+using NervaWalletMiner.Rpc.Wallet;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -119,12 +123,12 @@ namespace NervaWalletMiner.Helpers
 
         public static string GetDaemonPath()
         {
-            return Path.Combine(GlobalData.CliToolsDir, GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].DaemonProcessName);
+            return Path.Combine(GlobalData.CliToolsDir, GlobalData.DaemonProcessName);
         }
 
         public static string GetRpcWalletPath()
         {
-            return Path.Combine(GlobalData.CliToolsDir, GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].WalletProcessName);
+            return Path.Combine(GlobalData.CliToolsDir, GlobalData.WalletProcessName);
         }
 
         public static string GetConfigFilePath()
@@ -134,12 +138,13 @@ namespace NervaWalletMiner.Helpers
         }
         #endregion // Directories, Paths and Names
 
-        #region Coins Setup
+        #region Coin Specific Setup
         public static Dictionary<string, SettingsDaemon> GetDaemonSettings()
         {
             Dictionary<string, SettingsDaemon> daemonSettings = [];
 
             daemonSettings.Add(Coin.XNV, new SettingsDaemon(17566, false));
+            daemonSettings.Add(Coin.XMR, new SettingsDaemon(18081, false));
 
             return daemonSettings;
         }
@@ -149,6 +154,7 @@ namespace NervaWalletMiner.Helpers
             Dictionary<string, SettingsWallet> daemonSettings = [];
 
             daemonSettings.Add(Coin.XNV, new SettingsWallet());
+            daemonSettings.Add(Coin.XMR, new SettingsWallet());
 
             return daemonSettings;
         }
@@ -158,10 +164,73 @@ namespace NervaWalletMiner.Helpers
             Dictionary<string, SettingsMisc> daemonSettings = [];
 
             daemonSettings.Add(Coin.XNV, new SettingsMisc());
+            daemonSettings.Add(Coin.XMR, new SettingsMisc() { Logo = new Bitmap(AssetLoader.Open(new Uri("avares://NervaWalletMiner/Assets/xmr/logo.png"))) });
 
             return daemonSettings;
         }
-        #endregion // Coins Setup
+
+        public static void SetCoin(string newCoin)
+        {
+            switch(newCoin)
+            {
+                case Coin.XMR:
+                    GlobalData.AppSettings.ActiveCoin = Coin.XMR;
+                    GlobalData.WalletProcessName = GetWalletProcessName();
+                    GlobalData.DaemonProcessName = GetDaemonProcessName();
+
+                    // TODO: Change once interface implemented
+                    GlobalData.WalletService = new WalletServiceXNV();
+                    GlobalData.DaemonService = new DaemonServiceXNV();                    
+                    break;
+                default:
+                    // XNV or anything else not supported
+                    GlobalData.AppSettings.ActiveCoin = Coin.XNV;
+                    GlobalData.WalletProcessName = GetWalletProcessName();
+                    GlobalData.DaemonProcessName = GetDaemonProcessName();
+
+                    GlobalData.WalletService = new WalletServiceXNV();
+                    GlobalData.DaemonService = new DaemonServiceXNV();                   
+                    break;
+            }            
+        }
+
+        public static string GetDaemonProcessName()
+        {
+            string daemonProcess;
+
+            switch (GlobalData.AppSettings.ActiveCoin)
+            {
+                case Coin.XMR:
+                    daemonProcess = GlobalMethods.IsWindows()? "monerod.exe" : "monerod";
+                    break;
+                default:
+                    // XNV or anything else not supported
+                    daemonProcess = GlobalMethods.IsWindows()? "nervad.exe" : "nervad";
+                    break;
+            }
+
+            return daemonProcess;
+        }
+
+        public static string GetWalletProcessName()
+        {
+            string walletProcess;
+
+            switch (GlobalData.AppSettings.ActiveCoin)
+            {
+                case Coin.XMR:
+                    walletProcess = GlobalMethods.IsWindows() ? "monero-wallet-rpc.exe" : "monero-wallet-rpc";
+                    break;
+                default:
+                    // XNV or anything else not supported
+                    walletProcess = GlobalMethods.IsWindows() ? "nerva-wallet-rpc.exe" : "nerva-wallet-rpc";
+                    break;
+            }
+
+            return walletProcess;
+        }
+        #endregion // Coin Specific Setup
+
         public static string GetShorterString(string? text, int shorterLength)
         {
             if (string.IsNullOrEmpty(text))
@@ -284,8 +353,8 @@ namespace NervaWalletMiner.Helpers
                 return false;
             }
 
-            bool hasDaemon = File.Exists(Path.Combine(path, GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].DaemonProcessName));
-            bool hasRpcWallet = File.Exists(Path.Combine(path, GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].WalletProcessName));
+            bool hasDaemon = File.Exists(Path.Combine(path, GlobalData.DaemonProcessName));
+            bool hasRpcWallet = File.Exists(Path.Combine(path, GlobalData.WalletProcessName));
 
             return (hasRpcWallet && hasDaemon);
         }

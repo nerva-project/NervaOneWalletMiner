@@ -1,5 +1,4 @@
-﻿using NervaWalletMiner.Helpers;
-using NervaWalletMiner.Rpc.Common;
+﻿using NervaWalletMiner.Rpc.Common;
 
 namespace NervaWalletMiner.Objects.Settings
 {
@@ -17,8 +16,6 @@ namespace NervaWalletMiner.Objects.Settings
 
         public string AdditionalArguments { get; set; } = string.Empty;
 
-        public bool IsTestnet { get; set; } = isTestnet;
-
-        public string DaemonProcessName { get; set; } = GlobalMethods.IsWindows() ? "nervad.exe" : "nervad";
+        public bool IsTestnet { get; set; } = isTestnet;        
     }
 }

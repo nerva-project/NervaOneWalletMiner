@@ -42,7 +42,11 @@ namespace NervaWalletMiner.Helpers
 
         public static int CpuThreadCount = Environment.ProcessorCount;
 
+        // Coin specific
         public static IWalletService WalletService = new WalletServiceXNV();
         public static IDaemonService DaemonService = new DaemonServiceXNV();
+
+        public static string WalletProcessName = GlobalMethods.GetWalletProcessName();
+        public static string DaemonProcessName = GlobalMethods.GetDaemonProcessName();
     }
 }

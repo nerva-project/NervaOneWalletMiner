@@ -8,12 +8,12 @@ namespace NervaWalletMiner.Rpc
     {
         public static void ForceClose()
         {
-            ProcessManager.Kill(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].WalletProcessName);
+            ProcessManager.Kill(GlobalData.WalletProcessName);
         }
 
         public static bool IsRunning()
         {
-            ProcessManager.IsRunning(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].WalletProcessName, out Process? process);
+            ProcessManager.IsRunning(GlobalData.WalletProcessName, out Process? process);
 
             if (process != null)
             {

@@ -388,7 +388,7 @@ public class MainViewModel : ViewModelBase
                 Logger.LogDebug("Main.KDR", "No response from daemon since: " + _lastDaemonResponseTime.ToLongTimeString() + " . Forcing restart...");
             }
 
-            if (!ProcessManager.IsRunning(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].DaemonProcessName, out Process? process) || forceRestart)
+            if (!ProcessManager.IsRunning(GlobalData.DaemonProcessName, out Process? process) || forceRestart)
             {
                 if (GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
                 {
@@ -413,7 +413,7 @@ public class MainViewModel : ViewModelBase
     {
         try
         {
-            if (!ProcessManager.IsRunning(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].WalletProcessName, out Process? process))
+            if (!ProcessManager.IsRunning(GlobalData.WalletProcessName, out Process? process))
             {
                 if (GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
                 {
