@@ -1,4 +1,6 @@
-﻿using NervaWalletMiner.Objects.DataGrid;
+﻿using Avalonia.Media.Imaging;
+using NervaWalletMiner.Objects.Constants;
+using NervaWalletMiner.Objects.DataGrid;
 using NervaWalletMiner.Objects.Settings;
 using NervaWalletMiner.Objects.Stats;
 using NervaWalletMiner.Rpc.Daemon;
@@ -17,7 +19,7 @@ namespace NervaWalletMiner.Helpers
         public const string WalletDirName = "wallets";
         public const string LogsDirName = "logs";
         public const string MainCoinsDirName = "coins";
-        public static string CoinDirName = "xnv";
+        public static string CoinDirName = Coin.XNV;
 
         public static Random RandomGenerator = new Random();
 
@@ -25,8 +27,6 @@ namespace NervaWalletMiner.Helpers
         public static ApplicationSettings AppSettings = new();
 
         public static readonly string DataDir = GlobalMethods.GetDataDir();
-        public static readonly string CliToolsDir = GlobalMethods.GetCliToolsDir();
-        public static readonly string WalletDir = GlobalMethods.GetWalletDir();
         public static readonly string LogDir = GlobalMethods.GetLogDir();
         public static readonly string ConfigFilePath = GlobalMethods.GetConfigFilePath();
 
@@ -43,10 +43,15 @@ namespace NervaWalletMiner.Helpers
         public static int CpuThreadCount = Environment.ProcessorCount;
 
         // Coin specific
+        public static string CliToolsDir = GlobalMethods.GetCliToolsDir();
+        public static string WalletDir = GlobalMethods.GetWalletDir();
+
         public static IWalletService WalletService = new WalletServiceXNV();
         public static IDaemonService DaemonService = new DaemonServiceXNV();
 
         public static string WalletProcessName = GlobalMethods.GetWalletProcessName();
         public static string DaemonProcessName = GlobalMethods.GetDaemonProcessName();
+
+        public static Bitmap Logo = GlobalMethods.GetLogo();
     }
 }

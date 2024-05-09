@@ -4,6 +4,7 @@ using NervaWalletMiner.Objects.Constants;
 using NervaWalletMiner.Objects.Settings;
 using NervaWalletMiner.Rpc.Daemon;
 using NervaWalletMiner.Rpc.Wallet;
+using NervaWalletMiner.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -159,34 +160,36 @@ namespace NervaWalletMiner.Helpers
             return daemonSettings;
         }
 
-        public static Dictionary<string, SettingsMisc> GetMiscSettings()
-        {
-            Dictionary<string, SettingsMisc> daemonSettings = [];
-
-            daemonSettings.Add(Coin.XNV, new SettingsMisc());
-            daemonSettings.Add(Coin.XMR, new SettingsMisc() { Logo = new Bitmap(AssetLoader.Open(new Uri("avares://NervaWalletMiner/Assets/xmr/logo.png"))) });
-
-            return daemonSettings;
-        }
-
         public static void SetCoin(string newCoin)
         {
+            // TODO: Need to do certain tings when switching coins. RpcConnection? Wallet?
+
             switch(newCoin)
             {
                 case Coin.XMR:
-                    GlobalData.AppSettings.ActiveCoin = Coin.XMR;
+                    GlobalData.CoinDirName = Coin.XMR;
+                    GlobalData.AppSettings.ActiveCoin = Coin.XMR;                   
+                    GlobalData.CliToolsDir = GetCliToolsDir();
+                    GlobalData.WalletDir = GetWalletDir();
+
                     GlobalData.WalletProcessName = GetWalletProcessName();
                     GlobalData.DaemonProcessName = GetDaemonProcessName();
+                    GlobalData.Logo = GetLogo();
 
                     // TODO: Change once interface implemented
                     GlobalData.WalletService = new WalletServiceXNV();
-                    GlobalData.DaemonService = new DaemonServiceXNV();                    
+                    GlobalData.DaemonService = new DaemonServiceXNV();
                     break;
                 default:
                     // XNV or anything else not supported
+                    GlobalData.CoinDirName = Coin.XNV;
                     GlobalData.AppSettings.ActiveCoin = Coin.XNV;
+                    GlobalData.CliToolsDir = GetCliToolsDir();
+                    GlobalData.WalletDir = GetWalletDir();
+
                     GlobalData.WalletProcessName = GetWalletProcessName();
                     GlobalData.DaemonProcessName = GetDaemonProcessName();
+                    GlobalData.Logo = GetLogo();
 
                     GlobalData.WalletService = new WalletServiceXNV();
                     GlobalData.DaemonService = new DaemonServiceXNV();                   
@@ -228,6 +231,24 @@ namespace NervaWalletMiner.Helpers
             }
 
             return walletProcess;
+        }
+
+        public static Bitmap GetLogo()
+        {
+            Bitmap logo;
+
+            switch (GlobalData.AppSettings.ActiveCoin)
+            {
+                case Coin.XMR:
+                    logo = new Bitmap(AssetLoader.Open(new Uri("avares://NervaWalletMiner/Assets/xmr/logo.png")));
+                    break;
+                default:
+                    // XNV or anything else not supported
+                    logo = new Bitmap(AssetLoader.Open(new Uri("avares://NervaWalletMiner/Assets/xnv/logo.png")));
+                    break;
+            }
+
+            return logo;
         }
         #endregion // Coin Specific Setup
 

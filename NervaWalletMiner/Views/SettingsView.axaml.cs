@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using NervaWalletMiner.Helpers;
+using NervaWalletMiner.Objects.Constants;
 using System;
 
 namespace NervaWalletMiner.Views
@@ -19,11 +20,32 @@ namespace NervaWalletMiner.Views
         {
             try
             {
-                var tbxMiningAddress = this.Get<TextBox>("tbxMiningAddress");
+                bool isChanged = false;
 
-                if (!string.IsNullOrEmpty(tbxMiningAddress.Text))
+                var tbxMiningAddress = this.Get<TextBox>("tbxMiningAddress");
+                var cbxCoin = this.Get<ComboBox>("cbxCoin");
+
+                if (!string.IsNullOrEmpty(tbxMiningAddress.Text) && GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress != tbxMiningAddress.Text)
                 {
                     GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress = tbxMiningAddress.Text;
+                    isChanged = true;
+                }
+
+                // TODO: Do this in a better way!
+                string newCoin = Coin.XNV;                
+                if (cbxCoin.SelectionBoxItem.ToString().ToLower().Contains(Coin.XMR))
+                {
+                    newCoin = Coin.XMR;
+                }
+                if(newCoin != GlobalData.AppSettings.ActiveCoin)
+                {
+                    GlobalData.AppSettings.ActiveCoin = newCoin;
+                    isChanged = true;
+                    GlobalMethods.SetCoin(newCoin);
+                }
+
+                if(isChanged)
+                {
                     GlobalMethods.SaveConfig();
                 }
             }

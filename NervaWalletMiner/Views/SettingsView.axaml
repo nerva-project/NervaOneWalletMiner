@@ -22,8 +22,17 @@
 			VerticalAlignment="Top">
 			Debug Folder
 		</Button>
+		
 		<Label Content="Mining Address:" />
 		<TextBox Name="tbxMiningAddress" />
+
+		<Label Content="Coin:" />
+		<ComboBox Name="cbxCoin" SelectedIndex="0">
+			<ComboBoxItem>Nerva - XNV</ComboBoxItem>
+			<ComboBoxItem>Monero - XMR</ComboBoxItem>
+		</ComboBox>
+		
+		
 		<Button Name="btnSaveSettings"
 				Content="Save Settings"
 				Click="SaveSettingsClicked"/>
