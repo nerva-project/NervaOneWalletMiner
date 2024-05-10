@@ -176,10 +176,11 @@ namespace NervaWalletMiner.Helpers
                     GlobalData.DaemonProcessName = GetDaemonProcessName();
                     GlobalData.Logo = GetLogo();
 
+                    GlobalData.DaemonService = new DaemonServiceXMR();
                     // TODO: Change once interface implemented
                     GlobalData.WalletService = new WalletServiceXNV();
-                    GlobalData.DaemonService = new DaemonServiceXNV();
                     break;
+
                 default:
                     // XNV or anything else not supported
                     GlobalData.CoinDirName = Coin.XNV;
@@ -191,8 +192,8 @@ namespace NervaWalletMiner.Helpers
                     GlobalData.DaemonProcessName = GetDaemonProcessName();
                     GlobalData.Logo = GetLogo();
 
-                    GlobalData.WalletService = new WalletServiceXNV();
-                    GlobalData.DaemonService = new DaemonServiceXNV();                   
+                    GlobalData.DaemonService = new DaemonServiceXNV();
+                    GlobalData.WalletService = new WalletServiceXNV();                    
                     break;
             }            
         }
