@@ -15,7 +15,7 @@ namespace NervaWalletMiner.Rpc.Wallet
     public class WalletServiceXNV : IWalletService
     {
         #region OpenWallet
-        public async Task<OpenWalletResponse> OpenWallet(RpcSettings rpc, OpenWalletRequest requestObj)
+        public async Task<OpenWalletResponse> OpenWallet(RpcBase rpc, OpenWalletRequest requestObj)
         {
             OpenWalletResponse responseObj = new();
 
@@ -70,7 +70,7 @@ namespace NervaWalletMiner.Rpc.Wallet
         #endregion // OpenWallet
 
         #region GetAccounts
-        public async Task<GetAccountsResponse> GetAccounts(RpcSettings rpc, GetAccountsRequest requestObj)
+        public async Task<GetAccountsResponse> GetAccounts(RpcBase rpc, GetAccountsRequest requestObj)
         {
             GetAccountsResponse responseObj = new();
 
@@ -153,7 +153,7 @@ namespace NervaWalletMiner.Rpc.Wallet
         #endregion // GetAccounts
 
         #region GetTransfers
-        public async Task<GetTransfersResponse> GetTransfers(RpcSettings rpc, GetTransfersRequest requestObj)
+        public async Task<GetTransfersResponse> GetTransfers(RpcBase rpc, GetTransfersRequest requestObj)
         {
             GetTransfersResponse responseObj = new();
 

@@ -2,7 +2,7 @@
 
 namespace NervaWalletMiner.Rpc.Common
 {
-    public class RpcSettings(uint port)
+    public class RpcBase(uint port)
     {
         public bool IsPublic { get; set; } = false;
         public string HTProtocol { get; set; } = "http";
@@ -10,6 +10,5 @@ namespace NervaWalletMiner.Rpc.Common
         public uint Port { get; set; } = port;
         public string Login { get; set; } = GlobalMethods.GenerateRandomString(24);
         public string Pass { get; set; } = GlobalMethods.GenerateRandomString(24);
-        public uint LogLevel { get; set; } = 1;
     }
 }

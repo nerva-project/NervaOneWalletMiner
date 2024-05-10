@@ -122,12 +122,12 @@ namespace NervaWalletMiner.Helpers
             return cliToolsDirectory;
         }
 
-        public static string GetDaemonPath()
+        public static string GetDaemonProcess()
         {
             return Path.Combine(GlobalData.CliToolsDir, GlobalData.DaemonProcessName);
         }
 
-        public static string GetRpcWalletPath()
+        public static string GetRpcWalletProcess()
         {
             return Path.Combine(GlobalData.CliToolsDir, GlobalData.WalletProcessName);
         }

@@ -5,7 +5,9 @@ namespace NervaWalletMiner.Objects.Settings
 {
     public class SettingsWallet
     {
-        public RpcSettings Rpc { get; set; } = new RpcSettings((uint)GlobalData.RandomGenerator.Next(10000, 50000));        
+        public RpcBase Rpc { get; set; } = new RpcBase((uint)GlobalData.RandomGenerator.Next(10000, 50000));
+
+        public uint LogLevel { get; set; } = 1;
 
         public int NumTransfersToDisplay { get; set; } = 50;
     }

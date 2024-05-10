@@ -1,6 +1,8 @@
 ﻿using NervaWalletMiner.Helpers;
 using NervaWalletMiner.Objects;
+using NervaWalletMiner.Objects.Settings;
 using System.Diagnostics;
+using System.Runtime;
 
 namespace NervaWalletMiner.Rpc
 {
@@ -25,36 +27,43 @@ namespace NervaWalletMiner.Rpc
             }
         }
 
-        public static string GenerateCommandLine()
+        public static string GenerateOptions(SettingsDaemon daemonSettings)
         {
-            return GenerateCommandLine(string.Empty);
-        }
+            // TODO: Need to make this coin specific when adding coins that use different startup options
 
-        public static string GenerateCommandLine(string extraParams)
-        {
-            string appCommand = ProcessManager.GenerateCommandLine(GlobalMethods.GetDaemonPath(), GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc);
-
-            if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AutoStartMining)
+            string daemonCommand = "--rpc-bind-port " + daemonSettings.Rpc.Port;
+            daemonCommand += " --log-level " + daemonSettings.LogLevel;
+            daemonCommand += " --log-file \"" + GlobalMethods.CycleLogFile(GlobalMethods.GetDaemonProcess()) + "\"";
+            
+            if (!string.IsNullOrEmpty(daemonSettings.DataDir))
             {
-                string ma = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress;
+                daemonCommand += " --data-dir \"" + daemonSettings.DataDir + "\"";
+            }
 
-                Logger.LogDebug("DP.GCL", $"Enabling startup mining @ {ma}");
-                appCommand += $" --start-mining {ma} --mining-threads {GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads}";
+            if (daemonSettings.IsTestnet)
+            {
+                Logger.LogDebug("PM.GCL", "Connecting to testnet...");
+                daemonCommand += " --testnet";
+            }
+
+            if (daemonSettings.AutoStartMining)
+            {
+                string miningAddress = daemonSettings.MiningAddress;
+                Logger.LogDebug("DP.GCL", "Enabling startup mining @ " + miningAddress);
+                daemonCommand += " --start-mining " + miningAddress + " --mining-threads " + daemonSettings.MiningThreads;
             }
 
             if(GlobalMethods.IsLinux())
             {
-                appCommand += " --detach";
+                daemonCommand += " --detach";
             }
 
-            appCommand += $" {GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AdditionalArguments}";
-
-            if (!string.IsNullOrEmpty(extraParams))
+            if(!string.IsNullOrEmpty(daemonSettings.AdditionalArguments))
             {
-                appCommand += " " + extraParams;
-            }
+                daemonCommand += " " + daemonSettings.AdditionalArguments;
+            }          
 
-            return appCommand;
+            return daemonCommand;
         }
     }
 }

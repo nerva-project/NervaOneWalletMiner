@@ -394,7 +394,7 @@ public class MainViewModel : ViewModelBase
                 {
                     DaemonProcess.ForceClose();
                     Logger.LogDebug("Main.KDR", "Starting daemon process");
-                    ProcessManager.StartExternalProcess(GlobalMethods.GetDaemonPath(), DaemonProcess.GenerateCommandLine());
+                    ProcessManager.StartExternalProcess(GlobalMethods.GetDaemonProcess(), DaemonProcess.GenerateOptions(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]));
                     _isInitialDaemonConnectionSuccess = false;
                 }
                 else
@@ -419,7 +419,7 @@ public class MainViewModel : ViewModelBase
                 {
                     WalletProcess.ForceClose();
                     Logger.LogDebug("Main.KWPR", "Starting wallet process");
-                    ProcessManager.StartExternalProcess(GlobalMethods.GetRpcWalletPath(), WalletProcess.GenerateCommandLine());
+                    ProcessManager.StartExternalProcess(GlobalMethods.GetRpcWalletProcess(), WalletProcess.GenerateOptions(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin], GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc));
                 }
                 else
                 {

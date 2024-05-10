@@ -7,14 +7,14 @@ namespace NervaWalletMiner.Rpc.Daemon
 {
     public interface IDaemonService
     {
-        Task<StartMiningResponse> StartMining(RpcSettings rpc, StartMiningRequest requestObj);
+        Task<StartMiningResponse> StartMining(RpcBase rpc, StartMiningRequest requestObj);
 
-        Task<StopMiningResponse> StopMining(RpcSettings rpc, StopMiningRequest requestObj);
+        Task<StopMiningResponse> StopMining(RpcBase rpc, StopMiningRequest requestObj);
 
-        Task<GetInfoResponse> GetInfo(RpcSettings rpc, GetInfoRequest requestObj);
+        Task<GetInfoResponse> GetInfo(RpcBase rpc, GetInfoRequest requestObj);
 
-        Task<GetConnectionsResponse> GetConnections(RpcSettings rpc, GetConnectionsRequest requestObj);
+        Task<GetConnectionsResponse> GetConnections(RpcBase rpc, GetConnectionsRequest requestObj);
 
-        Task<MiningStatusResponse> MiningStatus(RpcSettings rpc, MiningStatusRequest requestObj);
+        Task<MiningStatusResponse> MiningStatus(RpcBase rpc, MiningStatusRequest requestObj);
     }
 }

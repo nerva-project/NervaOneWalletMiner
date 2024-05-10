@@ -58,7 +58,7 @@ namespace NervaWalletMiner.Rpc.Common
             return httpError;
         }
 
-        public static string GetServiceUrl(RpcSettings rpc, string path)
+        public static string GetServiceUrl(RpcBase rpc, string path)
         {
             string serviceUrl = string.Empty;
 

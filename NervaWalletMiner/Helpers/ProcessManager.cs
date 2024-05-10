@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using NervaWalletMiner.Rpc.Common;
 
 namespace NervaWalletMiner.Helpers
 {
@@ -19,13 +18,13 @@ namespace NervaWalletMiner.Helpers
 
                 if (processList.Count == 0)
                 {
-                    Logger.LogDebug("PM.KIL", $"No instances of {exe} to kill");
+                    Logger.LogDebug("PM.KIL", "No instances of " + exe + " to kill");
                     return;
                 }
 
                 foreach (Process process in processList)
                 {
-                    Logger.LogDebug("PM.KIL", $"Killing running instance of {exe} with id {process.Id}");
+                    Logger.LogDebug("PM.KIL", "Killing running instance of " + exe + " with id " + process.Id);
 
 /*
 #if UNIX
@@ -38,7 +37,7 @@ namespace NervaWalletMiner.Helpers
                     // TODO: Need to test this on Linux and MacOS!
                     process.Kill();
 
-                    Logger.LogDebug("PM.KIL", $"Process {process.Id} killed");
+                    Logger.LogDebug("PM.KIL", "Process " + process.Id + " killed");
                 }
             }
             catch (Exception ex)
@@ -66,7 +65,7 @@ namespace NervaWalletMiner.Helpers
 
                 if (process == null || process.HasExited)
                 {
-                    Logger.LogDebug("PM.IR", $"CLI tool {exe} exited unexpectedly. Restarting");
+                    Logger.LogDebug("PM.IR", "CLI tool " + exe + " exited unexpectedly. Restarting");
                     process = null;
                     return false;
                 }
@@ -108,7 +107,7 @@ namespace NervaWalletMiner.Helpers
                         if (process.ProcessName.Contains(processName.Length > 13 ? processName.Substring(0, 12) : processName))
                         {
                             // We're looking at all processes and some will not have MainModule so we need above check first
-                            if (process.MainModule.ModuleName.Contains(processName))
+                            if (process.MainModule!.ModuleName.Contains(processName))
                             {
                                 //Logger.LogDebug("PM.GEBN", "Found process: " + process.ProcessName + " | ID: " + process.Id + " | MWT: " + process.MainWindowTitle + " | MMFN: " + process.MainModule.FileName + " | MMMN: " + process.MainModule.ModuleName);
                                 processList.Add(process);
@@ -130,7 +129,7 @@ namespace NervaWalletMiner.Helpers
 
         public static void StartExternalProcess(string exePath, string args)
         {
-            Logger.LogDebug("PM.SEP", $"Starting process {ExeNameToProcessName(exePath)} {args}");
+            Logger.LogDebug("PM.SEP", "Starting process: " + ExeNameToProcessName(exePath) + " with args: " + args);
 
             _ = Process.Start(new ProcessStartInfo(exePath, args)
             {
@@ -139,22 +138,6 @@ namespace NervaWalletMiner.Helpers
                 RedirectStandardOutput = true,
                 CreateNoWindow = true
             });
-        }
-
-        public static string GenerateCommandLine(string exePath, RpcSettings d)
-        {
-            string arg = $"--log-file \"{GlobalMethods.CycleLogFile(exePath)}\"";
-
-            if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsTestnet)
-            {
-                Logger.LogDebug("PM.GCL", "Connecting to testnet");
-                arg += " --testnet";
-            }
-
-            arg += $" --rpc-bind-port {d.Port}";
-            arg += " --log-level " + d.LogLevel;
-
-            return arg;
         }
     }
 }

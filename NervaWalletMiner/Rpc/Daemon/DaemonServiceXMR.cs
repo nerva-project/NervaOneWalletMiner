@@ -23,7 +23,7 @@ namespace NervaWalletMiner.Rpc.Daemon
          *  bool        do_background_mining;
          *  bool        ignore_battery;
          */
-        public async Task<StartMiningResponse> StartMining(RpcSettings rpc, StartMiningRequest requestObj)
+        public async Task<StartMiningResponse> StartMining(RpcBase rpc, StartMiningRequest requestObj)
         {
             StartMiningResponse responseObj = new();
 
@@ -75,7 +75,7 @@ namespace NervaWalletMiner.Rpc.Daemon
         #endregion // StartMining
 
         #region StopMining
-        public async Task<StopMiningResponse> StopMining(RpcSettings rpc, StopMiningRequest requestObj)
+        public async Task<StopMiningResponse> StopMining(RpcBase rpc, StopMiningRequest requestObj)
         {
             StopMiningResponse responseObj = new();
 
@@ -123,7 +123,7 @@ namespace NervaWalletMiner.Rpc.Daemon
         #endregion // StopMining
 
         #region GetInfo
-        public async Task<GetInfoResponse> GetInfo(RpcSettings rpc, GetInfoRequest requestObj)
+        public async Task<GetInfoResponse> GetInfo(RpcBase rpc, GetInfoRequest requestObj)
         {
             GetInfoResponse responseObj = new();
 
@@ -232,7 +232,7 @@ namespace NervaWalletMiner.Rpc.Daemon
         #endregion // GetInfo
 
         #region GetConnections
-        public async Task<GetConnectionsResponse> GetConnections(RpcSettings rpc, GetConnectionsRequest requestObj)
+        public async Task<GetConnectionsResponse> GetConnections(RpcBase rpc, GetConnectionsRequest requestObj)
         {
             GetConnectionsResponse responseObj = new();
 
@@ -324,7 +324,7 @@ namespace NervaWalletMiner.Rpc.Daemon
         #endregion // GetConnections
 
         #region MiningStatus
-        public async Task<MiningStatusResponse> MiningStatus(RpcSettings rpc, MiningStatusRequest requestObj)
+        public async Task<MiningStatusResponse> MiningStatus(RpcBase rpc, MiningStatusRequest requestObj)
         {
             MiningStatusResponse responseObj = new();
 
