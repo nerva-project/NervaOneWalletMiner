@@ -82,6 +82,7 @@ public class MainViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _DaemonStatus, value);
     }
 
+    // Status Bar
     private string _DaemonVersion = "";
     public string DaemonVersion
     {
@@ -94,6 +95,14 @@ public class MainViewModel : ViewModelBase
     {
         get => _WalletStatus;
         set => this.RaiseAndSetIfChanged(ref _WalletStatus, value);
+    }
+
+    // TODO: Figure out how to do this in one place instead of on each view
+    private Bitmap _CoinIcon = GlobalData.Logo;
+    public Bitmap CoinIcon
+    {
+        get => _CoinIcon;
+        set => this.RaiseAndSetIfChanged(ref _CoinIcon, value);
     }
 
     void SelectionChanged(object? sender, SelectionModelSelectionChangedEventArgs e)
@@ -455,7 +464,19 @@ public class MainViewModel : ViewModelBase
 
                 GlobalData.NetworkStats.NetHeight = (infoRes.TargetHeight > infoRes.Height ? infoRes.TargetHeight : infoRes.Height);
                 GlobalData.NetworkStats.YourHeight = infoRes.Height;
-                GlobalData.NetworkStats.NetHash = Math.Round(((infoRes.Difficulty / 60.0d) / 1000.0d), 2) + " kH/s";
+
+                if(((infoRes.Difficulty / GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].BlockSeconds) / 1000000000.0d) > 1)
+                {
+                    GlobalData.NetworkStats.NetHash = Math.Round(((infoRes.Difficulty / GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].BlockSeconds) / 1000000000.0d), 2) + " GH/s";
+                }
+                else if(((infoRes.Difficulty / GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].BlockSeconds) / 1000000.0d) > 1)
+                {
+                    GlobalData.NetworkStats.NetHash = Math.Round(((infoRes.Difficulty / GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].BlockSeconds) / 1000000.0d), 2) + " MH/s";
+                }
+                else
+                {
+                    GlobalData.NetworkStats.NetHash = Math.Round(((infoRes.Difficulty / GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].BlockSeconds) / 1000.0d), 2) + " KH/s";
+                }                
 
                 DateTime miningStartTime = infoRes.StartTime;
                 GlobalData.NetworkStats.RunTime = (DateTime.Now.ToUniversalTime() - miningStartTime).ToString(@"%d\.hh\:mm\:ss");
@@ -468,14 +489,12 @@ public class MainViewModel : ViewModelBase
                 GlobalData.NetworkStats.StatusSync = "";
                 if (infoRes.TargetHeight != 0 && infoRes.Height < infoRes.TargetHeight)
                 {
-                    GlobalData.NetworkStats.StatusSync += " | Synchronizing (Height " + infoRes.Height + " of " + infoRes.TargetHeight + ")";
+                    GlobalData.NetworkStats.StatusSync += " | Sync (Height " + infoRes.Height + " of " + infoRes.TargetHeight + ")";
                 }
                 else
                 {
-                    GlobalData.NetworkStats.StatusSync += "  |  Sync OK";
+                    GlobalData.NetworkStats.StatusSync += "  |  Sync OK |  Status " + infoRes.Status;
                 }
-
-                GlobalData.NetworkStats.StatusSync += "  |  Status " + infoRes.Status;
 
 
                 //Logger.LogDebug("Main.DUU", "GetInfo Response Height: " + infoRes.height);
@@ -489,7 +508,7 @@ public class MainViewModel : ViewModelBase
 
                     if (miningRes.Speed > 1000)
                     {
-                        GlobalData.NetworkStats.YourHash = miningRes.Speed / 1000.0d + " kH/s";
+                        GlobalData.NetworkStats.YourHash = miningRes.Speed / 1000.0d + " KH/s";
                     }
                     else
                     {
@@ -498,7 +517,7 @@ public class MainViewModel : ViewModelBase
 
                     if (GlobalData.NetworkStats.Difficulty > 0)
                     {
-                        double blockMinutes = ((GlobalData.NetworkStats.Difficulty / 60.0d) / miningRes.Speed);
+                        double blockMinutes = ((GlobalData.NetworkStats.Difficulty / GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].BlockSeconds) / miningRes.Speed);
 
                         if ((blockMinutes / 1440d) > 1)
                         {

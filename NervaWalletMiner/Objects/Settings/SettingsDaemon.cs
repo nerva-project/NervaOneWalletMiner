@@ -2,7 +2,7 @@
 
 namespace NervaWalletMiner.Objects.Settings
 {
-    public class SettingsDaemon(uint rcpPort, bool isTestnet)
+    public class SettingsDaemon(uint rcpPort)
     {
         public RpcBase Rpc { get; set; } = new RpcBase(rcpPort);
 
@@ -12,7 +12,7 @@ namespace NervaWalletMiner.Objects.Settings
 
         public string MiningAddress { get; set; } = string.Empty;
 
-        public int MiningThreads { get; set; } = 0;        
+        public int MiningThreads { get; set; } = 0;
 
         public string AdditionalArguments { get; set; } = string.Empty;
 
@@ -20,6 +20,8 @@ namespace NervaWalletMiner.Objects.Settings
 
         public uint LogLevel { get; set; } = 1;
 
-        public bool IsTestnet { get; set; } = isTestnet;        
+        public bool IsTestnet { get; set; } = false;
+
+        public double BlockSeconds { get; set; } = 0.0;
     }
 }

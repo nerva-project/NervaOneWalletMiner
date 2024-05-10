@@ -6,7 +6,7 @@ namespace NervaWalletMiner.Objects.Stats
     {
         public ulong NetHeight { get; set; } = 0;
         public ulong YourHeight { get; set; } = 0;
-        public string NetHash { get; set; } = "0 kH/s";
+        public string NetHash { get; set; } = "0 KH/s";
         public string RunTime { get; set; } = "00:00:00";
         public ulong Difficulty { get; set; } = 0;
 

@@ -11,14 +11,17 @@
 		<vm:StatusBarViewModel />
 	</Design.DataContext>
 	
-	<Grid ColumnDefinitions="*,120" Margin="10" Height="50">
+	<Grid ColumnDefinitions="32,*,120" Margin="10" Height="50">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="25" />
 			<RowDefinition Height="25" />
 		</Grid.RowDefinitions>
+		
+		<Image Grid.RowSpan="2" Grid.Column="0" Source="{Binding CoinIcon}"></Image>
+		
+		<Label Grid.Row="0" Grid.Column="1" Margin="10,0,0,0" Content="{Binding DaemonStatus}"/>			
+		<Label Grid.Row="1" Grid.Column="1" Margin="10,0,0,0" Content="{Binding WalletStatus}" />
 
-		<Label Grid.Row="0" Grid.Column="0" Content="{Binding DaemonStatus}"/>
-		<Label Grid.Row="0" Grid.Column="1" Content="{Binding DaemonVersion}" HorizontalAlignment="Right"/>
-		<Label Grid.Row="1" Grid.Column="0" Content="{Binding WalletStatus}" />
+		<Label Grid.Row="0" Grid.Column="2" Content="{Binding DaemonVersion}" HorizontalAlignment="Right"/>
 	</Grid>
 </UserControl>

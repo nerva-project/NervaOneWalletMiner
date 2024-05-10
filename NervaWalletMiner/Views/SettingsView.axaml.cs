@@ -14,6 +14,9 @@ namespace NervaWalletMiner.Views
 
             var tbxMiningAddress = this.Get<TextBox>("tbxMiningAddress");
             tbxMiningAddress.Text = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress;
+
+            var tbxDaemonDataDir = this.Get<TextBox>("tbxDaemonDataDir");
+            tbxDaemonDataDir.Text = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].DataDir;
         }
 
         public void SaveSettingsClicked(object sender, RoutedEventArgs args)
@@ -23,11 +26,19 @@ namespace NervaWalletMiner.Views
                 bool isChanged = false;
 
                 var tbxMiningAddress = this.Get<TextBox>("tbxMiningAddress");
+                var tbxDaemonDataDir = this.Get<TextBox>("tbxDaemonDataDir");
+                
                 var cbxCoin = this.Get<ComboBox>("cbxCoin");
 
                 if (!string.IsNullOrEmpty(tbxMiningAddress.Text) && GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress != tbxMiningAddress.Text)
                 {
                     GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress = tbxMiningAddress.Text;
+                    isChanged = true;
+                }
+
+                if (!string.IsNullOrEmpty(tbxDaemonDataDir.Text) && GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].DataDir != tbxDaemonDataDir.Text)
+                {
+                    GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].DataDir = tbxDaemonDataDir.Text;
                     isChanged = true;
                 }
 

@@ -144,20 +144,20 @@ namespace NervaWalletMiner.Helpers
         {
             Dictionary<string, SettingsDaemon> daemonSettings = [];
 
-            daemonSettings.Add(Coin.XNV, new SettingsDaemon(17566, false));
-            daemonSettings.Add(Coin.XMR, new SettingsDaemon(18081, false));
+            daemonSettings.Add(Coin.XNV, new SettingsDaemon(17566) { BlockSeconds = 60.0 });
+            daemonSettings.Add(Coin.XMR, new SettingsDaemon(18081) { BlockSeconds = 120.0 });
 
             return daemonSettings;
         }
 
         public static Dictionary<string, SettingsWallet> GetWalletSettings()
         {
-            Dictionary<string, SettingsWallet> daemonSettings = [];
+            Dictionary<string, SettingsWallet> walletSettings = [];
 
-            daemonSettings.Add(Coin.XNV, new SettingsWallet());
-            daemonSettings.Add(Coin.XMR, new SettingsWallet());
+            walletSettings.Add(Coin.XNV, new SettingsWallet());
+            walletSettings.Add(Coin.XMR, new SettingsWallet());
 
-            return daemonSettings;
+            return walletSettings;
         }
 
         public static void SetCoin(string newCoin)
@@ -179,6 +179,12 @@ namespace NervaWalletMiner.Helpers
                     GlobalData.DaemonService = new DaemonServiceXMR();
                     // TODO: Change once interface implemented
                     GlobalData.WalletService = new WalletServiceXNV();
+
+                    // TODO: Change this. App.config overwrites GetDaemonSettings with 0
+                    if (GlobalData.AppSettings.Daemon[Coin.XMR].BlockSeconds != 120.0)
+                    {
+                        GlobalData.AppSettings.Daemon[Coin.XMR].BlockSeconds = 120.0;
+                    }
                     break;
 
                 default:
@@ -193,7 +199,13 @@ namespace NervaWalletMiner.Helpers
                     GlobalData.Logo = GetLogo();
 
                     GlobalData.DaemonService = new DaemonServiceXNV();
-                    GlobalData.WalletService = new WalletServiceXNV();                    
+                    GlobalData.WalletService = new WalletServiceXNV();
+
+                    // TODO: Change this. App.config overwrites GetDaemonSettings() with default 0
+                    if (GlobalData.AppSettings.Daemon[Coin.XNV].BlockSeconds != 60.0)
+                    {
+                        GlobalData.AppSettings.Daemon[Coin.XNV].BlockSeconds = 60.0;
+                    }
                     break;
             }            
         }
