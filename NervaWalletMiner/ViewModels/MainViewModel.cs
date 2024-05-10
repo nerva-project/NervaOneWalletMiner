@@ -37,6 +37,8 @@ public class MainViewModel : ViewModelBase
     public static readonly Bitmap _blockImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaWalletMiner/Assets/transfer_block.png")));
     public static readonly Bitmap _walletImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaWalletMiner/Assets/wallet.png")));
 
+    public static string _currentCoin = GlobalData.AppSettings.ActiveCoin;
+
     private bool? _isPaneOpen = false;
     private ViewModelBase _CurrentPage;
     public SelectionModel<ListBoxItem> Selection { get; }
@@ -320,6 +322,11 @@ public class MainViewModel : ViewModelBase
                 _masterUpdateTimer.Stop();
             }
 
+            if(_currentCoin != GlobalData.AppSettings.ActiveCoin)
+            {
+                UpdateLogos();
+            }
+
             // If kill master process is issued at any point, skip everything else and do not restrt master timer            
             if (_cliToolsRunningLastCheck.AddSeconds(10) < DateTime.Now)
             {
@@ -382,6 +389,20 @@ public class MainViewModel : ViewModelBase
                 _masterUpdateTimer.Start();
             }
         }
+    }
+    public void UpdateLogos()
+    {
+        // Update coins icons when coin changes
+
+        // TODO: I don't like how those icons work. Chage it!
+
+        CoinIcon = GlobalMethods.GetLogo();
+        ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).CoinIcon = GlobalMethods.GetLogo();
+        ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).CoinIcon = GlobalMethods.GetLogo();
+        ((TransfersViewModel)ViewModelPagesDictionary[SplitViewPages.Transfers]).CoinIcon = GlobalMethods.GetLogo();
+        ((SettingsViewModel)ViewModelPagesDictionary[SplitViewPages.Settings]).CoinIcon = GlobalMethods.GetLogo();
+
+        _currentCoin = GlobalData.AppSettings.ActiveCoin;
     }
 
     private static void KeepDaemonRunning()

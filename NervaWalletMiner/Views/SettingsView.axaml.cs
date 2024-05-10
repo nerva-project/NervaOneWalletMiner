@@ -4,6 +4,7 @@ using Avalonia.Interactivity;
 using Avalonia.Styling;
 using NervaWalletMiner.Helpers;
 using NervaWalletMiner.Objects.Constants;
+using NervaWalletMiner.Rpc;
 using System;
 
 namespace NervaWalletMiner.Views
@@ -72,9 +73,14 @@ namespace NervaWalletMiner.Views
                 }
                 if(newCoin != GlobalData.AppSettings.ActiveCoin)
                 {
+                    // Close wallet process becasue you're switching to different coin
+                    WalletProcess.ForceClose();
+
                     GlobalData.AppSettings.ActiveCoin = newCoin;
                     isChanged = true;
                     GlobalMethods.SetCoin(newCoin);
+
+                    // TODO: Need to force Settings screen refersh
                 }
 
                 if(isChanged)
