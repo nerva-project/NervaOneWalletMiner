@@ -12,9 +12,17 @@ using System.Threading.Tasks;
 
 namespace NervaWalletMiner.Rpc.Daemon
 {
+    // Monero implementation as of 5/10/24: https://github.com/monero-project/monero
+
     public class DaemonServiceXMR : IDaemonService
     {
-        #region StartMining        
+        #region StartMining
+        /* RPC request params:
+         *  std::string miner_address;
+         *  uint64_t    threads_count;
+         *  bool        do_background_mining;
+         *  bool        ignore_battery;
+         */
         public async Task<StartMiningResponse> StartMining(RpcSettings rpc, StartMiningRequest requestObj)
         {
             StartMiningResponse responseObj = new();
@@ -43,7 +51,7 @@ namespace NervaWalletMiner.Rpc.Daemon
                     else
                     {
                         // Set successful response
-                        ResStartMining startMiningResponse = JsonConvert.DeserializeObject<ResStartMining>(jsonObject.ToString());
+                        ResGeneric startMiningResponse = JsonConvert.DeserializeObject<ResGeneric>(jsonObject.ToString());
 
                         responseObj.Status = startMiningResponse.status;
                         responseObj.Untrusted = startMiningResponse.untrusted;
@@ -59,17 +67,10 @@ namespace NervaWalletMiner.Rpc.Daemon
             }
             catch (Exception ex)
             {
-                Logger.LogException("RpcD.StM", ex);
+                Logger.LogException("RDXMR.StM", ex);
             }
 
             return responseObj;
-        }
-
-        // Internal helper obejcts used to interact with service
-        private class ResStartMining
-        {
-            public string status { get; set; } = string.Empty;
-            public string untrusted { get; set; } = string.Empty;
         }
         #endregion // StartMining
 
@@ -98,7 +99,7 @@ namespace NervaWalletMiner.Rpc.Daemon
                     else
                     {
                         // Set successful response
-                        ResStartMining startMiningResponse = JsonConvert.DeserializeObject<ResStartMining>(jsonObject.ToString());
+                        ResGeneric startMiningResponse = JsonConvert.DeserializeObject<ResGeneric>(jsonObject.ToString());
 
                         responseObj.Status = startMiningResponse.status;
                         responseObj.Untrusted = startMiningResponse.untrusted;
@@ -114,7 +115,7 @@ namespace NervaWalletMiner.Rpc.Daemon
             }
             catch (Exception ex)
             {
-                Logger.LogException("RpcD.SpM", ex);
+                Logger.LogException("RDXMR.SpM", ex);
             }
 
             return responseObj;
@@ -173,7 +174,7 @@ namespace NervaWalletMiner.Rpc.Daemon
             }
             catch (Exception ex)
             {
-                Logger.LogException("RpcD.GI", ex);
+                Logger.LogException("RDXMR.GI", ex);
             }
 
             return responseObj;
@@ -185,6 +186,8 @@ namespace NervaWalletMiner.Rpc.Daemon
             public ulong height { get; set; }
             public ulong target_height { get; set; }
             public ulong difficulty { get; set; }
+            public string wide_difficulty { get; set; } = string.Empty;
+            public ulong difficulty_top64 { get; set; }
             public ulong target { get; set; }
             public ulong tx_count { get; set; }
             public ulong tx_pool_size { get; set; }
@@ -200,21 +203,31 @@ namespace NervaWalletMiner.Rpc.Daemon
             public string nettype { get; set; } = string.Empty;
             public string top_block_hash { get; set; } = string.Empty;
             public ulong cumulative_difficulty { get; set; }
+            public string wide_cumulative_difficulty { get; set; } = string.Empty;
             public ulong cumulative_difficulty_top64 { get; set; }
             public ulong block_size_limit { get; set; }
             public ulong block_weight_limit { get; set; }
             public ulong block_size_median { get; set; }
             public ulong block_weight_median { get; set; }
+            public ulong adjusted_time { get; set; }
             public ulong start_time { get; set; }
             public ulong free_space { get; set; }
             public bool offline { get; set; }
-            public string? bootstrap_daemon_address { get; set; }
+            public string bootstrap_daemon_address { get; set; } = string.Empty;
             public ulong height_without_bootstrap { get; set; }
             public bool was_bootstrap_ever_used { get; set; }
             public ulong database_size { get; set; }
             public bool update_available { get; set; }
+            public bool busy_syncing { get; set; }
             public string version { get; set; } = string.Empty;
+            public bool synchronized { get; set; }
+            public bool restricted { get; set; }
+
+            // From base
+            public ulong credits { get; set; }
+            public string top_hash { get; set; } = string.Empty;
             public string status { get; set; } = string.Empty;
+            public bool untrusted { get; set; }
         }
         #endregion // GetInfo
 
@@ -273,7 +286,7 @@ namespace NervaWalletMiner.Rpc.Daemon
             }
             catch (Exception ex)
             {
-                Logger.LogException("RpcD.GI", ex);
+                Logger.LogException("RDXMR.GI", ex);
             }
 
             return responseObj;
@@ -285,24 +298,25 @@ namespace NervaWalletMiner.Rpc.Daemon
             public bool localhost { get; set; }
             public bool local_ip { get; set; }
             public bool ssl { get; set; }
-            public string? address { get; set; }
-            public string? host { get; set; }
-            public string? ip { get; set; }
-            public string? port { get; set; }
+            public string address { get; set; } = string.Empty;
+            public string host { get; set; } = string.Empty;
+            public string ip { get; set; } = string.Empty;
+            public string port { get; set; } = string.Empty;
             public uint rpc_port { get; set; }
-            public string? peer_id { get; set; }
+            public uint rpc_credits_per_hash { get; set; }
+            public string peer_id { get; set; } = string.Empty;
             public ulong recv_count { get; set; }
             public ulong recv_idle_time { get; set; }
             public ulong send_count { get; set; }
             public ulong send_idle_time { get; set; }
-            public string? state { get; set; }
+            public string state { get; set; } = string.Empty;
             public ulong live_time { get; set; }
             public ulong avg_download { get; set; }
             public ulong current_download { get; set; }
             public ulong avg_upload { get; set; }
             public ulong current_upload { get; set; }
             public uint support_flags { get; set; }
-            public string? connection_id { get; set; }
+            public string connection_id { get; set; } = string.Empty;
             public ulong height { get; set; }
             public uint pruning_seed { get; set; }
             public uint address_type { get; set; }
@@ -351,7 +365,7 @@ namespace NervaWalletMiner.Rpc.Daemon
             }
             catch (Exception ex)
             {
-                Logger.LogException("RpcD.GI", ex);
+                Logger.LogException("RDXMR.GI", ex);
             }
 
             return responseObj;
@@ -363,6 +377,7 @@ namespace NervaWalletMiner.Rpc.Daemon
             public long speed { get; set; }
             public int threads_count { get; set; }
             public string address { get; set; } = string.Empty;
+            public string pow_algorithm { get; set; } = string.Empty;
             public bool is_background_mining_enabled { get; set; }
             public int bg_idle_threshold { get; set; }
             public int bg_min_idle_seconds { get; set; }
@@ -371,7 +386,17 @@ namespace NervaWalletMiner.Rpc.Daemon
             public int block_target { get; set; }
             public long block_reward { get; set; }
             public long difficulty { get; set; }
+            public string wide_difficulty { get; set; } = string.Empty;
+            public long difficulty_top64 { get; set; }
         }
         #endregion //MiningStatus
+
+
+        // Internal helper obejcts used to interact with service
+        private class ResGeneric
+        {
+            public string status { get; set; } = string.Empty;
+            public string untrusted { get; set; } = string.Empty;
+        }
     }
 }
