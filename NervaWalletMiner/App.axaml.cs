@@ -1,7 +1,9 @@
 ﻿using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Avalonia.Styling;
 using NervaWalletMiner.Helpers;
+using NervaWalletMiner.Objects.Constants;
 using NervaWalletMiner.Rpc;
 using NervaWalletMiner.ViewModels;
 using NervaWalletMiner.Views;
@@ -73,6 +75,21 @@ public partial class App : Application
     {
         try
         {
+            // Set theme
+            if(GlobalData.AppSettings.Theme == Theme.Default)
+            {
+                Application.Current!.RequestedThemeVariant = ThemeVariant.Default;
+            }
+            else if(GlobalData.AppSettings.Theme == Theme.Light)
+            {
+                Application.Current!.RequestedThemeVariant = ThemeVariant.Light;
+            }
+            else
+            {
+                Application.Current!.RequestedThemeVariant = ThemeVariant.Dark;
+            }
+            
+
             if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads == 0)
             {
                 // By default use 50% of threads

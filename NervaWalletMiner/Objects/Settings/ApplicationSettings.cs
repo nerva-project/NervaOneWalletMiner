@@ -12,6 +12,7 @@ namespace NervaWalletMiner.Objects.Settings
 
         // Common settings
         public string ActiveCoin { get; set; } = Coin.XNV;
+        public string Theme { get; set; } = "Dark";
         public int TimerIntervalMultiplier { get; set; } = 5;
     }
 }

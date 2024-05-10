@@ -1,5 +1,7 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Styling;
 using NervaWalletMiner.Helpers;
 using NervaWalletMiner.Objects.Constants;
 using System;
@@ -17,6 +19,16 @@ namespace NervaWalletMiner.Views
 
             var tbxDaemonDataDir = this.Get<TextBox>("tbxDaemonDataDir");
             tbxDaemonDataDir.Text = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].DataDir;
+
+            var cbxThemeVariants = this.Get<ComboBox>("cbxThemeVariants");
+            cbxThemeVariants.SelectedItem = Application.Current!.RequestedThemeVariant;
+            cbxThemeVariants.SelectionChanged += (sender, e) =>
+            {
+                if (cbxThemeVariants.SelectedItem is ThemeVariant themeVariant)
+                {
+                    Application.Current!.RequestedThemeVariant = themeVariant;
+                }
+            };
         }
 
         public void SaveSettingsClicked(object sender, RoutedEventArgs args)
@@ -27,7 +39,8 @@ namespace NervaWalletMiner.Views
 
                 var tbxMiningAddress = this.Get<TextBox>("tbxMiningAddress");
                 var tbxDaemonDataDir = this.Get<TextBox>("tbxDaemonDataDir");
-                
+                var cbxThemeVariants = this.Get<ComboBox>("cbxThemeVariants");
+
                 var cbxCoin = this.Get<ComboBox>("cbxCoin");
 
                 if (!string.IsNullOrEmpty(tbxMiningAddress.Text) && GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress != tbxMiningAddress.Text)
@@ -40,6 +53,15 @@ namespace NervaWalletMiner.Views
                 {
                     GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].DataDir = tbxDaemonDataDir.Text;
                     isChanged = true;
+                }
+
+                if (cbxThemeVariants.SelectedItem is ThemeVariant themeVariant)
+                {
+                    if(GlobalData.AppSettings.Theme != themeVariant.Key.ToString())
+                    {
+                        GlobalData.AppSettings.Theme = themeVariant.Key.ToString()!;
+                        isChanged = true;
+                    }
                 }
 
                 // TODO: Do this in a better way!
