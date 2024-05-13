@@ -12,9 +12,16 @@ using System.Threading.Tasks;
 
 namespace NervaWalletMiner.Rpc.Wallet
 {
+    // Nerva implementation as of 5/12/24: https://github.com/nerva-project/nerva
+
     public class WalletServiceXNV : IWalletService
     {
         #region OpenWallet
+        /* RPC request params:
+         *  std::string filename;
+         *  std::string password;
+         *  bool autosave_current;
+         */
         public async Task<OpenWalletResponse> OpenWallet(RpcBase rpc, OpenWalletRequest requestObj)
         {
             OpenWalletResponse responseObj = new();
@@ -62,7 +69,7 @@ namespace NervaWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("RWOW.CA", ex);
+                Logger.LogException("RWXNV.CA", ex);
             }
 
             return responseObj;
@@ -70,6 +77,12 @@ namespace NervaWalletMiner.Rpc.Wallet
         #endregion // OpenWallet
 
         #region GetAccounts
+        /* RPC request params:
+         *  std::string tag;      // all accounts if empty, otherwise those accounts with this tag
+         *  bool strict_balances;
+         */
+
+        // TODO: Allow params to be passed
         public async Task<GetAccountsResponse> GetAccounts(RpcBase rpc, GetAccountsRequest requestObj)
         {
             GetAccountsResponse responseObj = new();
@@ -127,7 +140,7 @@ namespace NervaWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("RWGA.CA", ex);
+                Logger.LogException("RWXNV.CA", ex);
             }
 
             return responseObj;
@@ -153,6 +166,20 @@ namespace NervaWalletMiner.Rpc.Wallet
         #endregion // GetAccounts
 
         #region GetTransfers
+        /* RPC request params:
+         *  bool in;
+         *  bool out;
+         *  bool pending;
+         *  bool failed;
+         *  bool pool;
+         *  
+         *  bool filter_by_height;
+         *  uint64_t min_height;
+         *  uint64_t max_height;
+         *  uint32_t account_index;
+         *  std::set<uint32_t> subaddr_indices;
+         *  bool all_accounts;
+         */
         public async Task<GetTransfersResponse> GetTransfers(RpcBase rpc, GetTransfersRequest requestObj)
         {
             GetTransfersResponse responseObj = new();
@@ -257,7 +284,7 @@ namespace NervaWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("RWGT.CA", ex);
+                Logger.LogException("RWXNV.CA", ex);
             }
 
             return responseObj;

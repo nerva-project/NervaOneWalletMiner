@@ -30,6 +30,12 @@ namespace NervaWalletMiner.Views
                 DirectoryInfo dir = new DirectoryInfo(GlobalMethods.GetWalletDir());
                 files = dir.GetFiles("*.cache", SearchOption.TopDirectoryOnly);
 
+                if(files.Length == 0)
+                {
+                    // TODO: XMR wallet files do not have extensions. Make this coin specific setting
+                    files = dir.GetFiles("*.", SearchOption.TopDirectoryOnly);
+                }
+
                 if (files.Length > 0)
                 {
                     foreach (FileInfo file in files)

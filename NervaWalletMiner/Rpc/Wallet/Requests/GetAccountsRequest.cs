@@ -2,5 +2,6 @@
 {
     public class GetAccountsRequest
     {
+        public string Tag { get; set; } = string.Empty;
     }
 }

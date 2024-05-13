@@ -12,9 +12,16 @@ using System.Threading.Tasks;
 
 namespace NervaWalletMiner.Rpc.Wallet
 {
+    // Monero implementation as of 5/13/24: https://github.com/monero-project/monero
+
     public class WalletServiceXMR : IWalletService
     {
         #region OpenWallet
+        /* RPC request params:
+         *  std::string filename;
+         *  std::string password;
+         *  std::string language;
+         */
         public async Task<OpenWalletResponse> OpenWallet(RpcBase rpc, OpenWalletRequest requestObj)
         {
             OpenWalletResponse responseObj = new();
@@ -62,7 +69,7 @@ namespace NervaWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("RWOW.CA", ex);
+                Logger.LogException("RWXMR.CA", ex);
             }
 
             return responseObj;
@@ -70,6 +77,13 @@ namespace NervaWalletMiner.Rpc.Wallet
         #endregion // OpenWallet
 
         #region GetAccounts
+        /* RPC request params:
+         *  std::string tag;      // all accounts if empty, otherwise those accounts with this tag
+         *  bool strict_balances;
+         *  bool regexp; // allow regular expression filters if set to true
+         */
+
+        // TODO: Allow params to be passed
         public async Task<GetAccountsResponse> GetAccounts(RpcBase rpc, GetAccountsRequest requestObj)
         {
             GetAccountsResponse responseObj = new();
@@ -127,7 +141,7 @@ namespace NervaWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("RWGA.CA", ex);
+                Logger.LogException("RWXMR.CA", ex);
             }
 
             return responseObj;
@@ -153,6 +167,20 @@ namespace NervaWalletMiner.Rpc.Wallet
         #endregion // GetAccounts
 
         #region GetTransfers
+        /* RPC request params:
+         *  bool in;
+         *  bool out;
+         *  bool pending;
+         *  bool failed;
+         *  bool pool;
+         *  
+         *  bool filter_by_height;
+         *  uint64_t min_height;
+         *  uint64_t max_height;
+         *  uint32_t account_index;
+         *  std::set<uint32_t> subaddr_indices;
+         *  bool all_accounts;
+         */
         public async Task<GetTransfersResponse> GetTransfers(RpcBase rpc, GetTransfersRequest requestObj)
         {
             GetTransfersResponse responseObj = new();
@@ -257,7 +285,7 @@ namespace NervaWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("RWGT.CA", ex);
+                Logger.LogException("RWXMR.CA", ex);
             }
 
             return responseObj;
@@ -280,6 +308,7 @@ namespace NervaWalletMiner.Rpc.Wallet
             public ulong height { get; set; }
             public ulong timestamp { get; set; }
             public ulong amount { get; set; }
+            public List<ulong> amounts { get; set; } = [];
             public ulong fee { get; set; }
             public string note { get; set; } = string.Empty;
             public List<TransferDestination> destinations { get; set; } = [];
