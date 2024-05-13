@@ -1,9 +1,11 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
+using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
 using NervaWalletMiner.Helpers;
 using NervaWalletMiner.Objects;
 using NervaWalletMiner.Objects.Constants;
-using NervaWalletMiner.Rpc.Wallet;
 using NervaWalletMiner.Rpc.Wallet.Requests;
 using NervaWalletMiner.Rpc.Wallet.Responses;
 using System;
@@ -29,9 +31,6 @@ namespace NervaWalletMiner.Views
                     // Open wallet dialog
                     var window = new OpenWalletView();
                     window.ShowDialog(GetWindow()).ContinueWith(DialogClosed);
-
-                    // TODO: Need to do this after wallet opens from non-ui thread
-                    btnOpenCloseWallet.Content = StatusWallet.CloseWallet;
                 }
                 else
                 {
@@ -76,12 +75,25 @@ namespace NervaWalletMiner.Views
 
             if (response.Error.IsError)
             {
-                // TODO: Report error to user
+                GlobalData.IsWalletOpen = false;
+                GlobalData.IsWalletJustOpened = false;
+
+                await Dispatcher.UIThread.Invoke(async () =>
+                {
+                    var box = MessageBoxManager.GetMessageBoxStandard("Open Wallet", "Error opening " + walletName + " wallet\r\n" + response.Error.Message, ButtonEnum.Ok);
+                    _ = await box.ShowAsync();
+                });
             }
             else
             {
                 GlobalData.IsWalletOpen = true;       
-                GlobalData.IsWalletJustOpened = true;                
+                GlobalData.IsWalletJustOpened = true;
+
+                await Dispatcher.UIThread.InvokeAsync(async () =>
+                {
+                    var box = MessageBoxManager.GetMessageBoxStandard("Open Wallet", walletName + " wallet opened successfully!", ButtonEnum.Ok);
+                    _ = await box.ShowAsync();
+                });
             }
         }
 
@@ -93,12 +105,25 @@ namespace NervaWalletMiner.Views
 
             if (response.Error.IsError)
             {
-                // TODO: Report error to user
+                GlobalData.IsWalletOpen = false;
+                GlobalData.IsWalletJustOpened = false;
+
+                await Dispatcher.UIThread.InvokeAsync(async () =>
+                {
+                    var box = MessageBoxManager.GetMessageBoxStandard("Close Wallet", "Error closing wallet\r\n" + response.Error.Message, ButtonEnum.Ok);
+                    _ = await box.ShowAsync();
+                });
             }
             else
             {
                 GlobalData.IsWalletOpen = false;
                 GlobalData.IsWalletJustOpened = false;
+
+                await Dispatcher.UIThread.InvokeAsync(async () =>
+                {
+                    var box = MessageBoxManager.GetMessageBoxStandard("Close Wallet", "Wallet closed successfully!", ButtonEnum.Ok);
+                    _ = await box.ShowAsync();
+                });
             }
         }
 
