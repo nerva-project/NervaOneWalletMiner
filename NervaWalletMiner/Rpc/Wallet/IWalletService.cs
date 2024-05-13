@@ -9,9 +9,12 @@ namespace NervaWalletMiner.Rpc.Wallet
     {
         Task<OpenWalletResponse> OpenWallet(RpcBase rpc, OpenWalletRequest requestObj);
 
+        Task<CloseWalletResponse> CloseWallet(RpcBase rpc, CloseWalletRequest requestObj);
+
+
         // TODO: Pass optional tag
         Task<GetAccountsResponse> GetAccounts(RpcBase rpc, GetAccountsRequest requestObj);
 
-        Task<GetTransfersResponse> GetTransfers(RpcBase rpc, GetTransfersRequest requestObj);
+        Task<GetTransfersResponse> GetTransfers(RpcBase rpc, GetTransfersRequest requestObj);        
     }
 }

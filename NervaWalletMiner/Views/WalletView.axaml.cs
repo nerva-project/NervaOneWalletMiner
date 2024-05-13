@@ -36,7 +36,7 @@ namespace NervaWalletMiner.Views
                 else
                 {
                     // TODO: Close wallet
-                    GlobalData.IsWalletOpen = false;
+                    CloseUserWallet();
                     btnOpenCloseWallet.Content = StatusWallet.OpenWallet;
                 }
             }
@@ -82,6 +82,23 @@ namespace NervaWalletMiner.Views
             {
                 GlobalData.IsWalletOpen = true;       
                 GlobalData.IsWalletJustOpened = true;                
+            }
+        }
+
+        private static async void CloseUserWallet()
+        {
+            CloseWalletRequest request = new();
+
+            CloseWalletResponse response = await GlobalData.WalletService.CloseWallet(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
+
+            if (response.Error.IsError)
+            {
+                // TODO: Report error to user
+            }
+            else
+            {
+                GlobalData.IsWalletOpen = false;
+                GlobalData.IsWalletJustOpened = false;
             }
         }
 

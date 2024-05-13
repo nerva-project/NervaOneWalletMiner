@@ -76,6 +76,57 @@ namespace NervaWalletMiner.Rpc.Wallet
         }
         #endregion // OpenWallet
 
+        #region Close Wallet
+        /* RPC request params:
+         *  bool autosave_current;
+         */
+        public async Task<CloseWalletResponse> CloseWallet(RpcBase rpc, CloseWalletRequest requestObj)
+        {
+            CloseWalletResponse responseObj = new();
+
+            try
+            {
+                // Build request content json
+                var requestJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = "0",
+                    ["method"] = "close_wallet"
+                };
+
+                // Call service and process response
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+
+                    var error = JObject.Parse(jsonObject.ToString())["error"];
+                    if (error != null)
+                    {
+                        // Set Service error
+                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                    }
+                    else
+                    {
+                        // Just set error to false
+                        responseObj.Error.IsError = false;
+                    }
+                }
+                else
+                {
+                    // Set HTTP error
+                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("RWXMR.CW", ex);
+            }
+
+            return responseObj;
+        }
+        #endregion // Close Wallet
+
         #region GetAccounts
         /* RPC request params:
          *  std::string tag;      // all accounts if empty, otherwise those accounts with this tag

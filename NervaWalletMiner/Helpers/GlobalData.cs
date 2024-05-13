@@ -53,5 +53,7 @@ namespace NervaWalletMiner.Helpers
         public static string DaemonProcessName = GlobalMethods.GetDaemonProcessName();
 
         public static Bitmap Logo = GlobalMethods.GetLogo();
+
+        public static string WalletClosedMessage = "Wallet offline - see Wallet screen to open";
     }
 }

@@ -92,7 +92,7 @@ public class MainViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _DaemonVersion, value);
     }
 
-    private string _WalletStatus = "Wallet offline - see Wallet tab to open";
+    private string _WalletStatus = GlobalData.WalletClosedMessage;
     public string WalletStatus
     {
         get => _WalletStatus;
@@ -179,124 +179,172 @@ public class MainViewModel : ViewModelBase
 
     public void UpdateWalletView()
     {       
-        // Wallet
-        if(!((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).TotalCoins.Equals(GlobalData.WalletStats.TotalBalanceLocked.ToString()))
-        {
-            ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).TotalCoins = GlobalData.WalletStats.TotalBalanceLocked.ToString();
-        }
-
-        if (!((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).UnlockedCoins.Equals(GlobalData.WalletStats.TotalBalanceUnlocked.ToString()))
-        {
-            ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).UnlockedCoins = GlobalData.WalletStats.TotalBalanceUnlocked.ToString();
-        }
-
-        string totalLockedLabel = "Total " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits + ":";
-        if (!((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).TotalLockedLabel.Equals(totalLockedLabel))
-        {
-            ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).TotalLockedLabel = totalLockedLabel;
-        }
-
-        string totalUnlockedLabel = "Unlocked " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits + ":";
-        if (!((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).TotalUnlockedLabel.Equals(totalUnlockedLabel))
-        {
-            ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).TotalUnlockedLabel = totalUnlockedLabel;
-        }
-
-        if (((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses.Count == 0)
-        {
-            ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses = GlobalData.WalletStats.Subaddresses.Values.ToList<Account>();
-        }
-        else
-        {
-            // TODO: ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses RaiseAndSetIfChanged not firing on updates. Find another way
-
-
-            // Trying to avoid loop within a loop
-            List<Account> deleteWallets = [];
-            HashSet<int> checkedIndexes = [];
-
-            foreach (Account wallet in ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses)
-            {
-                checkedIndexes.Add(wallet.Index);
-
-                if (GlobalData.WalletStats.Subaddresses.ContainsKey(wallet.Index))
-                {
-                    // Update, only if value changed
-                    if (!wallet.Label.Equals(GlobalData.WalletStats.Subaddresses[wallet.Index].Label))
-                    {
-                        wallet.Label = GlobalData.WalletStats.Subaddresses[wallet.Index].Label;
-                    }
-                    if (!wallet.Address.Equals(GlobalData.WalletStats.Subaddresses[wallet.Index].Address))
-                    {
-                        wallet.Address = GlobalData.WalletStats.Subaddresses[wallet.Index].Address;
-                    }
-                    if (wallet.BalanceLocked != (GlobalData.WalletStats.Subaddresses[wallet.Index].BalanceLocked))
-                    {
-                        wallet.BalanceLocked = GlobalData.WalletStats.Subaddresses[wallet.Index].BalanceLocked;
-                    }
-                    if (wallet.BalanceUnlocked != (GlobalData.WalletStats.Subaddresses[wallet.Index].BalanceUnlocked))
-                    {
-                        wallet.BalanceUnlocked = GlobalData.WalletStats.Subaddresses[wallet.Index].BalanceUnlocked;
-                    }
-                }
-                else
-                {
-                    // Wallets to remove
-                    deleteWallets.Add(wallet);
-                }
-            }
-
-            foreach (Account wallet in deleteWallets)
-            {
-                ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses.Remove(wallet);
-            }
-
-            foreach (int index in GlobalData.WalletStats.Subaddresses.Keys)
-            {
-                if (!checkedIndexes.Contains(index))
-                {
-                    // Need to add new wallet
-                    ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses.Add(GlobalData.WalletStats.Subaddresses[index]);
-                }
-            }
-        }       
-
         if(GlobalData.IsWalletOpen)
         {
+            if (!((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).TotalCoins.Equals(GlobalData.WalletStats.TotalBalanceLocked.ToString()))
+            {
+                ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).TotalCoins = GlobalData.WalletStats.TotalBalanceLocked.ToString();
+            }
+
+            if (!((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).UnlockedCoins.Equals(GlobalData.WalletStats.TotalBalanceUnlocked.ToString()))
+            {
+                ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).UnlockedCoins = GlobalData.WalletStats.TotalBalanceUnlocked.ToString();
+            }
+
+            string totalLockedLabel = "Total " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits + ":";
+            if (!((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).TotalLockedLabel.Equals(totalLockedLabel))
+            {
+                ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).TotalLockedLabel = totalLockedLabel;
+            }
+
+            string totalUnlockedLabel = "Unlocked " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits + ":";
+            if (!((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).TotalUnlockedLabel.Equals(totalUnlockedLabel))
+            {
+                ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).TotalUnlockedLabel = totalUnlockedLabel;
+            }
+
+            if (((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses.Count == 0)
+            {
+                ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses = GlobalData.WalletStats.Subaddresses.Values.ToList<Account>();
+            }
+            else
+            {
+                // TODO: ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses RaiseAndSetIfChanged not firing on updates. Find another way
+
+
+                // Trying to avoid loop within a loop
+                List<Account> deleteWallets = [];
+                HashSet<int> checkedIndexes = [];
+
+                foreach (Account wallet in ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses)
+                {
+                    checkedIndexes.Add(wallet.Index);
+
+                    if (GlobalData.WalletStats.Subaddresses.ContainsKey(wallet.Index))
+                    {
+                        // Update, only if value changed
+                        if (!wallet.Label.Equals(GlobalData.WalletStats.Subaddresses[wallet.Index].Label))
+                        {
+                            wallet.Label = GlobalData.WalletStats.Subaddresses[wallet.Index].Label;
+                        }
+                        if (!wallet.Address.Equals(GlobalData.WalletStats.Subaddresses[wallet.Index].Address))
+                        {
+                            wallet.Address = GlobalData.WalletStats.Subaddresses[wallet.Index].Address;
+                        }
+                        if (wallet.BalanceLocked != (GlobalData.WalletStats.Subaddresses[wallet.Index].BalanceLocked))
+                        {
+                            wallet.BalanceLocked = GlobalData.WalletStats.Subaddresses[wallet.Index].BalanceLocked;
+                        }
+                        if (wallet.BalanceUnlocked != (GlobalData.WalletStats.Subaddresses[wallet.Index].BalanceUnlocked))
+                        {
+                            wallet.BalanceUnlocked = GlobalData.WalletStats.Subaddresses[wallet.Index].BalanceUnlocked;
+                        }
+                    }
+                    else
+                    {
+                        // Wallets to remove
+                        deleteWallets.Add(wallet);
+                    }
+                }
+
+                foreach (Account wallet in deleteWallets)
+                {
+                    ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses.Remove(wallet);
+                }
+
+                foreach (int index in GlobalData.WalletStats.Subaddresses.Keys)
+                {
+                    if (!checkedIndexes.Contains(index))
+                    {
+                        // Need to add new wallet
+                        ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses.Add(GlobalData.WalletStats.Subaddresses[index]);
+                    }
+                }
+            }
+
             ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).OpenCloseWallet = StatusWallet.CloseWallet;
+
+            // Status Bar
+            string statusBarMessage = "Account(s): " + GlobalData.WalletStats.Subaddresses.Count + " | Balance: " + GlobalData.WalletStats.TotalBalanceLocked + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
+            if (WalletStatus != statusBarMessage)
+            {
+                WalletStatus = statusBarMessage;
+            }
         }
         else
         {
-            ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).OpenCloseWallet = StatusWallet.OpenWallet;
-        }
+            // If wallet is closed/was closed by the user, clear fields
+            if (!string.IsNullOrEmpty(((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).TotalCoins))
+            {
+                ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).TotalCoins = string.Empty;
+            }
 
-        // Status Bar
-        WalletStatus = "Account(s): " + GlobalData.WalletStats.Subaddresses.Count + " | Balance: " + GlobalData.WalletStats.TotalBalanceLocked + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;        
+            if (!string.IsNullOrEmpty(((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).UnlockedCoins))
+            {
+                ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).UnlockedCoins = string.Empty;
+            }
+
+            string totalLockedLabel = "Total " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits + ":";
+            if (!((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).TotalLockedLabel.Equals(totalLockedLabel))
+            {
+                ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).TotalLockedLabel = totalLockedLabel;
+            }
+
+            string totalUnlockedLabel = "Unlocked " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits + ":";
+            if (!((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).TotalUnlockedLabel.Equals(totalUnlockedLabel))
+            {
+                ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).TotalUnlockedLabel = totalUnlockedLabel;
+            }
+
+            if (((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses.Count != 0)
+            {
+                ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses = new List<Account>();
+            }
+
+            ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).OpenCloseWallet = StatusWallet.OpenWallet;
+
+            // Status Bar
+            if (WalletStatus != GlobalData.WalletClosedMessage)
+            {
+                WalletStatus = GlobalData.WalletClosedMessage;
+            }
+        }       
     }
 
     public void UpdateTransfersView()
     {
-        if (((TransfersViewModel)ViewModelPagesDictionary[SplitViewPages.Transfers]).Transactions.Count == 0)
+        if(GlobalData.IsWalletOpen)
         {
-            ((TransfersViewModel)ViewModelPagesDictionary[SplitViewPages.Transfers]).Transactions = GlobalData.TransfersStats.Transactions.Values.ToList<Transfer>().OrderByDescending(tr=>tr.Height).ToList();
+            if (((TransfersViewModel)ViewModelPagesDictionary[SplitViewPages.Transfers]).Transactions.Count == 0)
+            {
+                ((TransfersViewModel)ViewModelPagesDictionary[SplitViewPages.Transfers]).Transactions = GlobalData.TransfersStats.Transactions.Values.ToList<Transfer>().OrderByDescending(tr => tr.Height).ToList();
+            }
+            else
+            {
+                List<Transfer> newTransfers = [];
+
+                foreach (string transactionId in GlobalData.TransfersStats.Transactions.Keys)
+                {
+                    // Check if transaction already exists in datagrid and add it to the top if it does not
+                    if (!((TransfersViewModel)ViewModelPagesDictionary[SplitViewPages.Transfers]).Transactions.Any(transfer => transfer.TransactionId == transactionId))
+                    {
+                        newTransfers.Add(GlobalData.TransfersStats.Transactions[transactionId]);
+                    }
+                }
+
+                if (newTransfers.Count > 0)
+                {
+                    // TODO: If you scroll in the datagrid, new rows show up, otherwise, they do not. Figure out how to force refresh
+                    ((TransfersViewModel)ViewModelPagesDictionary[SplitViewPages.Transfers]).Transactions.InsertRange(0, newTransfers.OrderByDescending(tr => tr.Height).ToList());
+                }
+            }
         }
         else
         {
-            List<Transfer> newTransfers = [];
-
-            foreach(string transactionId in GlobalData.TransfersStats.Transactions.Keys)
+            // If wallet is closed/was closed by the user, clear fields
+            if (((TransfersViewModel)ViewModelPagesDictionary[SplitViewPages.Transfers]).Transactions.Count != 0)
             {
-                // Check if transaction already exists in datagrid and add it to the top if it does not
-                if(!((TransfersViewModel)ViewModelPagesDictionary[SplitViewPages.Transfers]).Transactions.Any(transfer => transfer.TransactionId == transactionId))
-                {
-                    newTransfers.Add(GlobalData.TransfersStats.Transactions[transactionId]);                    
-                }
-            }
-
-            if (newTransfers.Count > 0)
-            {
-                // TODO: If you scroll in the datagrid, new rows show up, otherwise, they do not. Figure out how to force refresh
-                ((TransfersViewModel)ViewModelPagesDictionary[SplitViewPages.Transfers]).Transactions.InsertRange(0, newTransfers.OrderByDescending(tr => tr.Height).ToList());
+                ((TransfersViewModel)ViewModelPagesDictionary[SplitViewPages.Transfers]).Transactions = [];
             }
         }
     }
@@ -372,13 +420,19 @@ public class MainViewModel : ViewModelBase
                 {
                     GlobalData.IsWalletJustOpened = false;
                     WalletUiUpdate();
+                    TransfersUiUpdate();
                 }
                 else if(_masterTimerCount % (GlobalData.AppSettings.TimerIntervalMultiplier * 3) == 0)
                 {
                     // Update wallet every 3rd call because you do not need to do it more often
                     WalletUiUpdate();
+                    TransfersUiUpdate();
                 }                
             }
+
+            // Actual UI update. If walet was closed, it will clear things
+            UpdateWalletView();
+            UpdateTransfersView();
         }
         catch (Exception ex)
         {
@@ -621,11 +675,18 @@ public class MainViewModel : ViewModelBase
 
                     GlobalData.WalletStats.Subaddresses.Add(account.Index, account);
                 }
+            }            
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException("Main.WUU", ex);
+        }
+    }
 
-                UpdateWalletView();
-            }
-
-
+    public async void TransfersUiUpdate()
+    {
+        try
+        {
             // TODO: Kepp track of latest transaction height and set min_hight
             // Scanning from height 0 can take 15+ seconds and is CPU intensive
 
@@ -658,20 +719,20 @@ public class MainViewModel : ViewModelBase
 
                 foreach (Transfer transfer in resTransfers.Transfers)
                 {
-                    if(transfer.Type.Equals("in"))
+                    if (transfer.Type.Equals("in"))
                     {
                         transfer.Icon = _inImage;
                     }
-                    else if(transfer.Type.Equals("out"))
+                    else if (transfer.Type.Equals("out"))
                     {
                         transfer.Icon = _outImage;
                     }
-                    else if(transfer.Type.Equals("block"))
+                    else if (transfer.Type.Equals("block"))
                     {
                         transfer.Icon = _blockImage;
                     }
 
-                    if(GlobalData.TransfersStats.Transactions.ContainsKey(transfer.TransactionId))
+                    if (GlobalData.TransfersStats.Transactions.ContainsKey(transfer.TransactionId))
                     {
                         // TODO: Figure out why you have duplicates. Maybe TransactionId is not unique on its own
                     }
@@ -680,20 +741,18 @@ public class MainViewModel : ViewModelBase
                         GlobalData.TransfersStats.Transactions.Add(transfer.TransactionId, transfer);
 
                         // TODO: Maybe do this in a different way
-                        if(transfer.Height > GlobalData.NewestTransactionHeight)
+                        if (transfer.Height > GlobalData.NewestTransactionHeight)
                         {
                             GlobalData.NewestTransactionHeight = transfer.Height;
                         }
                     }
-                }
-
-                UpdateTransfersView();
+                }                
             }
         }
         catch (Exception ex)
         {
-            Logger.LogException("Main.WUU", ex);
+            Logger.LogException("Main.TUU", ex);
         }
     }
-    #endregion // Master Process Methods
+     #endregion // Master Process Methods
 }

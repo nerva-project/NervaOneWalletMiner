@@ -24,28 +24,28 @@ namespace NervaWalletMiner.ViewModels
             set => this.RaiseAndSetIfChanged(ref _OpenCloseWallet, value);
         }
 
-        private string _TotalCoins = "";
+        private string _TotalCoins = string.Empty;
         public string TotalCoins
         {
             get => _TotalCoins;
             set => this.RaiseAndSetIfChanged(ref _TotalCoins, value);
         }
 
-        private string _UnlockedCoins = "";
+        private string _UnlockedCoins = string.Empty;
         public string UnlockedCoins
         {
             get => _UnlockedCoins;
             set => this.RaiseAndSetIfChanged(ref _UnlockedCoins, value);
         }
 
-        private string _TotalLockedLabel = "Total: ";
+        private string _TotalLockedLabel = "Total";
         public string TotalLockedLabel
         {
             get => _TotalLockedLabel;
             set => this.RaiseAndSetIfChanged(ref _TotalLockedLabel, value);
         }
 
-        private string _TotalUnlockedLabel = "Unlocked: ";
+        private string _TotalUnlockedLabel = "Unlocked";
         public string TotalUnlockedLabel
         {
             get => _TotalUnlockedLabel;
