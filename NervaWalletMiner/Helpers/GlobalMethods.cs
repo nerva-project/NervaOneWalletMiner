@@ -144,8 +144,8 @@ namespace NervaWalletMiner.Helpers
         {
             Dictionary<string, SettingsDaemon> daemonSettings = [];
 
-            daemonSettings.Add(Coin.XNV, new SettingsDaemon(17566) { BlockSeconds = 60.0 });
-            daemonSettings.Add(Coin.XMR, new SettingsDaemon(18081) { BlockSeconds = 120.0 });
+            daemonSettings.Add(Coin.XNV, new SettingsDaemon(17566) { BlockSeconds = 60.0, LogLevel = 1 });
+            daemonSettings.Add(Coin.XMR, new SettingsDaemon(18081) { BlockSeconds = 120.0, LogLevel = 0 });
 
             return daemonSettings;
         }
@@ -184,6 +184,10 @@ namespace NervaWalletMiner.Helpers
                     if (GlobalData.AppSettings.Daemon[Coin.XMR].BlockSeconds != 120.0)
                     {
                         GlobalData.AppSettings.Daemon[Coin.XMR].BlockSeconds = 120.0;
+                    }
+                    if (GlobalData.AppSettings.Daemon[Coin.XMR].LogLevel != 0)
+                    {
+                        GlobalData.AppSettings.Daemon[Coin.XMR].LogLevel = 0;
                     }
                     break;
 
