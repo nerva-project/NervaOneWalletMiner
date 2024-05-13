@@ -177,8 +177,7 @@ namespace NervaWalletMiner.Helpers
                     GlobalData.Logo = GetLogo();
 
                     GlobalData.DaemonService = new DaemonServiceXMR();
-                    // TODO: Change once interface implemented
-                    GlobalData.WalletService = new WalletServiceXNV();
+                    GlobalData.WalletService = new WalletServiceXMR();
 
                     // TODO: Change this. App.config overwrites GetDaemonSettings with 0
                     if (GlobalData.AppSettings.Daemon[Coin.XMR].BlockSeconds != 120.0)
