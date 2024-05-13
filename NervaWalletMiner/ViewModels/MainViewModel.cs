@@ -180,17 +180,29 @@ public class MainViewModel : ViewModelBase
     public void UpdateWalletView()
     {       
         // Wallet
-        if(!((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).TotalXnv.Equals(GlobalData.WalletStats.TotalBalanceLocked.ToString()))
+        if(!((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).TotalCoins.Equals(GlobalData.WalletStats.TotalBalanceLocked.ToString()))
         {
-            ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).TotalXnv = GlobalData.WalletStats.TotalBalanceLocked.ToString();
+            ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).TotalCoins = GlobalData.WalletStats.TotalBalanceLocked.ToString();
         }
-        
-        if(!((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).UnlockedXnv.Equals(GlobalData.WalletStats.TotalBalanceUnlocked.ToString()))
-        {
-            ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).UnlockedXnv = GlobalData.WalletStats.TotalBalanceUnlocked.ToString();
-        }        
 
-        if(((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses.Count == 0)
+        if (!((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).UnlockedCoins.Equals(GlobalData.WalletStats.TotalBalanceUnlocked.ToString()))
+        {
+            ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).UnlockedCoins = GlobalData.WalletStats.TotalBalanceUnlocked.ToString();
+        }
+
+        string totalLockedLabel = "Total " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits + ":";
+        if (!((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).TotalLockedLabel.Equals(totalLockedLabel))
+        {
+            ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).TotalLockedLabel = totalLockedLabel;
+        }
+
+        string totalUnlockedLabel = "Unlocked " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits + ":";
+        if (!((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).TotalUnlockedLabel.Equals(totalUnlockedLabel))
+        {
+            ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).TotalUnlockedLabel = totalUnlockedLabel;
+        }
+
+        if (((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses.Count == 0)
         {
             ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses = GlobalData.WalletStats.Subaddresses.Values.ToList<Account>();
         }
@@ -259,7 +271,7 @@ public class MainViewModel : ViewModelBase
         }
 
         // Status Bar
-        WalletStatus = "Account(s): " + GlobalData.WalletStats.Subaddresses.Count + " | Balance: " + GlobalData.WalletStats.TotalBalanceLocked + " XNV";        
+        WalletStatus = "Account(s): " + GlobalData.WalletStats.Subaddresses.Count + " | Balance: " + GlobalData.WalletStats.TotalBalanceLocked + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;        
     }
 
     public void UpdateTransfersView()

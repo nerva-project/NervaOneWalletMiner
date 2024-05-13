@@ -154,8 +154,8 @@ namespace NervaWalletMiner.Helpers
         {
             Dictionary<string, SettingsWallet> walletSettings = [];
 
-            walletSettings.Add(Coin.XNV, new SettingsWallet());
-            walletSettings.Add(Coin.XMR, new SettingsWallet());
+            walletSettings.Add(Coin.XNV, new SettingsWallet() { DisplayUnits = "XNV" });
+            walletSettings.Add(Coin.XMR, new SettingsWallet() { DisplayUnits = "XMR" });
 
             return walletSettings;
         }
@@ -187,6 +187,10 @@ namespace NervaWalletMiner.Helpers
                     if (GlobalData.AppSettings.Daemon[Coin.XMR].LogLevel != 0)
                     {
                         GlobalData.AppSettings.Daemon[Coin.XMR].LogLevel = 0;
+                    }
+                    if (GlobalData.AppSettings.Wallet[Coin.XMR].DisplayUnits != "XMR")
+                    {
+                        GlobalData.AppSettings.Wallet[Coin.XMR].DisplayUnits = "XMR";
                     }
                     break;
 

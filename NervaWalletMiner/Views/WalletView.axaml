@@ -34,10 +34,10 @@
 					<RowDefinition Height="35" />
 				</Grid.RowDefinitions>
 
-				<Label Grid.Row="0" Grid.Column="0" Content="Total XNV:" />
-				<Label Grid.Row="0" Grid.Column="1" Content="{Binding TotalXnv}" Width="160" HorizontalAlignment="Left" />
-				<Label Grid.Row="1" Grid.Column="0" Content="Unlocked XNV:" />
-				<Label Grid.Row="1" Grid.Column="1" Content="{Binding UnlockedXnv}" Width="160" HorizontalAlignment="Left" />
+				<Label Grid.Row="0" Grid.Column="0" Content="{Binding TotalLockedLabel}" />
+				<Label Grid.Row="0" Grid.Column="1" Content="{Binding TotalCoins}" Width="160" HorizontalAlignment="Left" />
+				<Label Grid.Row="1" Grid.Column="0" Content="{Binding TotalUnlockedLabel}" />
+				<Label Grid.Row="1" Grid.Column="1" Content="{Binding UnlockedCoins}" Width="160" HorizontalAlignment="Left" />
 			</Grid>
 
 			<Grid ColumnDefinitions="120" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right">
