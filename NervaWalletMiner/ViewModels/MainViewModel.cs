@@ -269,7 +269,7 @@ public class MainViewModel : ViewModelBase
             ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).OpenCloseWallet = StatusWallet.CloseWallet;
 
             // Status Bar
-            string statusBarMessage = "Account(s): " + GlobalData.WalletStats.Subaddresses.Count + " | Balance: " + GlobalData.WalletStats.TotalBalanceLocked + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
+            string statusBarMessage = GlobalData.OpenedWalletName + " | Account(s): " + GlobalData.WalletStats.Subaddresses.Count + " | Balance: " + GlobalData.WalletStats.TotalBalanceLocked + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
             if (WalletStatus != statusBarMessage)
             {
                 WalletStatus = statusBarMessage;

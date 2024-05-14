@@ -32,6 +32,7 @@ namespace NervaWalletMiner.Helpers
 
         public static bool IsWalletOpen = false;
         public static bool IsWalletJustOpened = true;
+        public static string OpenedWalletName = string.Empty;
 
         public static StatsDaemon NetworkStats = new();
         public static StatsWallet WalletStats = new();

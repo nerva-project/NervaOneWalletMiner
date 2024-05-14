@@ -68,6 +68,7 @@ namespace NervaWalletMiner.Views
             {
                 GlobalData.IsWalletOpen = false;
                 GlobalData.IsWalletJustOpened = false;
+                GlobalData.OpenedWalletName = string.Empty;
 
                 await Dispatcher.UIThread.Invoke(async () =>
                 {
@@ -79,6 +80,7 @@ namespace NervaWalletMiner.Views
             {
                 GlobalData.IsWalletOpen = true;
                 GlobalData.IsWalletJustOpened = true;
+                GlobalData.OpenedWalletName = walletName;
 
                 await Dispatcher.UIThread.InvokeAsync(async () =>
                 {
