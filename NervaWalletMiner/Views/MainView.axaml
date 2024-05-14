@@ -25,28 +25,34 @@
 					</Button>
 				
 					<ListBox Selection="{Binding Selection}">
-						<ListBoxItem Name="home" IsSelected="True">
+						<ListBoxItem Name="daemon" IsSelected="True">
 							<StackPanel Spacing="12" Orientation="Horizontal">
-								<PathIcon Height="20" Data="{StaticResource HomeRegular}" />
-								<TextBlock Text="Home" />
+								<PathIcon Height="20" Data="{StaticResource DaemonIcon}" />
+								<TextBlock Text="Daemon" />
 							</StackPanel>										
 						</ListBoxItem>
 						<ListBoxItem Name="wallet">
 							<StackPanel Spacing="12" Orientation="Horizontal">
-								<PathIcon Height="20" Data="{StaticResource MoneyRegular}" />
+								<PathIcon Height="20" Data="{StaticResource WalletIcon}" />
 								<TextBlock Text="Wallet" />
+							</StackPanel>
+						</ListBoxItem>
+						<ListBoxItem Name="wallet_setup">
+							<StackPanel Spacing="12" Orientation="Horizontal">
+								<PathIcon Height="20" Data="{StaticResource WalletSetupIcon}" />
+								<TextBlock Text="Wallet Setup" />
 							</StackPanel>
 						</ListBoxItem>
 						<ListBoxItem Name="transfers">
 							<StackPanel Spacing="12" Orientation="Horizontal">
-								<PathIcon Height="20" Data="{StaticResource ArrowSortRegular}" />
+								<PathIcon Height="20" Data="{StaticResource TransfersIcon}" />
 								<TextBlock Text="Transfers" />
 							</StackPanel>
 						</ListBoxItem>
 
-						<ListBoxItem VerticalAlignment="Bottom" Name="settings" >
+						<ListBoxItem Name="settings" >
 							<StackPanel Spacing="12" Orientation="Horizontal">
-								<PathIcon Height="20" Data="{StaticResource SettingsRegular}" />
+								<PathIcon Height="20" Data="{StaticResource SettingsIcon}" />
 								<TextBlock Text="Settings" />
 							</StackPanel>
 						</ListBoxItem>

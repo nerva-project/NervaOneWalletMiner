@@ -1,0 +1,27 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="clr-namespace:NervaWalletMiner.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="550"
+             x:Class="NervaWalletMiner.Views.WalletSetupView">
+
+	<Design.DataContext>
+		<vm:WalletSetupViewModel />
+	</Design.DataContext>
+
+	<StackPanel Spacing="5" Margin="10" HorizontalAlignment="Stretch" MaxWidth="650">
+
+			<Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="24,*">
+				<Image Grid.Row="0" Grid.Column="0" Source="{Binding CoinIcon}"></Image>
+				<Label Grid.Row="0" Grid.Column="1" Height="24">Wallet Setup</Label>
+			</Grid>
+
+			<Button Name="btnCreateWallet"
+					Content="Create New Wallet"
+					DockPanel.Dock="Right"
+					Margin="0,10,0,0"
+					Click="CreateWalletClicked"/>
+
+	</StackPanel>
+</UserControl>

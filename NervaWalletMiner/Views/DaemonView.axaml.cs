@@ -8,9 +8,9 @@ using System;
 
 namespace NervaWalletMiner.Views
 {
-    public partial class HomeView : UserControl
+    public partial class DaemonView : UserControl
     {
-        public HomeView()
+        public DaemonView()
         {
             InitializeComponent();
 

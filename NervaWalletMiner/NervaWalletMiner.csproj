@@ -38,4 +38,10 @@
     <Folder Include="Assets\xmr\" />
     <Folder Include="Assets\xnv\" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Views\DaemonView.axaml.cs">
+      <DependentUpon>DaemonView.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
 </Project>

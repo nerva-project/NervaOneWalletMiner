@@ -4,10 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:NervaWalletMiner.ViewModels"
 			 mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="550"
-			 x:DataType="vm:HomeViewModel"
-             x:Class="NervaWalletMiner.Views.HomeView">
+			 x:DataType="vm:DaemonViewModel"
+             x:Class="NervaWalletMiner.Views.DaemonView">
 	<Design.DataContext>
-		<vm:HomeViewModel />
+		<vm:DaemonViewModel />
 	</Design.DataContext>
 	
 	<StackPanel Spacing="5" HorizontalAlignment="Stretch" MaxWidth="650">

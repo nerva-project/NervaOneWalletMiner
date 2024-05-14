@@ -48,14 +48,15 @@ public class MainViewModel : ViewModelBase
     public MainViewModel()
     {
         // Set up split view pages
-        ViewModelPagesDictionary.Add(SplitViewPages.Home, new HomeViewModel());
+        ViewModelPagesDictionary.Add(SplitViewPages.Daemon, new DaemonViewModel());
         ViewModelPagesDictionary.Add(SplitViewPages.Wallet, new WalletViewModel());
+        ViewModelPagesDictionary.Add(SplitViewPages.WalletSetup, new WalletSetupViewModel());
         ViewModelPagesDictionary.Add(SplitViewPages.Transfers, new TransfersViewModel());
         ViewModelPagesDictionary.Add(SplitViewPages.Settings, new SettingsViewModel());
 
         TriggerPaneCommand = ReactiveCommand.Create(TriggerPane);
 
-        _CurrentPage = ViewModelPagesDictionary[SplitViewPages.Home];
+        _CurrentPage = ViewModelPagesDictionary[SplitViewPages.Daemon];
 
         Selection = new SelectionModel<ListBoxItem>();
         Selection.SelectionChanged += SelectionChanged;
@@ -115,6 +116,9 @@ public class MainViewModel : ViewModelBase
             case SplitViewPages.Wallet:
                 CurrentPage = ViewModelPagesDictionary[SplitViewPages.Wallet];
                 break;
+            case SplitViewPages.WalletSetup:
+                CurrentPage = ViewModelPagesDictionary[SplitViewPages.WalletSetup];
+                break;
             case SplitViewPages.Transfers:
                 CurrentPage = ViewModelPagesDictionary[SplitViewPages.Transfers];
                 break;
@@ -122,7 +126,7 @@ public class MainViewModel : ViewModelBase
                 CurrentPage = ViewModelPagesDictionary[SplitViewPages.Settings];
                 break;
             default:
-                CurrentPage = ViewModelPagesDictionary[SplitViewPages.Home];
+                CurrentPage = ViewModelPagesDictionary[SplitViewPages.Daemon];
                 break;
         }
     }
@@ -134,41 +138,41 @@ public class MainViewModel : ViewModelBase
 
     public void UpdateMainView()
     {
-        // Daemon (HomeView)
-        ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).NetHeight = GlobalData.NetworkStats.NetHeight.ToString();
-        ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).YourHeight = GlobalData.NetworkStats.YourHeight.ToString();
-        ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).NetHash = GlobalData.NetworkStats.NetHash;
-        ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).RunTime = GlobalData.NetworkStats.RunTime;
+        // Daemon View
+        ((DaemonViewModel)ViewModelPagesDictionary[SplitViewPages.Daemon]).NetHeight = GlobalData.NetworkStats.NetHeight.ToString();
+        ((DaemonViewModel)ViewModelPagesDictionary[SplitViewPages.Daemon]).YourHeight = GlobalData.NetworkStats.YourHeight.ToString();
+        ((DaemonViewModel)ViewModelPagesDictionary[SplitViewPages.Daemon]).NetHash = GlobalData.NetworkStats.NetHash;
+        ((DaemonViewModel)ViewModelPagesDictionary[SplitViewPages.Daemon]).RunTime = GlobalData.NetworkStats.RunTime;
 
-        ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).MinerMessage = GlobalData.NetworkStats.MinerStatus;
-        ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).YourHash = GlobalData.NetworkStats.YourHash;
-        ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).BlockTime = GlobalData.NetworkStats.BlockTime;
-        ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).MiningAddress = GlobalData.NetworkStats.MiningAddress;
+        ((DaemonViewModel)ViewModelPagesDictionary[SplitViewPages.Daemon]).MinerMessage = GlobalData.NetworkStats.MinerStatus;
+        ((DaemonViewModel)ViewModelPagesDictionary[SplitViewPages.Daemon]).YourHash = GlobalData.NetworkStats.YourHash;
+        ((DaemonViewModel)ViewModelPagesDictionary[SplitViewPages.Daemon]).BlockTime = GlobalData.NetworkStats.BlockTime;
+        ((DaemonViewModel)ViewModelPagesDictionary[SplitViewPages.Daemon]).MiningAddress = GlobalData.NetworkStats.MiningAddress;
 
-        ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).Connections = GlobalData.Connections;
+        ((DaemonViewModel)ViewModelPagesDictionary[SplitViewPages.Daemon]).Connections = GlobalData.Connections;
 
         if(GlobalData.NetworkStats.MinerStatus.Equals(StatusMiner.Mining))
         {
             // Mining so disable number of threads and show Stop Mining
-            if (((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).StartStopMining.Equals(StatusMiner.StartMining))
+            if (((DaemonViewModel)ViewModelPagesDictionary[SplitViewPages.Daemon]).StartStopMining.Equals(StatusMiner.StartMining))
             {
-                ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).StartStopMining = StatusMiner.StopMining;                
+                ((DaemonViewModel)ViewModelPagesDictionary[SplitViewPages.Daemon]).StartStopMining = StatusMiner.StopMining;                
             }
-            if(((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).IsNumThreadsEnabled)
+            if(((DaemonViewModel)ViewModelPagesDictionary[SplitViewPages.Daemon]).IsNumThreadsEnabled)
             {
-                ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).IsNumThreadsEnabled = false;
+                ((DaemonViewModel)ViewModelPagesDictionary[SplitViewPages.Daemon]).IsNumThreadsEnabled = false;
             }
         }
         else
         {
             // Not mining so enable number of threads and set Start Mining
-            if (((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).StartStopMining.Equals(StatusMiner.StopMining))
+            if (((DaemonViewModel)ViewModelPagesDictionary[SplitViewPages.Daemon]).StartStopMining.Equals(StatusMiner.StopMining))
             {
-                ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).StartStopMining = StatusMiner.StartMining;
+                ((DaemonViewModel)ViewModelPagesDictionary[SplitViewPages.Daemon]).StartStopMining = StatusMiner.StartMining;
             }
-            if (!((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).IsNumThreadsEnabled)
+            if (!((DaemonViewModel)ViewModelPagesDictionary[SplitViewPages.Daemon]).IsNumThreadsEnabled)
             {
-                ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).IsNumThreadsEnabled = true;
+                ((DaemonViewModel)ViewModelPagesDictionary[SplitViewPages.Daemon]).IsNumThreadsEnabled = true;
             }
         }
 
@@ -463,7 +467,7 @@ public class MainViewModel : ViewModelBase
         // TODO: I don't like how those icons work. Chage it!
 
         CoinIcon = GlobalMethods.GetLogo();
-        ((HomeViewModel)ViewModelPagesDictionary[SplitViewPages.Home]).CoinIcon = GlobalMethods.GetLogo();
+        ((DaemonViewModel)ViewModelPagesDictionary[SplitViewPages.Daemon]).CoinIcon = GlobalMethods.GetLogo();
         ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).CoinIcon = GlobalMethods.GetLogo();
         ((TransfersViewModel)ViewModelPagesDictionary[SplitViewPages.Transfers]).CoinIcon = GlobalMethods.GetLogo();
         ((SettingsViewModel)ViewModelPagesDictionary[SplitViewPages.Settings]).CoinIcon = GlobalMethods.GetLogo();
