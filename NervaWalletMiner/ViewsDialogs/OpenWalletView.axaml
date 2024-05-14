@@ -4,7 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:vm="clr-namespace:NervaWalletMiner.ViewModels"
 		mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="230"
-        x:Class="NervaWalletMiner.Views.OpenWalletView"
+        x:Class="NervaWalletMiner.ViewsDialogs.OpenWalletView"
 	    Width="500"
 		Height="230"
 		Topmost="True"

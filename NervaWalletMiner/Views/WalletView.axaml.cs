@@ -8,6 +8,7 @@ using NervaWalletMiner.Objects;
 using NervaWalletMiner.Objects.Constants;
 using NervaWalletMiner.Rpc.Wallet.Requests;
 using NervaWalletMiner.Rpc.Wallet.Responses;
+using NervaWalletMiner.ViewsDialogs;
 using System;
 using System.Threading.Tasks;
 
