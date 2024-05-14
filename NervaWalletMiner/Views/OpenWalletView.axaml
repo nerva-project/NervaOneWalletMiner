@@ -3,10 +3,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:vm="clr-namespace:NervaWalletMiner.ViewModels"
-	    Width="600"
-		Height="250"
-        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="250"
+		mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="230"
         x:Class="NervaWalletMiner.Views.OpenWalletView"
+	    Width="500"
+		Height="230"
+		Topmost="True"
+		WindowStartupLocation="CenterOwner"
         Title="Open Wallet">
 
 	<Design.DataContext>
@@ -19,16 +21,28 @@
 
 		<Label Content="Password" Margin="0,15,0,0" />
 		<DockPanel>
-			<TextBox Name="tbxPassword" PasswordChar="*" Watermark="Enter wallet password" />
-			<Button Name="btnShowPassword" Content="Show" Margin="10,0,0,0" />
+			<TextBox Name="tbxPassword"
+					 Watermark="Enter wallet password"
+					 PasswordChar="*"					 
+					 RevealPassword="False"
+					 Width="400" />
+			
+			<Button Name="btnShowHidePassword"
+					Content="Show"
+					Margin="10,0,0,0"
+					Click="ShowHidePasswordButtonClicked" />
 		</DockPanel>
 
 		<DockPanel Margin="0,15,0,0" >
-			<Button Name="btnOk" Content="OK" Click="OkButtonClicked" />
-			<Button Name="btnCancel" Content="Cancel" Click="CancelButtonClicked" Margin="10,0,0,0" />
-		</DockPanel>
-		
-
-
+			<Button Name="btnOk"
+					Content="OK"
+					Click="OkButtonClicked"
+					IsDefault="True" />
+			
+			<Button Name="btnCancel"
+					Content="Cancel"
+					Click="CancelButtonClicked"
+					Margin="10,0,0,0" />
+		</DockPanel>		
 	</StackPanel>
 </Window>
