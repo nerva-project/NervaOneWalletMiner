@@ -1,9 +1,9 @@
-﻿using System;
-using NervaWalletMiner.Helpers;
+﻿using NervaWalletMiner.Helpers;
+using System;
 
 namespace NervaWalletMiner.Rpc.Common
 {
-    public static class CommonXNV
+    public static class CommonXMR
     {
         public static ServiceError GetServiceError(string source, dynamic error)
         {
@@ -15,11 +15,11 @@ namespace NervaWalletMiner.Rpc.Common
                 serviceError.Code = error["code"].ToString();
                 serviceError.Message = error["message"].ToString();
 
-                Logger.LogError("CXNV.GSE", source + " - error from service. Code: " + serviceError.Code + ", Message: " + serviceError.Message);
+                Logger.LogError("CXMR.GSE", source + " - error from service. Code: " + serviceError.Code + ", Message: " + serviceError.Message);
             }
             catch (Exception ex)
             {
-                Logger.LogException("HTTP.GHE", ex);
+                Logger.LogException("CXMR.GSE", ex);
             }
 
             return serviceError;

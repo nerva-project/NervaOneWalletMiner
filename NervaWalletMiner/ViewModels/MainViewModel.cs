@@ -218,7 +218,7 @@ public class MainViewModel : ViewModelBase
 
                 // Trying to avoid loop within a loop
                 List<Account> deleteWallets = [];
-                HashSet<int> checkedIndexes = [];
+                HashSet<uint> checkedIndexes = [];
 
                 foreach (Account wallet in ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses)
                 {
@@ -256,7 +256,7 @@ public class MainViewModel : ViewModelBase
                     ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses.Remove(wallet);
                 }
 
-                foreach (int index in GlobalData.WalletStats.Subaddresses.Keys)
+                foreach (uint index in GlobalData.WalletStats.Subaddresses.Keys)
                 {
                     if (!checkedIndexes.Contains(index))
                     {

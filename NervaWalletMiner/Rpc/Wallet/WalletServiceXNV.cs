@@ -198,6 +198,106 @@ namespace NervaWalletMiner.Rpc.Wallet
         }
         #endregion // Create Wallet
 
+        #region Transfer
+        /* RPC request params:
+         *  std::list<transfer_destination> destinations;
+         *  uint32_t account_index;
+         *  std::set<uint32_t> subaddr_indices;
+         *  uint32_t priority;
+         *  uint64_t unlock_time;
+         *  std::string payment_id;
+         *  bool get_tx_key;
+         *  bool do_not_relay;
+         *  bool get_tx_hex;
+         *  bool get_tx_metadata;
+         */
+        public async Task<TransferResponse> Transfer(RpcBase rpc, TransferRequest requestObj)
+        {
+            TransferResponse responseObj = new();
+
+            try
+            {
+                // Build request content json
+                List<JObject> requestDestinations = [];
+                foreach (Common.TransferDestination destination in requestObj.Destinations)
+                {
+                    var estination = new JObject
+                    {
+                        ["amount"] = CommonXNV.AtomicUnitsFromDoubleAmount(destination.Amount),
+                        ["address"] = destination.Address
+                    };
+
+                    requestDestinations.Add(estination);
+                }
+
+                var requestParams = new JObject
+                {
+                    ["destinations"] = JsonConvert.SerializeObject(requestDestinations, Formatting.None),
+                    ["account_index"] = requestObj.AccountIndex,
+                    ["subaddr_indices"] = JsonConvert.SerializeObject(requestObj.SubAddressIndices, Formatting.None),
+                    ["priority"] = requestObj.Priority,
+                    ["unlock_time"] = requestObj.UnlockTime,
+                    ["payment_id"] = requestObj.PaymentId is null ? "" : requestObj.PaymentId,
+                    ["get_tx_key"] = requestObj.GetTxKey,
+                    ["do_not_relay"] = requestObj.DoNotRelay,
+                    ["get_tx_hex"] = requestObj.GetTxHex,
+                    ["get_tx_metadata"] = requestObj.GetTxMetadata
+                };
+
+                var requestJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = "0",
+                    ["method"] = "transfer",
+                    ["params"] = requestParams
+                };
+
+                // Call service and process response
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+
+                    var error = JObject.Parse(jsonObject.ToString())["error"];
+                    if (error != null)
+                    {
+                        // Set Service error
+                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                    }
+                    else
+                    {
+                        ResTransfer createWalletResponse = JsonConvert.DeserializeObject<ResTransfer>(jsonObject.SelectToken("result").ToString());
+
+                        responseObj.Error.IsError = false;
+                    }
+                }
+                else
+                {
+                    // Set HTTP error
+                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("RWXNV.T", ex);
+            }
+
+            return responseObj;
+        }
+
+        private class ResTransfer
+        {
+            public string tx_hash { get; set; } = string.Empty;
+            public string tx_key { get; set; } = string.Empty;
+            public ulong amount { get; set; }
+            public ulong fee { get; set; }
+            public string tx_blob { get; set; } = string.Empty;
+            public string tx_metadata { get; set; } = string.Empty;
+            public string multisig_txset { get; set; } = string.Empty;
+            public string unsigned_txset { get; set; } = string.Empty;
+        }
+        #endregion // Transfer
+
         #region Get Accounts
         /* RPC request params:
          *  std::string tag;      // all accounts if empty, otherwise those accounts with this tag
@@ -234,8 +334,8 @@ namespace NervaWalletMiner.Rpc.Wallet
                     else
                     {
                         ResGetAccounts getAccountsResponse = JsonConvert.DeserializeObject<ResGetAccounts>(jsonObject.SelectToken("result").ToString());
-                        responseObj.BalanceUnlocked = GlobalMethods.XnvFromAtomicUnits(getAccountsResponse.total_unlocked_balance, 4);
-                        responseObj.BalanceLocked = GlobalMethods.XnvFromAtomicUnits(getAccountsResponse.total_balance, 4);
+                        responseObj.BalanceUnlocked = CommonXNV.DoubleAmountFromAtomicUnits(getAccountsResponse.total_unlocked_balance, 4);
+                        responseObj.BalanceLocked = CommonXNV.DoubleAmountFromAtomicUnits(getAccountsResponse.total_balance, 4);
 
                         foreach (WalletAccount account in getAccountsResponse.subaddress_accounts)
                         {
@@ -244,8 +344,8 @@ namespace NervaWalletMiner.Rpc.Wallet
                                 Index = account.account_index,
                                 Label = account.label,
                                 Address = GlobalMethods.GetShorterString(account.base_address, 12),
-                                BalanceLocked = GlobalMethods.XnvFromAtomicUnits(account.balance, 1),
-                                BalanceUnlocked = GlobalMethods.XnvFromAtomicUnits(account.unlocked_balance, 1)
+                                BalanceLocked = CommonXNV.DoubleAmountFromAtomicUnits(account.balance, 1),
+                                BalanceUnlocked = CommonXNV.DoubleAmountFromAtomicUnits(account.unlocked_balance, 1)
                             };
 
                             responseObj.SubAccounts.Add(newAccount);
@@ -278,7 +378,7 @@ namespace NervaWalletMiner.Rpc.Wallet
 
         private class WalletAccount
         {
-            public int account_index { get; set; }
+            public uint account_index { get; set; }
             public string base_address { get; set; } = string.Empty;
             public ulong balance { get; set; }
             public ulong unlocked_balance { get; set; }
@@ -356,7 +456,7 @@ namespace NervaWalletMiner.Rpc.Wallet
                                 PaymentId = entry.payment_id,
                                 Height = entry.height,
                                 Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp),
-                                Amount = GlobalMethods.XnvFromAtomicUnits(entry.amount, 2),
+                                Amount = CommonXNV.DoubleAmountFromAtomicUnits(entry.amount, 2),
                                 Type = entry.type
                             };
 
@@ -372,7 +472,7 @@ namespace NervaWalletMiner.Rpc.Wallet
                                 PaymentId = entry.payment_id,
                                 Height = entry.height,
                                 Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp),
-                                Amount = GlobalMethods.XnvFromAtomicUnits(entry.amount, 2),
+                                Amount = CommonXNV.DoubleAmountFromAtomicUnits(entry.amount, 2),
                                 Type = entry.type
                             };
 
@@ -388,7 +488,7 @@ namespace NervaWalletMiner.Rpc.Wallet
                                 PaymentId = entry.payment_id,
                                 Height = entry.height,
                                 Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp),
-                                Amount = GlobalMethods.XnvFromAtomicUnits(entry.amount, 2),
+                                Amount = CommonXNV.DoubleAmountFromAtomicUnits(entry.amount, 2),
                                 Type = entry.type
                             };
 

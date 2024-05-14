@@ -16,6 +16,13 @@ namespace NervaWalletMiner.Rpc.Wallet
 
     public class WalletServiceXMR : IWalletService
     {
+        // TODO: Temporary as I test Nerva
+        public async Task<TransferResponse> Transfer(RpcBase rpc, TransferRequest requestObj)
+        {
+            TransferResponse responseObj = new();
+            return responseObj;
+        }
+
         #region Open Wallet
         /* RPC request params:
          *  std::string filename;
@@ -53,7 +60,7 @@ namespace NervaWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -104,7 +111,7 @@ namespace NervaWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -165,7 +172,7 @@ namespace NervaWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -220,13 +227,13 @@ namespace NervaWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
                         ResGetAccounts getAccountsResponse = JsonConvert.DeserializeObject<ResGetAccounts>(jsonObject.SelectToken("result").ToString());
-                        responseObj.BalanceUnlocked = GlobalMethods.XnvFromAtomicUnits(getAccountsResponse.total_unlocked_balance, 4);
-                        responseObj.BalanceLocked = GlobalMethods.XnvFromAtomicUnits(getAccountsResponse.total_balance, 4);
+                        responseObj.BalanceUnlocked = CommonXMR.DoubleAmountFromAtomicUnits(getAccountsResponse.total_unlocked_balance, 4);
+                        responseObj.BalanceLocked = CommonXMR.DoubleAmountFromAtomicUnits(getAccountsResponse.total_balance, 4);
 
                         foreach (WalletAccount account in getAccountsResponse.subaddress_accounts)
                         {
@@ -235,8 +242,8 @@ namespace NervaWalletMiner.Rpc.Wallet
                                 Index = account.account_index,
                                 Label = account.label,
                                 Address = GlobalMethods.GetShorterString(account.base_address, 12),
-                                BalanceLocked = GlobalMethods.XnvFromAtomicUnits(account.balance, 1),
-                                BalanceUnlocked = GlobalMethods.XnvFromAtomicUnits(account.unlocked_balance, 1)
+                                BalanceLocked = CommonXMR.DoubleAmountFromAtomicUnits(account.balance, 1),
+                                BalanceUnlocked = CommonXMR.DoubleAmountFromAtomicUnits(account.unlocked_balance, 1)
                             };
 
                             responseObj.SubAccounts.Add(newAccount);
@@ -269,7 +276,7 @@ namespace NervaWalletMiner.Rpc.Wallet
 
         private class WalletAccount
         {
-            public int account_index { get; set; }
+            public uint account_index { get; set; }
             public string base_address { get; set; } = string.Empty;
             public ulong balance { get; set; }
             public ulong unlocked_balance { get; set; }
@@ -332,7 +339,7 @@ namespace NervaWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -347,7 +354,7 @@ namespace NervaWalletMiner.Rpc.Wallet
                                 PaymentId = entry.payment_id,
                                 Height = entry.height,
                                 Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp),
-                                Amount = GlobalMethods.XnvFromAtomicUnits(entry.amount, 2),
+                                Amount = CommonXMR.DoubleAmountFromAtomicUnits(entry.amount, 2),
                                 Type = entry.type
                             };
 
@@ -363,7 +370,7 @@ namespace NervaWalletMiner.Rpc.Wallet
                                 PaymentId = entry.payment_id,
                                 Height = entry.height,
                                 Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp),
-                                Amount = GlobalMethods.XnvFromAtomicUnits(entry.amount, 2),
+                                Amount = CommonXMR.DoubleAmountFromAtomicUnits(entry.amount, 2),
                                 Type = entry.type
                             };
 
@@ -379,7 +386,7 @@ namespace NervaWalletMiner.Rpc.Wallet
                                 PaymentId = entry.payment_id,
                                 Height = entry.height,
                                 Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp),
-                                Amount = GlobalMethods.XnvFromAtomicUnits(entry.amount, 2),
+                                Amount = CommonXMR.DoubleAmountFromAtomicUnits(entry.amount, 2),
                                 Type = entry.type
                             };
 

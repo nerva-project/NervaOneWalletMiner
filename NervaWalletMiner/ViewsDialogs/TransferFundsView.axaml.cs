@@ -10,7 +10,7 @@ namespace NervaWalletMiner.ViewsDialogs
 {
     public partial class TransferFundsView : Window
     {
-        Dictionary<int, string> _accounts = [];
+        Dictionary<uint, string> _accounts = [];
         public TransferFundsView()
         {
             InitializeComponent();
@@ -45,10 +45,23 @@ namespace NervaWalletMiner.ViewsDialogs
                 }
                 else
                 {
+                    uint fromAccountIndex = 0;
+                    string? fromAddress = cbxSendFrom.SelectedValue?.ToString();
+
+                    // TODO: Since addresses are shortened, you could potentally have 2 of the same ones
+                    foreach (uint index in _accounts.Keys)
+                    {
+                        if(_accounts[index].Equals(fromAddress))
+                        {
+                            fromAccountIndex = index;
+                        }
+                    }
+
                     DialogResult result = new()
                     {
                         IsOk = true,
-                        SendFromAddress = cbxSendFrom.SelectedValue?.ToString(),
+                        SendFromAddress = fromAddress,
+                        SendFromAddressIndex = fromAccountIndex,
                         SendToAddress = tbxSendTo.Text,
                         SendAmount = Convert.ToDouble(tbxAmount.Text),
                         SendPaymentId = tbxPaymentId.Text

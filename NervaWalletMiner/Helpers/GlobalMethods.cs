@@ -283,11 +283,6 @@ namespace NervaWalletMiner.Helpers
             return text.Length > shorterLength ? text.Substring(0, charsOnEachSide) + "..." + text.Substring(text.Length - charsOnEachSide, charsOnEachSide) : text;
         }
 
-        public static double XnvFromAtomicUnits(ulong balanceAtomic, int decimalPlaces)
-        {
-            return Math.Round(balanceAtomic / 1000000000000.0d, decimalPlaces);
-        }
-
         public static DateTime UnixTimeStampToDateTime(ulong utcTimeStamp)
         {
             return new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddSeconds(utcTimeStamp);
