@@ -40,6 +40,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="ViewsDialogs\CreateWalletView.axaml.cs">
+      <DependentUpon>CreateWalletView.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\DaemonView.axaml.cs">
       <DependentUpon>DaemonView.axaml</DependentUpon>
     </Compile>

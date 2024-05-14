@@ -16,7 +16,7 @@ namespace NervaWalletMiner.Rpc.Wallet
 
     public class WalletServiceXNV : IWalletService
     {
-        #region OpenWallet
+        #region Open Wallet
         /* RPC request params:
          *  std::string filename;
          *  std::string password;
@@ -74,7 +74,7 @@ namespace NervaWalletMiner.Rpc.Wallet
 
             return responseObj;
         }
-        #endregion // OpenWallet
+        #endregion // Open Wallet
 
         #region Close Wallet
         /* RPC request params:
@@ -127,7 +127,78 @@ namespace NervaWalletMiner.Rpc.Wallet
         }
         #endregion // Close Wallet
 
-        #region GetAccounts
+        #region Create Wallet
+        /* RPC request params:
+         *  std::string filename;
+         *  std::string password;
+         *  std::string language;
+         */
+        public async Task<CreateWalletResponse> CreateWallet(RpcBase rpc, CreateWalletRequest requestObj)
+        {
+            CreateWalletResponse responseObj = new();
+
+            try
+            {
+                // Build request content json
+                var requestParams = new JObject
+                {
+                    ["filename"] = requestObj.WalletName,
+                    ["password"] = requestObj.Password,
+                    ["language"] = requestObj.Language
+                };
+
+                var requestJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = "0",
+                    ["method"] = "create_wallet",
+                    ["params"] = requestParams
+                };
+
+                // Call service and process response
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+
+                    var error = JObject.Parse(jsonObject.ToString())["error"];
+                    if (error != null)
+                    {
+                        // Set Service error
+                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                    }
+                    else
+                    {
+                        // Nerva returns this but Monero does not. Don't need it at this point
+                        //ResCreateWallet createWalletResponse = JsonConvert.DeserializeObject<ResCreateWallet>(jsonObject.SelectToken("result").ToString());
+                        //responseObj.Address = createWalletResponse.address;
+                        //responseObj.Seed = createWalletResponse.seed;
+
+                        responseObj.Error.IsError = false;
+                    }
+                }
+                else
+                {
+                    // Set HTTP error
+                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("RWXNV.CW", ex);
+            }
+
+            return responseObj;
+        }
+
+        private class ResCreateWallet
+        {
+            public string address { get; set; } = string.Empty;
+            public string seed { get; set; } = string.Empty;
+        }
+        #endregion // Create Wallet
+
+        #region Get Accounts
         /* RPC request params:
          *  std::string tag;      // all accounts if empty, otherwise those accounts with this tag
          *  bool strict_balances;
@@ -214,9 +285,9 @@ namespace NervaWalletMiner.Rpc.Wallet
             public string label { get; set; } = string.Empty;
             public string tag { get; set; } = string.Empty;
         }
-        #endregion // GetAccounts
+        #endregion // Get Accounts
 
-        #region GetTransfers
+        #region Get Transfers
         /* RPC request params:
          *  bool in;
          *  bool out;
@@ -383,6 +454,6 @@ namespace NervaWalletMiner.Rpc.Wallet
             public uint major { get; set; }
             public uint minor { get; set; }
         }
-        #endregion // GetTransfers
+        #endregion // Get Transfers
     }
 }

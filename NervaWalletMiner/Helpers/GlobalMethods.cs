@@ -399,5 +399,30 @@ namespace NervaWalletMiner.Helpers
 
             return (hasRpcWallet && hasDaemon);
         }
+
+        public static List<string> GetSupportedLanguages()
+        {
+            List<string> languages = [];
+            try
+            {
+                languages.Add(Language.English);
+                languages.Add(Language.German);
+                languages.Add(Language.Spanish);
+                languages.Add(Language.French);
+                languages.Add(Language.Italian);
+                languages.Add(Language.Dutch);
+                languages.Add(Language.Portuguese);
+                languages.Add(Language.Russian);
+                languages.Add(Language.Chinese_Simplified);
+                languages.Add(Language.Esperanto);
+                languages.Add(Language.Lojban);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("PM.GSL", ex);
+            }
+
+            return languages;
+        }
     }
 }

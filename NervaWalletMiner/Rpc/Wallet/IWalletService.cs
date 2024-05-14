@@ -11,6 +11,8 @@ namespace NervaWalletMiner.Rpc.Wallet
 
         Task<CloseWalletResponse> CloseWallet(RpcBase rpc, CloseWalletRequest requestObj);
 
+        Task<CreateWalletResponse> CreateWallet(RpcBase rpc, CreateWalletRequest requestObj);
+
 
         // TODO: Pass optional tag
         Task<GetAccountsResponse> GetAccounts(RpcBase rpc, GetAccountsRequest requestObj);

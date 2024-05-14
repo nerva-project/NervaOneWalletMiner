@@ -2,8 +2,8 @@
 {
     public static class Language
     {
-        public const string German = "German";
         public const string English = "English";
+        public const string German = "German";        
         public const string Spanish = "Spanish";
         public const string French = "French";
         public const string Italian = "Italian";
