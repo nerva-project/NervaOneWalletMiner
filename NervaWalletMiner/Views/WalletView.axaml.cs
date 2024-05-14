@@ -42,7 +42,20 @@ namespace NervaWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("Hom.SSMC", ex);
+                Logger.LogException("Wal.OCWC", ex);
+            }
+        }
+
+        public void TransferFundsClicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                var window = new TransferFundsView();
+                window.ShowDialog(GetWindow()).ContinueWith(DialogClosed);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("Wal.TFC", ex);
             }
         }
 

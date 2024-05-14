@@ -1,0 +1,43 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="500"
+        x:Class="NervaWalletMiner.ViewsDialogs.TransferFundsView"
+		Width="500"
+		Height="500"
+		Topmost="True"
+		WindowStartupLocation="CenterOwner"
+        Title="Transfer Funds">
+	
+	<StackPanel Spacing="5" Margin="10">
+		<Label Content="Send From" />
+		<ComboBox Name="cbxSendFrom"
+				  HorizontalAlignment="Stretch" />
+		
+		<Label Content="Send To" Margin="0,15,0,0" />
+		<TextBox Name="tbxSendTo"
+				 Watermark="Required - receipient wallet address" />
+
+		<Label Content="Amount" Margin="0,15,0,0" />
+		<TextBox Name="tbxAmount"
+				 Watermark="Required - amount to send" />
+
+		<Label Content="Payment Id" Margin="0,15,0,0" />
+		<TextBox Name="tbxPaymentId"
+				 Watermark="Optional - payment Id" />
+
+		<DockPanel Margin="0,15,0,0" >
+			<Button Name="btnOk"
+					Content="OK"
+					Click="OkButtonClicked"
+					IsDefault="True" />
+
+			<Button Name="btnCancel"
+					Content="Cancel"
+					Click="CancelButtonClicked"
+					Margin="10,0,0,0" />
+		</DockPanel>
+	</StackPanel>
+	
+</Window>

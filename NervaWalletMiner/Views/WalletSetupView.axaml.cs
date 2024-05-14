@@ -31,7 +31,7 @@ namespace NervaWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("Hom.SSMC", ex);
+                Logger.LogException("WalS.CWC", ex);
             }
         }
 
