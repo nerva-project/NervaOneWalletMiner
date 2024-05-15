@@ -1,7 +1,7 @@
 ﻿using System;
-using NervaWalletMiner.Helpers;
+using NervaOneWalletMiner.Helpers;
 
-namespace NervaWalletMiner.Rpc.Common
+namespace NervaOneWalletMiner.Rpc.Common
 {
     public static class CommonXNV
     {

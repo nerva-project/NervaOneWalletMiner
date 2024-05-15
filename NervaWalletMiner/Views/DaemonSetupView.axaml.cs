@@ -1,9 +1,9 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using NervaWalletMiner.Helpers;
+using NervaOneWalletMiner.Helpers;
 using System;
 
-namespace NervaWalletMiner.Views
+namespace NervaOneWalletMiner.Views
 {
     public partial class DaemonSetupView : UserControl
     {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using NervaWalletMiner.Objects.DataGrid;
+using NervaOneWalletMiner.Objects.DataGrid;
 
-namespace NervaWalletMiner.Objects.Stats
+namespace NervaOneWalletMiner.Objects.Stats
 {
     public class StatsWallet
     {

@@ -1,6 +1,6 @@
 using Avalonia.Controls;
 
-namespace NervaWalletMiner.Views
+namespace NervaOneWalletMiner.Views
 {
     public partial class StatusBarView : UserControl
     {

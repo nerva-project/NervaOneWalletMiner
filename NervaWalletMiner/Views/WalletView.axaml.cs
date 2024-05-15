@@ -3,16 +3,16 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
-using NervaWalletMiner.Helpers;
-using NervaWalletMiner.Objects;
-using NervaWalletMiner.Objects.Constants;
-using NervaWalletMiner.Rpc.Wallet.Requests;
-using NervaWalletMiner.Rpc.Wallet.Responses;
-using NervaWalletMiner.ViewsDialogs;
+using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Objects;
+using NervaOneWalletMiner.Objects.Constants;
+using NervaOneWalletMiner.Rpc.Wallet.Requests;
+using NervaOneWalletMiner.Rpc.Wallet.Responses;
+using NervaOneWalletMiner.ViewsDialogs;
 using System;
 using System.Threading.Tasks;
 
-namespace NervaWalletMiner.Views
+namespace NervaOneWalletMiner.Views
 {
     public partial class WalletView : UserControl
     {

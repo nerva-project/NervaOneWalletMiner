@@ -1,6 +1,6 @@
-﻿using NervaWalletMiner.Rpc.Common;
+﻿using NervaOneWalletMiner.Rpc.Common;
 
-namespace NervaWalletMiner.Rpc.Wallet.Responses
+namespace NervaOneWalletMiner.Rpc.Wallet.Responses
 {
     public class CreateWalletResponse
     {

@@ -3,7 +3,7 @@
 using Avalonia;
 using Avalonia.ReactiveUI;
 
-namespace NervaWalletMiner.Desktop;
+namespace NervaOneWalletMiner.Desktop;
 
 class Program
 {

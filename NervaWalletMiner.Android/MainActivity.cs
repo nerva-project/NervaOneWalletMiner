@@ -5,10 +5,10 @@ using Avalonia;
 using Avalonia.Android;
 using Avalonia.ReactiveUI;
 
-namespace NervaWalletMiner.Android;
+namespace NervaOneWalletMiner.Android;
 
 [Activity(
-    Label = "NervaWalletMiner.Android",
+    Label = "NervaOneWalletMiner.Android",
     Theme = "@style/MyTheme.NoActionBar",
     Icon = "@drawable/icon",
     MainLauncher = true,

@@ -1,6 +1,6 @@
-﻿using NervaWalletMiner.Rpc.Common;
+﻿using NervaOneWalletMiner.Rpc.Common;
 
-namespace NervaWalletMiner.Objects.Settings
+namespace NervaOneWalletMiner.Objects.Settings
 {
     public class SettingsDaemon(uint rcpPort)
     {

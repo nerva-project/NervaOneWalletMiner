@@ -1,7 +1,7 @@
-﻿using NervaWalletMiner.Helpers;
+﻿using NervaOneWalletMiner.Helpers;
 using System;
 
-namespace NervaWalletMiner.Rpc.Common
+namespace NervaOneWalletMiner.Rpc.Common
 {
     public static class CommonXMR
     {

@@ -1,4 +1,4 @@
-﻿namespace NervaWalletMiner.Rpc.Wallet.Requests
+﻿namespace NervaOneWalletMiner.Rpc.Wallet.Requests
 {
     public class OpenWalletRequest
     {

@@ -1,7 +1,7 @@
-﻿using NervaWalletMiner.Helpers;
-using NervaWalletMiner.Rpc.Common;
+﻿using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Rpc.Common;
 
-namespace NervaWalletMiner.Objects.Settings
+namespace NervaOneWalletMiner.Objects.Settings
 {
     public class SettingsWallet
     {

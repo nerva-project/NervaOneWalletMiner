@@ -1,7 +1,7 @@
-﻿using NervaWalletMiner.Rpc.Common;
+﻿using NervaOneWalletMiner.Rpc.Common;
 using System.Collections.Generic;
 
-namespace NervaWalletMiner.Rpc.Wallet.Requests
+namespace NervaOneWalletMiner.Rpc.Wallet.Requests
 {
     public class TransferRequest
     {

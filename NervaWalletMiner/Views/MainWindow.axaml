@@ -1,15 +1,15 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="using:NervaWalletMiner.ViewModels"
+        xmlns:vm="using:NervaOneWalletMiner.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:views="clr-namespace:NervaWalletMiner.Views"
+        xmlns:views="clr-namespace:NervaOneWalletMiner.Views"
 		Width="800"
 		Height="650"
         mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="550"
-        x:Class="NervaWalletMiner.Views.MainWindow"
+        x:Class="NervaOneWalletMiner.Views.MainWindow"
         Icon="/Assets/nerva-logo.ico"
-        Title="Nerva Wallet and Miner">
+        Title="NervaOne Wallet and Miner">
 
 	<Grid>
         <views:MainView />

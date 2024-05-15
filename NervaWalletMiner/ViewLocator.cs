@@ -1,9 +1,9 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using System;
-using NervaWalletMiner.ViewModels;
+using NervaOneWalletMiner.ViewModels;
 
-namespace NervaWalletMiner
+namespace NervaOneWalletMiner
 {
     public class ViewLocator : IDataTemplate
     {

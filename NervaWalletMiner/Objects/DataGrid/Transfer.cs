@@ -1,7 +1,7 @@
 ﻿using Avalonia.Media.Imaging;
 using System;
 
-namespace NervaWalletMiner.Objects.DataGrid
+namespace NervaOneWalletMiner.Objects.DataGrid
 {
     public class Transfer
     {

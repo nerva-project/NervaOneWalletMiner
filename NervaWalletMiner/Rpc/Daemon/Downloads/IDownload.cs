@@ -1,4 +1,4 @@
-﻿namespace NervaWalletMiner.Rpc.Daemon.Downloads
+﻿namespace NervaOneWalletMiner.Rpc.Daemon.Downloads
 {
     public interface IDownload
     {

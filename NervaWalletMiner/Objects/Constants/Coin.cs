@@ -1,4 +1,4 @@
-﻿namespace NervaWalletMiner.Objects.Constants
+﻿namespace NervaOneWalletMiner.Objects.Constants
 {
     public static class Coin
     {

@@ -1,4 +1,4 @@
-﻿namespace NervaWalletMiner.Rpc.Common
+﻿namespace NervaOneWalletMiner.Rpc.Common
 {
     public class ServiceError
     {

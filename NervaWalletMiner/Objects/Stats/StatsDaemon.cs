@@ -1,6 +1,6 @@
-﻿using NervaWalletMiner.Objects.Constants;
+﻿using NervaOneWalletMiner.Objects.Constants;
 
-namespace NervaWalletMiner.Objects.Stats
+namespace NervaOneWalletMiner.Objects.Stats
 {
     public class StatsDaemon
     {

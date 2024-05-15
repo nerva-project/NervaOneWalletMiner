@@ -1,6 +1,6 @@
 ﻿using UIKit;
 
-namespace NervaWalletMiner.iOS;
+namespace NervaOneWalletMiner.iOS;
 
 public class Application
 {

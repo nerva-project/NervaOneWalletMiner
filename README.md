@@ -6,18 +6,18 @@ To compile, you'll need dotnet SDK 8. You can install it for your operating syst
 [DOTNET SDK 8][dotnet-sdk-8]
  
 ## Command line
-Go to directory where you want to create NervaWalletMiner folder and run these commands:
+Go to directory where you want to create NervaOneWalletMiner folder and run these commands:
 
 ```
-rm -rf ./NervaWalletMiner/
-```
-
-```
-git clone https://github.com/nerva-project/NervaWalletMiner.git
+rm -rf ./NervaOneWalletMiner/
 ```
 
 ```
-cd NervaWalletMiner/NervaWalletMiner.Desktop
+git clone https://github.com/nerva-project/NervaOneWalletMiner.git
+```
+
+```
+cd NervaWalletMiner/NervaOneWalletMiner.Desktop
 ```
 
 ```

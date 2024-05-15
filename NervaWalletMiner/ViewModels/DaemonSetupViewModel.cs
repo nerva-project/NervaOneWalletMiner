@@ -1,8 +1,8 @@
 ﻿using Avalonia.Media.Imaging;
-using NervaWalletMiner.Helpers;
+using NervaOneWalletMiner.Helpers;
 using ReactiveUI;
 
-namespace NervaWalletMiner.ViewModels
+namespace NervaOneWalletMiner.ViewModels
 {
     internal class DaemonSetupViewModel : ViewModelBase
     {

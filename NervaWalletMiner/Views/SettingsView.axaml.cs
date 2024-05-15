@@ -2,12 +2,12 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Styling;
-using NervaWalletMiner.Helpers;
-using NervaWalletMiner.Objects.Constants;
-using NervaWalletMiner.Rpc;
+using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Objects.Constants;
+using NervaOneWalletMiner.Rpc;
 using System;
 
-namespace NervaWalletMiner.Views
+namespace NervaOneWalletMiner.Views
 {
     public partial class SettingsView : UserControl
     {

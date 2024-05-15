@@ -1,19 +1,19 @@
 ﻿using Avalonia.Media.Imaging;
-using NervaWalletMiner.Objects.Constants;
-using NervaWalletMiner.Objects.DataGrid;
-using NervaWalletMiner.Objects.Settings;
-using NervaWalletMiner.Objects.Stats;
-using NervaWalletMiner.Rpc.Daemon;
-using NervaWalletMiner.Rpc.Daemon.Downloads;
-using NervaWalletMiner.Rpc.Wallet;
+using NervaOneWalletMiner.Objects.Constants;
+using NervaOneWalletMiner.Objects.DataGrid;
+using NervaOneWalletMiner.Objects.Settings;
+using NervaOneWalletMiner.Objects.Stats;
+using NervaOneWalletMiner.Rpc.Daemon;
+using NervaOneWalletMiner.Rpc.Daemon.Downloads;
+using NervaOneWalletMiner.Rpc.Wallet;
 using System;
 using System.Collections.Generic;
 
-namespace NervaWalletMiner.Helpers
+namespace NervaOneWalletMiner.Helpers
 {
     public static class GlobalData
     {
-        public const string AppName = "NervaWalletMiner";
+        public const string AppName = "NervaOneWalletMiner";
         public const string Version = "0.5.0";
 
         public const string CliToolsDirName = "cli";

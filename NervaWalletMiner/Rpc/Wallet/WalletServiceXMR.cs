@@ -1,8 +1,8 @@
-﻿using NervaWalletMiner.Helpers;
-using NervaWalletMiner.Objects.DataGrid;
-using NervaWalletMiner.Rpc.Common;
-using NervaWalletMiner.Rpc.Wallet.Requests;
-using NervaWalletMiner.Rpc.Wallet.Responses;
+﻿using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Objects.DataGrid;
+using NervaOneWalletMiner.Rpc.Common;
+using NervaOneWalletMiner.Rpc.Wallet.Requests;
+using NervaOneWalletMiner.Rpc.Wallet.Responses;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace NervaWalletMiner.Rpc.Wallet
+namespace NervaOneWalletMiner.Rpc.Wallet
 {
     // Monero implementation as of 5/13/24: https://github.com/monero-project/monero
 

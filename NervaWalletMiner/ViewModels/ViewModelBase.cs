@@ -1,6 +1,6 @@
 ﻿using ReactiveUI;
 
-namespace NervaWalletMiner.ViewModels;
+namespace NervaOneWalletMiner.ViewModels;
 
 public partial class ViewModelBase : ReactiveObject
 {

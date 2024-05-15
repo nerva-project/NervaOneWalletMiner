@@ -1,12 +1,12 @@
-﻿using NervaWalletMiner.Objects.DataGrid;
-using NervaWalletMiner.Rpc.Common;
+﻿using NervaOneWalletMiner.Objects.DataGrid;
+using NervaOneWalletMiner.Rpc.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NervaWalletMiner.Rpc.Daemon.Responses
+namespace NervaOneWalletMiner.Rpc.Daemon.Responses
 {
     public class GetConnectionsResponse
     {

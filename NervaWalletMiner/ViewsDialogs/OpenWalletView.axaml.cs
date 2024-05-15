@@ -1,12 +1,12 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using NervaWalletMiner.Helpers;
-using NervaWalletMiner.Objects;
+using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Objects;
 using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace NervaWalletMiner.ViewsDialogs
+namespace NervaOneWalletMiner.ViewsDialogs
 {
     public partial class OpenWalletView : Window
     {

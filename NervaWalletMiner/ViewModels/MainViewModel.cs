@@ -2,14 +2,14 @@
 using Avalonia.Controls.Selection;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
-using NervaWalletMiner.Helpers;
-using NervaWalletMiner.Objects.Constants;
-using NervaWalletMiner.Objects.DataGrid;
-using NervaWalletMiner.Rpc;
-using NervaWalletMiner.Rpc.Daemon.Requests;
-using NervaWalletMiner.Rpc.Daemon.Responses;
-using NervaWalletMiner.Rpc.Wallet.Requests;
-using NervaWalletMiner.Rpc.Wallet.Responses;
+using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Objects.Constants;
+using NervaOneWalletMiner.Objects.DataGrid;
+using NervaOneWalletMiner.Rpc;
+using NervaOneWalletMiner.Rpc.Daemon.Requests;
+using NervaOneWalletMiner.Rpc.Daemon.Responses;
+using NervaOneWalletMiner.Rpc.Wallet.Requests;
+using NervaOneWalletMiner.Rpc.Wallet.Responses;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
@@ -17,7 +17,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows.Input;
 
-namespace NervaWalletMiner.ViewModels;
+namespace NervaOneWalletMiner.ViewModels;
 
 public class MainViewModel : ViewModelBase
 {
@@ -33,10 +33,10 @@ public class MainViewModel : ViewModelBase
 
     public static Dictionary<string, ViewModelBase> ViewModelPagesDictionary = new();
 
-    public static readonly Bitmap _inImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaWalletMiner/Assets/transfer_in.png")));
-    public static readonly Bitmap _outImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaWalletMiner/Assets/transfer_out.png")));
-    public static readonly Bitmap _blockImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaWalletMiner/Assets/transfer_block.png")));
-    public static readonly Bitmap _walletImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaWalletMiner/Assets/wallet.png")));
+    public static readonly Bitmap _inImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/transfer_in.png")));
+    public static readonly Bitmap _outImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/transfer_out.png")));
+    public static readonly Bitmap _blockImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/transfer_block.png")));
+    public static readonly Bitmap _walletImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/wallet.png")));
 
     public static bool _isTransfersUpdateComplete = true;
 

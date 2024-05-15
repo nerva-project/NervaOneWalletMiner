@@ -1,4 +1,4 @@
-﻿namespace NervaWalletMiner.Rpc.Daemon.Requests
+﻿namespace NervaOneWalletMiner.Rpc.Daemon.Requests
 {
     public class GetConnectionsRequest
     {

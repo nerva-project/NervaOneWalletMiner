@@ -5,7 +5,7 @@ using log4net.Appender;
 using log4net.Layout;
 using log4net.Repository.Hierarchy;
 
-namespace NervaWalletMiner.Helpers
+namespace NervaOneWalletMiner.Helpers
 {
     public static class Logger
     {        

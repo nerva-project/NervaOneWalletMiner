@@ -1,6 +1,6 @@
-﻿using NervaWalletMiner.Objects.Constants;
+﻿using NervaOneWalletMiner.Objects.Constants;
 
-namespace NervaWalletMiner.Objects
+namespace NervaOneWalletMiner.Objects
 {
     public class DialogResult
     {

@@ -1,7 +1,7 @@
-﻿using NervaWalletMiner.Rpc.Common;
+﻿using NervaOneWalletMiner.Rpc.Common;
 using System;
 
-namespace NervaWalletMiner.Rpc.Daemon.Responses
+namespace NervaOneWalletMiner.Rpc.Daemon.Responses
 {
     public class GetInfoResponse
     {

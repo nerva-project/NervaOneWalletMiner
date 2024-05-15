@@ -1,12 +1,12 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
-using NervaWalletMiner.Helpers;
-using NervaWalletMiner.Objects.Constants;
-using NervaWalletMiner.Rpc.Daemon.Requests;
-using NervaWalletMiner.Rpc.Daemon.Responses;
+using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Objects.Constants;
+using NervaOneWalletMiner.Rpc.Daemon.Requests;
+using NervaOneWalletMiner.Rpc.Daemon.Responses;
 using System;
 
-namespace NervaWalletMiner.Views
+namespace NervaOneWalletMiner.Views
 {
     public partial class DaemonView : UserControl
     {

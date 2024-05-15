@@ -1,6 +1,6 @@
-﻿using NervaWalletMiner.Helpers;
+﻿using NervaOneWalletMiner.Helpers;
 
-namespace NervaWalletMiner.Rpc.Common
+namespace NervaOneWalletMiner.Rpc.Common
 {
     public class RpcBase(uint port)
     {

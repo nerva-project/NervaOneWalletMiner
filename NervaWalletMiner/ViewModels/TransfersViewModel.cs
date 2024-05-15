@@ -1,11 +1,11 @@
 ﻿using Avalonia.Media.Imaging;
-using NervaWalletMiner.Helpers;
-using NervaWalletMiner.Objects.Constants;
-using NervaWalletMiner.Objects.DataGrid;
+using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Objects.Constants;
+using NervaOneWalletMiner.Objects.DataGrid;
 using ReactiveUI;
 using System.Collections.Generic;
 
-namespace NervaWalletMiner.ViewModels
+namespace NervaOneWalletMiner.ViewModels
 {
     internal class TransfersViewModel : ViewModelBase
     {

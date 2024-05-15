@@ -1,11 +1,11 @@
 ﻿using Avalonia.Media.Imaging;
 using Avalonia.Platform;
-using NervaWalletMiner.Objects.Constants;
-using NervaWalletMiner.Objects.Settings;
-using NervaWalletMiner.Rpc;
-using NervaWalletMiner.Rpc.Daemon;
-using NervaWalletMiner.Rpc.Daemon.Downloads;
-using NervaWalletMiner.Rpc.Wallet;
+using NervaOneWalletMiner.Objects.Constants;
+using NervaOneWalletMiner.Objects.Settings;
+using NervaOneWalletMiner.Rpc;
+using NervaOneWalletMiner.Rpc.Daemon;
+using NervaOneWalletMiner.Rpc.Daemon.Downloads;
+using NervaOneWalletMiner.Rpc.Wallet;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,7 +15,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace NervaWalletMiner.Helpers
+namespace NervaOneWalletMiner.Helpers
 {
     public static class GlobalMethods
     {
@@ -408,11 +408,11 @@ namespace NervaWalletMiner.Helpers
             switch (GlobalData.AppSettings.ActiveCoin)
             {
                 case Coin.XMR:
-                    logo = new Bitmap(AssetLoader.Open(new Uri("avares://NervaWalletMiner/Assets/xmr/logo.png")));
+                    logo = new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/xmr/logo.png")));
                     break;
                 default:
                     // XNV or anything else not supported
-                    logo = new Bitmap(AssetLoader.Open(new Uri("avares://NervaWalletMiner/Assets/xnv/logo.png")));
+                    logo = new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/xnv/logo.png")));
                     break;
             }
 

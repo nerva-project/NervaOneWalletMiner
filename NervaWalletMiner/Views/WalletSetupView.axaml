@@ -2,9 +2,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-			 xmlns:vm="clr-namespace:NervaWalletMiner.ViewModels"
+			 xmlns:vm="clr-namespace:NervaOneWalletMiner.ViewModels"
              mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="550"
-             x:Class="NervaWalletMiner.Views.WalletSetupView">
+             x:Class="NervaOneWalletMiner.Views.WalletSetupView">
 
 	<Design.DataContext>
 		<vm:WalletSetupViewModel />

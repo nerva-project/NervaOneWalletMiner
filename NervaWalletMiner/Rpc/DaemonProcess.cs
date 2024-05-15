@@ -1,10 +1,10 @@
-﻿using NervaWalletMiner.Helpers;
-using NervaWalletMiner.Objects;
-using NervaWalletMiner.Objects.Settings;
+﻿using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Objects;
+using NervaOneWalletMiner.Objects.Settings;
 using System.Diagnostics;
 using System.Runtime;
 
-namespace NervaWalletMiner.Rpc
+namespace NervaOneWalletMiner.Rpc
 {
     public static class DaemonProcess
     {

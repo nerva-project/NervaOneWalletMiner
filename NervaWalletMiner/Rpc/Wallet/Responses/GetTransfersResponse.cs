@@ -1,8 +1,8 @@
-﻿using NervaWalletMiner.Objects.DataGrid;
-using NervaWalletMiner.Rpc.Common;
+﻿using NervaOneWalletMiner.Objects.DataGrid;
+using NervaOneWalletMiner.Rpc.Common;
 using System.Collections.Generic;
 
-namespace NervaWalletMiner.Rpc.Wallet.Responses
+namespace NervaOneWalletMiner.Rpc.Wallet.Responses
 {
     public class GetTransfersResponse
     {

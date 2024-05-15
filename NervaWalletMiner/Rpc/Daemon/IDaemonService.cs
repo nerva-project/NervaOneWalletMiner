@@ -1,9 +1,9 @@
-﻿using NervaWalletMiner.Rpc.Common;
-using NervaWalletMiner.Rpc.Daemon.Requests;
-using NervaWalletMiner.Rpc.Daemon.Responses;
+﻿using NervaOneWalletMiner.Rpc.Common;
+using NervaOneWalletMiner.Rpc.Daemon.Requests;
+using NervaOneWalletMiner.Rpc.Daemon.Responses;
 using System.Threading.Tasks;
 
-namespace NervaWalletMiner.Rpc.Daemon
+namespace NervaOneWalletMiner.Rpc.Daemon
 {
     public interface IDaemonService
     {

@@ -1,10 +1,10 @@
-﻿using NervaWalletMiner.Helpers;
+﻿using NervaOneWalletMiner.Helpers;
 using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
-namespace NervaWalletMiner.Rpc.Common
+namespace NervaOneWalletMiner.Rpc.Common
 {
     public static class HttpHelper
     {

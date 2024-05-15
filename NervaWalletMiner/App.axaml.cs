@@ -2,14 +2,14 @@
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
-using NervaWalletMiner.Helpers;
-using NervaWalletMiner.Objects.Constants;
-using NervaWalletMiner.Rpc;
-using NervaWalletMiner.ViewModels;
-using NervaWalletMiner.Views;
+using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Objects.Constants;
+using NervaOneWalletMiner.Rpc;
+using NervaOneWalletMiner.ViewModels;
+using NervaOneWalletMiner.Views;
 using System;
 
-namespace NervaWalletMiner;
+namespace NervaOneWalletMiner;
 
 public partial class App : Application
 {

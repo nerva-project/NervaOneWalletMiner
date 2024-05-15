@@ -1,4 +1,4 @@
-﻿namespace NervaWalletMiner.ViewModels
+﻿namespace NervaOneWalletMiner.ViewModels
 {
     internal class OpenWalletViewModel : ViewModelBase
     {

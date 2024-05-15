@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NervaWalletMiner.Rpc.Daemon.Downloads
+namespace NervaOneWalletMiner.Rpc.Daemon.Downloads
 {
     internal class DownloadXMR : IDownload
     {

@@ -1,11 +1,11 @@
-﻿using NervaWalletMiner.Helpers;
+﻿using NervaOneWalletMiner.Helpers;
 using ReactiveUI;
 using System.Diagnostics;
 using System;
 using System.Windows.Input;
 using Avalonia.Media.Imaging;
 
-namespace NervaWalletMiner.ViewModels
+namespace NervaOneWalletMiner.ViewModels
 {
     internal class SettingsViewModel : ViewModelBase
     {

@@ -1,8 +1,8 @@
-﻿using NervaWalletMiner.Objects.DataGrid;
-using NervaWalletMiner.Helpers;
-using NervaWalletMiner.Rpc.Common;
-using NervaWalletMiner.Rpc.Daemon.Requests;
-using NervaWalletMiner.Rpc.Daemon.Responses;
+﻿using NervaOneWalletMiner.Objects.DataGrid;
+using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Rpc.Common;
+using NervaOneWalletMiner.Rpc.Daemon.Requests;
+using NervaOneWalletMiner.Rpc.Daemon.Responses;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace NervaWalletMiner.Rpc.Daemon
+namespace NervaOneWalletMiner.Rpc.Daemon
 {
     // Nerva implementation as of 5/10/24: https://github.com/nerva-project/nerva
 

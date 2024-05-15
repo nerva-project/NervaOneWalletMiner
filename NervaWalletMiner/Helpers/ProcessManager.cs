@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 
-namespace NervaWalletMiner.Helpers
+namespace NervaOneWalletMiner.Helpers
 {
     public static class ProcessManager
     {

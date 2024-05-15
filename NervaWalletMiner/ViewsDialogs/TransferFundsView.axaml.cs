@@ -1,12 +1,12 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using NervaWalletMiner.Helpers;
-using NervaWalletMiner.Objects;
-using NervaWalletMiner.Objects.DataGrid;
+using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Objects;
+using NervaOneWalletMiner.Objects.DataGrid;
 using System;
 using System.Collections.Generic;
 
-namespace NervaWalletMiner.ViewsDialogs
+namespace NervaOneWalletMiner.ViewsDialogs
 {
     public partial class TransferFundsView : Window
     {
