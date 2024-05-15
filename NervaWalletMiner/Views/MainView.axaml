@@ -15,7 +15,7 @@
 	<Grid RowDefinitions="*,50">
 		<SplitView IsPaneOpen="{Binding IsPaneOpen}"
 				   DisplayMode="CompactInline"
-				   OpenPaneLength="150"
+				   OpenPaneLength="160"
 				   CompactPaneLength="46"
 				   Grid.Row="0">
 			<SplitView.Pane>
@@ -37,19 +37,27 @@
 								<TextBlock Text="Wallet" />
 							</StackPanel>
 						</ListBoxItem>
-						<ListBoxItem Name="wallet_setup">
-							<StackPanel Spacing="12" Orientation="Horizontal">
-								<PathIcon Height="20" Data="{StaticResource WalletSetupIcon}" />
-								<TextBlock Text="Wallet Setup" />
-							</StackPanel>
-						</ListBoxItem>
-						<ListBoxItem Name="transfers">
+						<ListBoxItem Name="transfers" >
 							<StackPanel Spacing="12" Orientation="Horizontal">
 								<PathIcon Height="20" Data="{StaticResource TransfersIcon}" />
 								<TextBlock Text="Transfers" />
 							</StackPanel>
 						</ListBoxItem>
 
+						<ListBoxItem Name="space" Padding="15" IsEnabled="False" />
+						
+						<ListBoxItem Name="daemon_setup" >
+							<StackPanel Spacing="12" Orientation="Horizontal">
+								<PathIcon Height="20" Data="{StaticResource DaemonSetupIcon}" />
+								<TextBlock Text="Daemon Setup" />
+							</StackPanel>
+						</ListBoxItem>
+						<ListBoxItem Name="wallet_setup">
+							<StackPanel Spacing="12" Orientation="Horizontal">
+								<PathIcon Height="20" Data="{StaticResource WalletSetupIcon}" />
+								<TextBlock Text="Wallet Setup" />
+							</StackPanel>
+						</ListBoxItem>
 						<ListBoxItem Name="settings" >
 							<StackPanel Spacing="12" Orientation="Horizontal">
 								<PathIcon Height="20" Data="{StaticResource SettingsIcon}" />

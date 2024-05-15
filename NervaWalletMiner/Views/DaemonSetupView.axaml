@@ -4,24 +4,24 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:vm="clr-namespace:NervaWalletMiner.ViewModels"
              mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="550"
-             x:Class="NervaWalletMiner.Views.WalletSetupView">
+             x:Class="NervaWalletMiner.Views.DaemonSetupView">
 
 	<Design.DataContext>
-		<vm:WalletSetupViewModel />
+		<vm:DaemonSetupViewModel />
 	</Design.DataContext>
-
+	
 	<StackPanel Spacing="5" Margin="10" HorizontalAlignment="Stretch" MaxWidth="650">
 
-			<Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="24,*">
-				<Image Grid.Row="0" Grid.Column="0" Source="{Binding CoinIcon}"></Image>
-				<Label Grid.Row="0" Grid.Column="1" Height="24">Wallet Setup</Label>
-			</Grid>
+		<Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="24,*">
+			<Image Grid.Row="0" Grid.Column="0" Source="{Binding CoinIcon}"></Image>
+			<Label Grid.Row="0" Grid.Column="1" Height="24">Daemon Setup</Label>
+		</Grid>
 
-			<Button Name="btnCreateWallet"
-					Content="Create New Wallet"
-					DockPanel.Dock="Right"
-					Margin="0,10,0,0"
-					Click="CreateWalletClicked"/>
+		<Button Name="btnCheckForUpdates"
+				Content="Check for updates"
+				DockPanel.Dock="Right"
+				Margin="0,10,0,0"
+				Click="CheckForUpdatesClicked"/>
 
 	</StackPanel>
 	

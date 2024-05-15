@@ -51,9 +51,10 @@ public class MainViewModel : ViewModelBase
     {
         // Set up split view pages
         ViewModelPagesDictionary.Add(SplitViewPages.Daemon, new DaemonViewModel());
-        ViewModelPagesDictionary.Add(SplitViewPages.Wallet, new WalletViewModel());
-        ViewModelPagesDictionary.Add(SplitViewPages.WalletSetup, new WalletSetupViewModel());
+        ViewModelPagesDictionary.Add(SplitViewPages.Wallet, new WalletViewModel());        
         ViewModelPagesDictionary.Add(SplitViewPages.Transfers, new TransfersViewModel());
+        ViewModelPagesDictionary.Add(SplitViewPages.DaemonSetup, new DaemonSetupViewModel());
+        ViewModelPagesDictionary.Add(SplitViewPages.WalletSetup, new WalletSetupViewModel());
         ViewModelPagesDictionary.Add(SplitViewPages.Settings, new SettingsViewModel());
 
         TriggerPaneCommand = ReactiveCommand.Create(TriggerPane);
@@ -118,11 +119,14 @@ public class MainViewModel : ViewModelBase
             case SplitViewPages.Wallet:
                 CurrentPage = ViewModelPagesDictionary[SplitViewPages.Wallet];
                 break;
-            case SplitViewPages.WalletSetup:
-                CurrentPage = ViewModelPagesDictionary[SplitViewPages.WalletSetup];
-                break;
             case SplitViewPages.Transfers:
                 CurrentPage = ViewModelPagesDictionary[SplitViewPages.Transfers];
+                break;
+            case SplitViewPages.DaemonSetup:
+                CurrentPage = ViewModelPagesDictionary[SplitViewPages.DaemonSetup];
+                break;
+            case SplitViewPages.WalletSetup:
+                CurrentPage = ViewModelPagesDictionary[SplitViewPages.WalletSetup];
                 break;
             case SplitViewPages.Settings:
                 CurrentPage = ViewModelPagesDictionary[SplitViewPages.Settings];
