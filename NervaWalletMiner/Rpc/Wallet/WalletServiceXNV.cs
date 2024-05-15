@@ -218,38 +218,36 @@ namespace NervaWalletMiner.Rpc.Wallet
             try
             {
                 // Build request content json
-                List<JObject> requestDestinations = [];
+
+                // Doing var and building JObject was causing issue, adding escape character / to destination strings hence causing transfers to fail:
+                //  Code: -20, Message: No destinations for this transfer
+                dynamic paramsJson = new JObject();
+                dynamic destinationsJson = new JArray();
                 foreach (Common.TransferDestination destination in requestObj.Destinations)
                 {
-                    var estination = new JObject
-                    {
-                        ["amount"] = CommonXNV.AtomicUnitsFromDoubleAmount(destination.Amount),
-                        ["address"] = destination.Address
-                    };
-
-                    requestDestinations.Add(estination);
+                    dynamic newDest = new JObject();
+                    newDest.amount = CommonXNV.AtomicUnitsFromDoubleAmount(destination.Amount);
+                    newDest.address = destination.Address;
+                    destinationsJson.Add(newDest);
                 }
+                paramsJson.destinations = destinationsJson;
 
-                var requestParams = new JObject
-                {
-                    ["destinations"] = JsonConvert.SerializeObject(requestDestinations, Formatting.None),
-                    ["account_index"] = requestObj.AccountIndex,
-                    ["subaddr_indices"] = JsonConvert.SerializeObject(requestObj.SubAddressIndices, Formatting.None),
-                    ["priority"] = requestObj.Priority,
-                    ["unlock_time"] = requestObj.UnlockTime,
-                    ["payment_id"] = requestObj.PaymentId is null ? "" : requestObj.PaymentId,
-                    ["get_tx_key"] = requestObj.GetTxKey,
-                    ["do_not_relay"] = requestObj.DoNotRelay,
-                    ["get_tx_hex"] = requestObj.GetTxHex,
-                    ["get_tx_metadata"] = requestObj.GetTxMetadata
-                };
+                paramsJson.account_index = requestObj.AccountIndex;
+                paramsJson.subaddr_indices = new JArray(requestObj.SubAddressIndices);
+                paramsJson.priority = requestObj.Priority;
+                paramsJson.unlock_time = requestObj.UnlockTime;
+                paramsJson.payment_id = requestObj.PaymentId is null ? "" : requestObj.PaymentId;
+                paramsJson.get_tx_key = requestObj.GetTxKey;
+                paramsJson.do_not_relay = requestObj.DoNotRelay;
+                paramsJson.get_tx_hex = requestObj.GetTxHex;
+                paramsJson.get_tx_metadata = requestObj.GetTxMetadata;
 
                 var requestJson = new JObject
                 {
                     ["jsonrpc"] = "2.0",
                     ["id"] = "0",
                     ["method"] = "transfer",
-                    ["params"] = requestParams
+                    ["params"] = paramsJson
                 };
 
                 // Call service and process response
