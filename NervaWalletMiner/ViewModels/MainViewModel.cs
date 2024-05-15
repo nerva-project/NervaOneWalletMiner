@@ -37,6 +37,8 @@ public class MainViewModel : ViewModelBase
     public static readonly Bitmap _blockImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaWalletMiner/Assets/transfer_block.png")));
     public static readonly Bitmap _walletImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaWalletMiner/Assets/wallet.png")));
 
+    public static bool _isTransfersUpdateComplete = true;
+
     public static string _currentCoin = GlobalData.AppSettings.ActiveCoin;
 
     private bool? _isPaneOpen = false;
@@ -322,19 +324,23 @@ public class MainViewModel : ViewModelBase
             if (((TransfersViewModel)ViewModelPagesDictionary[SplitViewPages.Transfers]).Transactions.Count == 0)
             {
                 ((TransfersViewModel)ViewModelPagesDictionary[SplitViewPages.Transfers]).Transactions = GlobalData.TransfersStats.Transactions.Values.ToList<Transfer>().OrderByDescending(tr => tr.Height).ToList();
+                // Need to reset so we do not process transactions every second until next update
+                GlobalData.TransfersStats.Transactions = [];
             }
             else
             {
                 List<Transfer> newTransfers = [];
 
-                foreach (string transactionId in GlobalData.TransfersStats.Transactions.Keys)
+                foreach (string newTransferKey in GlobalData.TransfersStats.Transactions.Keys)
                 {
                     // Check if transaction already exists in datagrid and add it to the top if it does not
-                    if (!((TransfersViewModel)ViewModelPagesDictionary[SplitViewPages.Transfers]).Transactions.Any(transfer => transfer.TransactionId == transactionId))
+                    if (!((TransfersViewModel)ViewModelPagesDictionary[SplitViewPages.Transfers]).Transactions.Any(transfer => transfer.TransactionId + "_" + transfer.Type == newTransferKey))
                     {
-                        newTransfers.Add(GlobalData.TransfersStats.Transactions[transactionId]);
+                        newTransfers.Add(GlobalData.TransfersStats.Transactions[newTransferKey]);
                     }
                 }
+                // Need to reset so we do not process transactions every second until next update
+                GlobalData.TransfersStats.Transactions = [];
 
                 if (newTransfers.Count > 0)
                 {
@@ -691,58 +697,57 @@ public class MainViewModel : ViewModelBase
     {
         try
         {
-            // TODO: Kepp track of latest transaction height and set min_hight
-            // Scanning from height 0 can take 15+ seconds and is CPU intensive
-
-            // Get transactions for Transfers view
-            GetTransfersRequest reqTransfers = new GetTransfersRequest();
-            reqTransfers.IncludeIn = true;
-            reqTransfers.IncludeOut = true;
-            reqTransfers.IncludePending = true;
-            reqTransfers.IncludeFailed = false;
-            reqTransfers.IncludePool = false;
-            reqTransfers.IsFilterByHeight = true;
-            reqTransfers.MinHeight = GlobalData.NewestTransactionHeight;
-            reqTransfers.AccountIndex = 0;
-            reqTransfers.SubaddressIndices = [];
-            reqTransfers.IsAllAccounts = true;
-
-            // TODO: Remove stopwatch when no longer needed
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-            GetTransfersResponse resTransfers = await GlobalData.WalletService.GetTransfers(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, reqTransfers);
-            stopwatch.Stop();
-
-            if (resTransfers.Error.IsError)
+            if (_isTransfersUpdateComplete)
             {
-                Logger.LogError("Main.WUU", "GetTransfers Error Code: " + resTransfers.Error.Code + ", Message: " + resTransfers.Error.Message);
-            }
-            else
-            {
-                GlobalData.TransfersStats.Transactions = [];
+                // Wait for one GetTransactions to finish before calling next one
+                _isTransfersUpdateComplete = false;
 
-                foreach (Transfer transfer in resTransfers.Transfers)
+                // TODO: Kepp track of latest transaction height and set min_hight
+                // Scanning from height 0 can take 15+ seconds and is CPU intensive
+
+                // Get transactions for Transfers view
+                GetTransfersRequest reqTransfers = new GetTransfersRequest();
+                reqTransfers.IncludeIn = true;
+                reqTransfers.IncludeOut = true;
+                reqTransfers.IncludePending = true;
+                reqTransfers.IncludeFailed = false;
+                reqTransfers.IncludePool = false;
+                reqTransfers.IsFilterByHeight = true;
+                reqTransfers.MinHeight = GlobalData.NewestTransactionHeight;
+                reqTransfers.AccountIndex = 0;
+                reqTransfers.SubaddressIndices = [];
+                reqTransfers.IsAllAccounts = true;
+
+                // TODO: Remove stopwatch when no longer needed
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+                GetTransfersResponse resTransfers = await GlobalData.WalletService.GetTransfers(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, reqTransfers);
+                stopwatch.Stop();
+                
+                if (resTransfers.Error.IsError)
                 {
-                    if (transfer.Type.Equals("in"))
-                    {
-                        transfer.Icon = _inImage;
-                    }
-                    else if (transfer.Type.Equals("out"))
-                    {
-                        transfer.Icon = _outImage;
-                    }
-                    else if (transfer.Type.Equals("block"))
-                    {
-                        transfer.Icon = _blockImage;
-                    }
+                    Logger.LogError("Main.WUU", "GetTransfers Error Code: " + resTransfers.Error.Code + ", Message: " + resTransfers.Error.Message);
+                }
+                else
+                {
+                    GlobalData.TransfersStats.Transactions = [];
 
-                    if (GlobalData.TransfersStats.Transactions.ContainsKey(transfer.TransactionId))
+                    foreach (Transfer transfer in resTransfers.Transfers)
                     {
-                        // TODO: Figure out why you have duplicates. Maybe TransactionId is not unique on its own
-                    }
-                    else
-                    {
-                        GlobalData.TransfersStats.Transactions.Add(transfer.TransactionId, transfer);
+                        if (transfer.Type.Equals("in"))
+                        {
+                            transfer.Icon = _inImage;
+                        }
+                        else if (transfer.Type.Equals("out"))
+                        {
+                            transfer.Icon = _outImage;
+                        }
+                        else if (transfer.Type.Equals("block"))
+                        {
+                            transfer.Icon = _blockImage;
+                        }
+
+                        GlobalData.TransfersStats.Transactions.Add(transfer.TransactionId + "_" + transfer.Type, transfer);
 
                         // TODO: Maybe do this in a different way
                         if (transfer.Height > GlobalData.NewestTransactionHeight)
@@ -750,7 +755,9 @@ public class MainViewModel : ViewModelBase
                             GlobalData.NewestTransactionHeight = transfer.Height;
                         }
                     }
-                }                
+                }
+
+                _isTransfersUpdateComplete = true;
             }
         }
         catch (Exception ex)
