@@ -17,6 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NervaWalletMiner\NervaOneWalletMiner.csproj" />
+    <ProjectReference Include="..\NervaOneWalletMiner\NervaOneWalletMiner.csproj" />
   </ItemGroup>
 </Project>
