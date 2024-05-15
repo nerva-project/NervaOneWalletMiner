@@ -16,13 +16,6 @@ namespace NervaWalletMiner.Rpc.Wallet
 
     public class WalletServiceXMR : IWalletService
     {
-        // TODO: Temporary as I test Nerva
-        public async Task<TransferResponse> Transfer(RpcBase rpc, TransferRequest requestObj)
-        {
-            TransferResponse responseObj = new();
-            return responseObj;
-        }
-
         #region Open Wallet
         /* RPC request params:
          *  std::string filename;
@@ -194,6 +187,104 @@ namespace NervaWalletMiner.Rpc.Wallet
             return responseObj;
         }
         #endregion // Create Wallet
+
+        #region Transfer
+        /* RPC request params:
+         *  std::list<transfer_destination> destinations;
+         *  uint32_t account_index;
+         *  std::set<uint32_t> subaddr_indices;
+         *  uint32_t priority;
+         *  uint64_t unlock_time;
+         *  std::string payment_id;
+         *  bool get_tx_key;
+         *  bool do_not_relay;
+         *  bool get_tx_hex;
+         *  bool get_tx_metadata;
+         */
+        public async Task<TransferResponse> Transfer(RpcBase rpc, TransferRequest requestObj)
+        {
+            TransferResponse responseObj = new();
+
+            try
+            {
+                // Build request content json
+
+                // Doing var and building JObject was causing issue, adding escape character / to destination strings hence causing transfers to fail:
+                //  Code: -20, Message: No destinations for this transfer
+                dynamic paramsJson = new JObject();
+                dynamic destinationsJson = new JArray();
+                foreach (Common.TransferDestination destination in requestObj.Destinations)
+                {
+                    dynamic newDest = new JObject();
+                    newDest.amount = CommonXNV.AtomicUnitsFromDoubleAmount(destination.Amount);
+                    newDest.address = destination.Address;
+                    destinationsJson.Add(newDest);
+                }
+                paramsJson.destinations = destinationsJson;
+
+                paramsJson.account_index = requestObj.AccountIndex;
+                paramsJson.subaddr_indices = new JArray(requestObj.SubAddressIndices);
+                paramsJson.priority = requestObj.Priority;
+                paramsJson.unlock_time = requestObj.UnlockTime;
+                paramsJson.payment_id = requestObj.PaymentId is null ? "" : requestObj.PaymentId;
+                paramsJson.get_tx_key = requestObj.GetTxKey;
+                paramsJson.do_not_relay = requestObj.DoNotRelay;
+                paramsJson.get_tx_hex = requestObj.GetTxHex;
+                paramsJson.get_tx_metadata = requestObj.GetTxMetadata;
+
+                var requestJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = "0",
+                    ["method"] = "transfer",
+                    ["params"] = paramsJson
+                };
+
+                // Call service and process response
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+
+                    var error = JObject.Parse(jsonObject.ToString())["error"];
+                    if (error != null)
+                    {
+                        // Set Service error
+                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                    }
+                    else
+                    {
+                        ResTransfer createWalletResponse = JsonConvert.DeserializeObject<ResTransfer>(jsonObject.SelectToken("result").ToString());
+
+                        responseObj.Error.IsError = false;
+                    }
+                }
+                else
+                {
+                    // Set HTTP error
+                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("RWXNV.T", ex);
+            }
+
+            return responseObj;
+        }
+
+        private class ResTransfer
+        {
+            public string tx_hash { get; set; } = string.Empty;
+            public string tx_key { get; set; } = string.Empty;
+            public ulong amount { get; set; }
+            public ulong fee { get; set; }
+            public string tx_blob { get; set; } = string.Empty;
+            public string tx_metadata { get; set; } = string.Empty;
+            public string multisig_txset { get; set; } = string.Empty;
+            public string unsigned_txset { get; set; } = string.Empty;
+        }
+        #endregion // Transfer
 
         #region Get Accounts
         /* RPC request params:
