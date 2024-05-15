@@ -3,6 +3,7 @@ using Avalonia.Platform;
 using NervaWalletMiner.Objects.Constants;
 using NervaWalletMiner.Objects.Settings;
 using NervaWalletMiner.Rpc.Daemon;
+using NervaWalletMiner.Rpc.Daemon.Downloads;
 using NervaWalletMiner.Rpc.Wallet;
 using NervaWalletMiner.ViewModels;
 using System;
@@ -178,6 +179,7 @@ namespace NervaWalletMiner.Helpers
 
                     GlobalData.DaemonService = new DaemonServiceXMR();
                     GlobalData.WalletService = new WalletServiceXMR();
+                    GlobalData.DownloadLinks = new DownloadXMR();
 
                     // TODO: Change this. App.config overwrites GetDaemonSettings with 0
                     if (GlobalData.AppSettings.Daemon[Coin.XMR].BlockSeconds != 120.0)
@@ -207,6 +209,7 @@ namespace NervaWalletMiner.Helpers
 
                     GlobalData.DaemonService = new DaemonServiceXNV();
                     GlobalData.WalletService = new WalletServiceXNV();
+                    GlobalData.DownloadLinks = new DownloadXNV();
 
                     // TODO: Change this. App.config overwrites GetDaemonSettings() with default 0
                     if (GlobalData.AppSettings.Daemon[Coin.XNV].BlockSeconds != 60.0)

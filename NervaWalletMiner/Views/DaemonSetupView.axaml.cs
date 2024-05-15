@@ -16,7 +16,8 @@ namespace NervaWalletMiner.Views
         {
             try
             {
-                
+                // TODO: Implement in the future
+
             }
             catch (Exception ex)
             {
