@@ -25,6 +25,7 @@ public class MainViewModel : ViewModelBase
     public const int _masterTimerInterval = 1000;
     public static int _masterTimerCount = 0;
     public static bool _killMasterProcess = false;
+    public static bool _cliToolsFound = true;
 
     public static DateTime _cliToolsRunningLastCheck = DateTime.MinValue;
     public static DateTime _lastDaemonResponseTime = DateTime.Now;
@@ -183,7 +184,7 @@ public class MainViewModel : ViewModelBase
         }
 
         // Status Bar
-        DaemonStatus = "Connections: " + GlobalData.NetworkStats.ConnectionsOut + "(out) + " + GlobalData.NetworkStats.ConnectionsIn + "(in) " + GlobalData.NetworkStats.StatusSync;
+        DaemonStatus = "Connections: " + GlobalData.NetworkStats.ConnectionsOut + "(out) + " + GlobalData.NetworkStats.ConnectionsIn + "(in)" + GlobalData.NetworkStats.StatusSync;        
         DaemonVersion = "Version: " + GlobalData.NetworkStats.Version;
     }
 
@@ -419,8 +420,14 @@ public class MainViewModel : ViewModelBase
             }
 
 
+            if (!_cliToolsFound)
+            {
+                // TODO: For now
+                DaemonStatus = "Client tools not found. Attempting to download...";
+            }
+
             // Update UI
-            if (!_killMasterProcess)
+            if (!_killMasterProcess && _cliToolsFound)
             {
                 if (_masterTimerCount % GlobalData.AppSettings.TimerIntervalMultiplier == 0)
                 {
@@ -492,7 +499,7 @@ public class MainViewModel : ViewModelBase
             bool forceRestart = false;
             if (_lastDaemonResponseTime.AddMinutes(5) < DateTime.Now)
             {
-                // Daemon not responding.  Kill and restart
+                // Daemon not responding. Kill and restart
                 forceRestart = true;
                 _lastDaemonResponseTime = DateTime.Now;
                 Logger.LogDebug("Main.KDR", "No response from daemon since: " + _lastDaemonResponseTime.ToLongTimeString() + " . Forcing restart...");
@@ -506,10 +513,12 @@ public class MainViewModel : ViewModelBase
                     Logger.LogDebug("Main.KDR", "Starting daemon process");
                     ProcessManager.StartExternalProcess(GlobalMethods.GetDaemonProcess(), DaemonProcess.GenerateOptions(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]));
                     _isInitialDaemonConnectionSuccess = false;
+                    _cliToolsFound = true;
                 }
                 else
                 {
-                    Logger.LogDebug("Main.KDR", "CLI tools not found");
+                    Logger.LogInfo("Main.KDR", "CLI tools not found");
+                    _cliToolsFound = false;
                 }
             }
         }
@@ -594,7 +603,7 @@ public class MainViewModel : ViewModelBase
                 }
                 else
                 {
-                    GlobalData.NetworkStats.StatusSync += "  |  Sync OK |  Status " + infoRes.Status;
+                    GlobalData.NetworkStats.StatusSync += " | Sync OK | Status " + infoRes.Status;
                 }
 
 

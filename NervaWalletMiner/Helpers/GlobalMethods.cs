@@ -2,14 +2,18 @@
 using Avalonia.Platform;
 using NervaWalletMiner.Objects.Constants;
 using NervaWalletMiner.Objects.Settings;
+using NervaWalletMiner.Rpc;
 using NervaWalletMiner.Rpc.Daemon;
 using NervaWalletMiner.Rpc.Daemon.Downloads;
 using NervaWalletMiner.Rpc.Wallet;
-using NervaWalletMiner.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
+using System.Net;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NervaWalletMiner.Helpers
 {
@@ -217,7 +221,148 @@ namespace NervaWalletMiner.Helpers
                         GlobalData.AppSettings.Daemon[Coin.XNV].BlockSeconds = 60.0;
                     }
                     break;
-            }            
+            }
+
+
+            // Download CLI tools, if we do not have them already
+            if (!DirectoryContainsCliTools(GlobalData.CliToolsDir))
+            {                
+                string cliToolsLink = GetCliToolsDownloadLink();
+                if(!string.IsNullOrEmpty(cliToolsLink))
+                {
+                    DownloadCLI(cliToolsLink, GlobalData.CliToolsDir);
+                }
+            }
+        }
+
+        public static string GetCliToolsDownloadLink()
+        {
+            string cliDownloadLink = string.Empty;
+
+            try
+            {
+                Architecture arch = GetCpuArchitecture();
+
+                if (IsWindows())
+                {
+                    switch (arch)
+                    {
+                        case Architecture.X64:
+                            cliDownloadLink = GlobalData.DownloadLinks.CliUrlWindows64;
+                            break;
+                        default:
+                            cliDownloadLink = GlobalData.DownloadLinks.CliUrlWindows32;
+                            break;
+                    }
+                }
+                else if (IsLinux())
+                {
+                    switch (arch)
+                    {
+                        case Architecture.X64:
+                            cliDownloadLink = GlobalData.DownloadLinks.CliUrlLinux64;
+                            break;
+                        case Architecture.Arm:
+                        case Architecture.Arm64:
+                            cliDownloadLink = GlobalData.DownloadLinks.CliUrlLinuxArm;
+                            break;
+                        default:
+                            cliDownloadLink = GlobalData.DownloadLinks.CliUrlLinux32;
+                            break;
+                    }
+                }
+                else if (IsOsx())
+                {
+                    switch (arch)
+                    {
+                        case Architecture.Arm:
+                        case Architecture.Arm64:
+                            cliDownloadLink = GlobalData.DownloadLinks.CliUrlMacArm;
+                            break;
+                        default:
+                            cliDownloadLink = GlobalData.DownloadLinks.CliUrlMacIntel;
+                            break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("GM.GCTDL", ex);
+            }
+            
+            return cliDownloadLink;
+        }
+
+        public static void DownloadCLI(string downloadLink, string cliToolsPath)
+        {
+                // Check if we already downloaded the CLI package
+                string destFile = Path.Combine(cliToolsPath, Path.GetFileName(downloadLink));
+
+                if (File.Exists(destFile))
+                {
+                    Logger.LogDebug("UM.DC", $"CLI tools found @ {destFile}");
+
+                    ExtractFile(cliToolsPath, destFile);
+                }
+                else
+                {
+                    Logger.LogDebug("GM.DC", "Downloading CLI tools. URL: " + downloadLink);
+                    using (var client = new WebClient())
+                    {
+                        client.DownloadFileCompleted += (s, e) =>
+                        {
+                            if (e.Error == null)
+                            {
+                                ExtractFile(cliToolsPath, destFile);
+                            }
+                            else
+                            {
+                                Logger.LogError("UM.DC", e.Error.Message);                               
+                            }
+                        };
+
+                        client.DownloadFileAsync(new Uri(downloadLink), destFile);
+                    }
+                }
+        }
+
+        private static void ExtractFile(string destDir, string destFile)
+        {
+            try
+            {
+                Logger.LogDebug("GM.EF", "Closing Daemon and Wallet processes");
+                while (DaemonProcess.IsRunning())
+                {
+                    DaemonProcess.ForceClose();
+                    Thread.Sleep(1000);
+                }
+
+                while (WalletProcess.IsRunning())
+                {
+                    WalletProcess.ForceClose();
+                    Thread.Sleep(1000);
+                }
+
+                Logger.LogDebug("GM.EF", "Extracting CLI tools");
+
+                ZipArchive archive = ZipFile.Open(destFile, ZipArchiveMode.Read);
+                foreach (var entry in archive.Entries)
+                {
+                    if (!string.IsNullOrEmpty(entry.Name))
+                    {
+                        Logger.LogDebug("GM.EF", "Extracting: " + entry.Name);
+                        string extFile = Path.Combine(destDir, entry.Name);
+                        entry.ExtractToFile(extFile, true);
+#if UNIX
+                        UnixNative.Chmod(extFile, 33261);
+#endif
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("GM.EF", ex);
+            }
         }
 
         public static string GetDaemonProcessName()
@@ -377,12 +522,24 @@ namespace NervaWalletMiner.Helpers
 
         public static bool IsWindows()
         {
-            return RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            GetCpuArchitecture();
+
+            return RuntimeInformation.IsOSPlatform(OSPlatform.Windows);            
         }
 
         public static bool IsLinux()
         {
             return RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+        }
+
+        public static bool IsOsx()
+        {
+            return RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+        }
+
+        public static Architecture GetCpuArchitecture()
+        {
+            return RuntimeInformation.OSArchitecture;
         }
 
         public static bool DirectoryContainsCliTools(string path)
