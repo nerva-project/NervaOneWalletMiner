@@ -15,5 +15,9 @@ namespace NervaWalletMiner.Rpc.Wallet.Requests
         public bool DoNotRelay { get; set; } = false;
         public bool GetTxHex { get; set; } = false;
         public bool GetTxMetadata { get; set;} = false;
+
+        // XMR specific
+        public List<uint> SubtractFeeFromOutputs { get; set; } = [];
+        public ulong ring_size { get; set; } = 0;
     }
 }

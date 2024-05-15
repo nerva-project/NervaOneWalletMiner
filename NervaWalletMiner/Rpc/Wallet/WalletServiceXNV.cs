@@ -207,9 +207,9 @@ namespace NervaWalletMiner.Rpc.Wallet
          *  uint64_t unlock_time;
          *  std::string payment_id;
          *  bool get_tx_key;
-         *  bool do_not_relay;
-         *  bool get_tx_hex;
-         *  bool get_tx_metadata;
+         *  bool do_not_relay;                                  OPT
+         *  bool get_tx_hex;                                    OPT
+         *  bool get_tx_metadata;                               OPT
          */
         public async Task<TransferResponse> Transfer(RpcBase rpc, TransferRequest requestObj)
         {
@@ -264,7 +264,7 @@ namespace NervaWalletMiner.Rpc.Wallet
                     }
                     else
                     {
-                        ResTransfer createWalletResponse = JsonConvert.DeserializeObject<ResTransfer>(jsonObject.SelectToken("result").ToString());
+                        ResTransfer transferResponse = JsonConvert.DeserializeObject<ResTransfer>(jsonObject.SelectToken("result").ToString());
 
                         responseObj.Error.IsError = false;
                     }

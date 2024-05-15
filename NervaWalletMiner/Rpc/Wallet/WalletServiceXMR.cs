@@ -193,30 +193,31 @@ namespace NervaWalletMiner.Rpc.Wallet
          *  std::list<transfer_destination> destinations;
          *  uint32_t account_index;
          *  std::set<uint32_t> subaddr_indices;
+         *  std::set<uint32_t> subtract_fee_from_outputs;       OPT
          *  uint32_t priority;
+         *  uint64_t ring_size;                                 OPT
          *  uint64_t unlock_time;
          *  std::string payment_id;
          *  bool get_tx_key;
-         *  bool do_not_relay;
-         *  bool get_tx_hex;
-         *  bool get_tx_metadata;
+         *  bool do_not_relay;                                  OPT
+         *  bool get_tx_hex;                                    OPT
+         *  bool get_tx_metadata;                               OPT
          */
         public async Task<TransferResponse> Transfer(RpcBase rpc, TransferRequest requestObj)
         {
+            // TODO: Test Transfer!
+
             TransferResponse responseObj = new();
 
             try
             {
                 // Build request content json
-
-                // Doing var and building JObject was causing issue, adding escape character / to destination strings hence causing transfers to fail:
-                //  Code: -20, Message: No destinations for this transfer
                 dynamic paramsJson = new JObject();
                 dynamic destinationsJson = new JArray();
                 foreach (Common.TransferDestination destination in requestObj.Destinations)
                 {
                     dynamic newDest = new JObject();
-                    newDest.amount = CommonXNV.AtomicUnitsFromDoubleAmount(destination.Amount);
+                    newDest.amount = CommonXMR.AtomicUnitsFromDoubleAmount(destination.Amount);
                     newDest.address = destination.Address;
                     destinationsJson.Add(newDest);
                 }
@@ -250,11 +251,11 @@ namespace NervaWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
-                        ResTransfer createWalletResponse = JsonConvert.DeserializeObject<ResTransfer>(jsonObject.SelectToken("result").ToString());
+                        ResTransfer transferResponse = JsonConvert.DeserializeObject<ResTransfer>(jsonObject.SelectToken("result").ToString());
 
                         responseObj.Error.IsError = false;
                     }
@@ -267,7 +268,7 @@ namespace NervaWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("RWXNV.T", ex);
+                Logger.LogException("RWXMR.T", ex);
             }
 
             return responseObj;
@@ -275,14 +276,27 @@ namespace NervaWalletMiner.Rpc.Wallet
 
         private class ResTransfer
         {
-            public string tx_hash { get; set; } = string.Empty;
-            public string tx_key { get; set; } = string.Empty;
-            public ulong amount { get; set; }
-            public ulong fee { get; set; }
-            public string tx_blob { get; set; } = string.Empty;
-            public string tx_metadata { get; set; } = string.Empty;
+            public List<string> tx_hash_list { get; set; } = [];
+            public List<string> tx_key_list { get; set; } = [];
+            public List<ulong> amount_list { get; set; } = [];
+            public List<AmountsList> amounts_by_dest_list { get; set; } = [];
+            public List<ulong> fee_list { get; set; } = [];
+            public List<ulong> weight_list { get; set; } = [];
+            public List<string> tx_blob_list { get; set; } = [];
+            public List<string> tx_metadata_list { get; set; } = [];
             public string multisig_txset { get; set; } = string.Empty;
             public string unsigned_txset { get; set; } = string.Empty;
+            public List<KeyImageList> spent_key_images_list { get; set; } = [];
+        }
+
+        private class AmountsList
+        {
+            public List<ulong> amounts { get; set; } = [];
+        }
+
+        private class KeyImageList
+        {
+            public List<string> key_images { get; set; } = [];
         }
         #endregion // Transfer
 
