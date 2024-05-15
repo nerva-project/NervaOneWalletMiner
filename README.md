@@ -1,5 +1,5 @@
-# NervaWalletMiner
-New Nerva GUI Wallet and Miner
+# NervaOne Wallet and Miner
+New NervaOne multi-coin GUI Wallet and Miner
 
 ## Build instructions
 To compile, you'll need dotnet SDK 8. You can install it for your operating system from Microsoft:
