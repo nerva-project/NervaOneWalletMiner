@@ -32,46 +32,55 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("WalS.CWC", ex);
+                Logger.LogException("WalSV.CWC", ex);
             }
         }
 
         private static async void CreateNewWallet(string walletName, string walletPassword, string walletLanguage)
         {
-            CreateWalletRequest request = new()
+            try
             {
-                WalletName = walletName,
-                Password = walletPassword,
-                Language = walletLanguage
-            };
-
-            CreateWalletResponse response = await GlobalData.WalletService.CreateWallet(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
-
-            if (response.Error.IsError)
-            {
-                GlobalData.IsWalletOpen = false;
-                GlobalData.IsWalletJustOpened = false;
-                GlobalData.OpenedWalletName = string.Empty;
-
-                await Dispatcher.UIThread.Invoke(async () =>
+                CreateWalletRequest request = new()
                 {
-                    var box = MessageBoxManager.GetMessageBoxStandard("Create Wallet", "Error creating " + walletName + " wallet\r\n" + response.Error.Message, ButtonEnum.Ok);
-                    _ = await box.ShowAsync();
-                });
-            }
-            else
-            {
-                GlobalData.IsWalletOpen = true;
-                GlobalData.IsWalletJustOpened = true;
-                GlobalData.OpenedWalletName = walletName;
-                GlobalData.NewestTransactionHeight = 0;
+                    WalletName = walletName,
+                    Password = walletPassword,
+                    Language = walletLanguage
+                };
 
-                await Dispatcher.UIThread.InvokeAsync(async () =>
+                CreateWalletResponse response = await GlobalData.WalletService.CreateWallet(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
+
+                if (response.Error.IsError)
                 {
-                    var box = MessageBoxManager.GetMessageBoxStandard("Create Wallet", walletName + " wallet created successfully!\r\n\r\nYour new wallet is now open. Make sure to save your seed phrase and keys!", ButtonEnum.Ok);
-                    _ = await box.ShowAsync();
-                });
+                    GlobalData.IsWalletOpen = false;
+                    GlobalData.IsWalletJustOpened = false;
+                    GlobalData.OpenedWalletName = string.Empty;
+
+                    Logger.LogError("WalSV.CNW", "Failed to create wallet " + walletName + " | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+                    await Dispatcher.UIThread.Invoke(async () =>
+                    {
+                        var box = MessageBoxManager.GetMessageBoxStandard("Create Wallet", "Error creating " + walletName + " wallet\r\n" + response.Error.Message, ButtonEnum.Ok);
+                        _ = await box.ShowAsync();
+                    });
+                }
+                else
+                {
+                    GlobalData.IsWalletOpen = true;
+                    GlobalData.IsWalletJustOpened = true;
+                    GlobalData.OpenedWalletName = walletName;
+                    GlobalData.NewestTransactionHeight = 0;
+
+                    Logger.LogDebug("WalSV.CNW", "Wallet " + walletName + " created successfully.");
+                    await Dispatcher.UIThread.InvokeAsync(async () =>
+                    {
+                        var box = MessageBoxManager.GetMessageBoxStandard("Create Wallet", walletName + " wallet created successfully!\r\n\r\nYour new wallet is now open. Make sure to save your seed phrase and keys!", ButtonEnum.Ok);
+                        _ = await box.ShowAsync();
+                    });
+                }
             }
+            catch (Exception ex)
+            {
+                Logger.LogException("WalSV.CNW", ex);
+            }            
         }
 
         private void CreateWalletDialogClosed(Task task)
@@ -84,11 +93,6 @@ namespace NervaOneWalletMiner.Views
                 {
                     CreateNewWallet(result.WalletName, result.WalletPassword, result.WalletLanguage);
                 }
-            }
-            else
-            {
-                // Cancelled or closed. Don't need to do anything
-
             }
         }
         #endregion // Create Wallet
@@ -103,7 +107,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("WalS.CWC", ex);
+                Logger.LogException("WalSV.CWC", ex);
             }
         }
 
@@ -113,14 +117,62 @@ namespace NervaOneWalletMiner.Views
             if (result != null && result.IsOk)
             {
                 // TODO: Restore wallet
-                
+                if (!string.IsNullOrEmpty(result.SeedPhrase) && !string.IsNullOrEmpty(result.WalletName) && !string.IsNullOrEmpty(result.WalletPassword))
+                {
+                    RestoreFromSeed(result.SeedPhrase, result.SeedOffset, result.WalletName, result.WalletPassword, result.WalletLanguage);
+                }
 
-            }
-            else
+            }          
+        }
+
+        private static async void RestoreFromSeed(string seed, string seedOffset, string walletName, string walletPassword, string walletLanguage)
+        {
+            try
             {
-                // Cancelled or closed. Don't need to do anything
+                RestoreFromSeedRequest request = new()
+                {
+                    Seed = seed,
+                    SeedOffset = seedOffset,
+                    WalletName = walletName,
+                    Password = walletPassword,
+                    Language = walletLanguage
+                };
 
+                RestoreFromSeedResponse response = await GlobalData.WalletService.RestoreFromSeed(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
+
+                if (response.Error.IsError)
+                {
+                    GlobalData.IsWalletOpen = false;
+                    GlobalData.IsWalletJustOpened = false;
+                    GlobalData.OpenedWalletName = string.Empty;
+
+                    Logger.LogError("WalSV.RFS", "Failed to restore wallet " + walletName + " | Message: " + response.Error.Message + " | Code: " + response.Error.Code + " | Info: " + response.Info);
+                    await Dispatcher.UIThread.Invoke(async () =>
+                    {
+                        var box = MessageBoxManager.GetMessageBoxStandard("Restore from Seed", "Error restoring " + walletName + " wallet\r\n" + response.Error.Message, ButtonEnum.Ok);
+                        _ = await box.ShowAsync();
+                    });
+                }
+                else
+                {
+                    GlobalData.IsWalletOpen = true;
+                    GlobalData.IsWalletJustOpened = true;
+                    GlobalData.OpenedWalletName = walletName;
+                    GlobalData.NewestTransactionHeight = 0;
+
+                    Logger.LogDebug("WalSV.RFS", "Wallet " + walletName + " restored successfully! Info: " + response.Info);
+                    await Dispatcher.UIThread.InvokeAsync(async () =>
+                    {
+                        var box = MessageBoxManager.GetMessageBoxStandard("Restore from Seed", walletName + " wallet restored\r\n\r\nYour new wallet is now open. It will take some time to synchronize your transactions.", ButtonEnum.Ok);
+                        _ = await box.ShowAsync();
+                    });
+                }
             }
+            catch (Exception ex)
+            {
+                Logger.LogException("WalSV.RFS", ex);
+            }
+            
         }
         #endregion // Restore from Seed
     }

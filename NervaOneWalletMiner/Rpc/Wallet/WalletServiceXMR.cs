@@ -188,6 +188,88 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         }
         #endregion // Create Wallet
 
+        #region Restore from Seed
+        /* RPC request params:
+         *  uint64_t restore_height;                OPT
+         *  std::string filename;
+         *  std::string seed;
+         *  std::string seed_offset;
+         *  std::string password;
+         *  std::string language;
+         *  bool autosave_current;                  OPT
+         */
+        public async Task<RestoreFromSeedResponse> RestoreFromSeed(RpcBase rpc, RestoreFromSeedRequest requestObj)
+        {
+            RestoreFromSeedResponse responseObj = new();
+
+            try
+            {
+                // Build request content json
+                var requestParams = new JObject
+                {
+                    ["restore_height"] = requestObj.RestoreHeight,
+                    ["filename"] = requestObj.WalletName,
+                    ["seed"] = requestObj.Seed,
+                    ["seed_offset"] = requestObj.SeedOffset,
+                    ["password"] = requestObj.Password,
+                    ["language"] = requestObj.Language,
+                    ["autosave_current"] = requestObj.AutoSave
+                };
+
+                var requestJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = "0",
+                    ["method"] = "restore_wallet_from_seed",
+                    ["params"] = requestParams
+                };
+
+                // Call service and process response
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+
+                    var error = JObject.Parse(jsonObject.ToString())["error"];
+                    if (error != null)
+                    {
+                        // Set Service error
+                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                    }
+                    else
+                    {
+                        ResRestoreFromSeed createWalletResponse = JsonConvert.DeserializeObject<ResRestoreFromSeed>(jsonObject.SelectToken("result").ToString());
+                        responseObj.Address = createWalletResponse.address;
+                        responseObj.Seed = createWalletResponse.seed;
+                        responseObj.Info = createWalletResponse.info;
+                        responseObj.WasDeprecated = createWalletResponse.was_deprecated;
+
+                        responseObj.Error.IsError = false;
+                    }
+                }
+                else
+                {
+                    // Set HTTP error
+                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("RWXNV.RFS", ex);
+            }
+
+            return responseObj;
+        }
+
+        private class ResRestoreFromSeed
+        {
+            public string address { get; set; } = string.Empty;
+            public string seed { get; set; } = string.Empty;
+            public string info { get; set; } = string.Empty;
+            public bool was_deprecated { get; set; }
+        }
+        #endregion // Restore from Seed
+
         #region Transfer
         /* RPC request params:
          *  std::list<transfer_destination> destinations;
