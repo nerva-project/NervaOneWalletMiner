@@ -17,7 +17,7 @@ git clone https://github.com/nerva-project/NervaOneWalletMiner.git
 ```
 
 ```
-cd NervaWalletMiner/NervaOneWalletMiner.Desktop
+cd NervaOneWalletMiner/NervaOneWalletMiner.Desktop
 ```
 
 ```
