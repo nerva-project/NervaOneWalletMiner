@@ -22,34 +22,17 @@ namespace NervaOneWalletMiner.Views
             InitializeComponent();
         }
 
+        #region Create Wallet
         public void CreateWalletClicked(object sender, RoutedEventArgs args)
         {
             try
             {
                 var window = new CreateWalletView();
-                window.ShowDialog(GetWindow()).ContinueWith(DialogClosed);
+                window.ShowDialog(GetWindow()).ContinueWith(CreateWalletDialogClosed);
             }
             catch (Exception ex)
             {
                 Logger.LogException("WalS.CWC", ex);
-            }
-        }
-
-        private void DialogClosed(Task task)
-        {
-            DialogResult result = ((DialogResult)((Task<object>)task).Result);
-            if (result != null && result.IsOk)
-            {
-                // Open wallet
-                if (!string.IsNullOrEmpty(result.WalletName) && !string.IsNullOrEmpty(result.WalletPassword))
-                {
-                    CreateNewWallet(result.WalletName, result.WalletPassword, result.WalletLanguage);
-                }
-            }
-            else
-            {
-                // Cancelled or closed. Don't need to do anything
-
             }
         }
 
@@ -90,5 +73,55 @@ namespace NervaOneWalletMiner.Views
                 });
             }
         }
+
+        private void CreateWalletDialogClosed(Task task)
+        {
+            DialogResult result = ((DialogResult)((Task<object>)task).Result);
+            if (result != null && result.IsOk)
+            {
+                // Open wallet
+                if (!string.IsNullOrEmpty(result.WalletName) && !string.IsNullOrEmpty(result.WalletPassword))
+                {
+                    CreateNewWallet(result.WalletName, result.WalletPassword, result.WalletLanguage);
+                }
+            }
+            else
+            {
+                // Cancelled or closed. Don't need to do anything
+
+            }
+        }
+        #endregion // Create Wallet
+
+        #region Restore from Seed
+        public void RestoreFromSeedClicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                var window = new RestoreFromSeedView();
+                window.ShowDialog(GetWindow()).ContinueWith(RestoreFromSeedDialogClosed);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("WalS.CWC", ex);
+            }
+        }
+
+        private void RestoreFromSeedDialogClosed(Task task)
+        {
+            DialogResult result = ((DialogResult)((Task<object>)task).Result);
+            if (result != null && result.IsOk)
+            {
+                // TODO: Restore wallet
+                
+
+            }
+            else
+            {
+                // Cancelled or closed. Don't need to do anything
+
+            }
+        }
+        #endregion // Restore from Seed
     }
 }

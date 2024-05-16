@@ -12,16 +12,22 @@
 
 	<StackPanel Spacing="5" Margin="10" HorizontalAlignment="Stretch" MaxWidth="650">
 
-			<Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="24,*">
-				<Image Grid.Row="0" Grid.Column="0" Source="{Binding CoinIcon}"></Image>
-				<Label Grid.Row="0" Grid.Column="1" Height="24">Wallet Setup</Label>
-			</Grid>
+		<Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="24,*">
+			<Image Grid.Row="0" Grid.Column="0" Source="{Binding CoinIcon}"></Image>
+			<Label Grid.Row="0" Grid.Column="1" Height="24">Wallet Setup</Label>
+		</Grid>
 
-			<Button Name="btnCreateWallet"
-					Content="Create New Wallet"
-					DockPanel.Dock="Right"
-					Margin="0,10,0,0"
-					Click="CreateWalletClicked"/>
+		<Button Name="btnCreateWallet"
+			Content="Create New Wallet"
+			DockPanel.Dock="Right"
+			Margin="0,10,0,0"
+			Click="CreateWalletClicked"/>
+
+		<Button Name="btnRestoreFromSeed"
+			Content="Restore Wallet from Seed"
+			DockPanel.Dock="Right"
+			Margin="0,10,0,0"
+			Click="RestoreFromSeedClicked"/>
 
 	</StackPanel>
 	

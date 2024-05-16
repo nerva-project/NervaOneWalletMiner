@@ -8,11 +8,11 @@ namespace NervaOneWalletMiner.Objects
         public bool IsOk { get; set; } = false;
         public bool IsCancel { get; set; } = false;
 
-        // Open, create wallet
+        // Open, create wallet, restore from seed
         public string WalletName { get; set; } = string.Empty;
         public string WalletPassword { get; set; } = string.Empty;
 
-        // Create wallet
+        // Create wallet, restore from seed
         public string WalletLanguage { get; set; } = Language.English;
 
         // Transfer funds
@@ -21,5 +21,9 @@ namespace NervaOneWalletMiner.Objects
         public string SendToAddress { get; set; } = string.Empty;
         public double SendAmount { get; set; } = 0.0;
         public string SendPaymentId { get; set; } = string.Empty;
+
+        // Restore from Seed
+        public string SeedPhrase { get; set; } = string.Empty;
+        public string SeedOffset { get; set; } = string.Empty;
     }
 }
