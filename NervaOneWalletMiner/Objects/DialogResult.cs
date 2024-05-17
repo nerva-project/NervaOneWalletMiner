@@ -25,5 +25,10 @@ namespace NervaOneWalletMiner.Objects
         // Restore from Seed
         public string SeedPhrase { get; set; } = string.Empty;
         public string SeedOffset { get; set; } = string.Empty;
+
+        // Restore from Keys
+        public string WalletAddress { get; set;} = string.Empty;
+        public string ViewKey { get; set; } = string.Empty;
+        public string SpendKey {  get; set; } = string.Empty;
     }
 }

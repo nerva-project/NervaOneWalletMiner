@@ -271,6 +271,13 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         }
         #endregion // Restore from Seed
 
+        #region Restore from Keys
+        public Task<RestoreFromKeysResponse> RestoreFromKeys(RpcBase rpc, RestoreFromKeysRequest requestObj)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion // Restore from Keys
+
         #region Transfer
         /* RPC request params:
          *  std::list<transfer_destination> destinations;

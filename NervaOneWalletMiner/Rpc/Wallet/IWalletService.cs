@@ -15,6 +15,8 @@ namespace NervaOneWalletMiner.Rpc.Wallet
 
         Task<RestoreFromSeedResponse> RestoreFromSeed(RpcBase rpc, RestoreFromSeedRequest requestObj);
 
+        Task<RestoreFromKeysResponse> RestoreFromKeys(RpcBase rpc, RestoreFromKeysRequest requestObj);
+
         Task<TransferResponse> Transfer(RpcBase rpc, TransferRequest requestObj);
 
 

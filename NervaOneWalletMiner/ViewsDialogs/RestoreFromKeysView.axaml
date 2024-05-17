@@ -1,0 +1,61 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="600"
+        x:Class="NervaOneWalletMiner.ViewsDialogs.RestoreFromKeysView"
+		Width="500"
+		Height="600"
+		Topmost="True"
+		WindowStartupLocation="CenterOwner"
+        Title="Restore From Keys">
+	
+	<StackPanel Spacing="5" Margin="10">
+		<Label Content="Wallet Address" />
+		<TextBox Name="tbxWalletAddress"
+				 Watermark="Required - address of the wallet you want to restore" />
+
+		<Label Content="View Key" Margin="0,15,0,0" />
+		<TextBox Name="tbxViewKey"
+				 Watermark="Required - secret view key" />
+
+		<Label Content="Spend Key" Margin="0,15,0,0" />
+		<TextBox Name="tbxSpendKey"
+				 Watermark="Required - secret spend key" />
+
+		<Separator Margin="0,20,0,0"></Separator>
+
+		<Label Content="New Wallet Name" Margin="0,15,0,0" />
+		<TextBox Name="tbxWalletName"
+				 Watermark="Required - name of the new wallet" />
+
+		<Label Content="New Wallet Password" Margin="0,15,0,0" />
+		<DockPanel>
+			<TextBox Name="tbxPassword"
+					 Watermark="Required - new wallet password"
+					 PasswordChar="*"
+					 RevealPassword="False"
+					 Width="400" />
+
+			<Button Name="btnShowHidePassword"
+					Content="Show"
+					Margin="10,0,0,0"
+					Click="ShowHidePasswordButtonClicked" />
+		</DockPanel>
+
+		<Label Content="Language" Margin="0,15,0,0" />
+		<ComboBox Name="cbxLanguage" HorizontalAlignment="Stretch" />
+
+		<DockPanel Margin="0,15,0,0" >
+			<Button Name="btnOk"
+					Content="OK"
+					Click="OkButtonClicked"
+					IsDefault="True" />
+
+			<Button Name="btnCancel"
+					Content="Cancel"
+					Click="CancelButtonClicked"
+					Margin="10,0,0,0" />
+		</DockPanel>
+	</StackPanel>
+</Window>

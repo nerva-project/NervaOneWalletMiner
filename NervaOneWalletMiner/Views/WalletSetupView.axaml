@@ -29,6 +29,12 @@
 			Margin="0,10,0,0"
 			Click="RestoreFromSeedClicked"/>
 
+		<Button Name="btnRestoreFromKeys"
+			Content="Restore Wallet from Keys"
+			DockPanel.Dock="Right"
+			Margin="0,10,0,0"
+			Click="RestoreFromKeysClicked"/>
+
 	</StackPanel>
 	
 </UserControl>
