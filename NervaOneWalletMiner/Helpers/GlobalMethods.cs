@@ -198,6 +198,10 @@ namespace NervaOneWalletMiner.Helpers
                     {
                         GlobalData.AppSettings.Wallet[Coin.XMR].DisplayUnits = "XMR";
                     }
+                    if (GlobalData.AppSettings.Wallet[Coin.XMR].LogLevel != 0)
+                    {
+                        GlobalData.AppSettings.Wallet[Coin.XMR].LogLevel = 0;
+                    }
                     break;
 
                 default:

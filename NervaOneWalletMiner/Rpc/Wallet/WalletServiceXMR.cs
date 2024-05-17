@@ -197,6 +197,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
          *  std::string password;
          *  std::string language;
          *  bool autosave_current;                  OPT
+         *  bool enable_multisig_experimental;      OPT
          */
         public async Task<RestoreFromSeedResponse> RestoreFromSeed(RpcBase rpc, RestoreFromSeedRequest requestObj)
         {
@@ -220,7 +221,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 {
                     ["jsonrpc"] = "2.0",
                     ["id"] = "0",
-                    ["method"] = "restore_wallet_from_seed",
+                    ["method"] = "restore_deterministic_wallet",
                     ["params"] = requestParams
                 };
 
@@ -234,7 +235,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -255,7 +256,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("RWXNV.RFS", ex);
+                Logger.LogException("RWXMR.RFS", ex);
             }
 
             return responseObj;
