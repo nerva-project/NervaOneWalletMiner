@@ -279,11 +279,13 @@ namespace NervaOneWalletMiner.Rpc.Wallet
          *  std::string spendkey;
          *  std::string viewkey;
          *  std::string password;
-         *  std::string language;
          *  bool autosave_current;                  OPT
+         *  std::string language;         
          */
         public async Task<RestoreFromKeysResponse> RestoreFromKeys(RpcBase rpc, RestoreFromKeysRequest requestObj)
         {
+            // TODO: Test Restore from Keys!
+
             RestoreFromKeysResponse responseObj = new();
 
             try
@@ -305,7 +307,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 {
                     ["jsonrpc"] = "2.0",
                     ["id"] = "0",
-                    ["method"] = "restore_wallet_from_keys",
+                    ["method"] = "generate_from_keys",
                     ["params"] = requestParams
                 };
 
@@ -319,13 +321,12 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
                         ResRestoreFromKeys createWalletResponse = JsonConvert.DeserializeObject<ResRestoreFromKeys>(jsonObject.SelectToken("result").ToString());
                         responseObj.Address = createWalletResponse.address;
-                        responseObj.Seed = createWalletResponse.seed;
                         responseObj.Info = createWalletResponse.info;
 
                         responseObj.Error.IsError = false;
@@ -339,7 +340,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("RWXNV.RFK", ex);
+                Logger.LogException("RWXMR.RFK", ex);
             }
 
             return responseObj;
@@ -348,7 +349,6 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         private class ResRestoreFromKeys
         {
             public string address { get; set; } = string.Empty;
-            public string seed { get; set; } = string.Empty;
             public string info { get; set; } = string.Empty;
         }
         #endregion // Restore from Keys

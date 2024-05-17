@@ -334,7 +334,6 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     {
                         ResRestoreFromKeys createWalletResponse = JsonConvert.DeserializeObject<ResRestoreFromKeys>(jsonObject.SelectToken("result").ToString());
                         responseObj.Address = createWalletResponse.address;
-                        responseObj.Seed = createWalletResponse.seed;
                         responseObj.Info = createWalletResponse.info;
 
                         responseObj.Error.IsError = false;
