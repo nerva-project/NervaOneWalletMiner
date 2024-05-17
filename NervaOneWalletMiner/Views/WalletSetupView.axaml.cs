@@ -9,6 +9,7 @@ using NervaOneWalletMiner.Rpc.Wallet.Requests;
 using NervaOneWalletMiner.Rpc.Wallet.Responses;
 using NervaOneWalletMiner.ViewsDialogs;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace NervaOneWalletMiner.Views
@@ -20,6 +21,23 @@ namespace NervaOneWalletMiner.Views
         public WalletSetupView()
         {
             InitializeComponent();
+        }
+
+        public void OpenWalletsFolderClicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    FileName = GlobalData.WalletDir,
+                    UseShellExecute = true
+                };
+                Process.Start(psi);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DaeSV.OCTFC", ex);
+            }
         }
 
         #region Create Wallet

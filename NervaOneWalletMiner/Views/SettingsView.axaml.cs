@@ -15,12 +15,6 @@ namespace NervaOneWalletMiner.Views
         {
             InitializeComponent();
 
-            var tbxMiningAddress = this.Get<TextBox>("tbxMiningAddress");
-            tbxMiningAddress.Text = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress;
-
-            var tbxDaemonDataDir = this.Get<TextBox>("tbxDaemonDataDir");
-            tbxDaemonDataDir.Text = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].DataDir;
-
             var cbxThemeVariants = this.Get<ComboBox>("cbxThemeVariants");
             cbxThemeVariants.SelectedItem = Application.Current!.RequestedThemeVariant;
             cbxThemeVariants.SelectionChanged += (sender, e) =>
@@ -38,23 +32,8 @@ namespace NervaOneWalletMiner.Views
             {
                 bool isChanged = false;
 
-                var tbxMiningAddress = this.Get<TextBox>("tbxMiningAddress");
-                var tbxDaemonDataDir = this.Get<TextBox>("tbxDaemonDataDir");
                 var cbxThemeVariants = this.Get<ComboBox>("cbxThemeVariants");
-
                 var cbxCoin = this.Get<ComboBox>("cbxCoin");
-
-                if (!string.IsNullOrEmpty(tbxMiningAddress.Text) && GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress != tbxMiningAddress.Text)
-                {
-                    GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress = tbxMiningAddress.Text;
-                    isChanged = true;
-                }
-
-                if (!string.IsNullOrEmpty(tbxDaemonDataDir.Text) && GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].DataDir != tbxDaemonDataDir.Text)
-                {
-                    GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].DataDir = tbxDaemonDataDir.Text;
-                    isChanged = true;
-                }
 
                 if (cbxThemeVariants.SelectedItem is ThemeVariant themeVariant)
                 {

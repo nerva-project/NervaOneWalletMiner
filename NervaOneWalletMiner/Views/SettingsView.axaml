@@ -18,22 +18,14 @@
 		</Grid>
 		
 		<Button Command="{Binding OpenDebugFolderCommand}"
-			HorizontalAlignment="Center"
-			VerticalAlignment="Top">
-			Debug Folder
-		</Button>
-		
-		<Label Content="Mining Address" />
-		<TextBox Name="tbxMiningAddress" />
+				Content="Open Debug Folder"
+				Margin="0,10,0,0" />		
 
 		<Label Content="Active Coin" Margin="0,10,0,0"/>
 		<ComboBox Name="cbxCoin" SelectedIndex="0">
 			<ComboBoxItem>Nerva - XNV</ComboBoxItem>
 			<ComboBoxItem>Monero - XMR</ComboBoxItem>
 		</ComboBox>
-
-		<Label Content="Daemon Data Directory" Margin="0,10,0,0" />
-		<TextBox Name="tbxDaemonDataDir" />
 
 		<Label Content="Applicaiton Theme" Margin="0,10,0,0" />
 		<ComboBox Name="cbxThemeVariants"
@@ -50,7 +42,7 @@
 		<Button Name="btnSaveSettings"
 				Content="Save Settings"
 				Click="SaveSettingsClicked"
-				Margin="0,10,0,0" />
-		
+				Margin="0,10,0,0" />		
 	</StackPanel>
+	
 </UserControl>

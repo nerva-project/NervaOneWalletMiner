@@ -9,13 +9,18 @@
 	<Design.DataContext>
 		<vm:DaemonSetupViewModel />
 	</Design.DataContext>
-	
-	<StackPanel Spacing="5" Margin="10" HorizontalAlignment="Stretch" MaxWidth="650">
 
+	<StackPanel Spacing="5" Margin="10" HorizontalAlignment="Stretch" MaxWidth="650">
 		<Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="24,*">
 			<Image Grid.Row="0" Grid.Column="0" Source="{Binding CoinIcon}"></Image>
 			<Label Grid.Row="0" Grid.Column="1" Height="24">Daemon Setup</Label>
 		</Grid>
+
+		<Button Name="btnOpenCliToolsFolder"
+				Content="Open Client Tools Folder"
+				DockPanel.Dock="Right"
+				Margin="0,10,0,0"
+				Click="OpenCliToolsFolderClicked"/>
 
 		<Button Name="btnCheckForUpdates"
 				Content="Check for updates"
@@ -23,6 +28,16 @@
 				Margin="0,10,0,0"
 				Click="CheckForUpdatesClicked"/>
 
+		<Label Content="Mining Address" Margin="0,10,0,0" />
+		<TextBox Name="tbxMiningAddress" />
+
+		<Label Content="Daemon Data Directory" Margin="0,10,0,0" />
+		<TextBox Name="tbxDaemonDataDir" />
+
+		<Button Name="btnSaveSettings"
+				Content="Save Settings"
+				Click="SaveSettingsClicked"
+				Margin="0,10,0,0" />
 	</StackPanel>
 	
 </UserControl>
