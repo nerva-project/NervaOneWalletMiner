@@ -281,9 +281,84 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         #endregion // Restore from Seed
 
         #region Restore from Keys
-        public Task<RestoreFromKeysResponse> RestoreFromKeys(RpcBase rpc, RestoreFromKeysRequest requestObj)
+        /* RPC request params:
+         *  uint64_t restore_height;                OPT
+         *  std::string filename;
+         *  std::string address;
+         *  std::string spendkey;
+         *  std::string viewkey;
+         *  std::string password;
+         *  std::string language;
+         *  bool autosave_current;                  OPT
+         */
+        public async Task<RestoreFromKeysResponse> RestoreFromKeys(RpcBase rpc, RestoreFromKeysRequest requestObj)
         {
-            throw new NotImplementedException();
+            RestoreFromKeysResponse responseObj = new();
+
+            try
+            {
+                // Build request content json
+                var requestParams = new JObject
+                {
+                    ["restore_height"] = requestObj.RestoreHeight,
+                    ["filename"] = requestObj.WalletName,
+                    ["address"] = requestObj.WalletAddress,
+                    ["spendkey"] = requestObj.SpendKey,
+                    ["viewkey"] = requestObj.ViewKey,
+                    ["password"] = requestObj.Password,
+                    ["language"] = requestObj.Language,
+                    ["autosave_current"] = requestObj.AutoSave
+                };
+
+                var requestJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = "0",
+                    ["method"] = "restore_wallet_from_keys",
+                    ["params"] = requestParams
+                };
+
+                // Call service and process response
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+
+                    var error = JObject.Parse(jsonObject.ToString())["error"];
+                    if (error != null)
+                    {
+                        // Set Service error
+                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                    }
+                    else
+                    {
+                        ResRestoreFromKeys createWalletResponse = JsonConvert.DeserializeObject<ResRestoreFromKeys>(jsonObject.SelectToken("result").ToString());
+                        responseObj.Address = createWalletResponse.address;
+                        responseObj.Seed = createWalletResponse.seed;
+                        responseObj.Info = createWalletResponse.info;
+
+                        responseObj.Error.IsError = false;
+                    }
+                }
+                else
+                {
+                    // Set HTTP error
+                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("RWXNV.RFK", ex);
+            }
+
+            return responseObj;
+        }
+
+        private class ResRestoreFromKeys
+        {
+            public string address { get; set; } = string.Empty;
+            public string seed { get; set; } = string.Empty;
+            public string info { get; set; } = string.Empty;
         }
         #endregion // Restore from Keys
 
