@@ -324,6 +324,8 @@ public class MainViewModel : ViewModelBase
 
     public void UpdateTransfersView()
     {
+        int newTransfersCount = 0;
+
         if(GlobalData.IsWalletOpen)
         {
             if (((TransfersViewModel)ViewModelPagesDictionary[SplitViewPages.Transfers]).Transactions.Count == 0)
@@ -331,6 +333,12 @@ public class MainViewModel : ViewModelBase
                 ((TransfersViewModel)ViewModelPagesDictionary[SplitViewPages.Transfers]).Transactions = GlobalData.TransfersStats.Transactions.Values.ToList<Transfer>().OrderByDescending(tr => tr.Height).ToList();
                 // Need to reset so we do not process transactions every second until next update
                 GlobalData.TransfersStats.Transactions = [];
+
+                if(((TransfersViewModel)ViewModelPagesDictionary[SplitViewPages.Transfers]).Transactions.Count > 0)
+                {
+                    // TODO: This will also save after initial open BUT it will cover restoring wallet
+                    newTransfersCount = ((TransfersViewModel)ViewModelPagesDictionary[SplitViewPages.Transfers]).Transactions.Count;
+                }
             }
             else
             {
@@ -339,6 +347,7 @@ public class MainViewModel : ViewModelBase
                 foreach (string newTransferKey in GlobalData.TransfersStats.Transactions.Keys)
                 {
                     // Check if transaction already exists in datagrid and add it to the top if it does not
+                    // TODO: If for some reason, you keep getting a lot of transactions (that might already be in memory), this is very expensive and can block updating process
                     if (!((TransfersViewModel)ViewModelPagesDictionary[SplitViewPages.Transfers]).Transactions.Any(transfer => transfer.TransactionId + "_" + transfer.Type == newTransferKey))
                     {
                         newTransfers.Add(GlobalData.TransfersStats.Transactions[newTransferKey]);
@@ -351,7 +360,14 @@ public class MainViewModel : ViewModelBase
                 {
                     // TODO: If you scroll in the datagrid, new rows show up, otherwise, they do not. Figure out how to force refresh
                     ((TransfersViewModel)ViewModelPagesDictionary[SplitViewPages.Transfers]).Transactions.InsertRange(0, newTransfers.OrderByDescending(tr => tr.Height).ToList());
+                    newTransfersCount = newTransfers.Count;
                 }
+            }
+
+            if(!GlobalData.IsWalletJustOpened && newTransfersCount > 0)
+            {
+                Logger.LogDebug("Main.UTV", "Auto-saving wallet. New transfers count: " + newTransfersCount);
+                SaveWallet();
             }
         }
         else
@@ -438,8 +454,7 @@ public class MainViewModel : ViewModelBase
             if (!_killMasterProcess && _isInitialDaemonConnectionSuccess && GlobalData.IsWalletOpen)
             {
                 if(GlobalData.IsWalletJustOpened)
-                {
-                    GlobalData.IsWalletJustOpened = false;
+                {                    
                     WalletUiUpdate();
                     TransfersUiUpdate();
                 }
@@ -454,6 +469,12 @@ public class MainViewModel : ViewModelBase
             // Actual UI update. If walet was closed, it will clear things
             UpdateWalletView();
             UpdateTransfersView();
+
+            if (GlobalData.IsWalletJustOpened)
+            {
+                // Will use this to auto-save wallet so need to reset it at the end
+                GlobalData.IsWalletJustOpened = false;
+            }
         }
         catch (Exception ex)
         {
@@ -780,5 +801,26 @@ public class MainViewModel : ViewModelBase
             Logger.LogException("Main.TUU", ex);
         }
     }
-     #endregion // Master Process Methods
+    #endregion // Master Process Methods
+
+    public async void SaveWallet()
+    {
+        try
+        {
+            SaveWalletResponse resStore = await GlobalData.WalletService.SaveWallet(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new SaveWalletRequest());
+
+            if (resStore.Error.IsError)
+            {
+                Logger.LogError("Main.SW", "Error saving wallet: " + GlobalData.OpenedWalletName + ". Code: " + resStore.Error.Code + ", Message: " + resStore.Error.Message);
+            }
+            else
+            {
+                Logger.LogDebug("Main.SW", "Wallet " + GlobalData.OpenedWalletName + " saved!");
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException("Main.SW", ex);
+        }
+    }
 }

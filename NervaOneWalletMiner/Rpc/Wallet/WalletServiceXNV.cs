@@ -198,6 +198,54 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         }
         #endregion // Create Wallet
 
+        #region Save Wallet
+        public async Task<SaveWalletResponse> SaveWallet(RpcBase rpc, SaveWalletRequest requestObj)
+        {
+            SaveWalletResponse responseObj = new();
+
+            try
+            {
+                // Build request content json
+                var requestJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = "0",
+                    ["method"] = "store"
+                };
+
+                // Call service and process response
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+
+                    var error = JObject.Parse(jsonObject.ToString())["error"];
+                    if (error != null)
+                    {
+                        // Set Service error
+                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                    }
+                    else
+                    {
+                        // Just set error to false
+                        responseObj.Error.IsError = false;
+                    }
+                }
+                else
+                {
+                    // Set HTTP error
+                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("RWXNV.SW", ex);
+            }
+
+            return responseObj;
+        }
+        #endregion // Save Wallet
+
         #region Restore from Seed
         /* RPC request params:
          *  uint64_t restore_height;                OPT
