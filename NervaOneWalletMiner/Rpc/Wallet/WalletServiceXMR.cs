@@ -229,7 +229,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("RWXNV.SW", ex);
+                Logger.LogException("RWXMR.SW", ex);
             }
 
             return responseObj;
