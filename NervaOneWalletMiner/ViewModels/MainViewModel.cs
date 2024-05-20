@@ -276,7 +276,7 @@ public class MainViewModel : ViewModelBase
             ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).OpenCloseWallet = StatusWallet.CloseWallet;
 
             // Status Bar
-            string statusBarMessage = GlobalData.OpenedWalletName + " | Account(s): " + GlobalData.WalletStats.Subaddresses.Count + " | Balance: " + GlobalData.WalletStats.TotalBalanceLocked + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
+            string statusBarMessage = GlobalData.OpenedWalletName + " | Account(s): " + GlobalData.WalletStats.Subaddresses.Count + " | Balance: " + GlobalData.WalletStats.TotalBalanceLocked + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits + " | Height: " + GlobalData.WalletHeight;
             if (WalletStatus != statusBarMessage)
             {
                 WalletStatus = statusBarMessage;
@@ -457,12 +457,14 @@ public class MainViewModel : ViewModelBase
                 {                    
                     WalletUiUpdate();
                     TransfersUiUpdate();
+                    SetWalletHeight();
                 }
                 else if(_masterTimerCount % (GlobalData.AppSettings.TimerIntervalMultiplier * 3) == 0)
                 {
                     // Update wallet every 3rd call because you do not need to do it more often
                     WalletUiUpdate();
                     TransfersUiUpdate();
+                    SetWalletHeight();
                 }                
             }
 
@@ -795,6 +797,27 @@ public class MainViewModel : ViewModelBase
 
                 _isTransfersUpdateComplete = true;
             }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException("Main.TUU", ex);
+        }
+    }
+
+    public async void SetWalletHeight()
+    {
+        try
+        {
+            GetHeightResponse resGetHeight = await GlobalData.WalletService.GetHeight(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new GetHeightRequest());
+
+            if (resGetHeight.Error.IsError)
+            {
+                Logger.LogError("Main.WUU", "GetTransfers Error Code: " + resGetHeight.Error.Code + ", Message: " + resGetHeight.Error.Message);
+            }
+            else
+            {
+                GlobalData.WalletHeight = resGetHeight.Height;
+            }            
         }
         catch (Exception ex)
         {

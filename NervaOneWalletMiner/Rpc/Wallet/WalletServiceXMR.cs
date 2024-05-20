@@ -772,5 +772,60 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             public uint minor { get; set; }
         }
         #endregion // Get Transfers
+
+        #region Get Height
+        public async Task<GetHeightResponse> GetHeight(RpcBase rpc, GetHeightRequest requestObj)
+        {
+            GetHeightResponse responseObj = new();
+
+            try
+            {
+                // Build request content json
+                var requestJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = "0",
+                    ["method"] = "get_height"
+                };
+
+                // Call service and process response
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+
+                    var error = JObject.Parse(jsonObject.ToString())["error"];
+                    if (error != null)
+                    {
+                        // Set Service error
+                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                    }
+                    else
+                    {
+                        ResGetHeight getHeightResponse = JsonConvert.DeserializeObject<ResGetHeight>(jsonObject.SelectToken("result").ToString());
+                        responseObj.Height = getHeightResponse.height;
+
+                        responseObj.Error.IsError = false;
+                    }
+                }
+                else
+                {
+                    // Set HTTP error
+                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("RWXNV.CA", ex);
+            }
+
+            return responseObj;
+        }
+
+        private class ResGetHeight
+        {
+            public ulong height { get; set; }
+        }
+        #endregion // Get Height
     }
 }

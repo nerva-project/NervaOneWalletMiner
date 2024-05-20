@@ -25,6 +25,8 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         // TODO: Pass optional tag
         Task<GetAccountsResponse> GetAccounts(RpcBase rpc, GetAccountsRequest requestObj);
 
-        Task<GetTransfersResponse> GetTransfers(RpcBase rpc, GetTransfersRequest requestObj);        
+        Task<GetTransfersResponse> GetTransfers(RpcBase rpc, GetTransfersRequest requestObj);
+
+        Task<GetHeightResponse> GetHeight(RpcBase rpc, GetHeightRequest requestObj);
     }
 }

@@ -96,6 +96,8 @@ namespace NervaOneWalletMiner.Views
                 GlobalData.OpenedWalletName = walletName;
                 GlobalData.NewestTransactionHeight = 0;
             }
+
+            GlobalData.WalletHeight = 0;
         }
         #endregion // Open Wallet
 
@@ -172,7 +174,7 @@ namespace NervaOneWalletMiner.Views
             {
                 GlobalData.IsWalletOpen = false;
                 GlobalData.IsWalletJustOpened = false;
-                GlobalData.OpenedWalletName = string.Empty;
+                GlobalData.OpenedWalletName = string.Empty;                
 
                 await Dispatcher.UIThread.InvokeAsync(async () =>
                 {
@@ -192,6 +194,8 @@ namespace NervaOneWalletMiner.Views
                     _ = await box.ShowAsync();
                 });
             }
+
+            GlobalData.WalletHeight = 0;
         }        
     }
 }
