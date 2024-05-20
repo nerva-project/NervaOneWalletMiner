@@ -816,7 +816,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("RWXNV.CA", ex);
+                Logger.LogException("RWXMR.CA", ex);
             }
 
             return responseObj;
