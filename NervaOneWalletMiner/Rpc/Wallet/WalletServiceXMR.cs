@@ -827,5 +827,12 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             public ulong height { get; set; }
         }
         #endregion // Get Height
+
+        #region Query Key
+        public Task<QueryKeyResponse> QueryKey(RpcBase rpc, QueryKeyRequest requestObj)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion Query Key
     }
 }
