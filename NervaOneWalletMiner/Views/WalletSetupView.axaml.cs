@@ -20,7 +20,7 @@ namespace NervaOneWalletMiner.Views
 
         public WalletSetupView()
         {
-            InitializeComponent();
+            InitializeComponent();            
         }
 
         public void OpenWalletsFolderClicked(object sender, RoutedEventArgs args)
@@ -274,5 +274,20 @@ namespace NervaOneWalletMiner.Views
 
         }
         #endregion // Restore from Seed
+
+        #region View Keys/Seed
+        public void ViewKeysSeedClicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                var window = new DisplayKeysSeedView();
+                window.ShowDialog(GetWindow());
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("WalSV.VKSC", ex);
+            }
+        }
+        #endregion // View Keys/Seed
     }
 }
