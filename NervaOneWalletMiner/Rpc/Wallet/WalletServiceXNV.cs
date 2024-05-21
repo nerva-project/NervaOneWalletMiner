@@ -1,6 +1,7 @@
 ﻿using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects.DataGrid;
 using NervaOneWalletMiner.Rpc.Common;
+using NervaOneWalletMiner.Rpc.Wallet.Objects;
 using NervaOneWalletMiner.Rpc.Wallet.Requests;
 using NervaOneWalletMiner.Rpc.Wallet.Responses;
 using Newtonsoft.Json;
@@ -831,18 +832,28 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             try
             {
                 // Build request content json
-                var requestParams = new JObject
-                {
-                    ["key_type"] = requestObj.KeyType,
-                };
+                JObject requestJson = [];
 
-                var requestJson = new JObject
+                if (requestObj.KeyType == KeyType.Mnemonic)
                 {
-                    ["jsonrpc"] = "2.0",
-                    ["id"] = "0",
-                    ["method"] = "query_key",
-                    ["params"] = requestParams
-                };
+                    requestJson = new JObject
+                    {
+                        ["jsonrpc"] = "2.0",
+                        ["id"] = "0",
+                        ["method"] = "query_key",
+                        ["params"] = new JObject() { ["key_type"] = "mnemonic" }
+                    };
+                }
+                else if (requestObj.KeyType == KeyType.AllViewSpend)
+                {
+                    requestJson = new JObject
+                    {
+                        ["jsonrpc"] = "2.0",
+                        ["id"] = "0",
+                        ["method"] = "query_key",
+                        ["params"] = new JObject() { ["key_type"] = "all_keys" }
+                    };
+                }
 
                 // Call service and process response
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());

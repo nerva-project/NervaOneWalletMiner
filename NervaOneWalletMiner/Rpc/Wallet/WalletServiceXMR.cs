@@ -1,6 +1,7 @@
 ﻿using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects.DataGrid;
 using NervaOneWalletMiner.Rpc.Common;
+using NervaOneWalletMiner.Rpc.Wallet.Objects;
 using NervaOneWalletMiner.Rpc.Wallet.Requests;
 using NervaOneWalletMiner.Rpc.Wallet.Responses;
 using Newtonsoft.Json;
@@ -834,23 +835,36 @@ namespace NervaOneWalletMiner.Rpc.Wallet
          */
         public async Task<QueryKeyResponse> QueryKey(RpcBase rpc, QueryKeyRequest requestObj)
         {
+            // TODO: I do not like how this is done. Change it!
+
             QueryKeyResponse responseObj = new();
 
             try
             {
                 // Build request content json
-                var requestParams = new JObject
+                JObject requestJson = [];
+                
+                if (requestObj.KeyType == KeyType.Mnemonic)
+                {                    
+                    requestJson = new JObject
+                    {
+                        ["jsonrpc"] = "2.0",
+                        ["id"] = "0",
+                        ["method"] = "query_key",
+                        ["params"] = new JObject() { ["key_type"] = "mnemonic" }
+                    };
+                }
+                else if(requestObj.KeyType == KeyType.AllViewSpend)
                 {
-                    ["key_type"] = requestObj.KeyType,
-                };
+                    requestJson = new JObject
+                    {
+                        ["jsonrpc"] = "2.0",
+                        ["id"] = "0",
+                        ["method"] = "query_key",
+                        ["params"] = new JObject() { ["key_type"] = "view_key" }
+                    };
+                }
 
-                var requestJson = new JObject
-                {
-                    ["jsonrpc"] = "2.0",
-                    ["id"] = "0",
-                    ["method"] = "query_key",
-                    ["params"] = requestParams
-                };
 
                 // Call service and process response
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
@@ -867,13 +881,50 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     else
                     {
                         ResQueryKey getHeightResponse = JsonConvert.DeserializeObject<ResQueryKey>(jsonObject.SelectToken("result").ToString());
-                        responseObj.PublicViewKey = getHeightResponse.public_view_key;
-                        responseObj.PrivateViewKey = getHeightResponse.public_view_key;
-                        responseObj.PublicSpendKey = getHeightResponse.public_spend_key;
-                        responseObj.PrivateSpendKey = getHeightResponse.private_spend_key;
-                        responseObj.Mnemonic = getHeightResponse.mnemonic;
+                        if (requestObj.KeyType == KeyType.Mnemonic)
+                        {
+                            responseObj.Mnemonic = getHeightResponse.key;
 
-                        responseObj.Error.IsError = false;
+                            responseObj.Error.IsError = false;
+                        }
+                        else if (requestObj.KeyType == KeyType.AllViewSpend)
+                        {
+                            responseObj.PrivateViewKey = getHeightResponse.key;
+
+                            // Call again to get spend key
+                            requestJson = new JObject
+                            {
+                                ["jsonrpc"] = "2.0",
+                                ["id"] = "0",
+                                ["method"] = "query_key",
+                                ["params"] = new JObject() { ["key_type"] = "spend_key" }
+                            };
+                            
+                            httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
+                            if (httpResponse.IsSuccessStatusCode)
+                            {
+                                jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+
+                                error = JObject.Parse(jsonObject.ToString())["error"];
+                                if (error != null)
+                                {
+                                    // Set Service error
+                                    responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                                }
+                                else
+                                {
+                                    getHeightResponse = JsonConvert.DeserializeObject<ResQueryKey>(jsonObject.SelectToken("result").ToString());
+                                    responseObj.PrivateSpendKey = getHeightResponse.key;
+
+                                    responseObj.Error.IsError = false;
+                                }
+                            }
+                            else
+                            {
+                                // Set HTTP error
+                                responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
+                            }
+                        }
                     }
                 }
                 else
@@ -884,7 +935,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("RWXNV.CA", ex);
+                Logger.LogException("RWXMR.CA", ex);
             }
 
             return responseObj;
@@ -892,11 +943,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
 
         private class ResQueryKey
         {
-            public string public_view_key { get; set; } = string.Empty;
-            public string private_view_key { get; set; } = string.Empty;
-            public string public_spend_key { get; set; } = string.Empty;
-            public string private_spend_key { get; set; } = string.Empty;
-            public string mnemonic { get; set; } = string.Empty;
+            public string key { get; set; } = string.Empty;
         }
         #endregion // Query Key
     }

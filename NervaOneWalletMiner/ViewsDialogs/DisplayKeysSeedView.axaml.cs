@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects;
+using NervaOneWalletMiner.Rpc.Wallet.Objects;
 using NervaOneWalletMiner.Rpc.Wallet.Requests;
 using NervaOneWalletMiner.Rpc.Wallet.Responses;
 using System;
@@ -25,7 +26,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             {
                 // TODO: For multi-coin support, need to make generic KeyType values and handle them in interface implementation
 
-                QueryKeyResponse response = await GlobalData.WalletService.QueryKey(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new QueryKeyRequest() { KeyType = "all_keys" });
+                QueryKeyResponse response = await GlobalData.WalletService.QueryKey(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new QueryKeyRequest() { KeyType = KeyType.AllViewSpend });
 
                 if (response.Error.IsError)
                 {
@@ -37,9 +38,11 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     this.Get<TextBox>("tbxPrivateViewKey").Text = response.PrivateViewKey;
                     this.Get<TextBox>("tbxPublicSpendKey").Text = response.PublicSpendKey;
                     this.Get<TextBox>("tbxPrivateSpendKey").Text = response.PrivateSpendKey;
-                    
+                    response = new QueryKeyResponse();
+
+
                     // Once you got keys, query mnemonic seed
-                    response = await GlobalData.WalletService.QueryKey(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new QueryKeyRequest() { KeyType = "mnemonic" });
+                    response = await GlobalData.WalletService.QueryKey(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new QueryKeyRequest() { KeyType = KeyType.Mnemonic });
                     if (response.Error.IsError)
                     {
                         Logger.LogError("WalSV.RFK", "Failed to query mnemonic seed for " + GlobalData.OpenedWalletName + " | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
@@ -47,6 +50,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     else
                     {
                         this.Get<TextBox>("tbxMnemonicSeed").Text = response.Mnemonic;
+                        response = new QueryKeyResponse();
                     }                        
                 }
             }
@@ -64,6 +68,13 @@ namespace NervaOneWalletMiner.ViewsDialogs
                 {
                     IsCancel = true
                 };
+
+                // TODO: Clear those even if user closes window without clicking close
+                this.Get<TextBox>("tbxPublicViewKey").Text = "";
+                this.Get<TextBox>("tbxPrivateViewKey").Text = "";
+                this.Get<TextBox>("tbxPublicSpendKey").Text = "";
+                this.Get<TextBox>("tbxPrivateSpendKey").Text = "";
+                this.Get<TextBox>("tbxMnemonicSeed").Text = "";
 
                 Close(result);
             }

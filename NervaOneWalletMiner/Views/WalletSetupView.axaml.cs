@@ -66,6 +66,7 @@ namespace NervaOneWalletMiner.Views
                 };
 
                 CreateWalletResponse response = await GlobalData.WalletService.CreateWallet(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
+                request = new();
 
                 if (response.Error.IsError)
                 {
@@ -134,7 +135,7 @@ namespace NervaOneWalletMiner.Views
             DialogResult result = ((DialogResult)((Task<object>)task).Result);
             if (result != null && result.IsOk)
             {
-                // TODO: Restore wallet
+                // TODO: Change this so you're not storing sensitive date in many places
                 if (!string.IsNullOrEmpty(result.SeedPhrase) && !string.IsNullOrEmpty(result.WalletName) && !string.IsNullOrEmpty(result.WalletPassword))
                 {
                     RestoreFromSeed(result.SeedPhrase, result.SeedOffset, result.WalletName, result.WalletPassword, result.WalletLanguage);
@@ -213,7 +214,7 @@ namespace NervaOneWalletMiner.Views
             DialogResult result = ((DialogResult)((Task<object>)task).Result);
             if (result != null && result.IsOk)
             {
-                // TODO: Restore wallet
+                // TODO: Change this so you're not storing sensitive date in many places
                 if (!string.IsNullOrEmpty(result.WalletAddress) && !string.IsNullOrEmpty(result.ViewKey)  && !string.IsNullOrEmpty(result.SpendKey)
                     && !string.IsNullOrEmpty(result.WalletName) && !string.IsNullOrEmpty(result.WalletPassword))
                 {
