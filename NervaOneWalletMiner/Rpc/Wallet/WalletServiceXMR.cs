@@ -829,10 +829,75 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         #endregion // Get Height
 
         #region Query Key
-        public Task<QueryKeyResponse> QueryKey(RpcBase rpc, QueryKeyRequest requestObj)
+        /* RPC request params:
+         *  std::string key_type;
+         */
+        public async Task<QueryKeyResponse> QueryKey(RpcBase rpc, QueryKeyRequest requestObj)
         {
-            throw new NotImplementedException();
+            QueryKeyResponse responseObj = new();
+
+            try
+            {
+                // Build request content json
+                var requestParams = new JObject
+                {
+                    ["key_type"] = requestObj.KeyType,
+                };
+
+                var requestJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = "0",
+                    ["method"] = "query_key",
+                    ["params"] = requestParams
+                };
+
+                // Call service and process response
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+
+                    var error = JObject.Parse(jsonObject.ToString())["error"];
+                    if (error != null)
+                    {
+                        // Set Service error
+                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                    }
+                    else
+                    {
+                        ResQueryKey getHeightResponse = JsonConvert.DeserializeObject<ResQueryKey>(jsonObject.SelectToken("result").ToString());
+                        responseObj.PublicViewKey = getHeightResponse.public_view_key;
+                        responseObj.PrivateViewKey = getHeightResponse.public_view_key;
+                        responseObj.PublicSpendKey = getHeightResponse.public_spend_key;
+                        responseObj.PrivateSpendKey = getHeightResponse.private_spend_key;
+                        responseObj.Mnemonic = getHeightResponse.mnemonic;
+
+                        responseObj.Error.IsError = false;
+                    }
+                }
+                else
+                {
+                    // Set HTTP error
+                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("RWXNV.CA", ex);
+            }
+
+            return responseObj;
         }
-        #endregion Query Key
+
+        private class ResQueryKey
+        {
+            public string public_view_key { get; set; } = string.Empty;
+            public string private_view_key { get; set; } = string.Empty;
+            public string public_spend_key { get; set; } = string.Empty;
+            public string private_spend_key { get; set; } = string.Empty;
+            public string mnemonic { get; set; } = string.Empty;
+        }
+        #endregion // Query Key
     }
 }
