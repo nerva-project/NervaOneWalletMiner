@@ -2,6 +2,7 @@
 using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Objects.DataGrid;
 using NervaOneWalletMiner.Objects.Settings;
+using NervaOneWalletMiner.Objects.Settings.CoinSpecific;
 using NervaOneWalletMiner.Objects.Stats;
 using NervaOneWalletMiner.Rpc.Daemon;
 using NervaOneWalletMiner.Rpc.Daemon.Downloads;
@@ -26,6 +27,8 @@ namespace NervaOneWalletMiner.Helpers
 
         // Those will be saved to and read from app.config
         public static ApplicationSettings AppSettings = new();
+
+        public static Dictionary<string, ISettingsDefault> DefaultSettings = GlobalMethods.GetDefaultSettings();
 
         public static readonly string DataDir = GlobalMethods.GetDataDir();
         public static readonly string LogDir = GlobalMethods.GetLogDir();

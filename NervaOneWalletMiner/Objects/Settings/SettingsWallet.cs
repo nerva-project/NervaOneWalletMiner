@@ -1,15 +1,14 @@
-﻿using NervaOneWalletMiner.Helpers;
-using NervaOneWalletMiner.Rpc.Common;
+﻿using NervaOneWalletMiner.Rpc.Common;
 
 namespace NervaOneWalletMiner.Objects.Settings
 {
     public class SettingsWallet
     {
-        public RpcBase Rpc { get; set; } = new RpcBase((uint)GlobalData.RandomGenerator.Next(10000, 50000));
+        public RpcBase Rpc { get; set; } = new RpcBase();
 
-        public uint LogLevel { get; set; } = 1;
+        public uint LogLevel { get; set; } = 0;
 
-        public string DisplayUnits { get; set; } = "XNV";
+        public string DisplayUnits { get; set; } = string.Empty;
 
         public int NumTransfersToDisplay { get; set; } = 50;
     }

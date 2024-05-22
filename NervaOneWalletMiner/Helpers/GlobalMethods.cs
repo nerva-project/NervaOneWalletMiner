@@ -2,8 +2,10 @@
 using Avalonia.Platform;
 using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Objects.Settings;
+using NervaOneWalletMiner.Objects.Settings.CoinSpecific;
 using NervaOneWalletMiner.Rpc;
 using NervaOneWalletMiner.Rpc.Daemon;
+using NervaOneWalletMiner.Rpc.Common;
 using NervaOneWalletMiner.Rpc.Daemon.Downloads;
 using NervaOneWalletMiner.Rpc.Wallet;
 using System;
@@ -13,7 +15,6 @@ using System.IO.Compression;
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace NervaOneWalletMiner.Helpers
 {
@@ -145,22 +146,73 @@ namespace NervaOneWalletMiner.Helpers
         #endregion // Directories, Paths and Names
 
         #region Coin Specific Setup
+        public static Dictionary<string, ISettingsDefault> GetDefaultSettings()
+        {
+            Dictionary<string, ISettingsDefault> defaultSettings = [];
+
+            defaultSettings.Add(Coin.XNV, new SettingsDefaultXNV());
+            defaultSettings.Add(Coin.XMR, new SettingsDefaultXMR());
+
+            return defaultSettings;
+        }
         public static Dictionary<string, SettingsDaemon> GetDaemonSettings()
         {
+            if (GlobalData.DefaultSettings == null || GlobalData.DefaultSettings.Count == 0)
+            {
+                GlobalData.DefaultSettings = GetDefaultSettings();
+            }
+
             Dictionary<string, SettingsDaemon> daemonSettings = [];
 
-            daemonSettings.Add(Coin.XNV, new SettingsDaemon(17566) { BlockSeconds = 60.0, LogLevel = 1 });
-            daemonSettings.Add(Coin.XMR, new SettingsDaemon(18081) { BlockSeconds = 120.0, LogLevel = 0 });
+            daemonSettings.Add(Coin.XNV, new SettingsDaemon() { 
+                BlockSeconds = GlobalData.DefaultSettings[Coin.XNV].BlockSeconds,
+                LogLevel = GlobalData.DefaultSettings[Coin.XNV].LogLevelDaemon,
+                Rpc = new RpcBase() { 
+                    Port = GlobalData.DefaultSettings[Coin.XNV].DaemonPort
+                }
+            });
+
+            daemonSettings.Add(Coin.XMR, new SettingsDaemon()
+            {
+                BlockSeconds = GlobalData.DefaultSettings[Coin.XMR].BlockSeconds,
+                LogLevel = GlobalData.DefaultSettings[Coin.XMR].LogLevelDaemon,
+                Rpc = new RpcBase()
+                {
+                    Port = GlobalData.DefaultSettings[Coin.XMR].DaemonPort
+                }
+            });
 
             return daemonSettings;
         }
 
         public static Dictionary<string, SettingsWallet> GetWalletSettings()
         {
+            if(GlobalData.DefaultSettings == null || GlobalData.DefaultSettings.Count == 0)
+            {
+                GlobalData.DefaultSettings = GetDefaultSettings();
+            }
+
             Dictionary<string, SettingsWallet> walletSettings = [];
 
-            walletSettings.Add(Coin.XNV, new SettingsWallet() { DisplayUnits = "XNV" });
-            walletSettings.Add(Coin.XMR, new SettingsWallet() { DisplayUnits = "XMR" });
+            walletSettings.Add(Coin.XNV, new SettingsWallet()
+            {
+                DisplayUnits = GlobalData.DefaultSettings[Coin.XNV].DisplayUnits,
+                LogLevel = GlobalData.DefaultSettings[Coin.XNV].LogLevelDaemon,
+                Rpc = new RpcBase()
+                {
+                    Port = (uint)GlobalData.RandomGenerator.Next(10000, 50000)
+                }
+            });
+
+            walletSettings.Add(Coin.XMR, new SettingsWallet()
+            {
+                DisplayUnits = GlobalData.DefaultSettings[Coin.XMR].DisplayUnits,
+                LogLevel = GlobalData.DefaultSettings[Coin.XMR].LogLevelDaemon,
+                Rpc = new RpcBase()
+                {
+                    Port = (uint)GlobalData.RandomGenerator.Next(10000, 50000)
+                }
+            });
 
             return walletSettings;
         }
@@ -186,21 +238,21 @@ namespace NervaOneWalletMiner.Helpers
                     GlobalData.DownloadLinks = new DownloadXMR();
 
                     // TODO: Change this. App.config overwrites GetDaemonSettings with 0
-                    if (GlobalData.AppSettings.Daemon[Coin.XMR].BlockSeconds != 120.0)
+                    if (GlobalData.AppSettings.Daemon[Coin.XMR].BlockSeconds != GlobalData.DefaultSettings[Coin.XMR].BlockSeconds)
                     {
-                        GlobalData.AppSettings.Daemon[Coin.XMR].BlockSeconds = 120.0;
+                        GlobalData.AppSettings.Daemon[Coin.XMR].BlockSeconds = GlobalData.DefaultSettings[Coin.XMR].BlockSeconds;
                     }
-                    if (GlobalData.AppSettings.Daemon[Coin.XMR].LogLevel != 0)
+                    if (GlobalData.AppSettings.Daemon[Coin.XMR].LogLevel != GlobalData.DefaultSettings[Coin.XMR].LogLevelDaemon)
                     {
-                        GlobalData.AppSettings.Daemon[Coin.XMR].LogLevel = 0;
+                        GlobalData.AppSettings.Daemon[Coin.XMR].LogLevel = GlobalData.DefaultSettings[Coin.XMR].LogLevelDaemon;
                     }
-                    if (GlobalData.AppSettings.Wallet[Coin.XMR].DisplayUnits != "XMR")
+                    if (GlobalData.AppSettings.Wallet[Coin.XMR].DisplayUnits != GlobalData.DefaultSettings[Coin.XMR].DisplayUnits)
                     {
-                        GlobalData.AppSettings.Wallet[Coin.XMR].DisplayUnits = "XMR";
+                        GlobalData.AppSettings.Wallet[Coin.XMR].DisplayUnits = GlobalData.DefaultSettings[Coin.XMR].DisplayUnits;
                     }
-                    if (GlobalData.AppSettings.Wallet[Coin.XMR].LogLevel != 0)
+                    if (GlobalData.AppSettings.Wallet[Coin.XMR].LogLevel != GlobalData.DefaultSettings[Coin.XMR].LogLevelWallet)
                     {
-                        GlobalData.AppSettings.Wallet[Coin.XMR].LogLevel = 0;
+                        GlobalData.AppSettings.Wallet[Coin.XMR].LogLevel = GlobalData.DefaultSettings[Coin.XMR].LogLevelWallet;
                     }
                     break;
 
@@ -220,9 +272,9 @@ namespace NervaOneWalletMiner.Helpers
                     GlobalData.DownloadLinks = new DownloadXNV();
 
                     // TODO: Change this. App.config overwrites GetDaemonSettings() with default 0
-                    if (GlobalData.AppSettings.Daemon[Coin.XNV].BlockSeconds != 60.0)
+                    if (GlobalData.AppSettings.Daemon[Coin.XNV].BlockSeconds != GlobalData.DefaultSettings[Coin.XNV].BlockSeconds)
                     {
-                        GlobalData.AppSettings.Daemon[Coin.XNV].BlockSeconds = 60.0;
+                        GlobalData.AppSettings.Daemon[Coin.XNV].BlockSeconds = GlobalData.DefaultSettings[Coin.XNV].BlockSeconds;
                     }
                     break;
             }

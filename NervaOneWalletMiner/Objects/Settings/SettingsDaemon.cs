@@ -2,9 +2,9 @@
 
 namespace NervaOneWalletMiner.Objects.Settings
 {
-    public class SettingsDaemon(uint rcpPort)
+    public class SettingsDaemon
     {
-        public RpcBase Rpc { get; set; } = new RpcBase(rcpPort);
+        public RpcBase Rpc { get; set; } = new RpcBase();
 
         public bool StopOnExit { get; set; } = false;
 
@@ -18,7 +18,7 @@ namespace NervaOneWalletMiner.Objects.Settings
 
         public string DataDir { get; set; } = string.Empty;
 
-        public uint LogLevel { get; set; } = 1;
+        public uint LogLevel { get; set; } = 0;
 
         public bool IsTestnet { get; set; } = false;
 
