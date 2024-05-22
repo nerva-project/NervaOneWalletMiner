@@ -1,8 +1,10 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Rpc;
 using System;
 using System.Diagnostics;
+using System.IO;
 
 namespace NervaOneWalletMiner.Views
 {
@@ -68,16 +70,40 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
-        public void CheckForUpdatesClicked(object sender, RoutedEventArgs args)
+        public void RestartWithQuickSyncClicked(object sender, RoutedEventArgs args)
         {
             try
             {
-                // TODO: Implement in the future
-
+                RestartWithQuickSync();               
             }
             catch (Exception ex)
             {
-                Logger.LogException("DaeSV.CFUC", ex);
+                Logger.LogException("DaeSV.RWQSC", ex);
+            }
+        }
+
+        public static async void RestartWithQuickSync()
+        {
+            try
+            {
+                bool isSuccess = await GlobalMethods.DownloadFileToFolder(GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].QuickSyncUrl, GlobalData.CliToolsDir);
+                if(isSuccess)
+                {
+                    Logger.LogDebug("DaeSV.RSQS", "Restarting CLI");
+                    WalletProcess.ForceClose();
+                    DaemonProcess.ForceClose();
+
+                    string quickSyncFile = Path.Combine(GlobalData.CliToolsDir, Path.GetFileName(GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].QuickSyncUrl));
+                    ProcessManager.StartExternalProcess(GlobalMethods.GetDaemonProcess(), DaemonProcess.GenerateOptions(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]) + " --quicksync \"" + quickSyncFile + "\"");
+                }
+                else
+                {
+                    Logger.LogError("DaeSV.RSQS", "Failed to download file: " + GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].QuickSyncUrl + " to " + GlobalData.CliToolsDir);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DaeSV.RSQS", ex);
             }
         }
     }

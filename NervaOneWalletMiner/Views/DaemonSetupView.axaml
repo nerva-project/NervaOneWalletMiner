@@ -22,11 +22,11 @@
 				Margin="0,10,0,0"
 				Click="OpenCliToolsFolderClicked"/>
 
-		<Button Name="btnCheckForUpdates"
-				Content="Check for updates"
+		<Button Name="btnRestartWithQuickSync"
+				Content="Restart with QuickSync"
 				DockPanel.Dock="Right"
 				Margin="0,10,0,0"
-				Click="CheckForUpdatesClicked"/>
+				Click="RestartWithQuickSyncClicked"/>
 
 		<Label Content="Mining Address" Margin="0,10,0,0" />
 		<TextBox Name="tbxMiningAddress" />

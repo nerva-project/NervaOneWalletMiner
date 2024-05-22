@@ -11,9 +11,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Net;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
+using System.Net.Http;
 
 namespace NervaOneWalletMiner.Helpers
 {
@@ -283,7 +284,7 @@ namespace NervaOneWalletMiner.Helpers
                 string cliToolsLink = GetCliToolsDownloadLink();
                 if(!string.IsNullOrEmpty(cliToolsLink))
                 {
-                    DownloadCLI(cliToolsLink, GlobalData.CliToolsDir);
+                    SetUpCliTools(cliToolsLink, GlobalData.CliToolsDir);
                 }
             }
         }
@@ -346,37 +347,64 @@ namespace NervaOneWalletMiner.Helpers
             return cliDownloadLink;
         }
 
-        public static void DownloadCLI(string downloadLink, string cliToolsPath)
+        public static async void SetUpCliTools(string downloadUrl, string cliToolsPath)
         {
-                // Check if we already downloaded the CLI package
-                string destFile = Path.Combine(cliToolsPath, Path.GetFileName(downloadLink));
+            // Check if we already downloaded the CLI package
+            string destFileWithPath = Path.Combine(cliToolsPath, Path.GetFileName(downloadUrl));
 
-                if (File.Exists(destFile))
+            if (File.Exists(destFileWithPath))
+            {
+                Logger.LogDebug("UM.DC", "Extracting existing CLI tools: " + destFileWithPath);
+
+                ExtractFile(cliToolsPath, destFileWithPath);
+            }
+            else
+            {
+                Logger.LogDebug("GM.DC", "Downloading CLI tools. URL: " + downloadUrl);
+
+                bool isSuccess = await DownloadFileToFolder(downloadUrl, cliToolsPath);
+
+                if(isSuccess)
                 {
-                    Logger.LogDebug("UM.DC", $"CLI tools found @ {destFile}");
-
-                    ExtractFile(cliToolsPath, destFile);
+                    Logger.LogDebug("UM.DC", "Extracting CLI tools after download: " + destFileWithPath);
+                    ExtractFile(cliToolsPath, destFileWithPath);
                 }
-                else
-                {
-                    Logger.LogDebug("GM.DC", "Downloading CLI tools. URL: " + downloadLink);
-                    using (var client = new WebClient())
-                    {
-                        client.DownloadFileCompleted += (s, e) =>
-                        {
-                            if (e.Error == null)
-                            {
-                                ExtractFile(cliToolsPath, destFile);
-                            }
-                            else
-                            {
-                                Logger.LogError("UM.DC", e.Error.Message);                               
-                            }
-                        };
+            }
+        }
 
-                        client.DownloadFileAsync(new Uri(downloadLink), destFile);
+        public static async Task<bool> DownloadFileToFolder(string downloadUrl, string destinationDir)
+        {
+            bool isSuccess = false;
+
+            try
+            {
+                if (!Directory.Exists(destinationDir))
+                {
+                    Directory.CreateDirectory(destinationDir);
+                }
+
+                string destFile = Path.Combine(destinationDir, Path.GetFileName(downloadUrl));
+
+                Logger.LogDebug("GM.DFTF", "Downloading file: " + downloadUrl + " to: " + destFile);
+                using (HttpClient client = new())
+                {
+                    using (var clientStream = await client.GetStreamAsync(downloadUrl))
+                    {
+                        using (var fileStream = new FileStream(destFile, FileMode.Create))
+                        {
+                            await clientStream.CopyToAsync(fileStream);
+                            Logger.LogDebug("GM.DFTF", "Setting success for: " + downloadUrl);
+                            isSuccess = true;
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("GM.DFTF", ex);
+            }
+
+            return isSuccess;
         }
 
         private static void ExtractFile(string destDir, string destFile)
