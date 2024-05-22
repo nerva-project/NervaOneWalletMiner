@@ -145,39 +145,39 @@ namespace NervaOneWalletMiner.Helpers
         #endregion // Directories, Paths and Names
 
         #region Coin Specific Setup
-        public static Dictionary<string, ISettingsDefault> GetDefaultSettings()
+        public static Dictionary<string, ICoinSettings> GetDefaultCoinSettings()
         {
-            Dictionary<string, ISettingsDefault> defaultSettings = [];
+            Dictionary<string, ICoinSettings> defaultSettings = [];
 
-            defaultSettings.Add(Coin.XNV, new SettingsDefaultXNV());
-            defaultSettings.Add(Coin.XMR, new SettingsDefaultXMR());
+            defaultSettings.Add(Coin.XNV, new CoinSettingsXNV());
+            defaultSettings.Add(Coin.XMR, new CoinSettingsXMR());
 
             return defaultSettings;
         }
         public static Dictionary<string, SettingsDaemon> GetDaemonSettings()
         {
-            if (GlobalData.DefaultSettings == null || GlobalData.DefaultSettings.Count == 0)
+            if (GlobalData.CoinSettings == null || GlobalData.CoinSettings.Count == 0)
             {
-                GlobalData.DefaultSettings = GetDefaultSettings();
+                GlobalData.CoinSettings = GetDefaultCoinSettings();
             }
 
             Dictionary<string, SettingsDaemon> daemonSettings = [];
 
             daemonSettings.Add(Coin.XNV, new SettingsDaemon() { 
-                BlockSeconds = GlobalData.DefaultSettings[Coin.XNV].BlockSeconds,
-                LogLevel = GlobalData.DefaultSettings[Coin.XNV].LogLevelDaemon,
+                BlockSeconds = GlobalData.CoinSettings[Coin.XNV].BlockSeconds,
+                LogLevel = GlobalData.CoinSettings[Coin.XNV].LogLevelDaemon,
                 Rpc = new RpcBase() { 
-                    Port = GlobalData.DefaultSettings[Coin.XNV].DaemonPort
+                    Port = GlobalData.CoinSettings[Coin.XNV].DaemonPort
                 }
             });
 
             daemonSettings.Add(Coin.XMR, new SettingsDaemon()
             {
-                BlockSeconds = GlobalData.DefaultSettings[Coin.XMR].BlockSeconds,
-                LogLevel = GlobalData.DefaultSettings[Coin.XMR].LogLevelDaemon,
+                BlockSeconds = GlobalData.CoinSettings[Coin.XMR].BlockSeconds,
+                LogLevel = GlobalData.CoinSettings[Coin.XMR].LogLevelDaemon,
                 Rpc = new RpcBase()
                 {
-                    Port = GlobalData.DefaultSettings[Coin.XMR].DaemonPort
+                    Port = GlobalData.CoinSettings[Coin.XMR].DaemonPort
                 }
             });
 
@@ -186,17 +186,17 @@ namespace NervaOneWalletMiner.Helpers
 
         public static Dictionary<string, SettingsWallet> GetWalletSettings()
         {
-            if(GlobalData.DefaultSettings == null || GlobalData.DefaultSettings.Count == 0)
+            if(GlobalData.CoinSettings == null || GlobalData.CoinSettings.Count == 0)
             {
-                GlobalData.DefaultSettings = GetDefaultSettings();
+                GlobalData.CoinSettings = GetDefaultCoinSettings();
             }
 
             Dictionary<string, SettingsWallet> walletSettings = [];
 
             walletSettings.Add(Coin.XNV, new SettingsWallet()
             {
-                DisplayUnits = GlobalData.DefaultSettings[Coin.XNV].DisplayUnits,
-                LogLevel = GlobalData.DefaultSettings[Coin.XNV].LogLevelDaemon,
+                DisplayUnits = GlobalData.CoinSettings[Coin.XNV].DisplayUnits,
+                LogLevel = GlobalData.CoinSettings[Coin.XNV].LogLevelDaemon,
                 Rpc = new RpcBase()
                 {
                     Port = (uint)GlobalData.RandomGenerator.Next(10000, 50000)
@@ -205,8 +205,8 @@ namespace NervaOneWalletMiner.Helpers
 
             walletSettings.Add(Coin.XMR, new SettingsWallet()
             {
-                DisplayUnits = GlobalData.DefaultSettings[Coin.XMR].DisplayUnits,
-                LogLevel = GlobalData.DefaultSettings[Coin.XMR].LogLevelDaemon,
+                DisplayUnits = GlobalData.CoinSettings[Coin.XMR].DisplayUnits,
+                LogLevel = GlobalData.CoinSettings[Coin.XMR].LogLevelDaemon,
                 Rpc = new RpcBase()
                 {
                     Port = (uint)GlobalData.RandomGenerator.Next(10000, 50000)
@@ -236,21 +236,21 @@ namespace NervaOneWalletMiner.Helpers
                     GlobalData.WalletService = new WalletServiceXMR();
 
                     // TODO: Change this. App.config overwrites GetDaemonSettings with 0
-                    if (GlobalData.AppSettings.Daemon[Coin.XMR].BlockSeconds != GlobalData.DefaultSettings[Coin.XMR].BlockSeconds)
+                    if (GlobalData.AppSettings.Daemon[Coin.XMR].BlockSeconds != GlobalData.CoinSettings[Coin.XMR].BlockSeconds)
                     {
-                        GlobalData.AppSettings.Daemon[Coin.XMR].BlockSeconds = GlobalData.DefaultSettings[Coin.XMR].BlockSeconds;
+                        GlobalData.AppSettings.Daemon[Coin.XMR].BlockSeconds = GlobalData.CoinSettings[Coin.XMR].BlockSeconds;
                     }
-                    if (GlobalData.AppSettings.Daemon[Coin.XMR].LogLevel != GlobalData.DefaultSettings[Coin.XMR].LogLevelDaemon)
+                    if (GlobalData.AppSettings.Daemon[Coin.XMR].LogLevel != GlobalData.CoinSettings[Coin.XMR].LogLevelDaemon)
                     {
-                        GlobalData.AppSettings.Daemon[Coin.XMR].LogLevel = GlobalData.DefaultSettings[Coin.XMR].LogLevelDaemon;
+                        GlobalData.AppSettings.Daemon[Coin.XMR].LogLevel = GlobalData.CoinSettings[Coin.XMR].LogLevelDaemon;
                     }
-                    if (GlobalData.AppSettings.Wallet[Coin.XMR].DisplayUnits != GlobalData.DefaultSettings[Coin.XMR].DisplayUnits)
+                    if (GlobalData.AppSettings.Wallet[Coin.XMR].DisplayUnits != GlobalData.CoinSettings[Coin.XMR].DisplayUnits)
                     {
-                        GlobalData.AppSettings.Wallet[Coin.XMR].DisplayUnits = GlobalData.DefaultSettings[Coin.XMR].DisplayUnits;
+                        GlobalData.AppSettings.Wallet[Coin.XMR].DisplayUnits = GlobalData.CoinSettings[Coin.XMR].DisplayUnits;
                     }
-                    if (GlobalData.AppSettings.Wallet[Coin.XMR].LogLevel != GlobalData.DefaultSettings[Coin.XMR].LogLevelWallet)
+                    if (GlobalData.AppSettings.Wallet[Coin.XMR].LogLevel != GlobalData.CoinSettings[Coin.XMR].LogLevelWallet)
                     {
-                        GlobalData.AppSettings.Wallet[Coin.XMR].LogLevel = GlobalData.DefaultSettings[Coin.XMR].LogLevelWallet;
+                        GlobalData.AppSettings.Wallet[Coin.XMR].LogLevel = GlobalData.CoinSettings[Coin.XMR].LogLevelWallet;
                     }
                     break;
 
@@ -269,9 +269,9 @@ namespace NervaOneWalletMiner.Helpers
                     GlobalData.WalletService = new WalletServiceXNV();
 
                     // TODO: Change this. App.config overwrites GetDaemonSettings() with default 0
-                    if (GlobalData.AppSettings.Daemon[Coin.XNV].BlockSeconds != GlobalData.DefaultSettings[Coin.XNV].BlockSeconds)
+                    if (GlobalData.AppSettings.Daemon[Coin.XNV].BlockSeconds != GlobalData.CoinSettings[Coin.XNV].BlockSeconds)
                     {
-                        GlobalData.AppSettings.Daemon[Coin.XNV].BlockSeconds = GlobalData.DefaultSettings[Coin.XNV].BlockSeconds;
+                        GlobalData.AppSettings.Daemon[Coin.XNV].BlockSeconds = GlobalData.CoinSettings[Coin.XNV].BlockSeconds;
                     }
                     break;
             }
@@ -301,10 +301,10 @@ namespace NervaOneWalletMiner.Helpers
                     switch (arch)
                     {
                         case Architecture.X64:
-                            cliDownloadLink = GlobalData.DefaultSettings[GlobalData.AppSettings.ActiveCoin].CliWin64Url;
+                            cliDownloadLink = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].CliWin64Url;
                             break;
                         default:
-                            cliDownloadLink = GlobalData.DefaultSettings[GlobalData.AppSettings.ActiveCoin].CliWin32Url;
+                            cliDownloadLink = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].CliWin32Url;
                             break;
                     }
                 }
@@ -313,14 +313,14 @@ namespace NervaOneWalletMiner.Helpers
                     switch (arch)
                     {
                         case Architecture.X64:
-                            cliDownloadLink = GlobalData.DefaultSettings[GlobalData.AppSettings.ActiveCoin].CliLin64Url;
+                            cliDownloadLink = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].CliLin64Url;
                             break;
                         case Architecture.Arm:
                         case Architecture.Arm64:
-                            cliDownloadLink = GlobalData.DefaultSettings[GlobalData.AppSettings.ActiveCoin].CliLinArmUrl;
+                            cliDownloadLink = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].CliLinArmUrl;
                             break;
                         default:
-                            cliDownloadLink = GlobalData.DefaultSettings[GlobalData.AppSettings.ActiveCoin].CliLin32Url;
+                            cliDownloadLink = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].CliLin32Url;
                             break;
                     }
                 }
@@ -330,10 +330,10 @@ namespace NervaOneWalletMiner.Helpers
                     {
                         case Architecture.Arm:
                         case Architecture.Arm64:
-                            cliDownloadLink = GlobalData.DefaultSettings[GlobalData.AppSettings.ActiveCoin].CliMacArmUrl;
+                            cliDownloadLink = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].CliMacArmUrl;
                             break;
                         default:
-                            cliDownloadLink = GlobalData.DefaultSettings[GlobalData.AppSettings.ActiveCoin].CliMacIntelUrl;
+                            cliDownloadLink = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].CliMacIntelUrl;
                             break;
                     }
                 }

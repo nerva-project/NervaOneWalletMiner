@@ -1,6 +1,6 @@
 ﻿namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
 {
-    public class SettingsDefaultXNV : ISettingsDefault
+    public class CoinSettingsXNV : ICoinSettings
     {
         private uint _DaemonPort = 17566;
         private double _BlockSeconds = 60.0;

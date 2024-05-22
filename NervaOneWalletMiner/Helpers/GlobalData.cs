@@ -27,7 +27,7 @@ namespace NervaOneWalletMiner.Helpers
         // Those will be saved to and read from app.config
         public static ApplicationSettings AppSettings = new();
 
-        public static Dictionary<string, ISettingsDefault> DefaultSettings = GlobalMethods.GetDefaultSettings();
+        public static Dictionary<string, ICoinSettings> CoinSettings = GlobalMethods.GetDefaultCoinSettings();
 
         public static readonly string DataDir = GlobalMethods.GetDataDir();
         public static readonly string LogDir = GlobalMethods.GetLogDir();

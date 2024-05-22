@@ -1,6 +1,6 @@
 ﻿namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
 {
-    public interface ISettingsDefault
+    public interface ICoinSettings
     {
         uint DaemonPort { get; set; }
         double BlockSeconds { get; set; }
