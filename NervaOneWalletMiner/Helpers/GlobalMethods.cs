@@ -6,7 +6,6 @@ using NervaOneWalletMiner.Objects.Settings.CoinSpecific;
 using NervaOneWalletMiner.Rpc;
 using NervaOneWalletMiner.Rpc.Daemon;
 using NervaOneWalletMiner.Rpc.Common;
-using NervaOneWalletMiner.Rpc.Daemon.Downloads;
 using NervaOneWalletMiner.Rpc.Wallet;
 using System;
 using System.Collections.Generic;
@@ -235,7 +234,6 @@ namespace NervaOneWalletMiner.Helpers
 
                     GlobalData.DaemonService = new DaemonServiceXMR();
                     GlobalData.WalletService = new WalletServiceXMR();
-                    GlobalData.DownloadLinks = new DownloadXMR();
 
                     // TODO: Change this. App.config overwrites GetDaemonSettings with 0
                     if (GlobalData.AppSettings.Daemon[Coin.XMR].BlockSeconds != GlobalData.DefaultSettings[Coin.XMR].BlockSeconds)
@@ -269,7 +267,6 @@ namespace NervaOneWalletMiner.Helpers
 
                     GlobalData.DaemonService = new DaemonServiceXNV();
                     GlobalData.WalletService = new WalletServiceXNV();
-                    GlobalData.DownloadLinks = new DownloadXNV();
 
                     // TODO: Change this. App.config overwrites GetDaemonSettings() with default 0
                     if (GlobalData.AppSettings.Daemon[Coin.XNV].BlockSeconds != GlobalData.DefaultSettings[Coin.XNV].BlockSeconds)
@@ -304,10 +301,10 @@ namespace NervaOneWalletMiner.Helpers
                     switch (arch)
                     {
                         case Architecture.X64:
-                            cliDownloadLink = GlobalData.DownloadLinks.CliUrlWindows64;
+                            cliDownloadLink = GlobalData.DefaultSettings[GlobalData.AppSettings.ActiveCoin].CliWin64Url;
                             break;
                         default:
-                            cliDownloadLink = GlobalData.DownloadLinks.CliUrlWindows32;
+                            cliDownloadLink = GlobalData.DefaultSettings[GlobalData.AppSettings.ActiveCoin].CliWin32Url;
                             break;
                     }
                 }
@@ -316,14 +313,14 @@ namespace NervaOneWalletMiner.Helpers
                     switch (arch)
                     {
                         case Architecture.X64:
-                            cliDownloadLink = GlobalData.DownloadLinks.CliUrlLinux64;
+                            cliDownloadLink = GlobalData.DefaultSettings[GlobalData.AppSettings.ActiveCoin].CliLin64Url;
                             break;
                         case Architecture.Arm:
                         case Architecture.Arm64:
-                            cliDownloadLink = GlobalData.DownloadLinks.CliUrlLinuxArm;
+                            cliDownloadLink = GlobalData.DefaultSettings[GlobalData.AppSettings.ActiveCoin].CliLinArmUrl;
                             break;
                         default:
-                            cliDownloadLink = GlobalData.DownloadLinks.CliUrlLinux32;
+                            cliDownloadLink = GlobalData.DefaultSettings[GlobalData.AppSettings.ActiveCoin].CliLin32Url;
                             break;
                     }
                 }
@@ -333,10 +330,10 @@ namespace NervaOneWalletMiner.Helpers
                     {
                         case Architecture.Arm:
                         case Architecture.Arm64:
-                            cliDownloadLink = GlobalData.DownloadLinks.CliUrlMacArm;
+                            cliDownloadLink = GlobalData.DefaultSettings[GlobalData.AppSettings.ActiveCoin].CliMacArmUrl;
                             break;
                         default:
-                            cliDownloadLink = GlobalData.DownloadLinks.CliUrlMacIntel;
+                            cliDownloadLink = GlobalData.DefaultSettings[GlobalData.AppSettings.ActiveCoin].CliMacIntelUrl;
                             break;
                     }
                 }

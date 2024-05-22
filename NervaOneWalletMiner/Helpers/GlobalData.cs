@@ -5,7 +5,6 @@ using NervaOneWalletMiner.Objects.Settings;
 using NervaOneWalletMiner.Objects.Settings.CoinSpecific;
 using NervaOneWalletMiner.Objects.Stats;
 using NervaOneWalletMiner.Rpc.Daemon;
-using NervaOneWalletMiner.Rpc.Daemon.Downloads;
 using NervaOneWalletMiner.Rpc.Wallet;
 using System;
 using System.Collections.Generic;
@@ -54,7 +53,6 @@ namespace NervaOneWalletMiner.Helpers
 
         public static IWalletService WalletService = new WalletServiceXNV();
         public static IDaemonService DaemonService = new DaemonServiceXNV();
-        public static IDownload DownloadLinks = new DownloadXNV();
 
         public static string WalletProcessName = GlobalMethods.GetWalletProcessName();
         public static string DaemonProcessName = GlobalMethods.GetDaemonProcessName();
