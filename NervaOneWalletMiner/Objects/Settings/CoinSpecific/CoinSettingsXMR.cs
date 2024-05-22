@@ -2,11 +2,12 @@
 {
     public class CoinSettingsXMR : ICoinSettings
     {
-        protected uint _DaemonPort = 18081;
-        protected double _BlockSeconds = 120.0;
-        protected string _DisplayUnits = "XMR";
-        protected uint _LogLevelDaemon = 0;
-        protected uint _LogLevelWallet = 0;
+        #region Private Default Variables
+        private uint _DaemonPort = 18081;
+        private double _BlockSeconds = 120.0;
+        private string _DisplayUnits = "XMR";
+        private uint _LogLevelDaemon = 0;
+        private uint _LogLevelWallet = 0;
 
         private string _CliWin64Url = "https://downloads.getmonero.org/cli/monero-win-x64-v0.18.3.3.zip";
         private string _CliWin32Url = "https://downloads.getmonero.org/cli/monero-win-x86-v0.18.3.3.zip";
@@ -17,9 +18,10 @@
         private string _CliMacArmUrl = "https://downloads.getmonero.org/cli/monero-mac-armv8-v0.18.3.3.tar.bz2";
 
         private string _QuickSyncUrl = string.Empty;
+        #endregion // Private Default Variables
 
 
-
+        #region Interface Implementation
         public uint DaemonPort { get => _DaemonPort; set => _DaemonPort = value; }
         public double BlockSeconds { get => _BlockSeconds; set => _BlockSeconds = value; }
         public string DisplayUnits { get => _DisplayUnits; set => _DisplayUnits = value; }
@@ -35,5 +37,6 @@
         public string CliMacArmUrl { get => _CliMacArmUrl; set => _CliMacArmUrl = value; }
 
         public string QuickSyncUrl { get => _QuickSyncUrl; set => _QuickSyncUrl = value; }
+        #endregion // Interface Implementation
     }
 }

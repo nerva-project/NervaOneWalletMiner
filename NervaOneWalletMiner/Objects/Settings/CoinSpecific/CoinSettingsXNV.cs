@@ -2,6 +2,7 @@
 {
     public class CoinSettingsXNV : ICoinSettings
     {
+        #region Private Default Variables
         private uint _DaemonPort = 17566;
         private double _BlockSeconds = 60.0;
         private string _DisplayUnits = "XNV";
@@ -17,9 +18,10 @@
         private string _CliMacArmUrl = "https://github.com/nerva-project/nerva/releases/download/v0.1.8.0/nerva-v0.1.8.0_osx_minimal.zip";
 
         private string _QuickSyncUrl = "https://nerva.one/quicksync/quicksync.raw";
+        #endregion // Private Default Variables
 
 
-
+        #region Interface Implementation
         public uint DaemonPort { get => _DaemonPort; set => _DaemonPort = value; }
         public double BlockSeconds { get => _BlockSeconds; set => _BlockSeconds = value; }
         public string DisplayUnits { get => _DisplayUnits; set => _DisplayUnits = value; }
@@ -35,5 +37,6 @@
         public string CliMacArmUrl { get => _CliMacArmUrl; set => _CliMacArmUrl = value; }
 
         public string QuickSyncUrl { get => _QuickSyncUrl; set => _QuickSyncUrl = value; }
+        #endregion // Interface Implementation
     }
 }
