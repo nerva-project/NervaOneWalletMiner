@@ -141,29 +141,36 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
-
-                    var error = JObject.Parse(jsonObject.ToString())["error"];
-                    if (error != null)
+                    if (string.IsNullOrEmpty(httpResponse.Content.ReadAsStringAsync().Result))
                     {
-                        // Set Service error
-                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        Logger.LogInfo("RDXMR.GI", "Response Content is empty");
                     }
                     else
                     {
-                        // Set successful response
-                        ResGetInfo getInfoResponse = JsonConvert.DeserializeObject<ResGetInfo>(jsonObject.SelectToken("result").ToString());
+                        dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
 
-                        responseObj.Height = getInfoResponse.height;
-                        responseObj.TargetHeight = getInfoResponse.target_height;
-                        responseObj.Difficulty = getInfoResponse.difficulty;
-                        responseObj.ConnectionCountOut = getInfoResponse.outgoing_connections_count;
-                        responseObj.ConnectionCountIn = getInfoResponse.incoming_connections_count;
-                        responseObj.StartTime = GlobalMethods.UnixTimeStampToDateTime(getInfoResponse.start_time);
-                        responseObj.Version = getInfoResponse.version;
-                        responseObj.Status = getInfoResponse.status;
+                        var error = JObject.Parse(jsonObject.ToString())["error"];
+                        if (error != null)
+                        {
+                            // Set Service error
+                            responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        }
+                        else
+                        {
+                            // Set successful response
+                            ResGetInfo getInfoResponse = JsonConvert.DeserializeObject<ResGetInfo>(jsonObject.SelectToken("result").ToString());
 
-                        responseObj.Error.IsError = false;
+                            responseObj.Height = getInfoResponse.height;
+                            responseObj.TargetHeight = getInfoResponse.target_height;
+                            responseObj.Difficulty = getInfoResponse.difficulty;
+                            responseObj.ConnectionCountOut = getInfoResponse.outgoing_connections_count;
+                            responseObj.ConnectionCountIn = getInfoResponse.incoming_connections_count;
+                            responseObj.StartTime = GlobalMethods.UnixTimeStampToDateTime(getInfoResponse.start_time);
+                            responseObj.Version = getInfoResponse.version;
+                            responseObj.Status = getInfoResponse.status;
+
+                            responseObj.Error.IsError = false;
+                        }
                     }
                 }
                 else

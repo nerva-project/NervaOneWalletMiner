@@ -42,6 +42,8 @@ namespace NervaOneWalletMiner.Helpers
         public static StatsTransfers TransfersStats = new();
         public static List<Connection> Connections = new List<Connection>();
 
+        public static bool IsDaemonRestarting = false;
+
         public static ulong NewestTransactionHeight = 0;
         public static ulong WalletHeight = 0;
 

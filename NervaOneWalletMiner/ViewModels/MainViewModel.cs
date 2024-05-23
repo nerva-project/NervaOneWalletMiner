@@ -583,7 +583,22 @@ public class MainViewModel : ViewModelBase
         {
             if (!_isInitialDaemonConnectionSuccess)
             {
-                GlobalData.NetworkStats.StatusSync = "Trying to establish connection with daemon...";
+                GlobalData.NetworkStats = new()
+                {
+                    StatusSync = " | Trying to establish connection with daemon..."
+                };
+                GlobalData.Connections = [];
+                UpdateMainView();
+            }
+
+            if(GlobalData.IsDaemonRestarting)
+            {
+                GlobalData.NetworkStats = new()
+                {
+                    StatusSync = " | Restarting daemon..."
+                };
+                GlobalData.Connections = [];
+                UpdateMainView();
             }
 
             GetInfoResponse infoRes = await GlobalData.DaemonService.GetInfo(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new GetInfoRequest());
@@ -595,6 +610,11 @@ public class MainViewModel : ViewModelBase
                 {
                     // This will be used to get rid of establishing connection message and to StartWalletUiUpdate 
                     _isInitialDaemonConnectionSuccess = true;
+                }
+
+                if(GlobalData.IsDaemonRestarting)
+                {
+                    GlobalData.IsDaemonRestarting = false;
                 }
 
                 GlobalData.NetworkStats.NetHeight = (infoRes.TargetHeight > infoRes.Height ? infoRes.TargetHeight : infoRes.Height);

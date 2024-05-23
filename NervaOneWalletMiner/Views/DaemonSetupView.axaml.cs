@@ -2,7 +2,9 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects;
+using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Rpc;
+using NervaOneWalletMiner.ViewModels;
 using NervaOneWalletMiner.ViewsDialogs;
 using System;
 using System.Diagnostics;
@@ -98,6 +100,7 @@ namespace NervaOneWalletMiner.Views
                     WalletProcess.ForceClose();
                     DaemonProcess.ForceClose();
 
+                    GlobalData.IsDaemonRestarting = true;
                     string quickSyncFile = Path.Combine(GlobalData.CliToolsDir, Path.GetFileName(GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].QuickSyncUrl));
                     ProcessManager.StartExternalProcess(GlobalMethods.GetDaemonProcess(), DaemonProcess.GenerateOptions(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]) + " --quicksync \"" + quickSyncFile + "\"");
                 }
@@ -142,6 +145,7 @@ namespace NervaOneWalletMiner.Views
                 WalletProcess.ForceClose();
                 DaemonProcess.ForceClose();
 
+                GlobalData.IsDaemonRestarting = true;
                 ProcessManager.StartExternalProcess(GlobalMethods.GetDaemonProcess(), DaemonProcess.GenerateOptions(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]) + " " + restartOptions);
             }
             catch (Exception ex)
