@@ -1,9 +1,7 @@
 ﻿using NervaOneWalletMiner.Helpers;
-using NervaOneWalletMiner.Objects;
 using NervaOneWalletMiner.Objects.Settings;
 using NervaOneWalletMiner.Rpc.Common;
 using System.Diagnostics;
-using System.Runtime;
 
 namespace NervaOneWalletMiner.Rpc
 {
@@ -11,6 +9,7 @@ namespace NervaOneWalletMiner.Rpc
     {
         public static void ForceClose()
         {
+            Logger.LogDebug("WP.FC", "Forcing wallet close...");
             ProcessManager.Kill(GlobalData.WalletProcessName);
         }
 
@@ -41,7 +40,7 @@ namespace NervaOneWalletMiner.Rpc
 
             if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsTestnet)
             {
-                Logger.LogDebug("PM.GCL", "Connecting to testnet...");
+                Logger.LogDebug("WP.GO", "Connecting to testnet...");
                 appCommand += " --testnet";
             }
                        

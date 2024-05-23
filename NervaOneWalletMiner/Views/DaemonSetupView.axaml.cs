@@ -1,15 +1,20 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Objects;
 using NervaOneWalletMiner.Rpc;
+using NervaOneWalletMiner.ViewsDialogs;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace NervaOneWalletMiner.Views
 {
     public partial class DaemonSetupView : UserControl
     {
+        Window GetWindow() => TopLevel.GetTopLevel(this) as Window ?? throw new NullReferenceException("Invalid Owner");
+
         public DaemonSetupView()
         {
             InitializeComponent();
@@ -74,7 +79,7 @@ namespace NervaOneWalletMiner.Views
         {
             try
             {
-                RestartWithQuickSync();               
+                RestartWithQuickSync();
             }
             catch (Exception ex)
             {
@@ -87,7 +92,7 @@ namespace NervaOneWalletMiner.Views
             try
             {
                 bool isSuccess = await GlobalMethods.DownloadFileToFolder(GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].QuickSyncUrl, GlobalData.CliToolsDir);
-                if(isSuccess)
+                if (isSuccess)
                 {
                     Logger.LogDebug("DaeSV.RSQS", "Restarting CLI");
                     WalletProcess.ForceClose();
@@ -104,6 +109,44 @@ namespace NervaOneWalletMiner.Views
             catch (Exception ex)
             {
                 Logger.LogException("DaeSV.RSQS", ex);
+            }
+        }
+
+        public void RestartWithCommandClicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                var window = new RestartWithCommandView();
+                window.ShowDialog(GetWindow()).ContinueWith(RestartWithCommandDialogClosed);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DaeSV.RWCC", ex);
+            }
+        }
+
+        private void RestartWithCommandDialogClosed(Task task)
+        {
+            DialogResult result = ((DialogResult)((Task<object>)task).Result);
+            if (result != null && result.IsOk)
+            {
+                RestartWithCommand(result.RestartOptions);
+            }
+        }
+
+        public static void RestartWithCommand(string restartOptions)
+        {
+            try
+            {
+                Logger.LogDebug("DaeSV.RWC", "Restarting CLI");
+                WalletProcess.ForceClose();
+                DaemonProcess.ForceClose();
+
+                ProcessManager.StartExternalProcess(GlobalMethods.GetDaemonProcess(), DaemonProcess.GenerateOptions(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]) + " " + restartOptions);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DaeSV.RWC", ex);
             }
         }
     }

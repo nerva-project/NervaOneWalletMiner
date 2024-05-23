@@ -30,5 +30,8 @@ namespace NervaOneWalletMiner.Objects
         public string WalletAddress { get; set;} = string.Empty;
         public string ViewKey { get; set; } = string.Empty;
         public string SpendKey {  get; set; } = string.Empty;
+
+        // Restart with commands
+        public string RestartOptions { get; set; } = string.Empty;
     }
 }
