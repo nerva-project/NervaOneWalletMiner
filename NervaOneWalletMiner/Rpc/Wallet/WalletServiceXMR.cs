@@ -560,7 +560,8 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                             {
                                 Index = account.account_index,
                                 Label = account.label,
-                                Address = GlobalMethods.GetShorterString(account.base_address, 12),
+                                AddressFull = account.base_address,
+                                AddressShort = GlobalMethods.GetShorterString(account.base_address, 12),
                                 BalanceLocked = CommonXMR.DoubleAmountFromAtomicUnits(account.balance, 1),
                                 BalanceUnlocked = CommonXMR.DoubleAmountFromAtomicUnits(account.unlocked_balance, 1)
                             };

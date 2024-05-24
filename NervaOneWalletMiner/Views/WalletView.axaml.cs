@@ -164,6 +164,21 @@ namespace NervaOneWalletMiner.Views
         }
         #endregion // Transfer
 
+        #region Address Info
+        public void AddressInfoClicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                var window = new AddressInfoView();
+                window.ShowDialog(GetWindow());
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("Wal.AIC", ex);
+            }
+        }
+        #endregion // Address Info
+
         private static async void CloseUserWallet()
         {
             CloseWalletRequest request = new();

@@ -238,9 +238,9 @@ public class MainViewModel : ViewModelBase
                         {
                             wallet.Label = GlobalData.WalletStats.Subaddresses[wallet.Index].Label;
                         }
-                        if (!wallet.Address.Equals(GlobalData.WalletStats.Subaddresses[wallet.Index].Address))
+                        if (!wallet.AddressShort.Equals(GlobalData.WalletStats.Subaddresses[wallet.Index].AddressShort))
                         {
-                            wallet.Address = GlobalData.WalletStats.Subaddresses[wallet.Index].Address;
+                            wallet.AddressShort = GlobalData.WalletStats.Subaddresses[wallet.Index].AddressShort;
                         }
                         if (wallet.BalanceLocked != (GlobalData.WalletStats.Subaddresses[wallet.Index].BalanceLocked))
                         {

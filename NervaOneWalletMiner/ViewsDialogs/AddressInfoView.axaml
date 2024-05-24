@@ -1,0 +1,43 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="500"
+        x:Class="NervaOneWalletMiner.ViewsDialogs.AddressInfoView"
+		Width="500"
+		Height="500"
+		Topmost="True"
+		WindowStartupLocation="CenterOwner"
+        Title="Address Information"
+		Icon="/Assets/nerva-logo.ico">
+	
+	<StackPanel Spacing="5" Margin="10">
+		<Label Content="Select Account to View Full Address" />
+		<ComboBox Name="cbxAccount"
+				  HorizontalAlignment="Stretch"
+				  SelectionChanged="AccountSelectionChanged" />
+
+		<Label Content="Wallet Address" Margin="0,15,0,0" />
+		<TextBox Name="tbxWalletAddress" />
+
+		<Separator Margin="0,20,0,0"></Separator>
+		
+		<Button Name="btnMakeIntegratedAddress"
+				Content="Make Integrated Address"
+				Click="MakeIntegratedAddressClicked"
+				Margin="0,15,0,0" />
+
+		<Label Content="Integrated Address" Margin="0,15,0,0" />
+		<TextBox Name="tbxIntegratedAddress" />
+
+		<Label Content="Payment Id" Margin="0,15,0,0" />
+		<TextBox Name="tbxPaymentId" />
+
+		<Button Name="btnClose"
+				Content="Close"
+				Click="CloseButtonClicked"
+				Margin="0,15,0,0" />
+		
+	</StackPanel>
+	
+</Window>
