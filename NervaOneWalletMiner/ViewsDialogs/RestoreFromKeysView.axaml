@@ -8,54 +8,56 @@
 		Height="600"
 		Topmost="True"
 		WindowStartupLocation="CenterOwner"
+		Icon="/Assets/nerva-logo.ico"
         Title="Restore From Keys">
 	
 	<StackPanel Spacing="5" Margin="10">
-		<Label Content="Wallet Address" />
+		<Label Content="Wallet Address"/>
 		<TextBox Name="tbxWalletAddress"
-				 Watermark="Required - address of the wallet you want to restore" />
+				 Watermark="Required - address of the wallet you want to restore"/>
 
-		<Label Content="View Key" Margin="0,15,0,0" />
+		<Label Content="View Key" Margin="0,15,0,0"/>
 		<TextBox Name="tbxViewKey"
-				 Watermark="Required - secret view key" />
+				 Watermark="Required - secret view key"/>
 
-		<Label Content="Spend Key" Margin="0,15,0,0" />
+		<Label Content="Spend Key" Margin="0,15,0,0"/>
 		<TextBox Name="tbxSpendKey"
-				 Watermark="Required - secret spend key" />
+				 Watermark="Required - secret spend key"/>
 
-		<Separator Margin="0,20,0,0"></Separator>
+		<Separator Margin="0,20,0,0"/>
 
-		<Label Content="New Wallet Name" Margin="0,15,0,0" />
+		<Label Content="New Wallet Name" Margin="0,15,0,0"/>
 		<TextBox Name="tbxWalletName"
-				 Watermark="Required - name of the new wallet" />
+				 Watermark="Required - name of the new wallet"/>
 
-		<Label Content="New Wallet Password" Margin="0,15,0,0" />
+		<Label Content="New Wallet Password" Margin="0,15,0,0"/>
 		<DockPanel>
 			<TextBox Name="tbxPassword"
 					 Watermark="Required - new wallet password"
 					 PasswordChar="*"
 					 RevealPassword="False"
-					 Width="400" />
+					 Width="400"/>
 
 			<Button Name="btnShowHidePassword"
 					Content="Show"
 					Margin="10,0,0,0"
-					Click="ShowHidePasswordButtonClicked" />
+					Click="ShowHidePasswordButtonClicked"/>
 		</DockPanel>
 
-		<Label Content="Language" Margin="0,15,0,0" />
-		<ComboBox Name="cbxLanguage" HorizontalAlignment="Stretch" />
+		<Label Content="Language" Margin="0,15,0,0"/>
+		<ComboBox Name="cbxLanguage" HorizontalAlignment="Stretch"/>
 
-		<DockPanel Margin="0,15,0,0" >
+		<DockPanel Margin="0,15,0,0">
 			<Button Name="btnOk"
 					Content="OK"
 					Click="OkButtonClicked"
-					IsDefault="True" />
+					IsDefault="True"/>
 
 			<Button Name="btnCancel"
 					Content="Cancel"
 					Click="CancelButtonClicked"
-					Margin="10,0,0,0" />
+					Margin="10,0,0,0"/>
 		</DockPanel>
 	</StackPanel>
+	
 </Window>

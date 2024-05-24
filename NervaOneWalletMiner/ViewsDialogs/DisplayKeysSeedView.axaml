@@ -8,36 +8,38 @@
 		Height="550"
 		Topmost="True"
 		WindowStartupLocation="CenterOwner"
+		Icon="/Assets/nerva-logo.ico"
         Title="Wallet Restore Info">
 	
 	<StackPanel Spacing="5" Margin="10">
-		<Label Content="Public View Key" />
-		<TextBox Name="tbxPublicViewKey" />
+		<Label Content="Public View Key"/>
+		<TextBox Name="tbxPublicViewKey"/>
 
-		<Label Content="Private View Key" />
-		<TextBox Name="tbxPrivateViewKey" />
+		<Label Content="Private View Key"/>
+		<TextBox Name="tbxPrivateViewKey"/>
 
-		<Separator Margin="0,20,0,10"></Separator>
+		<Separator Margin="0,20,0,10"/>
 
-		<Label Content="Public Spend Key" />
-		<TextBox Name="tbxPublicSpendKey" />
+		<Label Content="Public Spend Key"/>
+		<TextBox Name="tbxPublicSpendKey"/>
 
-		<Label Content="Private Spend Key" />
-		<TextBox Name="tbxPrivateSpendKey" />
+		<Label Content="Private Spend Key"/>
+		<TextBox Name="tbxPrivateSpendKey"/>
 
-		<Separator Margin="0,20,0,10"></Separator>
+		<Separator Margin="0,20,0,10"/>
 
-		<Label Content="Mnemonic Seed" />
+		<Label Content="Mnemonic Seed"/>
 		<TextBox Name="tbxMnemonicSeed"				 
 				 AcceptsReturn="True"
 				 TextWrapping="Wrap"
-				 Height="100" />
+				 Height="100"/>
 
-		<DockPanel Margin="0,15,0,0" >
+		<DockPanel Margin="0,15,0,0">
 			<Button Name="btnClancel"
 					Content="Cancel"
 					Click="CancelButtonClicked"
-					Margin="10,0,0,0" />
+					Margin="10,0,0,0"/>
 		</DockPanel>
 	</StackPanel>
+	
 </Window>

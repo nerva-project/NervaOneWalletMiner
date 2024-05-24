@@ -8,22 +8,25 @@
 		Height="150"
 		Topmost="True"
 		WindowStartupLocation="CenterOwner"
+		Icon="/Assets/nerva-logo.ico"
         Title="Restart With Command">
+	
 	<StackPanel Spacing="5" Margin="10">
-		<Label Content="Additional Restart Options" />
+		<Label Content="Additional Restart Options"/>
 		<TextBox Name="tbxRestartOptions"
-				 Watermark="Example: --pop-blocks 10000" />		
+				 Watermark="Example: --pop-blocks 10000"/>		
 
-		<DockPanel Margin="0,15,0,0" >
+		<DockPanel Margin="0,15,0,0">
 			<Button Name="btnOk"
 					Content="OK"
 					Click="OkButtonClicked"
-					IsDefault="True" />
+					IsDefault="True"/>
 
 			<Button Name="btnCancel"
 					Content="Cancel"
 					Click="CancelButtonClicked"
-					Margin="10,0,0,0" />
+					Margin="10,0,0,0"/>
 		</DockPanel>
 	</StackPanel>
+	
 </Window>

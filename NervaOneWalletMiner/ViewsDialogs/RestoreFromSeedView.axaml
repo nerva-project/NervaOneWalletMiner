@@ -8,53 +8,55 @@
 		Height="600"
 		Topmost="True"
 		WindowStartupLocation="CenterOwner"
+		Icon="/Assets/nerva-logo.ico"
         Title="Restore From Seed Phrase">
 	
 	<StackPanel Spacing="5" Margin="10">
-		<Label Content="Seed Phrase" />
+		<Label Content="Seed Phrase"/>
 		<TextBox Name="tbxSeedPhrase"				 
 				 Watermark="Required - seed phrase from the wallet you want to restore"
 				 AcceptsReturn="True"
 				 TextWrapping="Wrap"
-				 Height="100" />
+				 Height="100"/>
 
-		<Label Content="Seed Offset" Margin="0,15,0,0" />
+		<Label Content="Seed Offset" Margin="0,15,0,0"/>
 		<TextBox Name="tbxSeedOffset"
-				 Watermark="Optional - seed phrase offset" />
+				 Watermark="Optional - seed phrase offset"/>
 
-		<Separator Margin="0,20,0,0"></Separator>
+		<Separator Margin="0,20,0,0"/>
 		
-		<Label Content="New Wallet Name" Margin="0,15,0,0" />
+		<Label Content="New Wallet Name" Margin="0,15,0,0"/>
 		<TextBox Name="tbxWalletName"
-				 Watermark="Required - name of the new wallet" />
+				 Watermark="Required - name of the new wallet"/>
 
-		<Label Content="New Wallet Password" Margin="0,15,0,0" />
+		<Label Content="New Wallet Password" Margin="0,15,0,0"/>
 		<DockPanel>
 			<TextBox Name="tbxPassword"
 					 Watermark="Required - new wallet password"
 					 PasswordChar="*"
 					 RevealPassword="False"
-					 Width="400" />
+					 Width="400"/>
 
 			<Button Name="btnShowHidePassword"
 					Content="Show"
 					Margin="10,0,0,0"
-					Click="ShowHidePasswordButtonClicked" />
+					Click="ShowHidePasswordButtonClicked"/>
 		</DockPanel>
 		
-		<Label Content="Language" Margin="0,15,0,0" />
-		<ComboBox Name="cbxLanguage" HorizontalAlignment="Stretch" />
+		<Label Content="Language" Margin="0,15,0,0"/>
+		<ComboBox Name="cbxLanguage" HorizontalAlignment="Stretch"/>
 
-		<DockPanel Margin="0,15,0,0" >
+		<DockPanel Margin="0,15,0,0">
 			<Button Name="btnOk"
 					Content="OK"
 					Click="OkButtonClicked"
-					IsDefault="True" />
+					IsDefault="True"/>
 
 			<Button Name="btnCancel"
 					Content="Cancel"
 					Click="CancelButtonClicked"
-					Margin="10,0,0,0" />
+					Margin="10,0,0,0"/>
 		</DockPanel>
 	</StackPanel>
+	
 </Window>

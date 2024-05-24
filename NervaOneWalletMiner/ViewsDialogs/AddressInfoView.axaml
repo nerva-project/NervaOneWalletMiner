@@ -8,36 +8,35 @@
 		Height="500"
 		Topmost="True"
 		WindowStartupLocation="CenterOwner"
-        Title="Address Information"
-		Icon="/Assets/nerva-logo.ico">
+        Icon="/Assets/nerva-logo.ico"
+		Title="Address Information">
 	
 	<StackPanel Spacing="5" Margin="10">
-		<Label Content="Select Account to View Full Address" />
+		<Label Content="Select Account to View Full Address"/>
 		<ComboBox Name="cbxAccount"
 				  HorizontalAlignment="Stretch"
-				  SelectionChanged="AccountSelectionChanged" />
+				  SelectionChanged="AccountSelectionChanged"/>
 
-		<Label Content="Wallet Address" Margin="0,15,0,0" />
-		<TextBox Name="tbxWalletAddress" />
+		<Label Content="Wallet Address" Margin="0,15,0,0"/>
+		<TextBox Name="tbxWalletAddress"/>
 
-		<Separator Margin="0,20,0,0"></Separator>
+		<Separator Margin="0,20,0,0"/>
 		
 		<Button Name="btnMakeIntegratedAddress"
 				Content="Make Integrated Address"
 				Click="MakeIntegratedAddressClicked"
-				Margin="0,15,0,0" />
+				Margin="0,15,0,0"/>
 
-		<Label Content="Integrated Address" Margin="0,15,0,0" />
-		<TextBox Name="tbxIntegratedAddress" />
+		<Label Content="Integrated Address" Margin="0,15,0,0"/>
+		<TextBox Name="tbxIntegratedAddress"/>
 
-		<Label Content="Payment Id" Margin="0,15,0,0" />
-		<TextBox Name="tbxPaymentId" />
+		<Label Content="Payment Id" Margin="0,15,0,0"/>
+		<TextBox Name="tbxPaymentId"/>
 
 		<Button Name="btnClose"
 				Content="Close"
 				Click="CloseButtonClicked"
-				Margin="0,15,0,0" />
-		
+				Margin="0,15,0,0"/>		
 	</StackPanel>
 	
 </Window>

@@ -9,40 +9,42 @@
 		Height="230"
 		Topmost="True"
 		WindowStartupLocation="CenterOwner"
+		Icon="/Assets/nerva-logo.ico"
         Title="Open Wallet">
 
 	<Design.DataContext>
-		<vm:OpenWalletViewModel />
+		<vm:OpenWalletViewModel/>
 	</Design.DataContext>
 
 	<StackPanel Spacing="5" Margin="10">
-		<Label Content="Wallet Name" />
-		<ComboBox Name="cbxWalletName" HorizontalAlignment="Stretch" />
+		<Label Content="Wallet Name"/>
+		<ComboBox Name="cbxWalletName" HorizontalAlignment="Stretch"/>
 
-		<Label Content="Password" Margin="0,15,0,0" />
+		<Label Content="Password" Margin="0,15,0,0"/>
 		<DockPanel>
 			<TextBox Name="tbxPassword"
 					 Watermark="Enter wallet password"
 					 PasswordChar="*"					 
 					 RevealPassword="False"
-					 Width="400" />
+					 Width="400"/>
 			
 			<Button Name="btnShowHidePassword"
 					Content="Show"
 					Margin="10,0,0,0"
-					Click="ShowHidePasswordButtonClicked" />
+					Click="ShowHidePasswordButtonClicked"/>
 		</DockPanel>
 
-		<DockPanel Margin="0,15,0,0" >
+		<DockPanel Margin="0,15,0,0">
 			<Button Name="btnOk"
 					Content="OK"
 					Click="OkButtonClicked"
-					IsDefault="True" />
+					IsDefault="True"/>
 			
 			<Button Name="btnCancel"
 					Content="Cancel"
 					Click="CancelButtonClicked"
-					Margin="10,0,0,0" />
+					Margin="10,0,0,0"/>
 		</DockPanel>		
 	</StackPanel>
+	
 </Window>

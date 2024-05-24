@@ -8,41 +8,42 @@
 		Height="330"
 		Topmost="True"
 		WindowStartupLocation="CenterOwner"
+		Icon="/Assets/nerva-logo.ico"
         Title="Create New Wallet">
 
 	<StackPanel Spacing="5" Margin="10">
-		<Label Content="Wallet Name" />
+		<Label Content="Wallet Name"/>
 		<TextBox Name="tbxWalletName"
-				 Watermark="Enter wallet name" />
+				 Watermark="Enter wallet name"/>
 
-		<Label Content="Password" Margin="0,15,0,0" />
+		<Label Content="Password" Margin="0,15,0,0"/>
 		<DockPanel>
 			<TextBox Name="tbxPassword"
 					 Watermark="Enter wallet password"
 					 PasswordChar="*"
 					 RevealPassword="False"
-					 Width="400" />
+					 Width="400"/>
 
 			<Button Name="btnShowHidePassword"
 					Content="Show"
 					Margin="10,0,0,0"
-					Click="ShowHidePasswordButtonClicked" />
+					Click="ShowHidePasswordButtonClicked"/>
 		</DockPanel>
 
-		<Label Content="Language" Margin="0,15,0,0" />
-		<ComboBox Name="cbxLanguage" HorizontalAlignment="Stretch" />
+		<Label Content="Language" Margin="0,15,0,0"/>
+		<ComboBox Name="cbxLanguage" HorizontalAlignment="Stretch"/>
 
-		<DockPanel Margin="0,15,0,0" >
+		<DockPanel Margin="0,15,0,0">
 			<Button Name="btnOk"
 					Content="OK"
 					Click="OkButtonClicked"
-					IsDefault="True" />
+					IsDefault="True"/>
 
 			<Button Name="btnCancel"
 					Content="Cancel"
 					Click="CancelButtonClicked"
-					Margin="10,0,0,0" />
-		</DockPanel>
+					Margin="10,0,0,0"/>
+		</DockPanel>		
 	</StackPanel>
 	
 </Window>
