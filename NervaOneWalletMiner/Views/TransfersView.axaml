@@ -11,14 +11,22 @@
 	</Design.DataContext>
 
 	<StackPanel Spacing="5" HorizontalAlignment="Stretch" MaxWidth="650">
-		<Grid ColumnDefinitions="200,*,120" Margin="10">
+		<Grid ColumnDefinitions="200,*,150" Margin="10">
 			<Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="24,*">
 				<Image Grid.Row="0" Grid.Column="0" Source="{Binding CoinIcon}"></Image>
 				<Label Grid.Row="0" Grid.Column="1" Height="24">Transfers</Label>
-			</Grid>					
+			</Grid>
+
+			<Button Name="btnTransactionDetails"
+				Grid.Row="0"
+				Grid.Column="2"
+				Content="Transaction Details"
+				DockPanel.Dock="Right"
+				Click="TransactionDetailsClicked"/>
 		</Grid>
 
 		<DataGrid ItemsSource="{Binding Transactions}"
+				  Name="dtgTransactions"
 				  AutoGenerateColumns="False"
 				  GridLinesVisibility="Horizontal"
 				  IsReadOnly="True"

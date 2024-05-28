@@ -1,0 +1,69 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="550"
+        x:Class="NervaOneWalletMiner.ViewsDialogs.TransactionDetailsView"
+		Width="600"
+		Height="550"
+		Topmost="True"
+		WindowStartupLocation="CenterOwner"
+		Icon="/Assets/nerva-logo.ico"
+        Title="Transaction Details">
+
+	<StackPanel Spacing="5" Margin="10">
+		<Label Content="Your Address"/>
+		<TextBox Name="tbxYourAddress" />
+
+		<Label Content="Transaction Id"/>
+		<TextBox Name="tbxTransactionId"/>
+
+
+		<Grid Margin="0,15,0,0">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="35"></RowDefinition>
+				<RowDefinition Height="35"></RowDefinition>
+				<RowDefinition Height="35"></RowDefinition>
+				<RowDefinition Height="35"></RowDefinition>
+			</Grid.RowDefinitions>
+
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="120"></ColumnDefinition>
+				<ColumnDefinition Width="*"></ColumnDefinition>
+				<ColumnDefinition Width="120"></ColumnDefinition>
+				<ColumnDefinition Width="*"></ColumnDefinition>
+			</Grid.ColumnDefinitions>		
+
+			<Label Grid.Row="0" Grid.Column="0" Content="Type:"/>
+			<Label Grid.Row="0" Grid.Column="1" Name="lblType" Content=""/>
+			<Label Grid.Row="0" Grid.Column="2" Content="Height:"/>
+			<Label Grid.Row="0" Grid.Column="3" Name="lblHeight" Content=""/>
+			
+			<Label Grid.Row="1" Grid.Column="0" Content="Amount:"/>
+			<Label Grid.Row="1" Grid.Column="1" Name="lblAmount" Content=""/>
+			<Label Grid.Row="1" Grid.Column="2" Content="Fee:"/>
+			<Label Grid.Row="1" Grid.Column="3" Name="lblFee" Content=""/>
+
+			<Label Grid.Row="2" Grid.Column="0" Content="Time:"/>
+			<Label Grid.Row="2" Grid.Column="1" Name="lblTime" Content=""/>
+			<Label Grid.Row="2" Grid.Column="2" Content="Is Locked:"/>
+			<Label Grid.Row="2" Grid.Column="3" Name="lblIsLocked" Content=""/>
+
+			<Label Grid.Row="3" Grid.Column="0" Content="Payment Id:"/>
+			<Label Grid.Row="3" Grid.Column="1" Name="lblPaymentId"/>
+			<Label Grid.Row="3" Grid.Column="2" Content="Note:"/>
+			<Label Grid.Row="3" Grid.Column="3" Name="lblNote"/>
+		</Grid>
+
+		<Label Content="Destination Info" Margin="0,15,0,0"/>
+		<TextBox Name="tbxDestinationInfo" />
+
+		<DockPanel Margin="0,15,0,0">
+			<Button Name="btnClancel"
+					Content="Cancel"
+					Click="CancelButtonClicked"
+					Margin="10,0,0,0"/>
+		</DockPanel>
+	</StackPanel>
+	
+</Window>

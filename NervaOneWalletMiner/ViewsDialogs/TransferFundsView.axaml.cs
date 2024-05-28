@@ -63,7 +63,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                         SendFromAddress = fromAddress,
                         SendFromAddressIndex = fromAccountIndex,
                         SendToAddress = tbxSendTo.Text,
-                        SendAmount = Convert.ToDouble(tbxAmount.Text),
+                        SendAmount = Convert.ToDecimal(tbxAmount.Text),
                         SendPaymentId = tbxPaymentId.Text
                     };
 

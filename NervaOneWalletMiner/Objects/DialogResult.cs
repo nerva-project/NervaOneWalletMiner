@@ -19,7 +19,7 @@ namespace NervaOneWalletMiner.Objects
         public string SendFromAddress { get; set; } = string.Empty;
         public uint SendFromAddressIndex { get; set; } = 0;
         public string SendToAddress { get; set; } = string.Empty;
-        public double SendAmount { get; set; } = 0.0;
+        public decimal SendAmount { get; set; } = 0;
         public string SendPaymentId { get; set; } = string.Empty;
 
         // Restore from Seed

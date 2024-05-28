@@ -8,8 +8,8 @@ namespace NervaOneWalletMiner.Rpc.Wallet.Responses
     {
         public ServiceError Error { get; set; } = new();
 
-        public double BalanceUnlocked { get; set; }
-        public double BalanceLocked { get; set; }
+        public decimal BalanceUnlocked { get; set; }
+        public decimal BalanceLocked { get; set; }
         public List<Account> SubAccounts { get; set; } = [];
     }
 }

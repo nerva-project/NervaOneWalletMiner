@@ -514,6 +514,97 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         }
         #endregion // Transfer
 
+        #region Get Transfer By TxId
+        /* RPC request params:
+         *  std::string txid;
+         *  uint32_t account_index;
+         */
+        public async Task<GetTransferByTxIdResponse> GetTransferByTxId(RpcBase rpc, GetTranserByTxIdRequest requestObj)
+        {
+            GetTransferByTxIdResponse responseObj = new();
+
+            try
+            {
+                // Build request content json
+                var requestParams = new JObject
+                {
+                    ["txid"] = requestObj.TransactionId,
+                    ["account_index"] = requestObj.AccountIndex
+                };
+
+                var requestJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = "0",
+                    ["method"] = "get_transfer_by_txid",
+                    ["params"] = requestParams
+                };
+
+                // Call service and process response
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+
+                    var error = JObject.Parse(jsonObject.ToString())["error"];
+                    if (error != null)
+                    {
+                        // Set Service error
+                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                    }
+                    else
+                    {
+                        // Create success response object
+                        ResGetTransferById getTransfersResponse = JsonConvert.DeserializeObject<ResGetTransferById>(jsonObject.SelectToken("result").ToString());
+                        responseObj.Address = getTransfersResponse.transfer.address;
+                        responseObj.TransactionId = getTransfersResponse.transfer.txid;
+                        responseObj.PaymentId = getTransfersResponse.transfer.payment_id;
+                        responseObj.Type = getTransfersResponse.transfer.type;
+                        responseObj.Height = getTransfersResponse.transfer.height;
+                        responseObj.Timestamp = GlobalMethods.UnixTimeStampToDateTime(getTransfersResponse.transfer.timestamp);
+                        responseObj.UnlockTime = GlobalMethods.UnixTimeStampToDateTime(getTransfersResponse.transfer.unlock_time);
+                        responseObj.Amount = CommonXNV.DoubleAmountFromAtomicUnits(getTransfersResponse.transfer.amount, 6);
+                        responseObj.Fee = CommonXNV.DoubleAmountFromAtomicUnits(getTransfersResponse.transfer.fee, 6);
+                        responseObj.Note = getTransfersResponse.transfer.note;
+                        responseObj.IsLocked = getTransfersResponse.transfer.locked;
+                        responseObj.Confirmations = getTransfersResponse.transfer.confirmations;
+
+                        foreach (TransferDestination destination in getTransfersResponse.transfer.destinations)
+                        {
+                            responseObj.Destinations.Add(destination.address + " | " + CommonXNV.DoubleAmountFromAtomicUnits(destination.amount, 6));
+                        }
+
+                        // There is also transfers but it seems to have the same info. Can you have more than 1 transfer for given transactioin id?
+                        //foreach (TransferEntry entry in getTransfersResponse.transfers)
+                        //{
+
+                        //}                       
+
+                        responseObj.Error.IsError = false;
+                    }
+                }
+                else
+                {
+                    // Set HTTP error
+                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("RWXNV.CA", ex);
+            }
+
+            return responseObj;
+        }
+
+        // Internal helper obejcts used to interact with service
+        private class ResGetTransferById
+        {
+            public TransferEntry transfer { get; set; } = new();
+            public List<TransferEntry> transfers { get; set; } = [];
+        }
+        #endregion // Get Transfer By TxId
+
         #region Get Accounts
         /* RPC request params:
          *  std::string tag;      // all accounts if empty, otherwise those accounts with this tag
@@ -668,7 +759,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                         foreach (TransferEntry entry in getTransfersResponse.In)
                         {
                             Transfer newTransfer = new()
-                            {
+                            {                                
                                 TransactionId = entry.txid,
                                 TransactionIdShort = GlobalMethods.GetShorterString(entry.txid, 12),
                                 PaymentId = entry.payment_id,

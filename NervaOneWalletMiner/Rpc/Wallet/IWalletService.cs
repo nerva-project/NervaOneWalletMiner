@@ -27,6 +27,8 @@ namespace NervaOneWalletMiner.Rpc.Wallet
 
         Task<GetTransfersResponse> GetTransfers(RpcBase rpc, GetTransfersRequest requestObj);
 
+        Task<GetTransferByTxIdResponse> GetTransferByTxId(RpcBase rpc, GetTranserByTxIdRequest requestObj);
+
         Task<GetHeightResponse> GetHeight(RpcBase rpc, GetHeightRequest requestObj);
 
         Task<QueryKeyResponse> QueryKey(RpcBase rpc, QueryKeyRequest requestObj);

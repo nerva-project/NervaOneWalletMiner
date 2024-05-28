@@ -25,14 +25,14 @@ namespace NervaOneWalletMiner.Rpc.Common
             return serviceError;
         }
 
-        public static double DoubleAmountFromAtomicUnits(ulong balanceAtomic, int decimalPlaces)
+        public static decimal DoubleAmountFromAtomicUnits(ulong balanceAtomic, int decimalPlaces)
         {
-            return Math.Round(balanceAtomic / 1000000000000.0, decimalPlaces);
+            return Math.Round(Convert.ToDecimal(balanceAtomic / 1000000000000.0), decimalPlaces);
         }
 
-        public static ulong AtomicUnitsFromDoubleAmount(double amount)
+        public static ulong AtomicUnitsFromDoubleAmount(decimal amount)
         {
-            return (ulong)(amount * 1000000000000.0);
+            return (ulong)(amount * Convert.ToDecimal(1000000000000.0));
         }
     }
 }

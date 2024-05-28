@@ -121,7 +121,7 @@ namespace NervaOneWalletMiner.Views
             if (result != null && result.IsOk)
             {
                 // Open wallet
-                if (!string.IsNullOrEmpty(result.SendToAddress) && result.SendAmount > 0.0)
+                if (!string.IsNullOrEmpty(result.SendToAddress) && result.SendAmount > 0)
                 {
                     MakeTransfer(result.SendFromAddressIndex, result.SendToAddress, result.SendAmount, result.SendPaymentId);
                 }
@@ -133,7 +133,7 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
-        private static async void MakeTransfer(uint sendFromAccountIndex, string sendToAddress, double amount, string paymentId)
+        private static async void MakeTransfer(uint sendFromAccountIndex, string sendToAddress, decimal amount, string paymentId)
         {
             // TODO: Add other options
             TransferRequest request = new()
