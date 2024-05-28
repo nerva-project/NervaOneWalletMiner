@@ -248,32 +248,39 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
-
-                    var error = JObject.Parse(jsonObject.ToString())["error"];
-                    if (error != null)
+                    if (string.IsNullOrEmpty(httpResponse.Content.ReadAsStringAsync().Result))
                     {
-                        // Set Service error
-                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        Logger.LogInfo("RDXNV.GC", "Response Content is empty");
                     }
                     else
                     {
-                        // Set successful response
-                        List<ResGetConnections> getConnectionsResponse = JsonConvert.DeserializeObject<List<ResGetConnections>>(jsonObject.SelectToken("result.connections").ToString());
+                        dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
 
-                        foreach (ResGetConnections connection in getConnectionsResponse)
+                        var error = JObject.Parse(jsonObject.ToString())["error"];
+                        if (error != null)
                         {
-                            responseObj.Connections.Add(new Connection
-                            {
-                                Address = connection.address,
-                                Height = connection.height,
-                                LiveTime = TimeSpan.FromSeconds(connection.live_time).ToString(@"hh\:mm\:ss"),
-                                State = connection.state,
-                                IsIncoming = connection.incoming
-                            });
+                            // Set Service error
+                            responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                         }
+                        else
+                        {
+                            // Set successful response
+                            List<ResGetConnections> getConnectionsResponse = JsonConvert.DeserializeObject<List<ResGetConnections>>(jsonObject.SelectToken("result.connections").ToString());
 
-                        responseObj.Error.IsError = false;
+                            foreach (ResGetConnections connection in getConnectionsResponse)
+                            {
+                                responseObj.Connections.Add(new Connection
+                                {
+                                    Address = connection.address,
+                                    Height = connection.height,
+                                    LiveTime = TimeSpan.FromSeconds(connection.live_time).ToString(@"hh\:mm\:ss"),
+                                    State = connection.state,
+                                    IsIncoming = connection.incoming
+                                });
+                            }
+
+                            responseObj.Error.IsError = false;
+                        }
                     }
                 }
                 else
@@ -284,7 +291,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
             }
             catch (Exception ex)
             {
-                Logger.LogException("RDXNV.GI", ex);
+                Logger.LogException("RDXNV.GC", ex);
             }
 
             return responseObj;
@@ -334,24 +341,31 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "mining_status"), requestJson.ToString());
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
-
-                    var error = JObject.Parse(jsonObject.ToString())["error"];
-                    if (error != null)
+                    if (string.IsNullOrEmpty(httpResponse.Content.ReadAsStringAsync().Result))
                     {
-                        // Set Service error
-                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        Logger.LogInfo("RDXNV.MS", "Response Content is empty");
                     }
                     else
                     {
-                        // Set successful response
-                        ResMiningStatus getConnectionsResponse = JsonConvert.DeserializeObject<ResMiningStatus>(jsonObject.ToString());
+                        dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
 
-                        responseObj.IsActive = getConnectionsResponse.active;
-                        responseObj.Speed = getConnectionsResponse.speed;
-                        responseObj.Address = getConnectionsResponse.address;
+                        var error = JObject.Parse(jsonObject.ToString())["error"];
+                        if (error != null)
+                        {
+                            // Set Service error
+                            responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        }
+                        else
+                        {
+                            // Set successful response
+                            ResMiningStatus getConnectionsResponse = JsonConvert.DeserializeObject<ResMiningStatus>(jsonObject.ToString());
 
-                        responseObj.Error.IsError = false;
+                            responseObj.IsActive = getConnectionsResponse.active;
+                            responseObj.Speed = getConnectionsResponse.speed;
+                            responseObj.Address = getConnectionsResponse.address;
+
+                            responseObj.Error.IsError = false;
+                        }
                     }
                 }
                 else
@@ -362,7 +376,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
             }
             catch (Exception ex)
             {
-                Logger.LogException("RDXNV.GI", ex);
+                Logger.LogException("RDXNV.MS", ex);
             }
 
             return responseObj;

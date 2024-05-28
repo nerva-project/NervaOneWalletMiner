@@ -1,5 +1,8 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
+using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Rpc.Daemon.Requests;
@@ -29,6 +32,7 @@ namespace NervaOneWalletMiner.Views
                 if (btnStartStopMining.Content!.ToString()!.Equals(StatusMiner.StopMining))
                 {
                     // Stop mining
+                    Logger.LogDebug("HomV.SSMC", "Stopping mining");
                     StopMiningAsync();
                     btnStartStopMining.Content = StatusMiner.StartMining;
                     nupThreads.IsEnabled = true;
@@ -42,6 +46,7 @@ namespace NervaOneWalletMiner.Views
                         GlobalMethods.SaveConfig();
                     }
 
+                    Logger.LogDebug("HomV.SSMC", "Starting mining");
                     StartMiningAsync(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
                     btnStartStopMining.Content = StatusMiner.StopMining;
                     nupThreads.IsEnabled = false;
@@ -63,10 +68,15 @@ namespace NervaOneWalletMiner.Views
                     ThreadCount = threads
                 };
 
+                Logger.LogDebug("HomV.StMA", "Calling StartMining. Address: " + GlobalMethods.GetShorterString(request.MiningAddress, 12) + " | Threads: " + request.ThreadCount);
                 StartMiningResponse response = await GlobalData.DaemonService.StartMining(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, request);
                 if(response.Error.IsError)
                 {
-                    // TODO: Error so alert user
+                    await Dispatcher.UIThread.Invoke(async () =>
+                    {
+                        var box = MessageBoxManager.GetMessageBoxStandard("Start Mining", "Error when starting mining\r\n\r\n" + response.Error.Message, ButtonEnum.Ok);
+                        _ = await box.ShowAsync();
+                    });
                 }
             }
             catch (Exception ex)
@@ -84,12 +94,16 @@ namespace NervaOneWalletMiner.Views
                 StopMiningResponse response = await GlobalData.DaemonService.StopMining(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, request);
                 if (response.Error.IsError)
                 {
-                    // TODO: Error so alert user
+                    await Dispatcher.UIThread.Invoke(async () =>
+                    {
+                        var box = MessageBoxManager.GetMessageBoxStandard("Stop Mining", "Error when stopping mining\r\n\r\n" + response.Error.Message, ButtonEnum.Ok);
+                        _ = await box.ShowAsync();
+                    });
                 }
             }
             catch (Exception ex)
             {
-                Logger.LogException("HomV.SMA", ex);
+                Logger.LogException("HomV.SpMA", ex);
             }
         }
     }
