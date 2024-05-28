@@ -70,7 +70,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("RWXNV.CA", ex);
+                Logger.LogException("RWXNV.OW", ex);
             }
 
             return responseObj;
@@ -121,7 +121,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("RWXNV.CW", ex);
+                Logger.LogException("RWXNV.ClW", ex);
             }
 
             return responseObj;
@@ -186,7 +186,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("RWXNV.CW", ex);
+                Logger.LogException("RWXNV.CrW", ex);
             }
 
             return responseObj;
@@ -573,7 +573,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("RWXNV.CA", ex);
+                Logger.LogException("RWXNV.GA", ex);
             }
 
             return responseObj;
@@ -720,7 +720,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("RWXNV.CA", ex);
+                Logger.LogException("RWXNV.GT", ex);
             }
 
             return responseObj;
@@ -778,21 +778,21 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     else
                     {
                         // Create success response object
-                        ResGetTransferById getTransfersResponse = JsonConvert.DeserializeObject<ResGetTransferById>(jsonObject.SelectToken("result").ToString());
-                        responseObj.Address = getTransfersResponse.transfer.address;
-                        responseObj.TransactionId = getTransfersResponse.transfer.txid;
-                        responseObj.PaymentId = getTransfersResponse.transfer.payment_id;
-                        responseObj.Type = getTransfersResponse.transfer.type;
-                        responseObj.Height = getTransfersResponse.transfer.height;
-                        responseObj.Timestamp = GlobalMethods.UnixTimeStampToDateTime(getTransfersResponse.transfer.timestamp);
-                        responseObj.UnlockTime = GlobalMethods.UnixTimeStampToDateTime(getTransfersResponse.transfer.unlock_time);
-                        responseObj.Amount = CommonXNV.DoubleAmountFromAtomicUnits(getTransfersResponse.transfer.amount, 6);
-                        responseObj.Fee = CommonXNV.DoubleAmountFromAtomicUnits(getTransfersResponse.transfer.fee, 6);
-                        responseObj.Note = getTransfersResponse.transfer.note;
-                        responseObj.IsLocked = getTransfersResponse.transfer.locked;
-                        responseObj.Confirmations = getTransfersResponse.transfer.confirmations;
+                        ResGetTransferById getTransfByTxIdResponse = JsonConvert.DeserializeObject<ResGetTransferById>(jsonObject.SelectToken("result").ToString());
+                        responseObj.Address = getTransfByTxIdResponse.transfer.address;
+                        responseObj.TransactionId = getTransfByTxIdResponse.transfer.txid;
+                        responseObj.PaymentId = getTransfByTxIdResponse.transfer.payment_id;
+                        responseObj.Type = getTransfByTxIdResponse.transfer.type;
+                        responseObj.Height = getTransfByTxIdResponse.transfer.height;
+                        responseObj.Timestamp = GlobalMethods.UnixTimeStampToDateTime(getTransfByTxIdResponse.transfer.timestamp);
+                        responseObj.UnlockTime = GlobalMethods.UnixTimeStampToDateTime(getTransfByTxIdResponse.transfer.unlock_time);
+                        responseObj.Amount = CommonXNV.DoubleAmountFromAtomicUnits(getTransfByTxIdResponse.transfer.amount, 6);
+                        responseObj.Fee = CommonXNV.DoubleAmountFromAtomicUnits(getTransfByTxIdResponse.transfer.fee, 6);
+                        responseObj.Note = getTransfByTxIdResponse.transfer.note;
+                        responseObj.IsLocked = getTransfByTxIdResponse.transfer.locked;
+                        responseObj.Confirmations = getTransfByTxIdResponse.transfer.confirmations;
 
-                        foreach(TransferDestination destination in getTransfersResponse.transfer.destinations)
+                        foreach(TransferDestination destination in getTransfByTxIdResponse.transfer.destinations)
                         {
                             responseObj.Destinations.Add(destination.address + " | " + CommonXNV.DoubleAmountFromAtomicUnits(destination.amount, 6));
                         }
@@ -814,7 +814,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("RWXNV.CA", ex);
+                Logger.LogException("RWXNV.GTBT", ex);
             }
 
             return responseObj;
@@ -871,7 +871,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("RWXNV.CA", ex);
+                Logger.LogException("RWXNV.GH", ex);
             }
 
             return responseObj;
@@ -949,7 +949,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("RWXNV.CA", ex);
+                Logger.LogException("RWXNV.QK", ex);
             }
 
             return responseObj;
