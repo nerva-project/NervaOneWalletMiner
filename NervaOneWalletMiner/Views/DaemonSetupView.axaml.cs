@@ -2,9 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects;
-using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Rpc;
-using NervaOneWalletMiner.ViewModels;
 using NervaOneWalletMiner.ViewsDialogs;
 using System;
 using System.Diagnostics;
@@ -26,6 +24,9 @@ namespace NervaOneWalletMiner.Views
 
             var tbxDaemonDataDir = this.Get<TextBox>("tbxDaemonDataDir");
             tbxDaemonDataDir.Text = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].DataDir;
+
+            var cbxAutoStartMining = this.Get<CheckBox>("cbxAutoStartMining");
+            cbxAutoStartMining.IsChecked = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AutoStartMining;
         }
 
         public void OpenCliToolsFolderClicked(object sender, RoutedEventArgs args)
@@ -51,18 +52,24 @@ namespace NervaOneWalletMiner.Views
             {
                 bool isChanged = false;
 
-                var tbxMiningAddress = this.Get<TextBox>("tbxMiningAddress");
-                var tbxDaemonDataDir = this.Get<TextBox>("tbxDaemonDataDir");
-
+                var tbxMiningAddress = this.Get<TextBox>("tbxMiningAddress");                             
                 if (!string.IsNullOrEmpty(tbxMiningAddress.Text) && GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress != tbxMiningAddress.Text)
                 {
                     GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress = tbxMiningAddress.Text;
                     isChanged = true;
                 }
 
+                var tbxDaemonDataDir = this.Get<TextBox>("tbxDaemonDataDir");
                 if (!string.IsNullOrEmpty(tbxDaemonDataDir.Text) && GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].DataDir != tbxDaemonDataDir.Text)
                 {
                     GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].DataDir = tbxDaemonDataDir.Text;
+                    isChanged = true;
+                }
+
+                var cbxAutoStartMining = this.Get<CheckBox>("cbxAutoStartMining");
+                if (cbxAutoStartMining.IsChecked != GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AutoStartMining)
+                {
+                    GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AutoStartMining = ((bool)(cbxAutoStartMining.IsChecked == null ? false : cbxAutoStartMining.IsChecked));
                     isChanged = true;
                 }
 

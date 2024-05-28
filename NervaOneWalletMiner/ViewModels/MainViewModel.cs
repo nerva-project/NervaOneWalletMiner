@@ -426,6 +426,17 @@ public class MainViewModel : ViewModelBase
                 if (!_killMasterProcess)
                 {
                     KeepDaemonRunning();
+
+                    // TODO: Maybe do it another way. Might be good enough though
+                    if(GlobalData.NetworkStats.YourHeight > 0
+                        && GlobalData.NetworkStats.YourHeight == GlobalData.NetworkStats.NetHeight
+                        && GlobalData.NetworkStats.MinerStatus == StatusMiner.Inactive
+                        && GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AutoStartMining
+                        && !GlobalData.IsManualStopMining)
+                    {
+                        Logger.LogDebug("Main.MUP", "Auto starting mining.");
+                        GlobalMethods.StartMiningAsync(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
+                    }
                 }
 
 
