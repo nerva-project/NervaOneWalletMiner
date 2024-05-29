@@ -56,17 +56,25 @@ namespace NervaOneWalletMiner.ViewsDialogs
         {
             try
             {
-                var cbxWallet = this.Get<ComboBox>("cbxWalletName");
+                var cbxWalletName = this.Get<ComboBox>("cbxWalletName");
                 var tbxPassword = this.Get<TextBox>("tbxPassword");
 
-                DialogResult result = new()
+                if (string.IsNullOrEmpty(cbxWalletName.SelectedValue!.ToString()) || string.IsNullOrEmpty(tbxPassword.Text))
                 {
-                    IsOk = true,
-                    WalletName = cbxWallet.SelectedValue?.ToString(),
-                    WalletPassword = tbxPassword.Text
-                };
+                    // TODO:  Let user know that both Wallet Name and Password are required
 
-                Close(result);
+                }
+                else
+                {
+                    DialogResult result = new()
+                    {
+                        IsOk = true,
+                        WalletName = cbxWalletName.SelectedValue.ToString()!,
+                        WalletPassword = tbxPassword.Text
+                    };
+
+                    Close(result);
+                }
             }
             catch (Exception ex)
             {

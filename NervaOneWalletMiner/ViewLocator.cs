@@ -10,7 +10,7 @@ namespace NervaOneWalletMiner
         public Control? Build(object? param)
         {
             var name = param?.GetType().FullName!.Replace("ViewModel", "View");
-            var type = Type.GetType(name);
+            var type = Type.GetType(name!);
 
             if (type != null)
             {

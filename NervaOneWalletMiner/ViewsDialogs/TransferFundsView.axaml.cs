@@ -44,7 +44,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                 var tbxAmount = this.Get<TextBox>("tbxAmount");
                 var tbxPaymentId = this.Get<TextBox>("tbxPaymentId");
 
-                if (string.IsNullOrEmpty(tbxSendTo.Text) || string.IsNullOrEmpty(tbxAmount.Text))
+                if (string.IsNullOrEmpty(cbxSendFrom.SelectedValue!.ToString()) || string.IsNullOrEmpty(tbxSendTo.Text) || string.IsNullOrEmpty(tbxAmount.Text))
                 {
                     // TODO:  Let user know that Send To and Amount are required
 
@@ -52,7 +52,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                 else
                 {
                     uint fromAccountIndex = 0;
-                    string? fromAddress = cbxSendFrom.SelectedValue?.ToString();
+                    string fromAddress = cbxSendFrom.SelectedValue.ToString()!;
 
                     // TODO: Since addresses are shortened, you could potentally have 2 of the same ones
                     foreach (uint index in _accounts.Keys)
@@ -70,7 +70,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                         SendFromAddressIndex = fromAccountIndex,
                         SendToAddress = tbxSendTo.Text,
                         SendAmount = Convert.ToDecimal(tbxAmount.Text),
-                        SendPaymentId = tbxPaymentId.Text
+                        SendPaymentId = tbxPaymentId.Text!
                     };
 
                     Close(result);

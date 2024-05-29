@@ -39,7 +39,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                         IsOk = true,
                         WalletName = tbxWalletName.Text,
                         WalletPassword = tbxPassword.Text,
-                        WalletLanguage = cbxLanguage.SelectedValue == null ? Language.English : cbxLanguage.SelectedValue.ToString()
+                        WalletLanguage = cbxLanguage.SelectedValue == null ? Language.English : cbxLanguage.SelectedValue.ToString()!
                     };
 
                     Close(result);

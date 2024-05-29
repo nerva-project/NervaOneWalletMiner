@@ -46,7 +46,7 @@ namespace NervaOneWalletMiner.Views
 
                 // TODO: Do this in a better way!
                 string newCoin = Coin.XNV;                
-                if (cbxCoin.SelectionBoxItem.ToString().ToLower().Contains(Coin.XMR))
+                if (cbxCoin.SelectionBoxItem!.ToString()!.ToLower().Contains(Coin.XMR))
                 {
                     newCoin = Coin.XMR;
                 }
