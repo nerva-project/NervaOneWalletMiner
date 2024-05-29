@@ -27,6 +27,9 @@ namespace NervaOneWalletMiner.Views
 
             var cbxAutoStartMining = this.Get<CheckBox>("cbxAutoStartMining");
             cbxAutoStartMining.IsChecked = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AutoStartMining;
+
+            var tbxAdditionalArguments = this.Get<TextBox>("tbxAdditionalArguments");
+            tbxAdditionalArguments.Text = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AdditionalArguments;
         }
 
         public void OpenCliToolsFolderClicked(object sender, RoutedEventArgs args)
@@ -70,6 +73,13 @@ namespace NervaOneWalletMiner.Views
                 if (cbxAutoStartMining.IsChecked != GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AutoStartMining)
                 {
                     GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AutoStartMining = ((bool)(cbxAutoStartMining.IsChecked == null ? false : cbxAutoStartMining.IsChecked));
+                    isChanged = true;
+                }
+
+                var tbxAdditionalArguments = this.Get<TextBox>("tbxAdditionalArguments");
+                if (!string.IsNullOrEmpty(tbxAdditionalArguments.Text) && GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AdditionalArguments != tbxAdditionalArguments.Text)
+                {
+                    GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AdditionalArguments = tbxAdditionalArguments.Text;
                     isChanged = true;
                 }
 

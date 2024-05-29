@@ -44,6 +44,9 @@
 		<Label Content="Daemon Data Directory" Margin="0,10,0,0" />
 		<TextBox Name="tbxDaemonDataDir" />
 
+		<Label Content="Additional Startup Arguments" Margin="0,10,0,0" />
+		<TextBox Name="tbxAdditionalArguments" />
+
 		<CheckBox Name="cbxAutoStartMining"
 				  Content="Auto start mining"
 				  Margin="0,10,0,0"/>
