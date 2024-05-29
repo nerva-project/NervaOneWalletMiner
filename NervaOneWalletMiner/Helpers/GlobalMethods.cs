@@ -229,6 +229,7 @@ namespace NervaOneWalletMiner.Helpers
             switch(newCoin)
             {
                 case Coin.XMR:
+                    Logger.LogDebug("GM.SC", "Setting up: " + Coin.XMR);
                     GlobalData.CoinDirName = Coin.XMR;
                     GlobalData.AppSettings.ActiveCoin = Coin.XMR;                   
                     GlobalData.CliToolsDir = GetCliToolsDir();
@@ -262,6 +263,7 @@ namespace NervaOneWalletMiner.Helpers
 
                 default:
                     // XNV or anything else not supported
+                    Logger.LogDebug("GM.SC", "Setting up: " + Coin.XNV);
                     GlobalData.CoinDirName = Coin.XNV;
                     GlobalData.AppSettings.ActiveCoin = Coin.XNV;
                     GlobalData.CliToolsDir = GetCliToolsDir();
@@ -282,12 +284,15 @@ namespace NervaOneWalletMiner.Helpers
                     break;
             }
 
+            Logger.LogDebug("GM.SC", "Coin set up: " + GlobalData.AppSettings.ActiveCoin);
+
 
             // Download CLI tools, if we do not have them already
             if (!DirectoryContainsCliTools(GlobalData.CliToolsDir))
-            {                
+            {
                 string cliToolsLink = GetCliToolsDownloadLink();
-                if(!string.IsNullOrEmpty(cliToolsLink))
+                Logger.LogDebug("GM.SC", "CLI tools not found. Attempting to download from: " + cliToolsLink);
+                if (!string.IsNullOrEmpty(cliToolsLink))
                 {
                     SetUpCliTools(cliToolsLink, GlobalData.CliToolsDir);
                 }
@@ -359,19 +364,19 @@ namespace NervaOneWalletMiner.Helpers
 
             if (File.Exists(destFileWithPath))
             {
-                Logger.LogDebug("UM.DC", "Extracting existing CLI tools: " + destFileWithPath);
+                Logger.LogDebug("GM.SUCT", "Extracting existing CLI tools: " + destFileWithPath);
 
                 ExtractFile(cliToolsPath, destFileWithPath);
             }
             else
             {
-                Logger.LogDebug("GM.DC", "Downloading CLI tools. URL: " + downloadUrl);
+                Logger.LogDebug("GM.SUCT", "Downloading CLI tools. URL: " + downloadUrl);
 
                 bool isSuccess = await DownloadFileToFolder(downloadUrl, cliToolsPath);
 
                 if(isSuccess)
                 {
-                    Logger.LogDebug("UM.DC", "Extracting CLI tools after download: " + destFileWithPath);
+                    Logger.LogDebug("GM.SUCT", "Extracting CLI tools after download: " + destFileWithPath);
                     ExtractFile(cliToolsPath, destFileWithPath);
                 }
             }
@@ -599,7 +604,7 @@ namespace NervaOneWalletMiner.Helpers
             }
             catch (Exception)
             {
-                Logger.LogError("PM.CLF", $"Cannot cycle log file. New log will be written to {logFile}");
+                Logger.LogError("GM.CLF", $"Cannot cycle log file. New log will be written to {logFile}");
                 return logFile;
             }
 
@@ -660,7 +665,7 @@ namespace NervaOneWalletMiner.Helpers
             }
             catch (Exception ex)
             {
-                Logger.LogException("PM.GSL", ex);
+                Logger.LogException("GM.GSL", ex);
             }
 
             return languages;
