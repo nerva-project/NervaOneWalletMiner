@@ -49,21 +49,23 @@
 						Content="Transfer Funds"
 						Grid.Row="0" Grid.Column="0"						
 						HorizontalAlignment="Stretch"
-						Click="TransferFundsClicked" />
+						Click="TransferFunds_Clicked" />
 				
 				<Button Name="btnAddressInfo"
 						Grid.Row="1" Grid.Column="0"
 						Content="Address Info"
 						HorizontalAlignment="Stretch"
-						Click="AddressInfoClicked" />
+						Click="AddressInfo_Clicked" />
 			</Grid>
 		</Grid>
-		<DataGrid ItemsSource="{Binding WalletAddresses}"
+		<DataGrid Name="dtgAccounts"
+				  ItemsSource="{Binding WalletAddresses}"
 				  AutoGenerateColumns="False"
 				  GridLinesVisibility="Horizontal"
 				  IsReadOnly="True"
 				  Height="365"
-				  Margin="10,20,10,10">
+				  Margin="10,20,10,10"
+				  DoubleTapped="DtgAccounts_DoubleTapped">
 			<DataGrid.Columns>
 				<DataGridTemplateColumn Header="">
 					<DataTemplate DataType="Bitmap">
@@ -72,10 +74,16 @@
 				</DataGridTemplateColumn>
 				<DataGridTextColumn Header="Id" Binding="{Binding Index}" />
 				<DataGridTextColumn Header="Label" MinWidth="120" Width="*" Binding="{Binding Label}" />
-				<DataGridTextColumn Header="Address" MinWidth="120" Width="*" Binding="{Binding Address}" />
+				<DataGridTextColumn Header="Address" MinWidth="120" Width="*" Binding="{Binding AddressShort}" />
 				<DataGridTextColumn Header="Balance" Binding="{Binding BalanceLocked}" />
 				<DataGridTextColumn Header="Unlocked" Binding="{Binding BalanceUnlocked}" />
 			</DataGrid.Columns>
+			<DataGrid.ContextMenu>
+				<ContextMenu>
+					<MenuItem Header="Address Info" Click="AddressInfo_Clicked"/>
+					<MenuItem Header="Transfer Funds" Click="TransferFunds_Clicked"/>
+				</ContextMenu>
+			</DataGrid.ContextMenu>
 		</DataGrid>
 
 	</StackPanel>

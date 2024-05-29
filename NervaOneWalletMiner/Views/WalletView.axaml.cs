@@ -6,6 +6,7 @@ using MsBox.Avalonia.Enums;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects;
 using NervaOneWalletMiner.Objects.Constants;
+using NervaOneWalletMiner.Objects.DataGrid;
 using NervaOneWalletMiner.Rpc.Wallet.Requests;
 using NervaOneWalletMiner.Rpc.Wallet.Responses;
 using NervaOneWalletMiner.ViewsDialogs;
@@ -102,11 +103,23 @@ namespace NervaOneWalletMiner.Views
         #endregion // Open Wallet
 
         #region Transfer
-        public void TransferFundsClicked(object sender, RoutedEventArgs args)
+        public void TransferFunds_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
-                var window = new TransferFundsView();
+                var dtgAccounts = this.Get<DataGrid>("dtgAccounts");
+                TransferFundsView window;
+
+                if (dtgAccounts.SelectedItem != null)
+                {
+                    Account selectedItem = (Account)dtgAccounts.SelectedItem;
+                    window = new TransferFundsView((int)selectedItem.Index);
+                }
+                else
+                {
+                    window = new TransferFundsView(0);
+                }
+                
                 window.ShowDialog(GetWindow()).ContinueWith(TransferDialogClosed);
             }
             catch (Exception ex)
@@ -165,20 +178,43 @@ namespace NervaOneWalletMiner.Views
         #endregion // Transfer
 
         #region Address Info
-        public void AddressInfoClicked(object sender, RoutedEventArgs args)
+        private void AddressInfo_Clicked(object sender, RoutedEventArgs args)
+        {
+            OpenAddressInfoView();
+        }
+
+        private void DtgAccounts_DoubleTapped(object? sender, Avalonia.Input.TappedEventArgs e)
+        {
+            OpenAddressInfoView();
+        }
+
+        private void OpenAddressInfoView()
         {
             try
             {
-                var window = new AddressInfoView();
+                var dtgAccounts = this.Get<DataGrid>("dtgAccounts");
+                AddressInfoView window;
+
+                if (dtgAccounts.SelectedItem != null)
+                {
+                    Account selectedItem = (Account)dtgAccounts.SelectedItem;
+                    window = new AddressInfoView((int)selectedItem.Index);
+                }
+                else
+                {
+                    window = new AddressInfoView(0);
+                }
+
                 window.ShowDialog(GetWindow());
             }
             catch (Exception ex)
             {
-                Logger.LogException("Wal.AIC", ex);
+                Logger.LogException("Wal.OAIV", ex);
             }
         }
         #endregion // Address Info
 
+        #region Close Wallet
         private static async void CloseUserWallet()
         {
             CloseWalletRequest request = new();
@@ -211,6 +247,7 @@ namespace NervaOneWalletMiner.Views
             }
 
             GlobalData.WalletHeight = 0;
-        }        
+        }
+        #endregion //Close Wallet
     }
 }

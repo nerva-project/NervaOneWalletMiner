@@ -11,7 +11,13 @@ namespace NervaOneWalletMiner.ViewsDialogs
     public partial class TransferFundsView : Window
     {
         Dictionary<uint, string> _accounts = [];
+
         public TransferFundsView()
+        {
+            InitializeComponent();
+        }
+
+        public TransferFundsView(int accountIndex)
         {
             InitializeComponent();
 
@@ -26,7 +32,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             var cbxSendFrom = this.Get<ComboBox>("cbxSendFrom");
 
             cbxSendFrom.ItemsSource = _accounts.Values;
-            cbxSendFrom.SelectedIndex = 0;            
+            cbxSendFrom.SelectedIndex = accountIndex;            
         }
 
         public void OkButtonClicked(object sender, RoutedEventArgs args)

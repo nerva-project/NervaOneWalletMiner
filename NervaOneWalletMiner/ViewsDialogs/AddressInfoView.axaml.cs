@@ -16,6 +16,11 @@ namespace NervaOneWalletMiner.ViewsDialogs
         public AddressInfoView()
         {
             InitializeComponent();
+        }
+
+        public AddressInfoView(int accountIndex)
+        {
+            InitializeComponent();
 
             foreach (Account account in GlobalData.WalletStats.Subaddresses.Values)
             {
@@ -28,7 +33,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
 
             var cbxAccount = this.Get<ComboBox>("cbxAccount");
             cbxAccount.ItemsSource = _accounts.Keys;
-            cbxAccount.SelectedIndex = 0;
+            cbxAccount.SelectedIndex = accountIndex;
         }
 
         private void AccountSelectionChanged(object sender, SelectionChangedEventArgs e)
