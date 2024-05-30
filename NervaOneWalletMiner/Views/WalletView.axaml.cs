@@ -162,6 +162,73 @@ namespace NervaOneWalletMiner.Views
         }
         #endregion Create Account
 
+        #region Rename Label
+        private void RenameLabel_Clicked(object sender, RoutedEventArgs args)
+        {
+            ShowRenameLabel();
+        }
+
+        private void ShowRenameLabel()
+        {
+            try
+            {
+                if (dtgAccounts.SelectedItem != null)
+                {
+                    Account selectedItem = (Account)dtgAccounts.SelectedItem;
+                    var window = new TextBoxView("Change Account Label", selectedItem.Label, string.Empty, "Account Label", false);
+                    window.ShowDialog(GetWindow()).ContinueWith(RenameLabelDialogClosed);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("Wal.SCA", ex);
+            }
+        }
+
+        private async void RenameLabelDialogClosed(Task task)
+        {
+            DialogResult result = ((DialogResult)((Task<object>)task).Result);
+            if (result != null && result.IsOk)
+            {
+                Account selectedItem = (Account)dtgAccounts.SelectedItem;
+
+                LabelAccountRequest request = new()
+                {
+                    AccountIndex = selectedItem.Index,
+                    Label = result.TextBoxValue
+                };
+
+                LabelAccountResponse response = await GlobalData.WalletService.LabelAccount(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
+
+                if (response.Error.IsError)
+                {
+                    Logger.LogError("Wal.RLDC", "Failed to rename account | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+                    await Dispatcher.UIThread.Invoke(async () =>
+                    {
+                        var box = MessageBoxManager.GetMessageBoxStandard("Rename Account", "Error renaming account\r\n" + response.Error.Message, ButtonEnum.Ok);
+                        _ = await box.ShowAsync();
+                    });
+                }
+                else
+                {
+                    Logger.LogDebug("Wal.RLDC", "Account label changed successfully.");
+                    GlobalMethods.SaveWallet();
+
+                    await Dispatcher.UIThread.InvokeAsync(async () =>
+                    {
+                        var box = MessageBoxManager.GetMessageBoxStandard("Rename Account", "Account label changed successfully!", ButtonEnum.Ok);
+                        _ = await box.ShowAsync();
+                    });
+                }
+            }
+            else
+            {
+                // Cancelled or closed. Don't need to do anything
+
+            }
+        }
+        #endregion Rename Label
+
         #region Transfer Funds
         private void TransferFunds_Clicked(object sender, RoutedEventArgs args)
         {
