@@ -227,7 +227,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     }
                     else
                     {
-                        // Nerva returns account_index and address but don't really need it
+                        // Monero returns account_index and address but don't really need it
 
                         responseObj.Error.IsError = false;
                     }
@@ -240,10 +240,16 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("RWXNV.CrA", ex);
+                Logger.LogException("RWXMR.CrA", ex);
             }
 
             return responseObj;
+        }
+
+        private class ResCreateAccount
+        {
+            public uint account_index { get; set; } = 0;
+            public string address { get; set; } = string.Empty;
         }
         #endregion // Create Account
 

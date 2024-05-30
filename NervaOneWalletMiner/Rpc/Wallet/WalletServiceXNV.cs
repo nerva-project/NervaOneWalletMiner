@@ -255,6 +255,12 @@ namespace NervaOneWalletMiner.Rpc.Wallet
 
             return responseObj;
         }
+
+        private class ResCreateAccount
+        {
+            public uint account_index { get; set; } = 0;
+            public string address { get; set; } = string.Empty;
+        }
         #endregion // Create Account
 
         #region Save Wallet

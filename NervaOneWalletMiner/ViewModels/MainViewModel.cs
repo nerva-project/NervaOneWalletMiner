@@ -488,6 +488,13 @@ public class MainViewModel : ViewModelBase
                 // Will use this to auto-save wallet so need to reset it at the end
                 GlobalData.IsWalletJustOpened = false;
             }
+
+            if(GlobalData.IsWalletOpen & _masterTimerCount % 300 == 0)
+            {
+                // Auto save wallet every 5 min
+                Logger.LogDebug("Main.MUP", "Auto saving wallet: " + GlobalData.OpenedWalletName);
+                SaveWallet();
+            }
         }
         catch (Exception ex)
         {
