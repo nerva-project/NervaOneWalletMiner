@@ -105,20 +105,37 @@ namespace NervaOneWalletMiner.Views
         #region Create Account
         private void CreateAccount_Clicked(object sender, RoutedEventArgs args)
         {
-            CreateAccount();
+            ShowCreateAccount();
         }
 
-        private async void CreateAccount()
+        private void ShowCreateAccount()
         {
             try
             {
-                // TODO: Add ability to set account label
+                var window = new TextBoxView("Create Account", string.Empty, "Enter new account label", "Account Label", false);
+                window.ShowDialog(GetWindow()).ContinueWith(CreateAccounDialogClosed);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("Wal.SCA", ex);
+            }
+        }
 
-                CreateAccountResponse response = await GlobalData.WalletService.CreateAccount(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new CreateAccountRequest());
+        private async void CreateAccounDialogClosed(Task task)
+        {
+            DialogResult result = ((DialogResult)((Task<object>)task).Result);
+            if (result != null && result.IsOk)
+            {
+                CreateAccountRequest request = new()
+                {
+                    Label = result.TextBoxValue
+                };
+
+                CreateAccountResponse response = await GlobalData.WalletService.CreateAccount(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
 
                 if (response.Error.IsError)
                 {
-                    Logger.LogError("Wal.CA", "Failed to create account | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+                    Logger.LogError("Wal.CADC", "Failed to create account | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
                     await Dispatcher.UIThread.Invoke(async () =>
                     {
                         var box = MessageBoxManager.GetMessageBoxStandard("Create Account", "Error creating account\r\n" + response.Error.Message, ButtonEnum.Ok);
@@ -127,18 +144,20 @@ namespace NervaOneWalletMiner.Views
                 }
                 else
                 {
+                    Logger.LogDebug("Wal.CADC", "New account created successfully.");
+                    GlobalMethods.SaveWallet();
 
-                    Logger.LogDebug("Wal.CA", "New account created successfully.");
                     await Dispatcher.UIThread.InvokeAsync(async () =>
                     {
                         var box = MessageBoxManager.GetMessageBoxStandard("Create Account", "Account created successfully!", ButtonEnum.Ok);
                         _ = await box.ShowAsync();
-                    });
+                    });                    
                 }
             }
-            catch (Exception ex)
+            else
             {
-                Logger.LogException("Wal.CA", ex);
+                // Cancelled or closed. Don't need to do anything
+
             }
         }
         #endregion Create Account

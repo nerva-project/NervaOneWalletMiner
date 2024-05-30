@@ -33,5 +33,8 @@ namespace NervaOneWalletMiner.Objects
 
         // Restart with commands
         public string RestartOptions { get; set; } = string.Empty;
+
+        // TextBox
+        public string TextBoxValue { get; set; } = string.Empty;
     }
 }

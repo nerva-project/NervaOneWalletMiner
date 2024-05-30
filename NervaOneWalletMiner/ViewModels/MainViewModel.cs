@@ -367,7 +367,7 @@ public class MainViewModel : ViewModelBase
             if(!GlobalData.IsWalletJustOpened && newTransfersCount > 0)
             {
                 Logger.LogDebug("Main.UTV", "Auto-saving wallet. New transfers count: " + newTransfersCount);
-                SaveWallet();
+                GlobalMethods.SaveWallet();
             }
         }
         else
@@ -493,7 +493,7 @@ public class MainViewModel : ViewModelBase
             {
                 // Auto save wallet every 5 min
                 Logger.LogDebug("Main.MUP", "Auto saving wallet: " + GlobalData.OpenedWalletName);
-                SaveWallet();
+                GlobalMethods.SaveWallet();
             }
         }
         catch (Exception ex)
@@ -863,25 +863,4 @@ public class MainViewModel : ViewModelBase
         }
     }
     #endregion // Master Process Methods
-
-    public async void SaveWallet()
-    {
-        try
-        {
-            SaveWalletResponse resStore = await GlobalData.WalletService.SaveWallet(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new SaveWalletRequest());
-
-            if (resStore.Error.IsError)
-            {
-                Logger.LogError("Main.SW", "Error saving wallet: " + GlobalData.OpenedWalletName + ". Code: " + resStore.Error.Code + ", Message: " + resStore.Error.Message);
-            }
-            else
-            {
-                Logger.LogDebug("Main.SW", "Wallet " + GlobalData.OpenedWalletName + " saved!");
-            }
-        }
-        catch (Exception ex)
-        {
-            Logger.LogException("Main.SW", ex);
-        }
-    }
 }

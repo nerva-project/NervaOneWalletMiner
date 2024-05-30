@@ -202,7 +202,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 // Build request content json
                 var requestParams = new JObject
                 {
-                    ["label"] = requestObj.Lable
+                    ["label"] = requestObj.Label
                 };
 
                 var requestJson = new JObject

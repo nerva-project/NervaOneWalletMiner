@@ -20,6 +20,8 @@ using NervaOneWalletMiner.Rpc.Daemon.Requests;
 using NervaOneWalletMiner.Rpc.Daemon.Responses;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
+using NervaOneWalletMiner.Rpc.Wallet.Requests;
+using NervaOneWalletMiner.Rpc.Wallet.Responses;
 
 namespace NervaOneWalletMiner.Helpers
 {
@@ -718,6 +720,27 @@ namespace NervaOneWalletMiner.Helpers
             catch (Exception ex)
             {
                 Logger.LogException("GM.SpMA", ex);
+            }
+        }
+
+        public static async void SaveWallet()
+        {
+            try
+            {
+                SaveWalletResponse resStore = await GlobalData.WalletService.SaveWallet(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new SaveWalletRequest());
+
+                if (resStore.Error.IsError)
+                {
+                    Logger.LogError("GM.SW", "Error saving wallet: " + GlobalData.OpenedWalletName + ". Code: " + resStore.Error.Code + ", Message: " + resStore.Error.Message);
+                }
+                else
+                {
+                    Logger.LogDebug("GM.SW", "Wallet " + GlobalData.OpenedWalletName + " saved!");
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("GM.SW", ex);
             }
         }
     }
