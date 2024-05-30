@@ -102,8 +102,49 @@ namespace NervaOneWalletMiner.Views
         }
         #endregion // Open Wallet
 
-        #region Transfer
-        public void TransferFunds_Clicked(object sender, RoutedEventArgs args)
+        #region Create Account
+        private void CreateAccount_Clicked(object sender, RoutedEventArgs args)
+        {
+            CreateAccount();
+        }
+
+        private async void CreateAccount()
+        {
+            try
+            {
+                // TODO: Add ability to set account label
+
+                CreateAccountResponse response = await GlobalData.WalletService.CreateAccount(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new CreateAccountRequest());
+
+                if (response.Error.IsError)
+                {
+                    Logger.LogError("Wal.CA", "Failed to create account | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+                    await Dispatcher.UIThread.Invoke(async () =>
+                    {
+                        var box = MessageBoxManager.GetMessageBoxStandard("Create Account", "Error creating account\r\n" + response.Error.Message, ButtonEnum.Ok);
+                        _ = await box.ShowAsync();
+                    });
+                }
+                else
+                {
+
+                    Logger.LogDebug("Wal.CA", "New account created successfully.");
+                    await Dispatcher.UIThread.InvokeAsync(async () =>
+                    {
+                        var box = MessageBoxManager.GetMessageBoxStandard("Create Account", "Account created successfully!", ButtonEnum.Ok);
+                        _ = await box.ShowAsync();
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("Wal.CA", ex);
+            }
+        }
+        #endregion Create Account
+
+        #region Transfer Funds
+        private void TransferFunds_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
@@ -175,7 +216,7 @@ namespace NervaOneWalletMiner.Views
                 });
             }
         }
-        #endregion // Transfer
+        #endregion // Transfer Funds
 
         #region Address Info
         private void AddressInfo_Clicked(object sender, RoutedEventArgs args)
