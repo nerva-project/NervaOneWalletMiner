@@ -304,7 +304,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("RWXNV.LA", ex);
+                Logger.LogException("RWXMR.LA", ex);
             }
 
             return responseObj;
@@ -684,8 +684,8 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                 Label = account.label,
                                 AddressFull = account.base_address,
                                 AddressShort = GlobalMethods.GetShorterString(account.base_address, 12),
-                                BalanceLocked = CommonXMR.DoubleAmountFromAtomicUnits(account.balance, 1),
-                                BalanceUnlocked = CommonXMR.DoubleAmountFromAtomicUnits(account.unlocked_balance, 1)
+                                BalanceLocked = CommonXMR.DoubleAmountFromAtomicUnits(account.balance, 4),
+                                BalanceUnlocked = CommonXMR.DoubleAmountFromAtomicUnits(account.unlocked_balance, 4)
                             };
 
                             responseObj.SubAccounts.Add(newAccount);
@@ -796,7 +796,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                 PaymentId = entry.payment_id,
                                 Height = entry.height,
                                 Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp),
-                                Amount = CommonXMR.DoubleAmountFromAtomicUnits(entry.amount, 2),
+                                Amount = CommonXMR.DoubleAmountFromAtomicUnits(entry.amount, 4),
                                 Type = entry.type
                             };
 
@@ -812,7 +812,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                 PaymentId = entry.payment_id,
                                 Height = entry.height,
                                 Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp),
-                                Amount = CommonXMR.DoubleAmountFromAtomicUnits(entry.amount, 2),
+                                Amount = CommonXMR.DoubleAmountFromAtomicUnits(entry.amount, 4),
                                 Type = entry.type
                             };
 
@@ -828,7 +828,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                 PaymentId = entry.payment_id,
                                 Height = entry.height,
                                 Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp),
-                                Amount = CommonXMR.DoubleAmountFromAtomicUnits(entry.amount, 2),
+                                Amount = CommonXMR.DoubleAmountFromAtomicUnits(entry.amount, 4),
                                 Type = entry.type
                             };
 
