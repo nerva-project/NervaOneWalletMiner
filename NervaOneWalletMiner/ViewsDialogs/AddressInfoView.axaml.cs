@@ -24,7 +24,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
 
             foreach (Account account in GlobalData.WalletStats.Subaddresses.Values)
             {
-                string accountValue = string.IsNullOrEmpty(account.Label) ? "No label" : account.Label + " (" + account.AddressShort + ")";
+                string accountValue = string.IsNullOrEmpty(account.Label) ? "No label" + " (" + account.AddressShort + ")" : account.Label + " (" + account.AddressShort + ")";
                 if (!_accounts.ContainsKey(accountValue))
                 {
                     _accounts.Add(accountValue, account.AddressFull);

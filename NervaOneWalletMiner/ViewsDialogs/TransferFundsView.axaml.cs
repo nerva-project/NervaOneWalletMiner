@@ -25,7 +25,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             {
                 if(!_accounts.ContainsKey(account.Index))
                 {
-                    _accounts.Add(account.Index, string.IsNullOrEmpty(account.Label) ? "No label" : account.Label + " (" + account.AddressShort + ")");
+                    _accounts.Add(account.Index, string.IsNullOrEmpty(account.Label) ? "No label" + " (" + account.AddressShort + ")" : account.Label + " (" + account.AddressShort + ")");
                 }
             }
 
