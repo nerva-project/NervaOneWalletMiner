@@ -59,7 +59,7 @@
 			</Grid>
 		</Grid>
 		<DataGrid Name="dtgAccounts"
-				  ItemsSource="{Binding WalletAddresses}"
+				  ItemsSource="{Binding WalletAddresses, Mode=OneWay}"
 				  AutoGenerateColumns="False"
 				  GridLinesVisibility="Horizontal"
 				  IsReadOnly="True"

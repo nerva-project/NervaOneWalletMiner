@@ -211,7 +211,8 @@ namespace NervaOneWalletMiner.Views
                 }
                 else
                 {
-                    Logger.LogDebug("Wal.RLDC", "Account label changed successfully.");
+                    Logger.LogDebug("Wal.RLDC", "Account label changed successfully.");                    
+                    GlobalMethods.WalletUiUpdate();
                     GlobalMethods.SaveWallet();
 
                     await Dispatcher.UIThread.InvokeAsync(async () =>

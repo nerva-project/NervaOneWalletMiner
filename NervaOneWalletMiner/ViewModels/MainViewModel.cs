@@ -35,8 +35,7 @@ public class MainViewModel : ViewModelBase
 
     public static readonly Bitmap _inImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/transfer_in.png")));
     public static readonly Bitmap _outImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/transfer_out.png")));
-    public static readonly Bitmap _blockImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/transfer_block.png")));
-    public static readonly Bitmap _walletImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/wallet.png")));
+    public static readonly Bitmap _blockImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/transfer_block.png")));    
 
     public static bool _isTransfersUpdateComplete = true;
 
@@ -466,14 +465,14 @@ public class MainViewModel : ViewModelBase
             {
                 if(GlobalData.IsWalletJustOpened)
                 {                    
-                    WalletUiUpdate();
+                    GlobalMethods.WalletUiUpdate();
                     TransfersUiUpdate();
                     SetWalletHeight();
                 }
-                else if(_masterTimerCount % (GlobalData.AppSettings.TimerIntervalMultiplier * 3) == 0)
+                else if(_masterTimerCount % (GlobalData.AppSettings.TimerIntervalMultiplier * 2) == 0)
                 {
-                    // Update wallet every 3rd call because you do not need to do it more often
-                    WalletUiUpdate();
+                    // Update wallet every 2nd call because you do not need to do it more often
+                    GlobalMethods.WalletUiUpdate();
                     TransfersUiUpdate();
                     SetWalletHeight();
                 }                
@@ -736,38 +735,7 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    public async void WalletUiUpdate()
-    {
-        try
-        {
-            // Get accounts for Wallets view
-            GetAccountsResponse resGetAccounts = await GlobalData.WalletService.GetAccounts(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new GetAccountsRequest());
 
-            if(resGetAccounts.Error.IsError)
-            {
-                Logger.LogError("Main.WUU", "GetAccounts Error Code: " + resGetAccounts.Error.Code + ", Message: " + resGetAccounts.Error.Message);
-            }
-            else
-            {
-                GlobalData.WalletStats.TotalBalanceLocked = resGetAccounts.BalanceLocked;
-                GlobalData.WalletStats.TotalBalanceUnlocked = resGetAccounts.BalanceUnlocked;
-
-                GlobalData.WalletStats.Subaddresses = [];
-
-                // TODO: Set icon inside CallAsync method above?
-                foreach (Account account in resGetAccounts.SubAccounts)
-                {
-                    account.WalletIcon = _walletImage;
-
-                    GlobalData.WalletStats.Subaddresses.Add(account.Index, account);
-                }
-            }            
-        }
-        catch (Exception ex)
-        {
-            Logger.LogException("Main.WUU", ex);
-        }
-    }
 
     public async void TransfersUiUpdate()
     {

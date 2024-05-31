@@ -22,11 +22,14 @@ using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using NervaOneWalletMiner.Rpc.Wallet.Requests;
 using NervaOneWalletMiner.Rpc.Wallet.Responses;
+using NervaOneWalletMiner.Objects.DataGrid;
 
 namespace NervaOneWalletMiner.Helpers
 {
     public static class GlobalMethods
     {
+        public static readonly Bitmap _walletImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/wallet.png")));
+
         #region Directories, Paths and Names
         public static string GetDataDir()
         {
@@ -741,6 +744,39 @@ namespace NervaOneWalletMiner.Helpers
             catch (Exception ex)
             {
                 Logger.LogException("GM.SW", ex);
+            }
+        }
+
+        public static async void WalletUiUpdate()
+        {
+            try
+            {
+                // Get accounts for Wallets view
+                GetAccountsResponse resGetAccounts = await GlobalData.WalletService.GetAccounts(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new GetAccountsRequest());
+
+                if (resGetAccounts.Error.IsError)
+                {
+                    Logger.LogError("GM.WUU", "GetAccounts Error Code: " + resGetAccounts.Error.Code + ", Message: " + resGetAccounts.Error.Message);
+                }
+                else
+                {
+                    GlobalData.WalletStats.TotalBalanceLocked = resGetAccounts.BalanceLocked;
+                    GlobalData.WalletStats.TotalBalanceUnlocked = resGetAccounts.BalanceUnlocked;
+
+                    GlobalData.WalletStats.Subaddresses = [];
+
+                    // TODO: Set icon inside CallAsync method above?
+                    foreach (Account account in resGetAccounts.SubAccounts)
+                    {
+                        account.WalletIcon = _walletImage;
+
+                        GlobalData.WalletStats.Subaddresses.Add(account.Index, account);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("GM.WUU", ex);
             }
         }
     }
