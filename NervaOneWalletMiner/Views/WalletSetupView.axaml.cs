@@ -332,6 +332,62 @@ namespace NervaOneWalletMiner.Views
         }
         #endregion // Rescan Spent
 
+        #region Rescan Blockchain
+        public void RescanBlockchainClicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                if (GlobalData.IsWalletOpen)
+                {
+                    RescanBlockchain();
+                }
+                else
+                {
+                    Dispatcher.UIThread.Invoke(async () =>
+                    {
+                        var box = MessageBoxManager.GetMessageBoxStandard("Rescan Blockchain", "Please open wallet first.", ButtonEnum.Ok);
+                        _ = await box.ShowAsync();
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("WalSV.RSP", ex);
+            }
+        }
+
+        private static async void RescanBlockchain()
+        {
+            try
+            {
+                RescanBlockchainResponse response = await GlobalData.WalletService.RescanBlockchain(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new RescanBlockchainRequest());
+
+                if (response.Error.IsError)
+                {
+                    Logger.LogError("WalSV.RB", "Failed to rescan Blockchain. Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+                    await Dispatcher.UIThread.Invoke(async () =>
+                    {
+                        var box = MessageBoxManager.GetMessageBoxStandard("Rescan Blockchain", "Error rescanning\r\n" + response.Error.Message, ButtonEnum.Ok);
+                        _ = await box.ShowAsync();
+                    });
+                }
+                else
+                {
+                    Logger.LogDebug("WalSV.RB", "Rescan Blockchain returned successfully.");
+                    await Dispatcher.UIThread.InvokeAsync(async () =>
+                    {
+                        var box = MessageBoxManager.GetMessageBoxStandard("Rescan Blockchain", "Rescan Blockchain command submitted successfully.", ButtonEnum.Ok);
+                        _ = await box.ShowAsync();
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("WalSV.RB", ex);
+            }
+        }
+        #endregion // Rescan Blockchain
+
         #region View Keys/Seed
         public void ViewKeysSeedClicked(object sender, RoutedEventArgs args)
         {

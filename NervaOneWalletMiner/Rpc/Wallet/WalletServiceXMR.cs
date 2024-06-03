@@ -684,6 +684,59 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         }
         #endregion // Rescan Spent
 
+        #region Rescan Blockchain
+        /* RPC request params:
+         *  bool hard;                          OPT
+         */
+
+        //Rescan the blockchain from scratch. If 'hard' is specified, you will lose any information which can not be recovered from the blockchain itself.
+        public async Task<RescanBlockchainResponse> RescanBlockchain(RpcBase rpc, RescanBlockchainRequest requestObj)
+        {
+            RescanBlockchainResponse responseObj = new();
+
+            try
+            {
+                // Build request content json
+                var requestJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = "0",
+                    ["method"] = "rescan_blockchain"
+                };
+
+                // Call service and process response
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+
+                    var error = JObject.Parse(jsonObject.ToString())["error"];
+                    if (error != null)
+                    {
+                        // Set Service error
+                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                    }
+                    else
+                    {
+                        // Just set error to false
+                        responseObj.Error.IsError = false;
+                    }
+                }
+                else
+                {
+                    // Set HTTP error
+                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("RWXNV.RB", ex);
+            }
+
+            return responseObj;
+        }
+        #endregion // Rescan Blockchain
+
         #region Get Accounts
         /* RPC request params:
          *  std::string tag;      // all accounts if empty, otherwise those accounts with this tag
