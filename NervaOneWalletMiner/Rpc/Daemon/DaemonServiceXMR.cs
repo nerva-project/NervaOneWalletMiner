@@ -122,6 +122,51 @@ namespace NervaOneWalletMiner.Rpc.Daemon
         }
         #endregion // StopMining
 
+        #region Stop Daemon
+        public async Task<StopDaemonResponse> StopDaemon(RpcBase rpc, StopDaemonRequest requestObj)
+        {
+            StopDaemonResponse responseObj = new();
+
+            try
+            {
+                // Build request content json
+                var requestJson = new JObject();
+
+                // Call service and process response
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "stop_daemon"), requestJson.ToString());
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+
+                    var error = JObject.Parse(jsonObject.ToString())["error"];
+                    if (error != null)
+                    {
+                        // Set Service error
+                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                    }
+                    else
+                    {
+                        // Set successful response
+                        ResGeneric startMiningResponse = JsonConvert.DeserializeObject<ResGeneric>(jsonObject.ToString());
+
+                        responseObj.Error.IsError = false;
+                    }
+                }
+                else
+                {
+                    // Set HTTP error
+                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("RDXNV.SpD", ex);
+            }
+
+            return responseObj;
+        }
+        #endregion // Stop Daemon
+
         #region GetInfo
         public async Task<GetInfoResponse> GetInfo(RpcBase rpc, GetInfoRequest requestObj)
         {

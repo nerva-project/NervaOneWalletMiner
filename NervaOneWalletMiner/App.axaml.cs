@@ -5,6 +5,7 @@ using Avalonia.Styling;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Rpc;
+using NervaOneWalletMiner.Rpc.Daemon.Requests;
 using NervaOneWalletMiner.ViewModels;
 using NervaOneWalletMiner.Views;
 using System;
@@ -56,19 +57,57 @@ public partial class App : Application
 
     public static void Shutdown()
     {
-        // Prevent the daemon restarting automatically before telling it to stop
-        if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopOnExit)
+        try
+        {            
+            if(GlobalData.IsWalletOpen)
+            {
+                ForceWalletClose();
+            }
+
+            Logger.LogDebug("App.SD", "Forcing wallet process close.");
+            WalletProcess.ForceClose();
+
+            if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopOnExit)
+            {
+                ForceDaemonStop();
+
+                Logger.LogDebug("App.SD", "Forcing daemon process close.");
+                DaemonProcess.ForceClose();
+            }            
+        }
+        catch (Exception ex)
         {
-            //TODO: Call daemon method to exit
-            //Daemon.StopDaemon();
-            DaemonProcess.ForceClose();
+            Logger.LogException("App.SD", ex);
         }
 
-        WalletProcess.ForceClose();
-
         Logger.LogInfo("App.SD", "PROGRAM TERMINATED");
-
         Environment.Exit(0);
+    }
+
+    public static async void ForceWalletClose()
+    {
+        try
+        {
+            Logger.LogDebug("App.FWC", "Closing wallet: " + GlobalData.OpenedWalletName);
+            _ = await GlobalData.WalletService.CloseWallet(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new Rpc.Wallet.Requests.CloseWalletRequest());
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException("App.FWC", ex);
+        }
+    }
+
+    public static async void ForceDaemonStop()
+    {
+        try
+        {
+            Logger.LogDebug("App.FDS", "Stopping Daemon.");
+            _ = await GlobalData.DaemonService.StopDaemon(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new StopDaemonRequest());
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException("App.FDS", ex);
+        }
     }
 
     public static void SetUpDefaults()

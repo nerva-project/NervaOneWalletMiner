@@ -11,6 +11,8 @@ namespace NervaOneWalletMiner.Rpc.Daemon
 
         Task<StopMiningResponse> StopMining(RpcBase rpc, StopMiningRequest requestObj);
 
+        Task<StopDaemonResponse> StopDaemon(RpcBase rpc, StopDaemonRequest requestObj);
+
         Task<GetInfoResponse> GetInfo(RpcBase rpc, GetInfoRequest requestObj);
 
         Task<GetConnectionsResponse> GetConnections(RpcBase rpc, GetConnectionsRequest requestObj);
