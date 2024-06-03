@@ -213,7 +213,7 @@ public class MainViewModel : ViewModelBase
                 ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).TotalUnlockedLabel = totalUnlockedLabel;
             }
 
-            if (((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses.Count == 0)
+            if (((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses.Count == 0 && GlobalData.WalletStats.Subaddresses.Values.Count > 0)
             {
                 ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses = GlobalData.WalletStats.Subaddresses.Values.ToList<Account>();
             }

@@ -16,7 +16,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
 
     public class DaemonServiceXMR : IDaemonService
     {
-        #region StartMining
+        #region Start Mining
         /* RPC request params:
          *  std::string miner_address;
          *  uint64_t    threads_count;
@@ -72,9 +72,9 @@ namespace NervaOneWalletMiner.Rpc.Daemon
 
             return responseObj;
         }
-        #endregion // StartMining
+        #endregion // Start Mining
 
-        #region StopMining
+        #region Stop Mining
         public async Task<StopMiningResponse> StopMining(RpcBase rpc, StopMiningRequest requestObj)
         {
             StopMiningResponse responseObj = new();
@@ -120,7 +120,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
 
             return responseObj;
         }
-        #endregion // StopMining
+        #endregion // Stop Mining
 
         #region Stop Daemon
         public async Task<StopDaemonResponse> StopDaemon(RpcBase rpc, StopDaemonRequest requestObj)
@@ -160,14 +160,14 @@ namespace NervaOneWalletMiner.Rpc.Daemon
             }
             catch (Exception ex)
             {
-                Logger.LogException("RDXNV.SpD", ex);
+                Logger.LogException("RDXMR.SpD", ex);
             }
 
             return responseObj;
         }
         #endregion // Stop Daemon
 
-        #region GetInfo
+        #region Get Info
         public async Task<GetInfoResponse> GetInfo(RpcBase rpc, GetInfoRequest requestObj)
         {
             GetInfoResponse responseObj = new();
@@ -281,9 +281,9 @@ namespace NervaOneWalletMiner.Rpc.Daemon
             public string status { get; set; } = string.Empty;
             public bool untrusted { get; set; }
         }
-        #endregion // GetInfo
+        #endregion // Get Info
 
-        #region GetConnections
+        #region Get Connections
         public async Task<GetConnectionsResponse> GetConnections(RpcBase rpc, GetConnectionsRequest requestObj)
         {
             GetConnectionsResponse responseObj = new();
@@ -380,9 +380,9 @@ namespace NervaOneWalletMiner.Rpc.Daemon
             public uint pruning_seed { get; set; }
             public uint address_type { get; set; }
         }
-        #endregion // GetConnections
+        #endregion // Get Connections
 
-        #region MiningStatus
+        #region Mining Status
         public async Task<MiningStatusResponse> MiningStatus(RpcBase rpc, MiningStatusRequest requestObj)
         {
             MiningStatusResponse responseObj = new();
@@ -455,7 +455,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
             public string wide_difficulty { get; set; } = string.Empty;
             public long difficulty_top64 { get; set; }
         }
-        #endregion //MiningStatus
+        #endregion //Mining Status
 
 
         // Internal helper obejcts used to interact with service
