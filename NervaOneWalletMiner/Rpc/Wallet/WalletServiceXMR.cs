@@ -223,7 +223,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -289,7 +289,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -336,7 +336,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -661,7 +661,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -677,7 +677,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("RWXNV.RS", ex);
+                Logger.LogException("RWXMR.RS", ex);
             }
 
             return responseObj;
@@ -773,7 +773,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -792,7 +792,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("RWXNV.MIA", ex);
+                Logger.LogException("RWXMR.MIA", ex);
             }
 
             return responseObj;
@@ -1068,7 +1068,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -1081,15 +1081,15 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                         responseObj.Height = getTransfByTxIdResponse.transfer.height;
                         responseObj.Timestamp = GlobalMethods.UnixTimeStampToDateTime(getTransfByTxIdResponse.transfer.timestamp);
                         responseObj.UnlockTime = GlobalMethods.UnixTimeStampToDateTime(getTransfByTxIdResponse.transfer.unlock_time);
-                        responseObj.Amount = CommonXNV.DoubleAmountFromAtomicUnits(getTransfByTxIdResponse.transfer.amount, 6);
-                        responseObj.Fee = CommonXNV.DoubleAmountFromAtomicUnits(getTransfByTxIdResponse.transfer.fee, 6);
+                        responseObj.Amount = CommonXMR.DoubleAmountFromAtomicUnits(getTransfByTxIdResponse.transfer.amount, 6);
+                        responseObj.Fee = CommonXMR.DoubleAmountFromAtomicUnits(getTransfByTxIdResponse.transfer.fee, 6);
                         responseObj.Note = getTransfByTxIdResponse.transfer.note;
                         responseObj.IsLocked = getTransfByTxIdResponse.transfer.locked;
                         responseObj.Confirmations = getTransfByTxIdResponse.transfer.confirmations;
 
                         foreach (TransferDestination destination in getTransfByTxIdResponse.transfer.destinations)
                         {
-                            responseObj.Destinations.Add(destination.address + " | " + CommonXNV.DoubleAmountFromAtomicUnits(destination.amount, 6));
+                            responseObj.Destinations.Add(destination.address + " | " + CommonXMR.DoubleAmountFromAtomicUnits(destination.amount, 6));
                         }
 
                         // There is also transfers but it seems to have the same info. Can you have more than 1 transfer for given transactioin id?
@@ -1109,7 +1109,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("RWXNV.GTBT", ex);
+                Logger.LogException("RWXMR.GTBT", ex);
             }
 
             return responseObj;
@@ -1148,7 +1148,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -1225,7 +1225,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -1258,7 +1258,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                 if (error != null)
                                 {
                                     // Set Service error
-                                    responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                                    responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                                 }
                                 else
                                 {
