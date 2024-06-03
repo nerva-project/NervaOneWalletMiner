@@ -141,5 +141,43 @@ namespace NervaOneWalletMiner.ViewsDialogs
                 Logger.LogException("NWal.CWTCC", ex);
             }
         }
+
+        public async void CopyIntegratedAddressToClipboardClicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                var clipboard = GetTopLevel(this)?.Clipboard;
+                var dataObject = new DataObject();
+                dataObject.Set(DataFormats.Text, tbxIntegratedAddress.Text!);
+
+                if (clipboard != null)
+                {
+                    await clipboard.SetDataObjectAsync(dataObject);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("NWal.CIATCC", ex);
+            }
+        }
+
+        public async void CopyPaymentIdToClipboardClicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                var clipboard = GetTopLevel(this)?.Clipboard;
+                var dataObject = new DataObject();
+                dataObject.Set(DataFormats.Text, tbxPaymentId.Text!);
+
+                if (clipboard != null)
+                {
+                    await clipboard.SetDataObjectAsync(dataObject);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("NWal.CPITCC", ex);
+            }
+        }
     }
 }

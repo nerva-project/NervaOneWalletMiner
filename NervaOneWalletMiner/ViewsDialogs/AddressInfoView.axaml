@@ -35,10 +35,26 @@
 				Margin="0,15,0,0"/>
 
 		<Label Content="Integrated Address" Margin="0,15,0,0"/>
-		<TextBox Name="tbxIntegratedAddress"/>
+		<DockPanel>
+			<TextBox Name="tbxIntegratedAddress" Width="400"/>
+			
+			<Button Name="btnCopyIntegratedAddressToClipboard"
+					Content="Copy"
+					Margin="10,0,0,0"
+					Click="CopyIntegratedAddressToClipboardClicked"/>
+		</DockPanel>
+		
 
 		<Label Content="Payment Id" Margin="0,15,0,0"/>
-		<TextBox Name="tbxPaymentId"/>
+		<DockPanel>
+			<TextBox Name="tbxPaymentId" Width="400"/>
+			
+			<Button Name="btnCopyPaymentIdToClipboard"
+					Content="Copy"
+					Margin="10,0,0,0"
+					Click="CopyPaymentIdToClipboardClicked"/>
+		</DockPanel>
+		
 
 		<Button Name="btnClose"
 				Content="Close"
