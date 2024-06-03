@@ -29,6 +29,8 @@ namespace NervaOneWalletMiner.Rpc.Wallet
 
         Task<RescanBlockchainResponse> RescanBlockchain(RpcBase rpc, RescanBlockchainRequest requestObj);
 
+        Task<MakeIntegratedAddressResponse> MakeIntegratedAddress(RpcBase rpc, MakeIntegratedAddressRequest requestObj);
+
 
         // TODO: Pass optional tag
         Task<GetAccountsResponse> GetAccounts(RpcBase rpc, GetAccountsRequest requestObj);

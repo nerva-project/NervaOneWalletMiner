@@ -6,6 +6,11 @@ using System;
 using NervaOneWalletMiner.Helpers;
 using System.Collections.Generic;
 using Avalonia.Input;
+using Avalonia.Threading;
+using NervaOneWalletMiner.Rpc.Wallet.Requests;
+using NervaOneWalletMiner.Rpc.Wallet.Responses;
+using MsBox.Avalonia.Enums;
+using MsBox.Avalonia;
 
 namespace NervaOneWalletMiner.ViewsDialogs
 {
@@ -58,11 +63,46 @@ namespace NervaOneWalletMiner.ViewsDialogs
         {
             try
             {
-                // TODO: Implement
+                MakeIntegratedAddress(tbxWalletAddress.Text!);
             }
             catch (Exception ex)
             {
-                Logger.LogException("AIWal.MIGC", ex);
+                Logger.LogException("AIWal.MIAC", ex);
+            }
+        }
+
+        private async void MakeIntegratedAddress(string walletAddress)
+        {
+            try
+            {
+                // TODO: Current GUI does not pass payment_id. Do we need it?
+                MakeIntegratedAddressRequest request = new()
+                {
+                    StandardAddress = walletAddress,
+                };
+
+                Logger.LogError("AIWal.MIA", "Making integrated address for: " + GlobalMethods.GetShorterString(walletAddress, 12));
+                MakeIntegratedAddressResponse response = await GlobalData.WalletService.MakeIntegratedAddress(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
+
+                if (response.Error.IsError)
+                {
+                    Logger.LogError("AIWal.MIA", "Failed to make integrated address. Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+                    await Dispatcher.UIThread.Invoke(async () =>
+                    {
+                        var box = MessageBoxManager.GetMessageBoxStandard("Make Integrated Address", "Error making integrated address\r\n" + response.Error.Message, ButtonEnum.Ok);
+                        _ = await box.ShowAsync();
+                    });
+                }
+                else
+                {
+                    Logger.LogError("AIWal.MIA", "Integrated address created successfully.");
+                    tbxIntegratedAddress.Text = response.IntegratedAddress;
+                    tbxPaymentId.Text = response.PaymentId;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("AIWal.MIA", ex);
             }
         }
 

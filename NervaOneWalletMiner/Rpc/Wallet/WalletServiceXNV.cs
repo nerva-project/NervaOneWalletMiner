@@ -731,6 +731,74 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         }
         #endregion // Rescan Blockchain
 
+        #region Make Integrated Address
+        /* RPC request params:
+         *  std::string standard_address;
+         *  std::string payment_id;
+         */
+        public async Task<MakeIntegratedAddressResponse> MakeIntegratedAddress(RpcBase rpc, MakeIntegratedAddressRequest requestObj)
+        {
+            MakeIntegratedAddressResponse responseObj = new();
+
+            try
+            {
+                // Build request content json
+                var requestParams = new JObject
+                {
+                    ["standard_address"] = requestObj.StandardAddress,
+                    ["payment_id"] = requestObj.PaymentId
+                };
+
+                var requestJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = "0",
+                    ["method"] = "make_integrated_address",
+                    ["params"] = requestParams
+                };
+
+                // Call service and process response
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+
+                    var error = JObject.Parse(jsonObject.ToString())["error"];
+                    if (error != null)
+                    {
+                        // Set Service error
+                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                    }
+                    else
+                    {
+                        ResMakeIntegratedAddress createWalletResponse = JsonConvert.DeserializeObject<ResMakeIntegratedAddress>(jsonObject.SelectToken("result").ToString());
+                        responseObj.IntegratedAddress = createWalletResponse.integrated_address;
+                        responseObj.PaymentId = createWalletResponse.payment_id;
+
+                        responseObj.Error.IsError = false;
+                    }
+                }
+                else
+                {
+                    // Set HTTP error
+                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("RWXNV.MIA", ex);
+            }
+
+            return responseObj;
+        }
+
+        private class ResMakeIntegratedAddress
+        {
+            public string integrated_address { get; set; } = string.Empty;
+            public string payment_id { get; set; } = string.Empty;
+        }
+        #endregion // Make Integrated Address
+
         #region Get Accounts
         /* RPC request params:
          *  std::string tag;      // all accounts if empty, otherwise those accounts with this tag
