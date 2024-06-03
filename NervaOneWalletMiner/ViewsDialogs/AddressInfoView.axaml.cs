@@ -5,6 +5,7 @@ using NervaOneWalletMiner.Objects;
 using System;
 using NervaOneWalletMiner.Helpers;
 using System.Collections.Generic;
+using Avalonia.Input;
 
 namespace NervaOneWalletMiner.ViewsDialogs
 {
@@ -79,6 +80,25 @@ namespace NervaOneWalletMiner.ViewsDialogs
             catch (Exception ex)
             {
                 Logger.LogException("AIWal.CBC", ex);
+            }
+        }
+
+        public async void CopyWalletToClipboardClicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                var clipboard = GetTopLevel(this)?.Clipboard;
+                var dataObject = new DataObject();
+                dataObject.Set(DataFormats.Text, tbxWalletAddress.Text!);
+
+                if(clipboard != null)
+                {
+                    await clipboard.SetDataObjectAsync(dataObject);
+                }                
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("NWal.CWTCC", ex);
             }
         }
     }
