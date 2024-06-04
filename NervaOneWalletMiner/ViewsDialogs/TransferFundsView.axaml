@@ -2,9 +2,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="500"
+        mc:Ignorable="d" d:DesignWidth="550" d:DesignHeight="500"
         x:Class="NervaOneWalletMiner.ViewsDialogs.TransferFundsView"
-		Width="500"
+		Width="550"
 		Height="500"
 		Topmost="True"
 		WindowStartupLocation="CenterOwner"
@@ -25,8 +25,18 @@
 				 Watermark="Required - amount to send"/>
 
 		<Label Content="Payment Id" Margin="0,15,0,0"/>
-		<TextBox Name="tbxPaymentId"
-				 Watermark="Optional - payment Id"/>
+		<DockPanel>
+			<TextBox Name="tbxPaymentId"
+					Watermark="Optional - payment Id"
+					Width="420"/>
+
+			<Button Name="btnGeneratePaymentId"
+					Content="Generate"
+					Margin="10,0,0,0"
+					Click="GeneratePaymentId_Clicked"/>
+		</DockPanel>
+		
+
 
 		<DockPanel Margin="0,15,0,0">
 			<Button Name="btnOk"

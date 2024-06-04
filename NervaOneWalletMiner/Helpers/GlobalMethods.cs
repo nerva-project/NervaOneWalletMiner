@@ -782,6 +782,18 @@ namespace NervaOneWalletMiner.Helpers
             }
         }
 
+        public static string GenerateRandomHexString(int length, bool upperCase = false)
+        {
+            char[] array = ("0123456789" + (upperCase ? "ABCDEF" : "abcdef")).ToCharArray();
+            string text = string.Empty;
+            for (int i = 0; i < length; i++)
+            {
+                text += array[GlobalData.RandomGenerator.Next(0, array.Length)];
+            }
+
+            return text;
+        }
+
         public static void CopyToClipboard(Avalonia.Visual visual, string text)
         {
             try
