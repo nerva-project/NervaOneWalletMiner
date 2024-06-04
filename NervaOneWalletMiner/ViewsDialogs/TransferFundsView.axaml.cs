@@ -100,7 +100,8 @@ namespace NervaOneWalletMiner.ViewsDialogs
                             SendToAddress = tbxSendTo.Text,
                             SendAmount = Convert.ToDecimal(tbxAmount.Text),
                             SendPaymentId = tbxPaymentId.Text!,
-                            Priority = (string)cbxPriority.SelectedValue!
+                            Priority = (string)cbxPriority.SelectedValue!,
+                            IsSplitTranfer = (bool)cbxSplitTransfer.IsChecked!
                         };
 
                         Close(result);

@@ -264,19 +264,20 @@ namespace NervaOneWalletMiner.Views
                 // Submit trannsfer
                 if (!string.IsNullOrEmpty(result.SendToAddress) && result.SendAmount > 0)
                 {
-                    MakeTransfer(result.SendFromAddressIndex, result.SendToAddress, result.SendAmount, result.SendPaymentId, result.Priority);
+                    if(result.IsSplitTranfer)
+                    {
+                        MakeTransferSplit(result.SendFromAddressIndex, result.SendToAddress, result.SendAmount, result.SendPaymentId, result.Priority);
+                    }
+                    else
+                    {
+                        MakeTransfer(result.SendFromAddressIndex, result.SendToAddress, result.SendAmount, result.SendPaymentId, result.Priority);
+                    }                    
                 }
-            }
-            else
-            {
-                // Cancelled or closed. Don't need to do anything
-
             }
         }
 
         private static async void MakeTransfer(uint sendFromAccountIndex, string sendToAddress, decimal amount, string paymentId, string priority)
         {
-            // TODO: Add other options
             TransferRequest request = new()
             {
                 Destinations = [new() { Amount = amount, Address = sendToAddress }],
@@ -300,6 +301,36 @@ namespace NervaOneWalletMiner.Views
                 await Dispatcher.UIThread.InvokeAsync(async () =>
                 {
                     var box = MessageBoxManager.GetMessageBoxStandard("Transfer", "Transfer successful!", ButtonEnum.Ok);
+                    _ = await box.ShowAsync();
+                });
+            }
+        }
+
+        private static async void MakeTransferSplit(uint sendFromAccountIndex, string sendToAddress, decimal amount, string paymentId, string priority)
+        {
+            TransferRequest request = new()
+            {
+                Destinations = [new() { Amount = amount, Address = sendToAddress }],
+                AccountIndex = sendFromAccountIndex,
+                Priority = priority,
+                PaymentId = paymentId
+            };
+
+            TransferResponse response = await GlobalData.WalletService.TransferSplit(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
+
+            if (response.Error.IsError)
+            {
+                await Dispatcher.UIThread.Invoke(async () =>
+                {
+                    var box = MessageBoxManager.GetMessageBoxStandard("Transfer Split", "Transfer error\r\n\r\n" + response.Error.Message, ButtonEnum.Ok);
+                    _ = await box.ShowAsync();
+                });
+            }
+            else
+            {
+                await Dispatcher.UIThread.InvokeAsync(async () =>
+                {
+                    var box = MessageBoxManager.GetMessageBoxStandard("Transfer Split", "Transfer successful!", ButtonEnum.Ok);
                     _ = await box.ShowAsync();
                 });
             }

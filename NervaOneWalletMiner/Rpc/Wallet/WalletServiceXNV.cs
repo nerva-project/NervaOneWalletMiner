@@ -598,6 +598,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     }
                     else
                     {
+                        // We don't use response values
                         ResTransfer transferResponse = JsonConvert.DeserializeObject<ResTransfer>(jsonObject.SelectToken("result").ToString());
 
                         responseObj.Error.IsError = false;
@@ -629,6 +630,102 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             public string unsigned_txset { get; set; } = string.Empty;
         }
         #endregion // Transfer
+
+        #region Transfer Split
+        /* RPC request params:
+         *  std::list<transfer_destination> destinations;
+         *  uint32_t account_index;
+         *  std::set<uint32_t> subaddr_indices;
+         *  uint32_t priority;
+         *  uint64_t unlock_time;
+         *  std::string payment_id;
+         *  bool get_tx_key;
+         *  bool do_not_relay;                                  OPT
+         *  bool get_tx_hex;                                    OPT
+         *  bool get_tx_metadata;                               OPT
+         */
+        public async Task<TransferResponse> TransferSplit(RpcBase rpc, TransferRequest requestObj)
+        {
+            TransferResponse responseObj = new();
+
+            try
+            {
+                // Build request content json
+                dynamic paramsJson = new JObject();
+                dynamic destinationsJson = new JArray();
+                foreach (Common.TransferDestination destination in requestObj.Destinations)
+                {
+                    dynamic newDest = new JObject();
+                    newDest.amount = CommonXNV.AtomicUnitsFromDoubleAmount(destination.Amount);
+                    newDest.address = destination.Address;
+                    destinationsJson.Add(newDest);
+                }
+                paramsJson.destinations = destinationsJson;
+
+                paramsJson.account_index = requestObj.AccountIndex;
+                paramsJson.subaddr_indices = new JArray(requestObj.SubAddressIndices);
+                paramsJson.priority = CommonXNV.GetPriority(requestObj.Priority);
+                paramsJson.unlock_time = requestObj.UnlockTime;
+                paramsJson.payment_id = requestObj.PaymentId is null ? "" : requestObj.PaymentId;
+                paramsJson.get_tx_key = requestObj.GetTxKey;
+                paramsJson.do_not_relay = requestObj.DoNotRelay;
+                paramsJson.get_tx_hex = requestObj.GetTxHex;
+                paramsJson.get_tx_metadata = requestObj.GetTxMetadata;
+
+                var requestJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = "0",
+                    ["method"] = "transfer_split",
+                    ["params"] = paramsJson
+                };
+
+                // Call service and process response
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+
+                    var error = JObject.Parse(jsonObject.ToString())["error"];
+                    if (error != null)
+                    {
+                        // Set Service error
+                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                    }
+                    else
+                    {
+                        // We don't use response values
+                        ResTransferSplit transferResponse = JsonConvert.DeserializeObject<ResTransferSplit>(jsonObject.SelectToken("result").ToString());
+
+                        responseObj.Error.IsError = false;
+                    }
+                }
+                else
+                {
+                    // Set HTTP error
+                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("RWXNV.TS", ex);
+            }
+
+            return responseObj;
+        }
+
+        private class ResTransferSplit
+        {
+            public List<string> tx_hash_list { get; set; } = [];
+            public List<string> tx_key_list { get; set; } = [];
+            public List<ulong> amount_list { get; set; } = [];
+            public List<ulong> fee_list { get; set; } = [];
+            public List<string> tx_blob_list { get; set; } = [];
+            public List<string> tx_metadata_list { get; set; } = [];
+            public string multisig_txset { get; set; } = string.Empty;
+            public string unsigned_txset { get; set; } = string.Empty;
+        }
+        #endregion // Transfer Split
 
         #region Rescan Spent
         public async Task<RescanSpentResponse> RescanSpent(RpcBase rpc, RescanSpentRequest requestObj)

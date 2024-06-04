@@ -22,6 +22,7 @@ namespace NervaOneWalletMiner.Objects
         public decimal SendAmount { get; set; } = 0;
         public string SendPaymentId { get; set; } = string.Empty;
         public string Priority { get; set; } = string.Empty;
+        public bool IsSplitTranfer { get;set; } = false;
 
         // Restore from Seed
         public string SeedPhrase { get; set; } = string.Empty;

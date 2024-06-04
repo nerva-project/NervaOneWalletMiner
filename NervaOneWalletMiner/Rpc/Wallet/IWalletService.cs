@@ -25,6 +25,8 @@ namespace NervaOneWalletMiner.Rpc.Wallet
 
         Task<TransferResponse> Transfer(RpcBase rpc, TransferRequest requestObj);
 
+        Task<TransferResponse> TransferSplit(RpcBase rpc, TransferRequest requestObj);
+
         Task<RescanSpentResponse> RescanSpent(RpcBase rpc, RescanSpentRequest requestObj);
 
         Task<RescanBlockchainResponse> RescanBlockchain(RpcBase rpc, RescanBlockchainRequest requestObj);
