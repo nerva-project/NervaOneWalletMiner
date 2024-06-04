@@ -241,7 +241,7 @@ namespace NervaOneWalletMiner.Views
                 if (dtgAccounts.SelectedItem != null)
                 {
                     Account selectedItem = (Account)dtgAccounts.SelectedItem;
-                    window = new TransferFundsView((int)selectedItem.Index);
+                    window = new TransferFundsView(selectedItem.Index);
                 }
                 else
                 {

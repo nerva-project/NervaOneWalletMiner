@@ -14,7 +14,18 @@
 	<StackPanel Spacing="5" Margin="10">
 		<Label Content="Send From"/>
 		<ComboBox Name="cbxSendFrom"
-				  HorizontalAlignment="Stretch"/>
+				  HorizontalAlignment="Stretch"
+				  SelectionChanged="Account_SelectionChanged"/>
+
+		<DockPanel Margin="0,10,0,0">
+			<Label Content="Balance:" Width="100"></Label>
+			<Label Name="lblBalance" Content="0"></Label>
+		</DockPanel>
+		
+		<DockPanel>
+			<Label Content="Unlocked:" Width="100"></Label>
+			<Label Name="lblUnlocked" Content="0"></Label>
+		</DockPanel>
 		
 		<Label Content="Send To" Margin="0,15,0,0"/>
 		<TextBox Name="tbxSendTo"

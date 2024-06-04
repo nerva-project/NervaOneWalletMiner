@@ -23,7 +23,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             InitializeComponent();
         }
 
-        public TransferFundsView(int accountIndex)
+        public TransferFundsView(uint selectedAccountIndex)
         {
             InitializeComponent();
 
@@ -36,7 +36,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
           
             cbxSendFrom.ItemsSource = _accounts.Values;
-            cbxSendFrom.SelectedIndex = accountIndex;
+            cbxSendFrom.SelectedIndex = (int)selectedAccountIndex;
 
             // Can change this based on coin and what priories it has
             List<string> priorityList =
@@ -49,6 +49,9 @@ namespace NervaOneWalletMiner.ViewsDialogs
 
             cbxPriority.ItemsSource = priorityList;
             cbxPriority.SelectedIndex = 0;
+
+            lblBalance.Content = GlobalData.WalletStats.Subaddresses[selectedAccountIndex].BalanceLocked + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
+            lblUnlocked.Content = GlobalData.WalletStats.Subaddresses[selectedAccountIndex].BalanceUnlocked + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
         }
 
         public async void OkButtonClicked(object sender, RoutedEventArgs args)
@@ -136,6 +139,31 @@ namespace NervaOneWalletMiner.ViewsDialogs
             catch (Exception ex)
             {
                 Logger.LogException("TFWal.GPIC", ex);
+            }
+        }
+
+        private void Account_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                // TODO: Change this to something easier
+                uint fromAccountIndex = 0;
+                string fromAddress = cbxSendFrom.SelectedValue!.ToString()!;
+
+                foreach (uint index in _accounts.Keys)
+                {
+                    if (_accounts[index].Equals(fromAddress))
+                    {
+                        fromAccountIndex = index;
+                    }
+                }
+
+                lblBalance.Content = GlobalData.WalletStats.Subaddresses[fromAccountIndex].BalanceLocked + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
+                lblUnlocked.Content = GlobalData.WalletStats.Subaddresses[fromAccountIndex].BalanceUnlocked + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("AIWal.ASC", ex);
             }
         }
     }
