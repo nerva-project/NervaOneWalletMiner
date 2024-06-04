@@ -33,6 +33,9 @@ namespace NervaOneWalletMiner.Views
 
             var tbxAdditionalArguments = this.Get<TextBox>("tbxAdditionalArguments");
             tbxAdditionalArguments.Text = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AdditionalArguments;
+
+            var tbxLogLevel = this.Get<TextBox>("tbxLogLevel");
+            tbxLogLevel.Text = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].LogLevel.ToString();
         }
 
         public void OpenCliToolsFolderClicked(object sender, RoutedEventArgs args)
@@ -90,6 +93,13 @@ namespace NervaOneWalletMiner.Views
                 if (!string.IsNullOrEmpty(tbxAdditionalArguments.Text) && GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AdditionalArguments != tbxAdditionalArguments.Text)
                 {
                     GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AdditionalArguments = tbxAdditionalArguments.Text;
+                    isChanged = true;
+                }
+
+                uint logLevel = Convert.ToUInt32(tbxLogLevel.Text);
+                if (!string.IsNullOrEmpty(tbxLogLevel.Text) && GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].LogLevel != logLevel)
+                {
+                    GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].LogLevel = logLevel;
                     isChanged = true;
                 }
 

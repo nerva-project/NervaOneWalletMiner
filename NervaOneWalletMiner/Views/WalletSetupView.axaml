@@ -10,59 +10,71 @@
 		<vm:WalletSetupViewModel />
 	</Design.DataContext>
 
-	<StackPanel Spacing="5" Margin="10" HorizontalAlignment="Stretch" MaxWidth="650">
-		<Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="24,*">
-			<Image Grid.Row="0" Grid.Column="0" Source="{Binding CoinIcon}"></Image>
-			<Label Grid.Row="0" Grid.Column="1" Height="24">Wallet Setup</Label>
-		</Grid>
+	<ScrollViewer>
+		<StackPanel Spacing="5" Margin="10" HorizontalAlignment="Stretch" MaxWidth="650">
+			<Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="24,*">
+				<Image Grid.Row="0" Grid.Column="0" Source="{Binding CoinIcon}"></Image>
+				<Label Grid.Row="0" Grid.Column="1" Height="24">Wallet Setup</Label>
+			</Grid>
 
-		<Button Name="btnOpenWalletsFolder"
-				Content="Open Wallets Folder"
-				DockPanel.Dock="Right"
-				Margin="0,10,0,0"
-				Click="OpenWalletsFolderClicked"/>
+			<Button Name="btnOpenWalletsFolder"
+					Content="Open Wallets Folder"
+					DockPanel.Dock="Right"
+					Margin="0,10,0,0"
+					Click="OpenWalletsFolder_Clicked"/>
 
-		<Separator Margin="0,20,0,0"></Separator>
+			<Separator Margin="0,20,0,0"></Separator>
 
-		<Button Name="btnCreateWallet"
-				Content="Create New Wallet"
-				DockPanel.Dock="Right"
-				Margin="0,10,0,0"
-				Click="CreateWalletClicked"/>
+			<Button Name="btnCreateWallet"
+					Content="Create New Wallet"
+					DockPanel.Dock="Right"
+					Margin="0,10,0,0"
+					Click="CreateWallet_Clicked"/>
 
-		<Button Name="btnRestoreFromSeed"
-				Content="Restore Wallet from Seed"
-				DockPanel.Dock="Right"
-				Margin="0,10,0,0"
-				Click="RestoreFromSeedClicked"/>
+			<Button Name="btnRestoreFromSeed"
+					Content="Restore Wallet from Seed"
+					DockPanel.Dock="Right"
+					Margin="0,10,0,0"
+					Click="RestoreFromSeed_Clicked"/>
 
-		<Button Name="btnRestoreFromKeys"
-				Content="Restore Wallet from Keys"
-				DockPanel.Dock="Right"
-				Margin="0,10,0,0"
-				Click="RestoreFromKeysClicked"/>
+			<Button Name="btnRestoreFromKeys"
+					Content="Restore Wallet from Keys"
+					DockPanel.Dock="Right"
+					Margin="0,10,0,0"
+					Click="RestoreFromKeys_Clicked"/>
 
-		<Separator Margin="0,20,0,0"></Separator>
+			<Separator Margin="0,20,0,0"></Separator>
 
-		<Button Name="btnRescanSpent"
-				Content="Rescan Spent"
-				DockPanel.Dock="Right"
-				Margin="0,10,0,0"
-				Click="RescanSpentClicked"/>
+			<Button Name="btnRescanSpent"
+					Content="Rescan Spent"
+					DockPanel.Dock="Right"
+					Margin="0,10,0,0"
+					Click="RescanSpent_Clicked"/>
 
-		<Button Name="btnRescanBlockchain"
-				Content="Rescan Blockchain"
-				DockPanel.Dock="Right"
-				Margin="0,10,0,0"
-				Click="RescanBlockchainClicked"/>
+			<Button Name="btnRescanBlockchain"
+					Content="Rescan Blockchain"
+					DockPanel.Dock="Right"
+					Margin="0,10,0,0"
+					Click="RescanBlockchain_Clicked"/>
 		
-		<Separator Margin="0,20,0,0"></Separator>
+			<Separator Margin="0,20,0,0"></Separator>
 
-		<Button Name="btnViewKeysSeed"
-				Content="View Keys and Mnemonic Seed"
-				DockPanel.Dock="Right"
-				Margin="0,10,0,0"
-				Click="ViewKeysSeedClicked"/>
-	</StackPanel>
+			<Button Name="btnViewKeysSeed"
+					Content="View Keys and Mnemonic Seed"
+					DockPanel.Dock="Right"
+					Margin="0,10,0,0"
+					Click="ViewKeysSeed_Clicked"/>
+
+			<Separator Margin="0,20,0,0"></Separator>
+		
+			<Label Content="Log Level" Margin="0,10,0,0" />
+			<TextBox Name="tbxLogLevel" />
+		
+			<Button Name="btnSaveSettings"
+					Content="Save Settings"
+					Click="SaveSettings_Clicked"
+					Margin="0,10,0,0" />
+		</StackPanel>
+	</ScrollViewer>
 	
 </UserControl>

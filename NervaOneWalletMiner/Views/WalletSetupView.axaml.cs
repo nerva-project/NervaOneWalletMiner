@@ -20,10 +20,12 @@ namespace NervaOneWalletMiner.Views
 
         public WalletSetupView()
         {
-            InitializeComponent();            
+            InitializeComponent();
+
+            tbxLogLevel.Text = GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].LogLevel.ToString();
         }
 
-        public void OpenWalletsFolderClicked(object sender, RoutedEventArgs args)
+        public void OpenWalletsFolder_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
@@ -36,12 +38,36 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("DaeSV.OCTFC", ex);
+                Logger.LogException("WalSV.OCTFC", ex);
+            }
+        }
+
+        public void SaveSettings_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                bool isChanged = false;
+               
+                uint logLevel = Convert.ToUInt32(tbxLogLevel.Text);
+                if (!string.IsNullOrEmpty(tbxLogLevel.Text) && GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].LogLevel != logLevel)
+                {
+                    GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].LogLevel = logLevel;
+                    isChanged = true;
+                }
+
+                if (isChanged)
+                {
+                    GlobalMethods.SaveConfig();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("WalSV.SSC", ex);
             }
         }
 
         #region Create Wallet
-        public void CreateWalletClicked(object sender, RoutedEventArgs args)
+        public void CreateWallet_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
@@ -117,7 +143,7 @@ namespace NervaOneWalletMiner.Views
         #endregion // Create Wallet
 
         #region Restore from Seed
-        public void RestoreFromSeedClicked(object sender, RoutedEventArgs args)
+        public void RestoreFromSeed_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
@@ -193,10 +219,10 @@ namespace NervaOneWalletMiner.Views
             }
             
         }
-        #endregion // Restore from Keys
+        #endregion // Restore from Seed
 
-        #region Restore from Seed
-        public void RestoreFromKeysClicked(object sender, RoutedEventArgs args)
+        #region Restore from Keys
+        public void RestoreFromKeys_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
@@ -274,10 +300,10 @@ namespace NervaOneWalletMiner.Views
             }
 
         }
-        #endregion // Restore from Seed
+        #endregion // Restore from Keys
 
         #region Rescan Spent
-        public void RescanSpentClicked(object sender, RoutedEventArgs args)
+        public void RescanSpent_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
@@ -333,7 +359,7 @@ namespace NervaOneWalletMiner.Views
         #endregion // Rescan Spent
 
         #region Rescan Blockchain
-        public void RescanBlockchainClicked(object sender, RoutedEventArgs args)
+        public void RescanBlockchain_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
@@ -389,7 +415,7 @@ namespace NervaOneWalletMiner.Views
         #endregion // Rescan Blockchain
 
         #region View Keys/Seed
-        public void ViewKeysSeedClicked(object sender, RoutedEventArgs args)
+        public void ViewKeysSeed_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
