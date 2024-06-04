@@ -21,9 +21,13 @@
 				 Watermark="Required - receipient wallet address"/>
 
 		<Label Content="Amount" Margin="0,15,0,0"/>
-		<TextBox Name="tbxAmount"
-				 Watermark="Required - amount to send"/>
-
+		<DockPanel>
+			<TextBox Name="tbxAmount"
+					 Watermark="Required - amount to send"
+					 Width="420"/>
+			<ComboBox Name="cbxPriority" Margin="10,0,0,0"/>
+		</DockPanel>
+		
 		<Label Content="Payment Id" Margin="0,15,0,0"/>
 		<DockPanel>
 			<TextBox Name="tbxPaymentId"

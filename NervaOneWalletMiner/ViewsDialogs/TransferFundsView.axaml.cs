@@ -6,9 +6,9 @@ using MsBox.Avalonia.Enums;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects;
 using NervaOneWalletMiner.Objects.DataGrid;
+using NervaOneWalletMiner.Rpc.Common;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace NervaOneWalletMiner.ViewsDialogs
 {
@@ -34,11 +34,21 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     _accounts.Add(account.Index, string.IsNullOrEmpty(account.Label) ? "No label" + " (" + account.AddressShort + ")" : account.Label + " (" + account.AddressShort + ")");
                 }
             }
-
-            var cbxSendFrom = this.Get<ComboBox>("cbxSendFrom");
-
+          
             cbxSendFrom.ItemsSource = _accounts.Values;
-            cbxSendFrom.SelectedIndex = accountIndex;            
+            cbxSendFrom.SelectedIndex = accountIndex;
+
+            // Can change this based on coin and what priories it has
+            List<string> priorityList =
+            [
+                SendPriority.Default,
+                SendPriority.Low,
+                SendPriority.Medium,
+                SendPriority.High,
+            ];
+
+            cbxPriority.ItemsSource = priorityList;
+            cbxPriority.SelectedIndex = 0;
         }
 
         public async void OkButtonClicked(object sender, RoutedEventArgs args)
@@ -86,7 +96,8 @@ namespace NervaOneWalletMiner.ViewsDialogs
                             SendFromAddressIndex = fromAccountIndex,
                             SendToAddress = tbxSendTo.Text,
                             SendAmount = Convert.ToDecimal(tbxAmount.Text),
-                            SendPaymentId = tbxPaymentId.Text!
+                            SendPaymentId = tbxPaymentId.Text!,
+                            Priority = (string)cbxPriority.SelectedValue!
                         };
 
                         Close(result);

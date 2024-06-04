@@ -261,10 +261,10 @@ namespace NervaOneWalletMiner.Views
             DialogResult result = ((DialogResult)((Task<object>)task).Result);
             if (result != null && result.IsOk)
             {
-                // Open wallet
+                // Submit trannsfer
                 if (!string.IsNullOrEmpty(result.SendToAddress) && result.SendAmount > 0)
                 {
-                    MakeTransfer(result.SendFromAddressIndex, result.SendToAddress, result.SendAmount, result.SendPaymentId);
+                    MakeTransfer(result.SendFromAddressIndex, result.SendToAddress, result.SendAmount, result.SendPaymentId, result.Priority);
                 }
             }
             else
@@ -274,14 +274,15 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
-        private static async void MakeTransfer(uint sendFromAccountIndex, string sendToAddress, decimal amount, string paymentId)
+        private static async void MakeTransfer(uint sendFromAccountIndex, string sendToAddress, decimal amount, string paymentId, string priority)
         {
             // TODO: Add other options
             TransferRequest request = new()
             {
                 Destinations = [new() { Amount = amount, Address = sendToAddress }],
                 AccountIndex = sendFromAccountIndex,
-                PaymentId = paymentId
+                Priority = priority,
+                PaymentId = paymentId                
             };
 
             TransferResponse response = await GlobalData.WalletService.Transfer(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);

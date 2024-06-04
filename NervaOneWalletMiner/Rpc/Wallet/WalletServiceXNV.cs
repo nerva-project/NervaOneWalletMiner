@@ -568,7 +568,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
 
                 paramsJson.account_index = requestObj.AccountIndex;
                 paramsJson.subaddr_indices = new JArray(requestObj.SubAddressIndices);
-                paramsJson.priority = requestObj.Priority;
+                paramsJson.priority = CommonXNV.GetPriority(requestObj.Priority);
                 paramsJson.unlock_time = requestObj.UnlockTime;
                 paramsJson.payment_id = requestObj.PaymentId is null ? "" : requestObj.PaymentId;
                 paramsJson.get_tx_key = requestObj.GetTxKey;

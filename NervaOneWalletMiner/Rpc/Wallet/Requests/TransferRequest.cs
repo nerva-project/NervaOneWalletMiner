@@ -8,7 +8,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet.Requests
         public List<TransferDestination> Destinations { get; set; } = [];
         public uint AccountIndex { get; set; } = 0;
         public List<uint> SubAddressIndices { get; set; } = [];
-        public uint Priority { get; set; } = 0;
+        public string Priority { get; set; } = string.Empty;
         public ulong UnlockTime { get; set; } = 0;
         public string PaymentId { get; set; } = "";
         public bool GetTxKey { get; set; } = true;
