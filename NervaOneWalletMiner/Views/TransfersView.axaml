@@ -31,7 +31,8 @@
 				  GridLinesVisibility="Horizontal"
 				  IsReadOnly="True"
 				  Height="455"
-				  Margin="10,20,10,10">
+				  Margin="10,20,10,10"
+				  DoubleTapped="TransactionDetails_DoubleTapped">
 			<DataGrid.Columns>
 				<DataGridTemplateColumn Header="">
 					<DataTemplate DataType="Bitmap">

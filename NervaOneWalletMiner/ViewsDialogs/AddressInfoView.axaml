@@ -24,14 +24,14 @@
 			<Button Name="btnCopyWalletToClipboard"
 					Content="Copy"
 					Margin="10,0,0,0"
-					Click="CopyWalletToClipboardClicked"/>
+					Click="CopyWalletToClipboard_Clicked"/>
 		</DockPanel>
 	
 		<Separator Margin="0,20,0,0"/>
 		
 		<Button Name="btnMakeIntegratedAddress"
 				Content="Make Integrated Address"
-				Click="MakeIntegratedAddressClicked"
+				Click="MakeIntegratedAddress_Clicked"
 				Margin="0,15,0,0"/>
 
 		<Label Content="Integrated Address" Margin="0,15,0,0"/>
@@ -41,7 +41,7 @@
 			<Button Name="btnCopyIntegratedAddressToClipboard"
 					Content="Copy"
 					Margin="10,0,0,0"
-					Click="CopyIntegratedAddressToClipboardClicked"/>
+					Click="CopyIntegratedAddressToClipboard_Clicked"/>
 		</DockPanel>
 		
 
@@ -52,13 +52,13 @@
 			<Button Name="btnCopyPaymentIdToClipboard"
 					Content="Copy"
 					Margin="10,0,0,0"
-					Click="CopyPaymentIdToClipboardClicked"/>
+					Click="CopyPaymentIdToClipboard_Clicked"/>
 		</DockPanel>
 		
 
 		<Button Name="btnClose"
 				Content="Close"
-				Click="CloseButtonClicked"
+				Click="CloseButton_Clicked"
 				Margin="0,15,0,0"/>		
 	</StackPanel>
 	

@@ -23,6 +23,8 @@ using MsBox.Avalonia.Enums;
 using NervaOneWalletMiner.Rpc.Wallet.Requests;
 using NervaOneWalletMiner.Rpc.Wallet.Responses;
 using NervaOneWalletMiner.Objects.DataGrid;
+using Avalonia.Input;
+using Avalonia.Controls;
 
 namespace NervaOneWalletMiner.Helpers
 {
@@ -777,6 +779,25 @@ namespace NervaOneWalletMiner.Helpers
             catch (Exception ex)
             {
                 Logger.LogException("GM.WUU", ex);
+            }
+        }
+
+        public static void CopyToClipboard(Avalonia.Visual visual, string text)
+        {
+            try
+            {
+                var clipboard = TopLevel.GetTopLevel(visual)?.Clipboard;
+                var dataObject = new DataObject();
+                dataObject.Set(DataFormats.Text, text);
+
+                if (clipboard != null)
+                {
+                    clipboard.SetDataObjectAsync(dataObject);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("GM.CTC", ex);
             }
         }
     }

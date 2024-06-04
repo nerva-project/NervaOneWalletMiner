@@ -59,7 +59,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }                       
         }
 
-        public void MakeIntegratedAddressClicked(object sender, RoutedEventArgs args)
+        public void MakeIntegratedAddress_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
@@ -106,7 +106,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
         }
 
-        public void CloseButtonClicked(object sender, RoutedEventArgs args)
+        public void CloseButton_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
@@ -123,60 +123,39 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
         }
 
-        public async void CopyWalletToClipboardClicked(object sender, RoutedEventArgs args)
+        public void CopyWalletToClipboard_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
-                var clipboard = GetTopLevel(this)?.Clipboard;
-                var dataObject = new DataObject();
-                dataObject.Set(DataFormats.Text, tbxWalletAddress.Text!);
-
-                if(clipboard != null)
-                {
-                    await clipboard.SetDataObjectAsync(dataObject);
-                }                
+                GlobalMethods.CopyToClipboard(this, tbxWalletAddress.Text!);            
             }
             catch (Exception ex)
             {
-                Logger.LogException("NWal.CWTCC", ex);
+                Logger.LogException("NWal.CWC", ex);
             }
         }
 
-        public async void CopyIntegratedAddressToClipboardClicked(object sender, RoutedEventArgs args)
+        public void CopyIntegratedAddressToClipboard_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
-                var clipboard = GetTopLevel(this)?.Clipboard;
-                var dataObject = new DataObject();
-                dataObject.Set(DataFormats.Text, tbxIntegratedAddress.Text!);
-
-                if (clipboard != null)
-                {
-                    await clipboard.SetDataObjectAsync(dataObject);
-                }
+                GlobalMethods.CopyToClipboard(this, tbxIntegratedAddress.Text!);
             }
             catch (Exception ex)
             {
-                Logger.LogException("NWal.CIATCC", ex);
+                Logger.LogException("NWal.CIAC", ex);
             }
         }
 
-        public async void CopyPaymentIdToClipboardClicked(object sender, RoutedEventArgs args)
+        public void CopyPaymentIdToClipboard_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
-                var clipboard = GetTopLevel(this)?.Clipboard;
-                var dataObject = new DataObject();
-                dataObject.Set(DataFormats.Text, tbxPaymentId.Text!);
-
-                if (clipboard != null)
-                {
-                    await clipboard.SetDataObjectAsync(dataObject);
-                }
+                GlobalMethods.CopyToClipboard(this, tbxPaymentId.Text!);
             }
             catch (Exception ex)
             {
-                Logger.LogException("NWal.CPITCC", ex);
+                Logger.LogException("NWal.CPIC", ex);
             }
         }
     }

@@ -2,7 +2,6 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects;
-using NervaOneWalletMiner.Rpc.Wallet.Objects;
 using NervaOneWalletMiner.Rpc.Wallet.Requests;
 using NervaOneWalletMiner.Rpc.Wallet.Responses;
 using System;
@@ -60,8 +59,16 @@ namespace NervaOneWalletMiner.ViewsDialogs
 
                     if (response.Destinations.Count > 0)
                     {
-                        // TODO: Show only first one for now
-                        this.Get<TextBox>("tbxDestinationInfo").Text = response.Destinations[0];
+                        this.Get<SelectableTextBlock>("stbkDestinationInfo").Text = string.Empty;
+
+                        foreach (string destination in response.Destinations)
+                        {
+                            this.Get<SelectableTextBlock>("stbkDestinationInfo").Text += destination + "\r\n";
+                        }
+                    }
+                    else
+                    {
+                        this.Get<SelectableTextBlock>("stbkDestinationInfo").Text = "Not available\r\n";
                     }
                 }
             }
@@ -71,7 +78,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
         }
 
-        public void CancelButtonClicked(object sender, RoutedEventArgs args)
+        public void CancelButton_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
@@ -85,6 +92,30 @@ namespace NervaOneWalletMiner.ViewsDialogs
             catch (Exception ex)
             {
                 Logger.LogException("TDVWal.CBC", ex);
+            }
+        }
+
+        public void CopyYourAddressToClipboard_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                GlobalMethods.CopyToClipboard(this, tbxYourAddress.Text!);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("NWal.CYAC", ex);
+            }
+        }
+
+        public void CopyTransactionIdToClipboard_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                GlobalMethods.CopyToClipboard(this, tbxTransactionId.Text!);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("NWal.CTIC", ex);
             }
         }
     }

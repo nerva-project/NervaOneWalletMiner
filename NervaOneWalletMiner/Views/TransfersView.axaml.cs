@@ -19,21 +19,31 @@ namespace NervaOneWalletMiner.Views
             InitializeComponent();
         }
 
-        public async void TransactionDetailsClicked(object sender, RoutedEventArgs args)
+        public void TransactionDetailsClicked(object sender, RoutedEventArgs args)
+        {
+            OpenTransactionDetailsView();
+        }
+
+        private void TransactionDetails_DoubleTapped(object? sender, Avalonia.Input.TappedEventArgs e)
+        {
+            OpenTransactionDetailsView();
+        }
+
+        private void OpenTransactionDetailsView()
         {
             try
             {
                 var dtgTransactions = this.Get<DataGrid>("dtgTransactions");
 
-                if(dtgTransactions.SelectedItem != null)
+                if (dtgTransactions.SelectedItem != null)
                 {
                     Transfer selectedItem = (Transfer)dtgTransactions.SelectedItem;
                     var window = new TransactionDetailsView(selectedItem.TransactionId, selectedItem.AccountIndex);
-                    await window.ShowDialog(GetWindow());
+                    window.ShowDialog(GetWindow());
                 }
                 else
                 {
-                    await Dispatcher.UIThread.Invoke(async () =>
+                    Dispatcher.UIThread.Invoke(async () =>
                     {
                         var box = MessageBoxManager.GetMessageBoxStandard("Transaction Details", "Please select transaction", ButtonEnum.Ok);
                         _ = await box.ShowAsync();
