@@ -56,6 +56,7 @@ public class MainViewModel : ViewModelBase
         ViewModelPagesDictionary.Add(SplitViewPages.DaemonSetup, new DaemonSetupViewModel());
         ViewModelPagesDictionary.Add(SplitViewPages.WalletSetup, new WalletSetupViewModel());
         ViewModelPagesDictionary.Add(SplitViewPages.Settings, new SettingsViewModel());
+        ViewModelPagesDictionary.Add(SplitViewPages.About, new AboutViewModel());
 
         TriggerPaneCommand = ReactiveCommand.Create(TriggerPane);
 
@@ -130,6 +131,9 @@ public class MainViewModel : ViewModelBase
                 break;
             case SplitViewPages.Settings:
                 CurrentPage = ViewModelPagesDictionary[SplitViewPages.Settings];
+                break;
+            case SplitViewPages.About:
+                CurrentPage = ViewModelPagesDictionary[SplitViewPages.About];
                 break;
             default:
                 CurrentPage = ViewModelPagesDictionary[SplitViewPages.Daemon];
@@ -530,6 +534,7 @@ public class MainViewModel : ViewModelBase
         ((DaemonSetupViewModel)ViewModelPagesDictionary[SplitViewPages.DaemonSetup]).CoinIcon = GlobalMethods.GetLogo();
         ((WalletSetupViewModel)ViewModelPagesDictionary[SplitViewPages.WalletSetup]).CoinIcon = GlobalMethods.GetLogo();
         ((SettingsViewModel)ViewModelPagesDictionary[SplitViewPages.Settings]).CoinIcon = GlobalMethods.GetLogo();
+        ((AboutViewModel)ViewModelPagesDictionary[SplitViewPages.About]).CoinIcon = GlobalMethods.GetLogo();
 
         _currentCoin = GlobalData.AppSettings.ActiveCoin;
     }

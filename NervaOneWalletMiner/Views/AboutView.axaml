@@ -1,0 +1,62 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="clr-namespace:NervaOneWalletMiner.ViewModels"			 
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="550"
+             x:Class="NervaOneWalletMiner.Views.AboutView">
+
+	<Design.DataContext>
+		<vm:DaemonSetupViewModel />
+	</Design.DataContext>
+
+	<StackPanel ScrollViewer.AllowAutoHide="True" Spacing="5" Margin="10" HorizontalAlignment="Stretch" MaxWidth="650">
+		<Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="24,*">
+			<Image Grid.Row="0" Grid.Column="0" Source="{Binding CoinIcon}"></Image>
+			<Label Grid.Row="0" Grid.Column="1" Height="24">About NervaOne</Label>
+		</Grid>
+
+		<TextBlock TextWrapping="Wrap" Margin="0,10,0,0">
+			NervaOne Wallet and Miner is an open source, multi-coin
+			wallet and CPU miner created by Nerva team:
+		</TextBlock>
+
+		<Button Name="btnGitHub"
+			Content="NervaOne GitHub"
+			Margin="0,10,0,0"
+			Click="OpenGitHub_Clicked"/>
+
+		<TextBlock TextWrapping="Wrap" Margin="0,10,0,0">
+			It is non-custodial wallet that uses core software from your device 
+			to manage miner and provide wallet functionality.
+		</TextBlock>
+
+		<TextBlock TextWrapping="Wrap" Margin="0,10,0,0">
+			By using NervaOne, you are running your own nodes of the coins
+			you choose to support, decentralizing their blockchains
+			and at the same time being your own bank.
+			Everything runs on your device so there are no 3rd parties involved.
+		</TextBlock>
+
+		<TextBlock TextWrapping="Wrap" Margin="0,10,0,0">
+			It's also modern designed software that easy to use for new users.
+		</TextBlock>
+
+		<TextBlock TextWrapping="Wrap" Margin="0,10,0,0">
+			If you need help with NervaOne, or just want to say Hi,
+			stop by Nerva's Discord or Telegram:
+		</TextBlock>
+
+		<Button Name="btnDiscord"
+			Content="Nerva Discord"
+			Margin="0,10,0,0"
+			Click="OpenDiscord_Clicked"/>
+
+		<Button Name="btnTelegram"
+			Content="Nerva Telegram"
+			Margin="0,10,0,0"
+			Click="OpenTelegram_Clicked"/>
+
+	</StackPanel>
+	
+</UserControl>

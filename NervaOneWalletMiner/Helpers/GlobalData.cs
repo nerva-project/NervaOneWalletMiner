@@ -22,6 +22,10 @@ namespace NervaOneWalletMiner.Helpers
         public const string MainCoinsDirName = "coins";
         public static string CoinDirName = Coin.XNV;
 
+        public const string NervaOneGitHubLink = "https://github.com/nerva-project/NervaOneWalletMiner";
+        public const string NervaDiscordLink = "https://discord.gg/KxjqZytC5Y";
+        public const string NervaTelegramLink = "https://t.me/NervaCrypto";
+
         public static Random RandomGenerator = new Random();
 
         // Those will be saved to and read from app.config

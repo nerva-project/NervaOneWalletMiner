@@ -8,5 +8,6 @@
         public const string DaemonSetup = "daemon_setup";
         public const string WalletSetup = "wallet_setup";
         public const string Settings = "settings";
+        public const string About = "about";
     }
 }

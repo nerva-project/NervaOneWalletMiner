@@ -44,7 +44,7 @@
 							</StackPanel>
 						</ListBoxItem>
 
-						<ListBoxItem Name="space" Padding="15" IsEnabled="False" />
+						<ListBoxItem Name="space" Padding="10" IsEnabled="False" />
 						
 						<ListBoxItem Name="daemon_setup" >
 							<StackPanel Spacing="12" Orientation="Horizontal">
@@ -62,6 +62,15 @@
 							<StackPanel Spacing="12" Orientation="Horizontal">
 								<PathIcon Height="20" Data="{StaticResource SettingsIcon}" />
 								<TextBlock Text="Settings" />
+							</StackPanel>
+						</ListBoxItem>
+
+						<ListBoxItem Name="space2" Padding="10" IsEnabled="False" />
+
+						<ListBoxItem Name="about" >
+							<StackPanel Spacing="12" Orientation="Horizontal">
+								<PathIcon Height="20" Data="{StaticResource AboutIcon}" />
+								<TextBlock Text="About" />
 							</StackPanel>
 						</ListBoxItem>
 					</ListBox>
