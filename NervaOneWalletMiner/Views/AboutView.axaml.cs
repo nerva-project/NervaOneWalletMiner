@@ -17,7 +17,12 @@ namespace NervaOneWalletMiner.Views
         {
             try
             {
-                Process.Start(GlobalData.NervaOneGitHubLink);
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    FileName = GlobalData.NervaOneGitHubLink,
+                    UseShellExecute = true
+                };
+                Process.Start(psi);
             }
             catch (Exception ex)
             {
@@ -29,7 +34,12 @@ namespace NervaOneWalletMiner.Views
         {
             try
             {
-                Process.Start(GlobalData.NervaDiscordLink);
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    FileName = GlobalData.NervaDiscordLink,
+                    UseShellExecute = true
+                };
+                Process.Start(psi);
             }
             catch (Exception ex)
             {
@@ -41,7 +51,12 @@ namespace NervaOneWalletMiner.Views
         {
             try
             {
-                Process.Start(GlobalData.NervaTelegramLink);
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    FileName = GlobalData.NervaTelegramLink,
+                    UseShellExecute = true
+                };
+                Process.Start(psi);
             }
             catch (Exception ex)
             {
