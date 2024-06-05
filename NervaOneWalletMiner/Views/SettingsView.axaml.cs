@@ -3,7 +3,6 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Styling;
 using NervaOneWalletMiner.Helpers;
-using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Rpc;
 using System;
 
@@ -24,6 +23,17 @@ namespace NervaOneWalletMiner.Views
                     Application.Current!.RequestedThemeVariant = themeVariant;
                 }
             };
+
+            // TODO: Should probably come up with a simpler way to do this
+            ComboBoxItem selectedCoin = (ComboBoxItem)cbxCoin.Items[0]!;
+            foreach(ComboBoxItem? coin in cbxCoin.Items)
+            {
+                if (coin!.Name!.Equals(GlobalData.AppSettings.ActiveCoin))
+                {
+                    selectedCoin = coin;
+                }
+            }
+            cbxCoin.SelectedValue = selectedCoin;
         }
 
         public void SaveSettingsClicked(object sender, RoutedEventArgs args)
@@ -31,9 +41,6 @@ namespace NervaOneWalletMiner.Views
             try
             {
                 bool isChanged = false;
-
-                var cbxThemeVariants = this.Get<ComboBox>("cbxThemeVariants");
-                var cbxCoin = this.Get<ComboBox>("cbxCoin");
 
                 if (cbxThemeVariants.SelectedItem is ThemeVariant themeVariant)
                 {
@@ -44,20 +51,17 @@ namespace NervaOneWalletMiner.Views
                     }
                 }
 
-                // TODO: Do this in a better way!
-                string newCoin = Coin.XNV;                
-                if (cbxCoin.SelectionBoxItem!.ToString()!.ToLower().Contains(Coin.XMR))
+                string selectedCoin = ((ComboBoxItem)cbxCoin.SelectedItem!).Name!;
+                if (!selectedCoin.Equals(GlobalData.AppSettings.ActiveCoin))
                 {
-                    newCoin = Coin.XMR;
-                }
-                if(newCoin != GlobalData.AppSettings.ActiveCoin)
-                {
+                    GlobalData.AppSettings.ActiveCoin = selectedCoin;
+
                     // Close wallet process becasue you're switching to different coin
                     WalletProcess.ForceClose();
 
-                    GlobalData.AppSettings.ActiveCoin = newCoin;
+                    GlobalData.AppSettings.ActiveCoin = selectedCoin;
                     isChanged = true;
-                    GlobalMethods.SetCoin(newCoin);
+                    GlobalMethods.SetCoin(selectedCoin);
 
                     // TODO: Need to force Settings screen refersh
                 }
