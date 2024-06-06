@@ -16,23 +16,18 @@
 			<Label Grid.Row="0" Grid.Column="1" Height="24">Address Book</Label>
 		</Grid>
 
-		<DataGrid ItemsSource="{Binding AddressBook}"
-				  Name="dtgAddressBook"
+		<DataGrid Name="dtgAddressBook"
 				  AutoGenerateColumns="False"
 				  GridLinesVisibility="Horizontal"
 				  IsReadOnly="False"
 				  Height="455"
-				  Margin="10,20,10,10">
+				  Margin="10,20,10,10"
+				  RowEditEnded="AddressBook_RowEditEnded">
 			<DataGrid.Columns>
-				<DataGridTemplateColumn Header="">
-					<DataTemplate DataType="Bitmap">
-						<Image Source="{Binding Icon}" Height="15"></Image>
-					</DataTemplate>
-				</DataGridTemplateColumn>
-				<DataGridTextColumn Header="Name" Binding="{Binding Name}" />
-				<DataGridTextColumn Header="Description" MinWidth="120" Width="*" Binding="{Binding Description}" />
-				<DataGridTextColumn Header="Address" Binding="{Binding Address}" />
-				<DataGridTextColumn Header="Pay Id" Binding="{Binding PayId}" />
+				<DataGridTextColumn Header="Name" Width="*" Binding="{Binding Name}" />
+				<DataGridTextColumn Header="Description" Width="*" Binding="{Binding Description}" />
+				<DataGridTextColumn Header="Address" MinWidth="120" Width="*" Binding="{Binding Address}" />
+				<DataGridTextColumn Header="Payment Id" Binding="{Binding PaymentId}" />
 			</DataGrid.Columns>
 		</DataGrid>
 	</StackPanel>

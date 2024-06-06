@@ -25,6 +25,7 @@ using NervaOneWalletMiner.Rpc.Wallet.Responses;
 using NervaOneWalletMiner.Objects.DataGrid;
 using Avalonia.Input;
 using Avalonia.Controls;
+using NervaOneWalletMiner.Objects.Stats;
 
 namespace NervaOneWalletMiner.Helpers
 {
@@ -150,10 +151,10 @@ namespace NervaOneWalletMiner.Helpers
             return Path.Combine(GlobalData.CliToolsDir, GlobalData.WalletProcessName);
         }
 
-        public static string GetConfigFilePath()
+        public static string GetConfigFileNameWithPath()
         {           
             string dataDir = GetDataDir();
-            return Path.Combine(dataDir, "app.config");
+            return Path.Combine(dataDir, GlobalData.AppConfigFileName);
         }
         #endregion // Directories, Paths and Names
 
@@ -544,7 +545,7 @@ namespace NervaOneWalletMiner.Helpers
             try
             {
                 var contentsToWriteToFile = Newtonsoft.Json.JsonConvert.SerializeObject(GlobalData.AppSettings);
-                using (TextWriter writer = new StreamWriter(GlobalData.ConfigFilePath))
+                using (TextWriter writer = new StreamWriter(GlobalData.ConfigFileNameWithPath))
                 {
                     writer.Write(contentsToWriteToFile);
                 }                    
@@ -559,9 +560,9 @@ namespace NervaOneWalletMiner.Helpers
         {
             try
             {
-                if(File.Exists(GlobalData.ConfigFilePath))
+                if(File.Exists(GlobalData.ConfigFileNameWithPath))
                 {
-                    using (TextReader reader = new StreamReader(GlobalData.ConfigFilePath))
+                    using (TextReader reader = new StreamReader(GlobalData.ConfigFileNameWithPath))
                     {
                         var fileContents = reader.ReadToEnd();
                         ApplicationSettings settings = Newtonsoft.Json.JsonConvert.DeserializeObject<ApplicationSettings>(fileContents)!;
@@ -575,6 +576,51 @@ namespace NervaOneWalletMiner.Helpers
             catch (Exception ex)
             {
                 Logger.LogException("GM.LC", ex);
+            }
+        }
+
+        public static void LoadAddressBook()
+        {
+            try
+            {
+                string addressBookFile = Path.Combine(GlobalData.WalletDir, GlobalData.AddressBookFileName);
+                if (File.Exists(addressBookFile))
+                {
+                    using (TextReader reader = new StreamReader(addressBookFile))
+                    {
+                        var fileContents = reader.ReadToEnd();
+                        AddressBook addressBook = Newtonsoft.Json.JsonConvert.DeserializeObject<AddressBook>(fileContents)!;
+                        if (addressBook != null)
+                        {
+                            GlobalData.AddressBook = addressBook;
+                        }
+                    }
+                }
+                else
+                {
+                    GlobalData.AddressBook = new();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("GM.LAB", ex);
+            }
+        }
+
+        public static void SaveAddressBook()
+        {
+            try
+            {
+                string addressBookFile = Path.Combine(GlobalData.WalletDir, GlobalData.AddressBookFileName);
+                var contentsToWriteToFile = Newtonsoft.Json.JsonConvert.SerializeObject(GlobalData.AddressBook);
+                using (TextWriter writer = new StreamWriter(addressBookFile))
+                {
+                    writer.Write(contentsToWriteToFile);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("GM.SAB", ex);
             }
         }
 

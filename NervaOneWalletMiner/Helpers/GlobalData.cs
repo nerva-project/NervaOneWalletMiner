@@ -20,6 +20,8 @@ namespace NervaOneWalletMiner.Helpers
         public const string WalletDirName = "wallets";
         public const string LogsDirName = "logs";
         public const string MainCoinsDirName = "coins";
+        public const string AppConfigFileName = "app.config";
+        public const string AddressBookFileName = "address.book";
         public static string CoinDirName = Coin.XNV;
 
         public const string NervaOneGitHubLink = "https://github.com/nerva-project/NervaOneWalletMiner";
@@ -29,13 +31,13 @@ namespace NervaOneWalletMiner.Helpers
         public static Random RandomGenerator = new Random();
 
         // Those will be saved to and read from app.config
-        public static ApplicationSettings AppSettings = new();
+        public static ApplicationSettings AppSettings = new();        
 
         public static Dictionary<string, ICoinSettings> CoinSettings = GlobalMethods.GetDefaultCoinSettings();
 
         public static readonly string DataDir = GlobalMethods.GetDataDir();
         public static readonly string LogDir = GlobalMethods.GetLogDir();
-        public static readonly string ConfigFilePath = GlobalMethods.GetConfigFilePath();
+        public static readonly string ConfigFileNameWithPath = GlobalMethods.GetConfigFileNameWithPath();
 
         public static bool IsWalletOpen = false;
         public static bool IsWalletJustOpened = true;
@@ -44,7 +46,8 @@ namespace NervaOneWalletMiner.Helpers
         public static StatsDaemon NetworkStats = new();
         public static StatsWallet WalletStats = new();
         public static StatsTransfers TransfersStats = new();
-        public static List<Connection> Connections = new List<Connection>();
+        public static List<Connection> Connections = [];
+        public static AddressBook AddressBook = new();
 
         public static bool IsDaemonRestarting = false;
         public static bool IsManualStopMining = false;
