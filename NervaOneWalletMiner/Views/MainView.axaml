@@ -43,6 +43,12 @@
 								<TextBlock Text="Transfers" />
 							</StackPanel>
 						</ListBoxItem>
+						<ListBoxItem Name="address_book" >
+							<StackPanel Spacing="12" Orientation="Horizontal">
+								<PathIcon Height="20" Data="{StaticResource AddressBookIcon}" />
+								<TextBlock Text="AddressBook" />
+							</StackPanel>
+						</ListBoxItem>
 
 						<ListBoxItem Name="space" Padding="10" IsEnabled="False" />
 						

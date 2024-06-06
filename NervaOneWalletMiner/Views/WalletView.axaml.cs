@@ -398,6 +398,7 @@ namespace NervaOneWalletMiner.Views
                 GlobalData.IsWalletOpen = false;
                 GlobalData.IsWalletJustOpened = false;
                 GlobalData.OpenedWalletName = string.Empty;
+                GlobalData.WalletStats = new();
 
                 await Dispatcher.UIThread.InvokeAsync(async () =>
                 {

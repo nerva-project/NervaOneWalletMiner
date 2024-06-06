@@ -53,10 +53,11 @@ public class MainViewModel : ViewModelBase
         ViewModelPagesDictionary.Add(SplitViewPages.Daemon, new DaemonViewModel());
         ViewModelPagesDictionary.Add(SplitViewPages.Wallet, new WalletViewModel());        
         ViewModelPagesDictionary.Add(SplitViewPages.Transfers, new TransfersViewModel());
+        ViewModelPagesDictionary.Add(SplitViewPages.AddressBook, new AddressBookViewModel());
         ViewModelPagesDictionary.Add(SplitViewPages.DaemonSetup, new DaemonSetupViewModel());
         ViewModelPagesDictionary.Add(SplitViewPages.WalletSetup, new WalletSetupViewModel());
         ViewModelPagesDictionary.Add(SplitViewPages.Settings, new SettingsViewModel());
-        ViewModelPagesDictionary.Add(SplitViewPages.About, new AboutViewModel());
+        ViewModelPagesDictionary.Add(SplitViewPages.About, new AboutViewModel());        
 
         TriggerPaneCommand = ReactiveCommand.Create(TriggerPane);
 
@@ -122,6 +123,9 @@ public class MainViewModel : ViewModelBase
                 break;
             case SplitViewPages.Transfers:
                 CurrentPage = ViewModelPagesDictionary[SplitViewPages.Transfers];
+                break;
+            case SplitViewPages.AddressBook:
+                CurrentPage = ViewModelPagesDictionary[SplitViewPages.AddressBook];
                 break;
             case SplitViewPages.DaemonSetup:
                 CurrentPage = ViewModelPagesDictionary[SplitViewPages.DaemonSetup];
@@ -531,10 +535,11 @@ public class MainViewModel : ViewModelBase
         ((DaemonViewModel)ViewModelPagesDictionary[SplitViewPages.Daemon]).CoinIcon = GlobalMethods.GetLogo();
         ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).CoinIcon = GlobalMethods.GetLogo();
         ((TransfersViewModel)ViewModelPagesDictionary[SplitViewPages.Transfers]).CoinIcon = GlobalMethods.GetLogo();
+        ((AddressBookViewModel)ViewModelPagesDictionary[SplitViewPages.AddressBook]).CoinIcon = GlobalMethods.GetLogo();
         ((DaemonSetupViewModel)ViewModelPagesDictionary[SplitViewPages.DaemonSetup]).CoinIcon = GlobalMethods.GetLogo();
         ((WalletSetupViewModel)ViewModelPagesDictionary[SplitViewPages.WalletSetup]).CoinIcon = GlobalMethods.GetLogo();
         ((SettingsViewModel)ViewModelPagesDictionary[SplitViewPages.Settings]).CoinIcon = GlobalMethods.GetLogo();
-        ((AboutViewModel)ViewModelPagesDictionary[SplitViewPages.About]).CoinIcon = GlobalMethods.GetLogo();
+        ((AboutViewModel)ViewModelPagesDictionary[SplitViewPages.About]).CoinIcon = GlobalMethods.GetLogo();        
 
         _currentCoin = GlobalData.AppSettings.ActiveCoin;
     }

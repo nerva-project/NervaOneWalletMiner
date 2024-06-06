@@ -9,5 +9,6 @@
         public const string WalletSetup = "wallet_setup";
         public const string Settings = "settings";
         public const string About = "about";
+        public const string AddressBook = "address_book";
     }
 }
