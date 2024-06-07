@@ -15,11 +15,11 @@ namespace NervaOneWalletMiner.Rpc.Common
                 serviceError.Code = error["code"].ToString();
                 serviceError.Message = error["message"].ToString();
 
-                Logger.LogError("CXNV.GSE", source + " - error from service. Code: " + serviceError.Code + ", Message: " + serviceError.Message);
+                Logger.LogError("XNV.CGSE", source + " - error from service. Code: " + serviceError.Code + ", Message: " + serviceError.Message);
             }
             catch (Exception ex)
             {
-                Logger.LogException("HTTP.GHE", ex);
+                Logger.LogException("XNV.CGSE", ex);
             }
 
             return serviceError;

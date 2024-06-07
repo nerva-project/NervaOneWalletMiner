@@ -9,7 +9,7 @@ namespace NervaOneWalletMiner.Rpc
     {
         public static void ForceClose()
         {
-            Logger.LogDebug("WP.FC", "Forcing wallet close...");
+            Logger.LogDebug("WAP.FRCL", "Forcing wallet close...");
             ProcessManager.Kill(GlobalData.WalletProcessName);
         }
 
@@ -40,7 +40,7 @@ namespace NervaOneWalletMiner.Rpc
 
             if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsTestnet)
             {
-                Logger.LogDebug("WP.GO", "Connecting to testnet...");
+                Logger.LogDebug("WAP.FRCL", "Connecting to testnet...");
                 appCommand += " --testnet";
             }
                        

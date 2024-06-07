@@ -18,13 +18,13 @@ namespace NervaOneWalletMiner.Helpers
 
                 if (processList.Count == 0)
                 {
-                    Logger.LogDebug("PM.KIL", "No instances of " + exe + " to kill");
+                    Logger.LogDebug("PRM.KILL", "No instances of " + exe + " to kill");
                     return;
                 }
 
                 foreach (Process process in processList)
                 {
-                    Logger.LogDebug("PM.KIL", "Killing running instance of " + exe + " with id " + process.Id);
+                    Logger.LogDebug("PRM.KILL", "Killing running instance of " + exe + " with id " + process.Id);
 
 /*
 #if UNIX
@@ -37,12 +37,12 @@ namespace NervaOneWalletMiner.Helpers
                     // TODO: Need to test this on Linux and MacOS!
                     process.Kill();
 
-                    Logger.LogDebug("PM.KIL", "Process " + process.Id + " killed");
+                    Logger.LogDebug("PRM.KILL", "Process " + process.Id + " killed");
                 }
             }
             catch (Exception ex)
             {
-                Logger.LogException("PM.KIL", "Could not kill process", ex);
+                Logger.LogException("PRM.KILL", "Could not kill process", ex);
             }
         }
 
@@ -65,7 +65,7 @@ namespace NervaOneWalletMiner.Helpers
 
                 if (process == null || process.HasExited)
                 {
-                    Logger.LogDebug("PM.IR", "CLI tool " + exe + " exited unexpectedly. Restarting");
+                    Logger.LogDebug("PRM.ISRN", "CLI tool " + exe + " exited unexpectedly. Restarting");
                     process = null;
                     return false;
                 }
@@ -76,7 +76,7 @@ namespace NervaOneWalletMiner.Helpers
             }
             catch (Exception ex)
             {
-                Logger.LogException("PM.IR", ex);
+                Logger.LogException("PRM.ISRN", ex);
                 return false;
             }
         }
@@ -88,7 +88,7 @@ namespace NervaOneWalletMiner.Helpers
             try
             {
                 string processName = ExeNameToProcessName(exe);
-                //Logger.LogDebug("PM.GEBN", "Exe: " + exe + " | Process Name: " + processName);
+                //Logger.LogDebug("PRM.GEBN", "Exe: " + exe + " | Process Name: " + processName);
 
                 IList<Process> runningProcesses = Process.GetProcesses();
 
@@ -101,7 +101,7 @@ namespace NervaOneWalletMiner.Helpers
 
                         //if(process.ProcessName.Contains("nerva"))
                         //{
-                        //    Logger.LogDebug("PM.GEBN", "Found nerva: " + process.ProcessName + " | ID: " + process.Id + " | MWT: " + process.MainWindowTitle + " | MMFN: " + process.MainModule.FileName + " | MMMN: " + process.MainModule.ModuleName);
+                        //    Logger.LogDebug("PRM.GEBN", "Found nerva: " + process.ProcessName + " | ID: " + process.Id + " | MWT: " + process.MainWindowTitle + " | MMFN: " + process.MainModule.FileName + " | MMMN: " + process.MainModule.ModuleName);
                         //}
 
                         if (process.ProcessName.Contains(processName.Length > 13 ? processName.Substring(0, 12) : processName))
@@ -109,27 +109,27 @@ namespace NervaOneWalletMiner.Helpers
                             // We're looking at all processes and some will not have MainModule so we need above check first
                             if (process.MainModule!.ModuleName.Contains(processName))
                             {
-                                //Logger.LogDebug("PM.GEBN", "Found process: " + process.ProcessName + " | ID: " + process.Id + " | MWT: " + process.MainWindowTitle + " | MMFN: " + process.MainModule.FileName + " | MMMN: " + process.MainModule.ModuleName);
+                                //Logger.LogDebug("PRM.GEBN", "Found process: " + process.ProcessName + " | ID: " + process.Id + " | MWT: " + process.MainWindowTitle + " | MMFN: " + process.MainModule.FileName + " | MMMN: " + process.MainModule.ModuleName);
                                 processList.Add(process);
                             }
                         }
                     }
                     catch (Exception ex1)
                     {
-                        Logger.LogException("PM.GRBN1", ex1);
+                        Logger.LogException("PRM.GRN1", ex1);
                     }
                 }
             }
             catch (Exception ex)
             {
-                Logger.LogException("PM.GRBN", ex);
+                Logger.LogException("PRM.GRBN", ex);
             }
             return processList;
         }
 
         public static void StartExternalProcess(string exePath, string args)
         {
-            Logger.LogDebug("PM.SEP", "Starting process: " + ExeNameToProcessName(exePath) + " with args: " + args);
+            Logger.LogDebug("PRM.STEP", "Starting process: " + ExeNameToProcessName(exePath) + " with args: " + args);
 
             _ = Process.Start(new ProcessStartInfo(exePath, args)
             {

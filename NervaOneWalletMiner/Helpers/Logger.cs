@@ -32,9 +32,9 @@ namespace NervaOneWalletMiner.Helpers
 
             log4net.Config.BasicConfigurator.Configure(fileAppender);
 
-            Logger.LogInfo("Log.SUL", "App Version: " + GlobalData.Version + " | OS: " + Environment.OSVersion.Platform + " " + Environment.OSVersion.Version + " | CPUs: " + Environment.ProcessorCount);
-            Logger.LogInfo("Log.SUL", "Is Windows: " + GlobalMethods.IsWindows() + " | Is Linux: " + GlobalMethods.IsLinux() + " | Is OSX: " + GlobalMethods.IsOsx() + " | CPU Architecture: " + GlobalMethods.GetCpuArchitecture());
-            Logger.LogInfo("Log.SUL", "Using Data Directory: " + GlobalData.DataDir);
+            LogInfo("LOG.SULR", "App Version: " + GlobalData.Version + " | OS: " + Environment.OSVersion.Platform + " " + Environment.OSVersion.Version + " | CPUs: " + Environment.ProcessorCount);
+            LogInfo("LOG.SULR", "Is Windows: " + GlobalMethods.IsWindows() + " | Is Linux: " + GlobalMethods.IsLinux() + " | Is OSX: " + GlobalMethods.IsOsx() + " | CPU Architecture: " + GlobalMethods.GetCpuArchitecture());
+            LogInfo("LOG.SULR", "Using Data Directory: " + GlobalData.DataDir);
         }
         public static void LogException(string origin, Exception exception)
         {

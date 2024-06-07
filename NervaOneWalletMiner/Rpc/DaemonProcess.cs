@@ -8,7 +8,7 @@ namespace NervaOneWalletMiner.Rpc
     {
         public static void ForceClose()
         {
-            Logger.LogDebug("DP.FC", "Forcing daemon close...");
+            Logger.LogDebug("DNP.FRCL", "Forcing daemon close...");
             ProcessManager.Kill(GlobalData.DaemonProcessName);
         }
 
@@ -41,14 +41,14 @@ namespace NervaOneWalletMiner.Rpc
 
             if (daemonSettings.IsTestnet)
             {
-                Logger.LogDebug("DP.GO", "Connecting to testnet...");
+                Logger.LogDebug("DNP.FRCL", "Connecting to testnet...");
                 daemonCommand += " --testnet";
             }
 
             if (daemonSettings.AutoStartMining)
             {
                 string miningAddress = daemonSettings.MiningAddress;
-                Logger.LogDebug("DP.GO", "Enabling startup mining @ " + miningAddress);
+                Logger.LogDebug("DNP.FRCL", "Enabling startup mining @ " + miningAddress);
                 daemonCommand += " --start-mining " + miningAddress + " --mining-threads " + daemonSettings.MiningThreads;
             }
 

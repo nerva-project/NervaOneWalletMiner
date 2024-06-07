@@ -67,7 +67,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
             }
             catch (Exception ex)
             {
-                Logger.LogException("RDXMR.StM", ex);
+                Logger.LogException("XMR.DSTM", ex);
             }
 
             return responseObj;
@@ -115,7 +115,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
             }
             catch (Exception ex)
             {
-                Logger.LogException("RDXMR.SpM", ex);
+                Logger.LogException("XMR.DSPM", ex);
             }
 
             return responseObj;
@@ -160,7 +160,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
             }
             catch (Exception ex)
             {
-                Logger.LogException("RDXMR.SpD", ex);
+                Logger.LogException("XMR.DSPD", ex);
             }
 
             return responseObj;
@@ -188,7 +188,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 {
                     if (string.IsNullOrEmpty(httpResponse.Content.ReadAsStringAsync().Result))
                     {
-                        Logger.LogInfo("RDXMR.GI", "Response Content is empty");
+                        Logger.LogInfo("XMR.DGTI", "Response Content is empty");
                     }
                     else
                     {
@@ -226,7 +226,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
             }
             catch (Exception ex)
             {
-                Logger.LogException("RDXMR.GI", ex);
+                Logger.LogException("XMR.DGTI", ex);
             }
 
             return responseObj;
@@ -304,7 +304,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 {
                     if (string.IsNullOrEmpty(httpResponse.Content.ReadAsStringAsync().Result))
                     {
-                        Logger.LogInfo("RDXMR.GC", "Response Content is empty");
+                        Logger.LogInfo("XMR.DGTC", "Response Content is empty");
                     }
                     else
                     {
@@ -345,7 +345,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
             }
             catch (Exception ex)
             {
-                Logger.LogException("RDXMR.GC", ex);
+                Logger.LogException("XMR.DGTC", ex);
             }
 
             return responseObj;
@@ -398,7 +398,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 {
                     if (string.IsNullOrEmpty(httpResponse.Content.ReadAsStringAsync().Result))
                     {
-                        Logger.LogInfo("RDXMR.MS", "Response Content is empty");
+                        Logger.LogInfo("XMR.DMSS", "Response Content is empty");
                     }
                     else
                     {
@@ -431,7 +431,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
             }
             catch (Exception ex)
             {
-                Logger.LogException("RDXMR.MS", ex);
+                Logger.LogException("XMR.DMSS", ex);
             }
 
             return responseObj;

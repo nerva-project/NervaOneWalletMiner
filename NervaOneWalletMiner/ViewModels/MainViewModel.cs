@@ -373,7 +373,7 @@ public class MainViewModel : ViewModelBase
 
             if(!GlobalData.IsWalletJustOpened && newTransfersCount > 0)
             {
-                Logger.LogDebug("Main.UTV", "Auto-saving wallet. New transfers count: " + newTransfersCount);
+                Logger.LogDebug("MAM.UPTV", "Auto-saving wallet. New transfers count: " + newTransfersCount);
                 GlobalMethods.SaveWallet();
             }
         }
@@ -393,7 +393,7 @@ public class MainViewModel : ViewModelBase
     {
         try
         {
-            Logger.LogDebug("Main.SMUP", "Start Master Update Process");
+            Logger.LogDebug("MAM.SMUP", "Start Master Update Process");
 
             if (_masterUpdateTimer == null)
             {
@@ -402,12 +402,12 @@ public class MainViewModel : ViewModelBase
                 _masterUpdateTimer.Elapsed += (s, e) => MasterUpdateProcess();
                 _masterUpdateTimer.Start();
 
-                Logger.LogDebug("Main.SMUP", "Master timer running every " + _masterTimerInterval / 1000 + " seconds. Update every " + (_masterTimerInterval / 1000) * GlobalData.AppSettings.TimerIntervalMultiplier + " seconds.");
+                Logger.LogDebug("MAM.SMUP", "Master timer running every " + _masterTimerInterval / 1000 + " seconds. Update every " + (_masterTimerInterval / 1000) * GlobalData.AppSettings.TimerIntervalMultiplier + " seconds.");
             }
         }
         catch (Exception ex)
         {
-            Logger.LogException("Main.SMUP", ex);
+            Logger.LogException("MAM.SMUP", ex);
         }
     }
 
@@ -441,7 +441,7 @@ public class MainViewModel : ViewModelBase
                         && GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AutoStartMining
                         && !GlobalData.IsManualStopMining)
                     {
-                        Logger.LogDebug("Main.MUP", "Auto starting mining.");
+                        Logger.LogDebug("MAM.MUPS", "Auto starting mining.");
                         GlobalMethods.StartMiningAsync(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
                     }
                 }
@@ -499,20 +499,20 @@ public class MainViewModel : ViewModelBase
             if(GlobalData.IsWalletOpen & _masterTimerCount % 300 == 0)
             {
                 // Auto save wallet every 5 min
-                Logger.LogDebug("Main.MUP", "Auto saving wallet: " + GlobalData.OpenedWalletName);
+                Logger.LogDebug("MAM.MUPS", "Auto saving wallet: " + GlobalData.OpenedWalletName);
                 GlobalMethods.SaveWallet();
             }
         }
         catch (Exception ex)
         {
-            Logger.LogException("Main.MUP", ex);
+            Logger.LogException("MAM.MUPS", ex);
         }
         finally
         {
             // Restart timer
             if (_masterUpdateTimer == null)
             {
-                Logger.LogError("Main.MUP", "Timer is NULL. Recreating. Why?");
+                Logger.LogError("MAM.MUPS", "Timer is NULL. Recreating. Why?");
                 _masterUpdateTimer = new System.Timers.Timer();
                 _masterUpdateTimer.Interval = _masterTimerInterval;
                 _masterUpdateTimer.Elapsed += (s, e) => MasterUpdateProcess();
@@ -554,7 +554,7 @@ public class MainViewModel : ViewModelBase
                 // Daemon not responding. Kill and restart
                 forceRestart = true;
                 _lastDaemonResponseTime = DateTime.Now;
-                Logger.LogDebug("Main.KDR", "No response from daemon since: " + _lastDaemonResponseTime.ToLongTimeString() + " . Forcing restart...");
+                Logger.LogDebug("MAM.KDNR", "No response from daemon since: " + _lastDaemonResponseTime.ToLongTimeString() + " . Forcing restart...");
             }
 
             if (!ProcessManager.IsRunning(GlobalData.DaemonProcessName, out Process? process) || forceRestart)
@@ -562,21 +562,21 @@ public class MainViewModel : ViewModelBase
                 if (GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
                 {
                     DaemonProcess.ForceClose();
-                    Logger.LogDebug("Main.KDR", "Starting daemon process");
+                    Logger.LogDebug("MAM.KDNR", "Starting daemon process");
                     ProcessManager.StartExternalProcess(GlobalMethods.GetDaemonProcess(), DaemonProcess.GenerateOptions(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]));
                     _isInitialDaemonConnectionSuccess = false;
                     _cliToolsFound = true;
                 }
                 else
                 {
-                    Logger.LogInfo("Main.KDR", "CLI tools not found");
+                    Logger.LogInfo("MAM.KDNR", "CLI tools not found");
                     _cliToolsFound = false;
                 }
             }
         }
         catch (Exception ex)
         {
-            Logger.LogException("Main.KDR", ex);
+            Logger.LogException("MAM.KDNR", ex);
         }
     }
 
@@ -589,18 +589,18 @@ public class MainViewModel : ViewModelBase
                 if (GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
                 {
                     WalletProcess.ForceClose();
-                    Logger.LogDebug("Main.KWPR", "Starting wallet process");
+                    Logger.LogDebug("MAM.KWPR", "Starting wallet process");
                     ProcessManager.StartExternalProcess(GlobalMethods.GetRpcWalletProcess(), WalletProcess.GenerateOptions(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin], GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc));
                 }
                 else
                 {
-                    Logger.LogDebug("Main.KWPR", "CLI tools not found");
+                    Logger.LogDebug("MAM.KWPR", "CLI tools not found");
                 }
             }
         }
         catch (Exception ex)
         {
-            Logger.LogException("Main.KWPR", ex);
+            Logger.LogException("MAM.KWPR", ex);
         }
     }
 
@@ -679,7 +679,7 @@ public class MainViewModel : ViewModelBase
                 }
 
 
-                //Logger.LogDebug("Main.DUU", "GetInfo Response Height: " + infoRes.height);
+                //Logger.LogDebug("MAM.DUUT", "GetInfo Response Height: " + infoRes.height);
 
 
                 MiningStatusResponse miningRes = await GlobalData.DaemonService.MiningStatus(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new MiningStatusRequest());
@@ -741,7 +741,7 @@ public class MainViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            Logger.LogException("Main.DUU", ex);
+            Logger.LogException("MAM.DUUT", ex);
         }
     }
 
@@ -780,7 +780,7 @@ public class MainViewModel : ViewModelBase
                 
                 if (resTransfers.Error.IsError)
                 {
-                    Logger.LogError("Main.WUU", "GetTransfers Error Code: " + resTransfers.Error.Code + ", Message: " + resTransfers.Error.Message);
+                    Logger.LogError("MAM.TUUD", "GetTransfers Error Code: " + resTransfers.Error.Code + ", Message: " + resTransfers.Error.Message);
                 }
                 else
                 {
@@ -816,7 +816,7 @@ public class MainViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            Logger.LogException("Main.TUU", ex);
+            Logger.LogException("MAM.TUUD", ex);
         }
     }
 
@@ -828,7 +828,7 @@ public class MainViewModel : ViewModelBase
 
             if (resGetHeight.Error.IsError)
             {
-                Logger.LogError("Main.WUU", "GetTransfers Error Code: " + resGetHeight.Error.Code + ", Message: " + resGetHeight.Error.Message);
+                Logger.LogError("MAM.SWHT", "GetTransfers Error Code: " + resGetHeight.Error.Code + ", Message: " + resGetHeight.Error.Message);
             }
             else
             {
@@ -837,7 +837,7 @@ public class MainViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            Logger.LogException("Main.TUU", ex);
+            Logger.LogException("MAM.SWHT", ex);
         }
     }
     #endregion // Master Process Methods
