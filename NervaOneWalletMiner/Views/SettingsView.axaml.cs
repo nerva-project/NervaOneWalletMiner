@@ -12,28 +12,35 @@ namespace NervaOneWalletMiner.Views
     {
         public SettingsView()
         {
-            InitializeComponent();
-
-            var cbxThemeVariants = this.Get<ComboBox>("cbxThemeVariants");
-            cbxThemeVariants.SelectedItem = Application.Current!.RequestedThemeVariant;
-            cbxThemeVariants.SelectionChanged += (sender, e) =>
+            try
             {
-                if (cbxThemeVariants.SelectedItem is ThemeVariant themeVariant)
-                {
-                    Application.Current!.RequestedThemeVariant = themeVariant;
-                }
-            };
+                InitializeComponent();
 
-            // TODO: Should probably come up with a simpler way to do this
-            ComboBoxItem selectedCoin = (ComboBoxItem)cbxCoin.Items[0]!;
-            foreach(ComboBoxItem? coin in cbxCoin.Items)
-            {
-                if (coin!.Name!.Equals(GlobalData.AppSettings.ActiveCoin))
+                var cbxThemeVariants = this.Get<ComboBox>("cbxThemeVariants");
+                cbxThemeVariants.SelectedItem = Application.Current!.RequestedThemeVariant;
+                cbxThemeVariants.SelectionChanged += (sender, e) =>
                 {
-                    selectedCoin = coin;
+                    if (cbxThemeVariants.SelectedItem is ThemeVariant themeVariant)
+                    {
+                        Application.Current!.RequestedThemeVariant = themeVariant;
+                    }
+                };
+
+                // TODO: Should probably come up with a simpler way to do this
+                ComboBoxItem selectedCoin = (ComboBoxItem)cbxCoin.Items[0]!;
+                foreach (ComboBoxItem? coin in cbxCoin.Items)
+                {
+                    if (coin!.Name!.Equals(GlobalData.AppSettings.ActiveCoin))
+                    {
+                        selectedCoin = coin;
+                    }
                 }
+                cbxCoin.SelectedValue = selectedCoin;
             }
-            cbxCoin.SelectedValue = selectedCoin;
+            catch (Exception ex)
+            {
+                Logger.LogException("SET.CONS", ex);
+            }            
         }
 
         public void SaveSettingsClicked(object sender, RoutedEventArgs args)
@@ -73,7 +80,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("SetV.SSC", ex);
+                Logger.LogException("SET.SSC1", ex);
             }
         }
     }

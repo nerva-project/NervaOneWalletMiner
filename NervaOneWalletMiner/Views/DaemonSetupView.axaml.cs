@@ -17,25 +17,32 @@ namespace NervaOneWalletMiner.Views
 
         public DaemonSetupView()
         {
-            InitializeComponent();
+            try
+            {
+                InitializeComponent();
 
-            var tbxMiningAddress = this.Get<TextBox>("tbxMiningAddress");
-            tbxMiningAddress.Text = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress;
+                var tbxMiningAddress = this.Get<TextBox>("tbxMiningAddress");
+                tbxMiningAddress.Text = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress;
 
-            var tbxDaemonDataDir = this.Get<TextBox>("tbxDaemonDataDir");
-            tbxDaemonDataDir.Text = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].DataDir;
+                var tbxDaemonDataDir = this.Get<TextBox>("tbxDaemonDataDir");
+                tbxDaemonDataDir.Text = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].DataDir;
 
-            var cbxAutoStartMining = this.Get<CheckBox>("cbxAutoStartMining");
-            cbxAutoStartMining.IsChecked = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AutoStartMining;
+                var cbxAutoStartMining = this.Get<CheckBox>("cbxAutoStartMining");
+                cbxAutoStartMining.IsChecked = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AutoStartMining;
 
-            var cbxStopOnExit = this.Get<CheckBox>("cbxStopOnExit");
-            cbxStopOnExit.IsChecked = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopOnExit;
+                var cbxStopOnExit = this.Get<CheckBox>("cbxStopOnExit");
+                cbxStopOnExit.IsChecked = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopOnExit;
 
-            var tbxAdditionalArguments = this.Get<TextBox>("tbxAdditionalArguments");
-            tbxAdditionalArguments.Text = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AdditionalArguments;
+                var tbxAdditionalArguments = this.Get<TextBox>("tbxAdditionalArguments");
+                tbxAdditionalArguments.Text = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AdditionalArguments;
 
-            var tbxLogLevel = this.Get<TextBox>("tbxLogLevel");
-            tbxLogLevel.Text = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].LogLevel.ToString();
+                var tbxLogLevel = this.Get<TextBox>("tbxLogLevel");
+                tbxLogLevel.Text = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].LogLevel.ToString();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DMS.CONS", ex);
+            }
         }
 
         public void OpenCliToolsFolderClicked(object sender, RoutedEventArgs args)
@@ -51,7 +58,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("DaeSV.OCTFC", ex);
+                Logger.LogException("DMS.OCFC", ex);
             }
         }
 
@@ -110,7 +117,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("DaeSV.SSC", ex);
+                Logger.LogException("DMS.SSC1", ex);
             }
         }
 
@@ -122,7 +129,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("DaeSV.RWQSC", ex);
+                Logger.LogException("DMS.RQSC", ex);
             }
         }
 
@@ -133,7 +140,7 @@ namespace NervaOneWalletMiner.Views
                 bool isSuccess = await GlobalMethods.DownloadFileToFolder(GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].QuickSyncUrl, GlobalData.CliToolsDir);
                 if (isSuccess)
                 {
-                    Logger.LogDebug("DaeSV.RSQS", "Restarting CLI");
+                    Logger.LogDebug("DMS.RSQS", "Restarting CLI");
                     WalletProcess.ForceClose();
                     DaemonProcess.ForceClose();
 
@@ -143,12 +150,12 @@ namespace NervaOneWalletMiner.Views
                 }
                 else
                 {
-                    Logger.LogError("DaeSV.RSQS", "Failed to download file: " + GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].QuickSyncUrl + " to " + GlobalData.CliToolsDir);
+                    Logger.LogError("DMS.RSQS", "Failed to download file: " + GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].QuickSyncUrl + " to " + GlobalData.CliToolsDir);
                 }
             }
             catch (Exception ex)
             {
-                Logger.LogException("DaeSV.RSQS", ex);
+                Logger.LogException("DMS.RSQS", ex);
             }
         }
 
@@ -161,16 +168,23 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("DaeSV.RWCC", ex);
+                Logger.LogException("DMS.RWCC", ex);
             }
         }
 
         private void RestartWithCommandDialogClosed(Task task)
         {
-            DialogResult result = ((DialogResult)((Task<object>)task).Result);
-            if (result != null && result.IsOk)
+            try
             {
-                RestartWithCommand(result.RestartOptions);
+                DialogResult result = ((DialogResult)((Task<object>)task).Result);
+                if (result != null && result.IsOk)
+                {
+                    RestartWithCommand(result.RestartOptions);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DMS.RCDC", ex);
             }
         }
 
@@ -178,7 +192,7 @@ namespace NervaOneWalletMiner.Views
         {
             try
             {
-                Logger.LogDebug("DaeSV.RWC", "Restarting CLI");
+                Logger.LogDebug("DMS.RWC1", "Restarting CLI");
                 WalletProcess.ForceClose();
                 DaemonProcess.ForceClose();
 
@@ -187,7 +201,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("DaeSV.RWC", ex);
+                Logger.LogException("DMS.RWC1", ex);
             }
         }
     }

@@ -1,4 +1,6 @@
 using Avalonia.Controls;
+using NervaOneWalletMiner.Helpers;
+using System;
 
 namespace NervaOneWalletMiner.Views
 {
@@ -6,7 +8,14 @@ namespace NervaOneWalletMiner.Views
     {
         public StatusBarView()
         {
-            InitializeComponent();
+            try
+            {
+                InitializeComponent();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("STB.CONS", ex);
+            }            
         }
     }
 }

@@ -20,9 +20,16 @@ namespace NervaOneWalletMiner.Views
 
         public WalletSetupView()
         {
-            InitializeComponent();
+            try
+            {
+                InitializeComponent();
 
-            tbxLogLevel.Text = GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].LogLevel.ToString();
+                tbxLogLevel.Text = GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].LogLevel.ToString();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("WAS.CONST", ex);
+            }
         }
 
         public void OpenWalletsFolder_Clicked(object sender, RoutedEventArgs args)
@@ -38,7 +45,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("WalSV.OCTFC", ex);
+                Logger.LogException("WAS.OWFC", ex);
             }
         }
 
@@ -62,7 +69,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("WalSV.SSC", ex);
+                Logger.LogException("WAS.SSC1", ex);
             }
         }
 
@@ -76,7 +83,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("WalSV.CWC", ex);
+                Logger.LogException("WAS.CWC1", ex);
             }
         }
 
@@ -100,7 +107,7 @@ namespace NervaOneWalletMiner.Views
                     GlobalData.IsWalletJustOpened = false;
                     GlobalData.OpenedWalletName = string.Empty;
 
-                    Logger.LogError("WalSV.CNW", "Failed to create wallet " + walletName + " | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+                    Logger.LogError("WAS.CNW1", "Failed to create wallet " + walletName + " | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
                     await Dispatcher.UIThread.Invoke(async () =>
                     {
                         var box = MessageBoxManager.GetMessageBoxStandard("Create Wallet", "Error creating " + walletName + " wallet\r\n" + response.Error.Message, ButtonEnum.Ok);
@@ -114,7 +121,7 @@ namespace NervaOneWalletMiner.Views
                     GlobalData.OpenedWalletName = walletName;
                     GlobalData.NewestTransactionHeight = 0;
 
-                    Logger.LogDebug("WalSV.CNW", "Wallet " + walletName + " created successfully.");
+                    Logger.LogDebug("WAS.CNW1", "Wallet " + walletName + " created successfully.");
                     await Dispatcher.UIThread.InvokeAsync(async () =>
                     {
                         var box = MessageBoxManager.GetMessageBoxStandard("Create Wallet", walletName + " wallet created successfully!\r\n\r\nYour new wallet is now open. Make sure to save your seed phrase and keys!", ButtonEnum.Ok);
@@ -124,7 +131,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("WalSV.CNW", ex);
+                Logger.LogException("WAS.CNW1", ex);
             }            
         }
 
@@ -152,7 +159,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("WalSV.RFSC", ex);
+                Logger.LogException("WAS.RFSC", ex);
             }
         }
 
@@ -191,7 +198,7 @@ namespace NervaOneWalletMiner.Views
                     GlobalData.IsWalletJustOpened = false;
                     GlobalData.OpenedWalletName = string.Empty;
 
-                    Logger.LogError("WalSV.RFS", "Failed to restore wallet " + walletName + " | Message: " + response.Error.Message + " | Code: " + response.Error.Code + " | Info: " + response.Info);
+                    Logger.LogError("WAS.RFS1", "Failed to restore wallet " + walletName + " | Message: " + response.Error.Message + " | Code: " + response.Error.Code + " | Info: " + response.Info);
                     await Dispatcher.UIThread.Invoke(async () =>
                     {
                         var box = MessageBoxManager.GetMessageBoxStandard("Restore from Seed", "Error restoring " + walletName + " wallet\r\n" + response.Error.Message, ButtonEnum.Ok);
@@ -205,7 +212,7 @@ namespace NervaOneWalletMiner.Views
                     GlobalData.OpenedWalletName = walletName;
                     GlobalData.NewestTransactionHeight = 0;
 
-                    Logger.LogDebug("WalSV.RFS", "Wallet " + walletName + " restored successfully! Info: " + response.Info);
+                    Logger.LogDebug("WAS.RFS1", "Wallet " + walletName + " restored successfully! Info: " + response.Info);
                     await Dispatcher.UIThread.InvokeAsync(async () =>
                     {
                         var box = MessageBoxManager.GetMessageBoxStandard("Restore from Seed", walletName + " wallet restored\r\n\r\nYour new wallet is now open. It will take some time to synchronize your transactions.", ButtonEnum.Ok);
@@ -215,7 +222,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("WalSV.RFS", ex);
+                Logger.LogException("WAS.RFS1", ex);
             }
             
         }
@@ -231,7 +238,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("WalSV.RFKC", ex);
+                Logger.LogException("WAS.RFKC", ex);
             }
         }
 
@@ -272,7 +279,7 @@ namespace NervaOneWalletMiner.Views
                     GlobalData.IsWalletJustOpened = false;
                     GlobalData.OpenedWalletName = string.Empty;
 
-                    Logger.LogError("WalSV.RFK", "Failed to restore wallet " + walletName + " | Message: " + response.Error.Message + " | Code: " + response.Error.Code + " | Info: " + response.Info);
+                    Logger.LogError("WAS.RFK1", "Failed to restore wallet " + walletName + " | Message: " + response.Error.Message + " | Code: " + response.Error.Code + " | Info: " + response.Info);
                     await Dispatcher.UIThread.Invoke(async () =>
                     {
                         var box = MessageBoxManager.GetMessageBoxStandard("Restore from Seed", "Error restoring " + walletName + " wallet\r\n" + response.Error.Message, ButtonEnum.Ok);
@@ -286,7 +293,7 @@ namespace NervaOneWalletMiner.Views
                     GlobalData.OpenedWalletName = walletName;
                     GlobalData.NewestTransactionHeight = 0;
 
-                    Logger.LogDebug("WalSV.RFS", "Wallet " + walletName + " restored successfully! Info: " + response.Info);
+                    Logger.LogDebug("WAS.RFK1", "Wallet " + walletName + " restored successfully! Info: " + response.Info);
                     await Dispatcher.UIThread.InvokeAsync(async () =>
                     {
                         var box = MessageBoxManager.GetMessageBoxStandard("Restore from Seed", walletName + " wallet restored\r\n\r\nYour new wallet is now open. It will take some time to synchronize your transactions.", ButtonEnum.Ok);
@@ -296,7 +303,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("WalSV.RFK", ex);
+                Logger.LogException("WAS.RFK1", ex);
             }
 
         }
@@ -322,7 +329,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("WalSV.RSP", ex);
+                Logger.LogException("WAS.RSP1", ex);
             }
         }
 
@@ -334,7 +341,7 @@ namespace NervaOneWalletMiner.Views
 
                 if (response.Error.IsError)
                 {
-                    Logger.LogError("WalSV.CNW", "Failed to rescan spent. Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+                    Logger.LogError("WAS.RS01", "Failed to rescan spent. Message: " + response.Error.Message + " | Code: " + response.Error.Code);
                     await Dispatcher.UIThread.Invoke(async () =>
                     {
                         var box = MessageBoxManager.GetMessageBoxStandard("Rescan Spent", "Error rescanning\r\n" + response.Error.Message, ButtonEnum.Ok);
@@ -343,7 +350,7 @@ namespace NervaOneWalletMiner.Views
                 }
                 else
                 {
-                    Logger.LogDebug("WalSV.CNW", "Rescan spent returned successfully.");
+                    Logger.LogDebug("WAS.RS01", "Rescan spent returned successfully.");
                     await Dispatcher.UIThread.InvokeAsync(async () =>
                     {
                         var box = MessageBoxManager.GetMessageBoxStandard("Rescan Spent", "Rescan spent command submitted successfully.", ButtonEnum.Ok);
@@ -353,7 +360,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("WalSV.RS", ex);
+                Logger.LogException("WAS.RS01", ex);
             }
         }
         #endregion // Rescan Spent
@@ -378,7 +385,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("WalSV.RSP", ex);
+                Logger.LogException("WAS.RBC1", ex);
             }
         }
 
@@ -390,7 +397,7 @@ namespace NervaOneWalletMiner.Views
 
                 if (response.Error.IsError)
                 {
-                    Logger.LogError("WalSV.RB", "Failed to rescan Blockchain. Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+                    Logger.LogError("WAS.RB01", "Failed to rescan Blockchain. Message: " + response.Error.Message + " | Code: " + response.Error.Code);
                     await Dispatcher.UIThread.Invoke(async () =>
                     {
                         var box = MessageBoxManager.GetMessageBoxStandard("Rescan Blockchain", "Error rescanning\r\n" + response.Error.Message, ButtonEnum.Ok);
@@ -399,7 +406,7 @@ namespace NervaOneWalletMiner.Views
                 }
                 else
                 {
-                    Logger.LogDebug("WalSV.RB", "Rescan Blockchain returned successfully.");
+                    Logger.LogDebug("WAS.RB01", "Rescan Blockchain returned successfully.");
                     await Dispatcher.UIThread.InvokeAsync(async () =>
                     {
                         var box = MessageBoxManager.GetMessageBoxStandard("Rescan Blockchain", "Rescan Blockchain command submitted successfully.", ButtonEnum.Ok);
@@ -409,7 +416,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("WalSV.RB", ex);
+                Logger.LogException("WAS.RB01", ex);
             }
         }
         #endregion // Rescan Blockchain
@@ -424,7 +431,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("WalSV.VKSC", ex);
+                Logger.LogException("WAS.VKSC", ex);
             }
         }
         #endregion // View Keys/Seed

@@ -21,7 +21,14 @@ namespace NervaOneWalletMiner.Views
 
         public WalletView()
         {
-            InitializeComponent();
+            try
+            {
+                InitializeComponent();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("WAL.CONS", ex);
+            }            
         }
 
         #region Open Wallet        
@@ -46,7 +53,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("Wal.OCWC", ex);
+                Logger.LogException("WAL.OCWC", ex);
             }
         }
 
@@ -61,44 +68,46 @@ namespace NervaOneWalletMiner.Views
                     OpenUserWallet(result.WalletName, result.WalletPassword);
                 }
             }
-            else
-            {
-                // Cancelled or closed. Don't need to do anything
-
-            }
         }
 
         private static async void OpenUserWallet(string walletName, string walletPassword)
         {
-            OpenWalletRequest request = new()
+            try
             {
-                WalletName = walletName,
-                Password = walletPassword
-            };
-
-            OpenWalletResponse response = await GlobalData.WalletService.OpenWallet(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
-
-            if (response.Error.IsError)
-            {
-                GlobalData.IsWalletOpen = false;
-                GlobalData.IsWalletJustOpened = false;
-                GlobalData.OpenedWalletName = string.Empty;
-
-                await Dispatcher.UIThread.Invoke(async () =>
+                OpenWalletRequest request = new()
                 {
-                    var box = MessageBoxManager.GetMessageBoxStandard("Open Wallet", "Error opening " + walletName + " wallet\r\n" + response.Error.Message, ButtonEnum.Ok);
-                    _ = await box.ShowAsync();
-                });
-            }
-            else
-            {
-                GlobalData.IsWalletOpen = true;
-                GlobalData.IsWalletJustOpened = true;
-                GlobalData.OpenedWalletName = walletName;
-                GlobalData.NewestTransactionHeight = 0;
-            }
+                    WalletName = walletName,
+                    Password = walletPassword
+                };
 
-            GlobalData.WalletHeight = 0;
+                OpenWalletResponse response = await GlobalData.WalletService.OpenWallet(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
+
+                if (response.Error.IsError)
+                {
+                    GlobalData.IsWalletOpen = false;
+                    GlobalData.IsWalletJustOpened = false;
+                    GlobalData.OpenedWalletName = string.Empty;
+
+                    await Dispatcher.UIThread.Invoke(async () =>
+                    {
+                        var box = MessageBoxManager.GetMessageBoxStandard("Open Wallet", "Error opening " + walletName + " wallet\r\n" + response.Error.Message, ButtonEnum.Ok);
+                        _ = await box.ShowAsync();
+                    });
+                }
+                else
+                {
+                    GlobalData.IsWalletOpen = true;
+                    GlobalData.IsWalletJustOpened = true;
+                    GlobalData.OpenedWalletName = walletName;
+                    GlobalData.NewestTransactionHeight = 0;
+                }
+
+                GlobalData.WalletHeight = 0;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("WAL.OUW1", ex);
+            }            
         }
         #endregion // Open Wallet
 
@@ -117,48 +126,50 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("Wal.SCA", ex);
+                Logger.LogException("WAL.SCA1", ex);
             }
         }
 
         private async void CreateAccounDialogClosed(Task task)
         {
-            DialogResult result = ((DialogResult)((Task<object>)task).Result);
-            if (result != null && result.IsOk)
+            try
             {
-                CreateAccountRequest request = new()
+                DialogResult result = ((DialogResult)((Task<object>)task).Result);
+                if (result != null && result.IsOk)
                 {
-                    Label = result.TextBoxValue
-                };
-
-                CreateAccountResponse response = await GlobalData.WalletService.CreateAccount(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
-
-                if (response.Error.IsError)
-                {
-                    Logger.LogError("Wal.CADC", "Failed to create account | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
-                    await Dispatcher.UIThread.Invoke(async () =>
+                    CreateAccountRequest request = new()
                     {
-                        var box = MessageBoxManager.GetMessageBoxStandard("Create Account", "Error creating account\r\n" + response.Error.Message, ButtonEnum.Ok);
-                        _ = await box.ShowAsync();
-                    });
-                }
-                else
-                {
-                    Logger.LogDebug("Wal.CADC", "New account created successfully.");
-                    GlobalMethods.SaveWallet();
+                        Label = result.TextBoxValue
+                    };
 
-                    await Dispatcher.UIThread.InvokeAsync(async () =>
+                    CreateAccountResponse response = await GlobalData.WalletService.CreateAccount(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
+
+                    if (response.Error.IsError)
                     {
-                        var box = MessageBoxManager.GetMessageBoxStandard("Create Account", "Account created successfully!", ButtonEnum.Ok);
-                        _ = await box.ShowAsync();
-                    });                    
+                        Logger.LogError("WAL.CADC", "Failed to create account | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+                        await Dispatcher.UIThread.Invoke(async () =>
+                        {
+                            var box = MessageBoxManager.GetMessageBoxStandard("Create Account", "Error creating account\r\n" + response.Error.Message, ButtonEnum.Ok);
+                            _ = await box.ShowAsync();
+                        });
+                    }
+                    else
+                    {
+                        Logger.LogDebug("WAL.CADC", "New account created successfully.");
+                        GlobalMethods.SaveWallet();
+
+                        await Dispatcher.UIThread.InvokeAsync(async () =>
+                        {
+                            var box = MessageBoxManager.GetMessageBoxStandard("Create Account", "Account created successfully!", ButtonEnum.Ok);
+                            _ = await box.ShowAsync();
+                        });
+                    }
                 }
             }
-            else
+            catch (Exception ex)
             {
-                // Cancelled or closed. Don't need to do anything
-
-            }
+                Logger.LogException("WAL.CADC", ex);
+            }            
         }
         #endregion Create Account
 
@@ -181,52 +192,54 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("Wal.SCA", ex);
+                Logger.LogException("WAL.SRL1", ex);
             }
         }
 
         private async void RenameLabelDialogClosed(Task task)
         {
-            DialogResult result = ((DialogResult)((Task<object>)task).Result);
-            if (result != null && result.IsOk)
+            try
             {
-                Account selectedItem = (Account)dtgAccounts.SelectedItem;
-
-                LabelAccountRequest request = new()
+                DialogResult result = ((DialogResult)((Task<object>)task).Result);
+                if (result != null && result.IsOk)
                 {
-                    AccountIndex = selectedItem.Index,
-                    Label = result.TextBoxValue
-                };
+                    Account selectedItem = (Account)dtgAccounts.SelectedItem;
 
-                LabelAccountResponse response = await GlobalData.WalletService.LabelAccount(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
-
-                if (response.Error.IsError)
-                {
-                    Logger.LogError("Wal.RLDC", "Failed to rename account | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
-                    await Dispatcher.UIThread.Invoke(async () =>
+                    LabelAccountRequest request = new()
                     {
-                        var box = MessageBoxManager.GetMessageBoxStandard("Rename Account", "Error renaming account\r\n" + response.Error.Message, ButtonEnum.Ok);
-                        _ = await box.ShowAsync();
-                    });
-                }
-                else
-                {
-                    Logger.LogDebug("Wal.RLDC", "Account label changed successfully.");                    
-                    GlobalMethods.WalletUiUpdate();
-                    GlobalMethods.SaveWallet();
+                        AccountIndex = selectedItem.Index,
+                        Label = result.TextBoxValue
+                    };
 
-                    await Dispatcher.UIThread.InvokeAsync(async () =>
+                    LabelAccountResponse response = await GlobalData.WalletService.LabelAccount(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
+
+                    if (response.Error.IsError)
                     {
-                        var box = MessageBoxManager.GetMessageBoxStandard("Rename Account", "Account label changed successfully!", ButtonEnum.Ok);
-                        _ = await box.ShowAsync();
-                    });
+                        Logger.LogError("WAL.RLDC", "Failed to rename account | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+                        await Dispatcher.UIThread.Invoke(async () =>
+                        {
+                            var box = MessageBoxManager.GetMessageBoxStandard("Rename Account", "Error renaming account\r\n" + response.Error.Message, ButtonEnum.Ok);
+                            _ = await box.ShowAsync();
+                        });
+                    }
+                    else
+                    {
+                        Logger.LogDebug("WAL.RLDC", "Account label changed successfully.");
+                        GlobalMethods.WalletUiUpdate();
+                        GlobalMethods.SaveWallet();
+
+                        await Dispatcher.UIThread.InvokeAsync(async () =>
+                        {
+                            var box = MessageBoxManager.GetMessageBoxStandard("Rename Account", "Account label changed successfully!", ButtonEnum.Ok);
+                            _ = await box.ShowAsync();
+                        });
+                    }
                 }
             }
-            else
+            catch (Exception ex)
             {
-                // Cancelled or closed. Don't need to do anything
-
-            }
+                Logger.LogException("WAL.RLDC", ex);
+            }            
         }
         #endregion Rename Label
 
@@ -252,7 +265,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("Wal.TFC", ex);
+                Logger.LogException("WAL.TFC1", ex);
             }
         }
 
@@ -264,76 +277,90 @@ namespace NervaOneWalletMiner.Views
                 // Submit trannsfer
                 if (!string.IsNullOrEmpty(result.SendToAddress) && result.SendAmount > 0)
                 {
-                    if(result.IsSplitTranfer)
+                    if (result.IsSplitTranfer)
                     {
                         MakeTransferSplit(result.SendFromAddressIndex, result.SendToAddress, result.SendAmount, result.SendPaymentId, result.Priority);
                     }
                     else
                     {
                         MakeTransfer(result.SendFromAddressIndex, result.SendToAddress, result.SendAmount, result.SendPaymentId, result.Priority);
-                    }                    
+                    }
                 }
-            }
+            }         
         }
 
         private static async void MakeTransfer(uint sendFromAccountIndex, string sendToAddress, decimal amount, string paymentId, string priority)
         {
-            TransferRequest request = new()
+            try
             {
-                Destinations = [new() { Amount = amount, Address = sendToAddress }],
-                AccountIndex = sendFromAccountIndex,
-                Priority = priority,
-                PaymentId = paymentId                
-            };
-
-            TransferResponse response = await GlobalData.WalletService.Transfer(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
-
-            if (response.Error.IsError)
-            {
-                await Dispatcher.UIThread.Invoke(async () =>
+                TransferRequest request = new()
                 {
-                    var box = MessageBoxManager.GetMessageBoxStandard("Transfer", "Transfer error\r\n\r\n" + response.Error.Message, ButtonEnum.Ok);
-                    _ = await box.ShowAsync();
-                });
-            }
-            else
-            {
-                await Dispatcher.UIThread.InvokeAsync(async () =>
+                    Destinations = [new() { Amount = amount, Address = sendToAddress }],
+                    AccountIndex = sendFromAccountIndex,
+                    Priority = priority,
+                    PaymentId = paymentId
+                };
+
+                TransferResponse response = await GlobalData.WalletService.Transfer(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
+
+                if (response.Error.IsError)
                 {
-                    var box = MessageBoxManager.GetMessageBoxStandard("Transfer", "Transfer successful!", ButtonEnum.Ok);
-                    _ = await box.ShowAsync();
-                });
+                    await Dispatcher.UIThread.Invoke(async () =>
+                    {
+                        var box = MessageBoxManager.GetMessageBoxStandard("Transfer", "Transfer error\r\n\r\n" + response.Error.Message, ButtonEnum.Ok);
+                        _ = await box.ShowAsync();
+                    });
+                }
+                else
+                {
+                    await Dispatcher.UIThread.InvokeAsync(async () =>
+                    {
+                        var box = MessageBoxManager.GetMessageBoxStandard("Transfer", "Transfer successful!", ButtonEnum.Ok);
+                        _ = await box.ShowAsync();
+                    });
+                }
             }
+            catch (Exception ex)
+            {
+                Logger.LogException("WAL.MT01", ex);
+            }            
         }
 
         private static async void MakeTransferSplit(uint sendFromAccountIndex, string sendToAddress, decimal amount, string paymentId, string priority)
         {
-            TransferRequest request = new()
+            try
             {
-                Destinations = [new() { Amount = amount, Address = sendToAddress }],
-                AccountIndex = sendFromAccountIndex,
-                Priority = priority,
-                PaymentId = paymentId
-            };
-
-            TransferResponse response = await GlobalData.WalletService.TransferSplit(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
-
-            if (response.Error.IsError)
-            {
-                await Dispatcher.UIThread.Invoke(async () =>
+                TransferRequest request = new()
                 {
-                    var box = MessageBoxManager.GetMessageBoxStandard("Transfer Split", "Transfer error\r\n\r\n" + response.Error.Message, ButtonEnum.Ok);
-                    _ = await box.ShowAsync();
-                });
-            }
-            else
-            {
-                await Dispatcher.UIThread.InvokeAsync(async () =>
+                    Destinations = [new() { Amount = amount, Address = sendToAddress }],
+                    AccountIndex = sendFromAccountIndex,
+                    Priority = priority,
+                    PaymentId = paymentId
+                };
+
+                TransferResponse response = await GlobalData.WalletService.TransferSplit(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
+
+                if (response.Error.IsError)
                 {
-                    var box = MessageBoxManager.GetMessageBoxStandard("Transfer Split", "Transfer successful!", ButtonEnum.Ok);
-                    _ = await box.ShowAsync();
-                });
+                    await Dispatcher.UIThread.Invoke(async () =>
+                    {
+                        var box = MessageBoxManager.GetMessageBoxStandard("Transfer Split", "Transfer error\r\n\r\n" + response.Error.Message, ButtonEnum.Ok);
+                        _ = await box.ShowAsync();
+                    });
+                }
+                else
+                {
+                    await Dispatcher.UIThread.InvokeAsync(async () =>
+                    {
+                        var box = MessageBoxManager.GetMessageBoxStandard("Transfer Split", "Transfer successful!", ButtonEnum.Ok);
+                        _ = await box.ShowAsync();
+                    });
+                }
             }
+            catch (Exception ex)
+            {
+                Logger.LogException("WAL.MTS1", ex);
+            }            
         }
         #endregion // Transfer Funds
 
@@ -369,7 +396,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("Wal.OAIV", ex);
+                Logger.LogException("WAL.OAIV", ex);
             }
         }
         #endregion // Address Info
@@ -377,37 +404,44 @@ namespace NervaOneWalletMiner.Views
         #region Close Wallet
         private static async void CloseUserWallet()
         {
-            CloseWalletRequest request = new();
-
-            CloseWalletResponse response = await GlobalData.WalletService.CloseWallet(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
-
-            if (response.Error.IsError)
+            try
             {
-                GlobalData.IsWalletOpen = false;
-                GlobalData.IsWalletJustOpened = false;
-                GlobalData.OpenedWalletName = string.Empty;                
+                CloseWalletRequest request = new();
 
-                await Dispatcher.UIThread.InvokeAsync(async () =>
+                CloseWalletResponse response = await GlobalData.WalletService.CloseWallet(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
+
+                if (response.Error.IsError)
                 {
-                    var box = MessageBoxManager.GetMessageBoxStandard("Close Wallet", "Error closing wallet\r\n" + response.Error.Message, ButtonEnum.Ok);
-                    _ = await box.ShowAsync();
-                });
+                    GlobalData.IsWalletOpen = false;
+                    GlobalData.IsWalletJustOpened = false;
+                    GlobalData.OpenedWalletName = string.Empty;
+
+                    await Dispatcher.UIThread.InvokeAsync(async () =>
+                    {
+                        var box = MessageBoxManager.GetMessageBoxStandard("Close Wallet", "Error closing wallet\r\n" + response.Error.Message, ButtonEnum.Ok);
+                        _ = await box.ShowAsync();
+                    });
+                }
+                else
+                {
+                    GlobalData.IsWalletOpen = false;
+                    GlobalData.IsWalletJustOpened = false;
+                    GlobalData.OpenedWalletName = string.Empty;
+                    GlobalData.WalletStats = new();
+
+                    await Dispatcher.UIThread.InvokeAsync(async () =>
+                    {
+                        var box = MessageBoxManager.GetMessageBoxStandard("Close Wallet", "Wallet closed successfully!", ButtonEnum.Ok);
+                        _ = await box.ShowAsync();
+                    });
+                }
+
+                GlobalData.WalletHeight = 0;
             }
-            else
+            catch (Exception ex)
             {
-                GlobalData.IsWalletOpen = false;
-                GlobalData.IsWalletJustOpened = false;
-                GlobalData.OpenedWalletName = string.Empty;
-                GlobalData.WalletStats = new();
-
-                await Dispatcher.UIThread.InvokeAsync(async () =>
-                {
-                    var box = MessageBoxManager.GetMessageBoxStandard("Close Wallet", "Wallet closed successfully!", ButtonEnum.Ok);
-                    _ = await box.ShowAsync();
-                });
-            }
-
-            GlobalData.WalletHeight = 0;
+                Logger.LogException("WAL.CUW1", ex);
+            }            
         }
         #endregion //Close Wallet
     }

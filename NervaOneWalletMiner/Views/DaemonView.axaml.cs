@@ -10,11 +10,18 @@ namespace NervaOneWalletMiner.Views
     {
         public DaemonView()
         {
-            InitializeComponent();
+            try
+            {
+                InitializeComponent();
 
-            var nupThreads = this.Get<NumericUpDown>("nupThreads");
-            nupThreads.Maximum = GlobalData.CpuThreadCount;
-            nupThreads.Value = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads;
+                var nupThreads = this.Get<NumericUpDown>("nupThreads");
+                nupThreads.Maximum = GlobalData.CpuThreadCount;
+                nupThreads.Value = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DMN.CONS", ex);
+            }
         }
 
         public void StartStopMiningClicked(object sender, RoutedEventArgs args)
@@ -27,7 +34,7 @@ namespace NervaOneWalletMiner.Views
                 if (btnStartStopMining.Content!.ToString()!.Equals(StatusMiner.StopMining))
                 {
                     // Stop mining
-                    Logger.LogDebug("HomV.SSMC", "Stopping mining");
+                    Logger.LogDebug("DMN.SSMC", "Stopping mining");
                     GlobalData.IsManualStopMining = true;
                     GlobalMethods.StopMiningAsync();
                     btnStartStopMining.Content = StatusMiner.StartMining;
@@ -42,7 +49,7 @@ namespace NervaOneWalletMiner.Views
                         GlobalMethods.SaveConfig();
                     }
 
-                    Logger.LogDebug("HomV.SSMC", "Starting mining");
+                    Logger.LogDebug("DMN.SSMC", "Starting mining");
                     GlobalData.IsManualStopMining = false;
                     GlobalMethods.StartMiningAsync(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
                     btnStartStopMining.Content = StatusMiner.StopMining;
@@ -51,7 +58,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("HomV.SSMC", ex);
+                Logger.LogException("DMN.SSMC", ex);
             }
         }
     }

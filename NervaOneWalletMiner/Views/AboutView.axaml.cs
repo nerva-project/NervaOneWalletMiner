@@ -26,7 +26,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("Abo.OGHC", ex);
+                Logger.LogException("ABO.OGHC", ex);
             }
         }
 
@@ -43,7 +43,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("Abo.ODC", ex);
+                Logger.LogException("ABO.ODC1", ex);
             }
         }
 
@@ -60,7 +60,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("Abo.ODC", ex);
+                Logger.LogException("ABO.OTC1", ex);
             }
         }
     }

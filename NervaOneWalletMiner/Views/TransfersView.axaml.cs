@@ -16,7 +16,14 @@ namespace NervaOneWalletMiner.Views
 
         public TransfersView()
         {
-            InitializeComponent();
+            try
+            {
+                InitializeComponent();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("TRA.CONS", ex);
+            }            
         }
 
         public void TransactionDetailsClicked(object sender, RoutedEventArgs args)
@@ -53,7 +60,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("TranV.TDC", ex);
+                Logger.LogException("TRA.TDC", ex);
             }
         }
     }

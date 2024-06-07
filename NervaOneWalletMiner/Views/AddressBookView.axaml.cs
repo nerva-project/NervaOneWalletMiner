@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects.DataGrid;
+using System;
 
 namespace NervaOneWalletMiner.Views
 {
@@ -8,39 +9,53 @@ namespace NervaOneWalletMiner.Views
     {
         public AddressBookView()
         {
-            InitializeComponent();
-
-            GlobalMethods.LoadAddressBook();
-
-            if (GlobalData.AddressBook.List.Count == 0)
+            try
             {
-                // Add blank row so user can add new address
-                GlobalData.AddressBook.List.Add(new AddressInfo());
-            }
-            else
-            {
-                AddressInfo addressWithHighestId = GetAddressWithHighestId();
+                InitializeComponent();
 
-                if (!string.IsNullOrEmpty(addressWithHighestId.Address))
+                GlobalMethods.LoadAddressBook();
+
+                if (GlobalData.AddressBook.List.Count == 0)
                 {
-                    // Only add new row if there isn't one already based on Address
-                    GlobalData.AddressBook.List.Add(new AddressInfo { Id = addressWithHighestId.Id + 1 });
+                    // Add blank row so user can add new address
+                    GlobalData.AddressBook.List.Add(new AddressInfo());
                 }
-            }
+                else
+                {
+                    AddressInfo addressWithHighestId = GetAddressWithHighestId();
 
-            dtgAddressBook.ItemsSource = GlobalData.AddressBook.List;
+                    if (!string.IsNullOrEmpty(addressWithHighestId.Address))
+                    {
+                        // Only add new row if there isn't one already based on Address
+                        GlobalData.AddressBook.List.Add(new AddressInfo { Id = addressWithHighestId.Id + 1 });
+                    }
+                }
+
+                dtgAddressBook.ItemsSource = GlobalData.AddressBook.List;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("ADB.CONS", ex);
+            }
         }
 
         private void AddressBook_RowEditEnded(object? sender, DataGridRowEditEndedEventArgs e)
-        {           
-            // Just save. Don't need to complicate things
-            GlobalMethods.SaveAddressBook();
-
-            // Add blank row if new one was just added
-            AddressInfo addressWithHighestId = GetAddressWithHighestId();
-            if (!string.IsNullOrEmpty(addressWithHighestId.Address))
+        {
+            try
             {
-                GlobalData.AddressBook.List.Add(new AddressInfo { Id = addressWithHighestId.Id + 1 });
+                // Just save. Don't need to complicate things
+                GlobalMethods.SaveAddressBook();
+
+                // Add blank row if new one was just added
+                AddressInfo addressWithHighestId = GetAddressWithHighestId();
+                if (!string.IsNullOrEmpty(addressWithHighestId.Address))
+                {
+                    GlobalData.AddressBook.List.Add(new AddressInfo { Id = addressWithHighestId.Id + 1 });
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("ADB.ABRE", ex);
             }
         }
 
@@ -48,16 +63,23 @@ namespace NervaOneWalletMiner.Views
         {
             AddressInfo highestIdAddress = new();
 
-            if(GlobalData.AddressBook.List.Count > 0)
+            try
             {
-                highestIdAddress = GlobalData.AddressBook.List[0];
-                foreach (AddressInfo address in GlobalData.AddressBook.List)
+                if (GlobalData.AddressBook.List.Count > 0)
                 {
-                    if (address.Id > highestIdAddress.Id)
+                    highestIdAddress = GlobalData.AddressBook.List[0];
+                    foreach (AddressInfo address in GlobalData.AddressBook.List)
                     {
-                        highestIdAddress = address;
+                        if (address.Id > highestIdAddress.Id)
+                        {
+                            highestIdAddress = address;
+                        }
                     }
-                }
+                }                
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("ADB.GAHI", ex);
             }
 
             return highestIdAddress;
