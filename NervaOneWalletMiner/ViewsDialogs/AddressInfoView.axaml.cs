@@ -5,7 +5,6 @@ using NervaOneWalletMiner.Objects;
 using System;
 using NervaOneWalletMiner.Helpers;
 using System.Collections.Generic;
-using Avalonia.Input;
 using Avalonia.Threading;
 using NervaOneWalletMiner.Rpc.Wallet.Requests;
 using NervaOneWalletMiner.Rpc.Wallet.Responses;
@@ -19,27 +18,35 @@ namespace NervaOneWalletMiner.ViewsDialogs
         // <Label + AddressShort, AddressFull>
         Dictionary<string, string> _accounts = [];
 
+        // Not used but designer will complain without it
         public AddressInfoView()
-        {
+        {            
             InitializeComponent();
         }
 
         public AddressInfoView(int accountIndex)
         {
-            InitializeComponent();
-
-            foreach (Account account in GlobalData.WalletStats.Subaddresses.Values)
+            try
             {
-                string accountValue = string.IsNullOrEmpty(account.Label) ? "No label" + " (" + account.AddressShort + ")" : account.Label + " (" + account.AddressShort + ")";
-                if (!_accounts.ContainsKey(accountValue))
-                {
-                    _accounts.Add(accountValue, account.AddressFull);
-                }
-            }
+                InitializeComponent();
 
-            var cbxAccount = this.Get<ComboBox>("cbxAccount");
-            cbxAccount.ItemsSource = _accounts.Keys;
-            cbxAccount.SelectedIndex = accountIndex;
+                foreach (Account account in GlobalData.WalletStats.Subaddresses.Values)
+                {
+                    string accountValue = string.IsNullOrEmpty(account.Label) ? "No label" + " (" + account.AddressShort + ")" : account.Label + " (" + account.AddressShort + ")";
+                    if (!_accounts.ContainsKey(accountValue))
+                    {
+                        _accounts.Add(accountValue, account.AddressFull);
+                    }
+                }
+
+                var cbxAccount = this.Get<ComboBox>("cbxAccount");
+                cbxAccount.ItemsSource = _accounts.Keys;
+                cbxAccount.SelectedIndex = accountIndex;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("AID.CONS", ex);
+            }
         }
 
         private void AccountSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -55,7 +62,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("AIWal.ASC", ex);
+                Logger.LogException("AID.ASC1", ex);
             }                       
         }
 
@@ -67,7 +74,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("AIWal.MIAC", ex);
+                Logger.LogException("AID.MIAC", ex);
             }
         }
 
@@ -81,12 +88,12 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     StandardAddress = walletAddress,
                 };
 
-                Logger.LogError("AIWal.MIA", "Making integrated address for: " + GlobalMethods.GetShorterString(walletAddress, 12));
+                Logger.LogError("AID.MIA1", "Making integrated address for: " + GlobalMethods.GetShorterString(walletAddress, 12));
                 MakeIntegratedAddressResponse response = await GlobalData.WalletService.MakeIntegratedAddress(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
 
                 if (response.Error.IsError)
                 {
-                    Logger.LogError("AIWal.MIA", "Failed to make integrated address. Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+                    Logger.LogError("AID.MIA1", "Failed to make integrated address. Message: " + response.Error.Message + " | Code: " + response.Error.Code);
                     await Dispatcher.UIThread.Invoke(async () =>
                     {
                         var box = MessageBoxManager.GetMessageBoxStandard("Make Integrated Address", "Error making integrated address\r\n" + response.Error.Message, ButtonEnum.Ok);
@@ -95,14 +102,14 @@ namespace NervaOneWalletMiner.ViewsDialogs
                 }
                 else
                 {
-                    Logger.LogError("AIWal.MIA", "Integrated address created successfully.");
+                    Logger.LogError("AID.MIA1", "Integrated address created successfully.");
                     tbxIntegratedAddress.Text = response.IntegratedAddress;
                     tbxPaymentId.Text = response.PaymentId;
                 }
             }
             catch (Exception ex)
             {
-                Logger.LogException("AIWal.MIA", ex);
+                Logger.LogException("AID.MIA1", ex);
             }
         }
 
@@ -119,7 +126,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("AIWal.CBC", ex);
+                Logger.LogException("AID.CBC1", ex);
             }
         }
 
@@ -131,7 +138,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("NWal.CWC", ex);
+                Logger.LogException("AID.CWCC", ex);
             }
         }
 
@@ -143,7 +150,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("NWal.CIAC", ex);
+                Logger.LogException("AID.CIAC", ex);
             }
         }
 
@@ -155,7 +162,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("NWal.CPIC", ex);
+                Logger.LogException("AID.CPIC", ex);
             }
         }
     }

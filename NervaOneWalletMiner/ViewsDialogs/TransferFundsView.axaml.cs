@@ -18,6 +18,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
 
         Dictionary<uint, string> _accounts = [];
 
+        // Not used but designer will complain without it
         public TransferFundsView()
         {
             InitializeComponent();
@@ -25,33 +26,40 @@ namespace NervaOneWalletMiner.ViewsDialogs
 
         public TransferFundsView(uint selectedAccountIndex)
         {
-            InitializeComponent();
-
-            foreach(Account account in GlobalData.WalletStats.Subaddresses.Values)
+            try
             {
-                if(!_accounts.ContainsKey(account.Index))
-                {
-                    _accounts.Add(account.Index, string.IsNullOrEmpty(account.Label) ? "No label" + " (" + account.AddressShort + ")" : account.Label + " (" + account.AddressShort + ")");
-                }
-            }
-          
-            cbxSendFrom.ItemsSource = _accounts.Values;
-            cbxSendFrom.SelectedIndex = (int)selectedAccountIndex;
+                InitializeComponent();
 
-            // Can change this based on coin and what priories it has
-            List<string> priorityList =
-            [
-                SendPriority.Default,
+                foreach (Account account in GlobalData.WalletStats.Subaddresses.Values)
+                {
+                    if (!_accounts.ContainsKey(account.Index))
+                    {
+                        _accounts.Add(account.Index, string.IsNullOrEmpty(account.Label) ? "No label" + " (" + account.AddressShort + ")" : account.Label + " (" + account.AddressShort + ")");
+                    }
+                }
+
+                cbxSendFrom.ItemsSource = _accounts.Values;
+                cbxSendFrom.SelectedIndex = (int)selectedAccountIndex;
+
+                // Can change this based on coin and what priories it has
+                List<string> priorityList =
+                [
+                    SendPriority.Default,
                 SendPriority.Low,
                 SendPriority.Medium,
                 SendPriority.High,
             ];
 
-            cbxPriority.ItemsSource = priorityList;
-            cbxPriority.SelectedIndex = 0;
+                cbxPriority.ItemsSource = priorityList;
+                cbxPriority.SelectedIndex = 0;
 
-            lblBalance.Content = GlobalData.WalletStats.Subaddresses[selectedAccountIndex].BalanceLocked + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
-            lblUnlocked.Content = GlobalData.WalletStats.Subaddresses[selectedAccountIndex].BalanceUnlocked + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
+                lblBalance.Content = GlobalData.WalletStats.Subaddresses[selectedAccountIndex].BalanceLocked + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
+                lblUnlocked.Content = GlobalData.WalletStats.Subaddresses[selectedAccountIndex].BalanceUnlocked + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("TFD.CONS", ex); ;
+            }            
         }
 
         public async void OkButtonClicked(object sender, RoutedEventArgs args)
@@ -110,7 +118,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("TFWal.OBC", ex);
+                Logger.LogException("TFD.OKBC", ex);
             }
         }
 
@@ -127,7 +135,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("TFWal.CBC", ex);
+                Logger.LogException("TFD.CLBC", ex);
             }
         }
 
@@ -139,7 +147,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("TFWal.GPIC", ex);
+                Logger.LogException("TFD.GPIC", ex);
             }
         }
 
@@ -164,7 +172,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("AIWal.ASC", ex);
+                Logger.LogException("TFD.ASC1", ex);
             }
         }
     }

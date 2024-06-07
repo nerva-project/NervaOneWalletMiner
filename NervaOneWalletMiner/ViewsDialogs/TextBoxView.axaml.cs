@@ -10,6 +10,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
     {
         bool _isTextRequired = false;
 
+        // Not used but designer will complain without it
         public TextBoxView()
         {
             InitializeComponent();
@@ -17,14 +18,21 @@ namespace NervaOneWalletMiner.ViewsDialogs
 
         public TextBoxView(string title, string textValue, string textWatermark, string labelValue, bool isTextRequired)
         {
-            InitializeComponent();
+            try
+            {
+                InitializeComponent();
 
-            _isTextRequired = isTextRequired;
+                _isTextRequired = isTextRequired;
 
-            Title = title;
-            tbxValue.Text = textValue;
-            tbxValue.Watermark = textWatermark;
-            lblValue.Content = labelValue;
+                Title = title;
+                tbxValue.Text = textValue;
+                tbxValue.Watermark = textWatermark;
+                lblValue.Content = labelValue;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("TBD.CONS", ex);
+            }
         }
 
         public void OkButtonClicked(object sender, RoutedEventArgs args)
@@ -50,7 +58,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("TBWal.OBC", ex);
+                Logger.LogException("TBD.OKBC", ex);
             }
         }
 
@@ -67,7 +75,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("TBWal.CBC", ex);
+                Logger.LogException("TBD.CLBC", ex);
             }
         }
     }

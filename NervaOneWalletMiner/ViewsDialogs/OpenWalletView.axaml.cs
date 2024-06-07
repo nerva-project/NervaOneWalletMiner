@@ -12,12 +12,19 @@ namespace NervaOneWalletMiner.ViewsDialogs
     {
         public OpenWalletView()
         {
-            InitializeComponent();
+            try
+            {
+                InitializeComponent();
 
-            var walletName = this.Get<ComboBox>("cbxWalletName");
+                var walletName = this.Get<ComboBox>("cbxWalletName");
 
-            walletName.ItemsSource = GetWalletFileNames();
-            walletName.SelectedIndex = 0;
+                walletName.ItemsSource = GetWalletFileNames();
+                walletName.SelectedIndex = 0;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("OWD.CONS", ex);
+            }
         }
 
         public List<string> GetWalletFileNames()
@@ -46,7 +53,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("OWal.GWFN", ex);
+                Logger.LogException("OWD.GWFN", ex);
             }
 
             return walletFiles;
@@ -78,7 +85,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("OWal.OBC", ex);
+                Logger.LogException("OWD.OKBC", ex);
             }
         }
 
@@ -95,7 +102,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("OWal.CBC", ex);
+                Logger.LogException("OWD.CLBC", ex);
             }
         }
 
@@ -121,7 +128,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("OWal.SHPBC", ex);
+                Logger.LogException("OWD.SHPC", ex);
             }
         }
     }

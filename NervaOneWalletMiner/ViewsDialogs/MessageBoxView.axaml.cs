@@ -8,17 +8,25 @@ namespace NervaOneWalletMiner.ViewsDialogs
 {
     public partial class MessageBoxView : Window
     {
+        // Not used but designer will complain without it
         public MessageBoxView()
         {
-            InitializeComponent();
+            InitializeComponent();         
         }
 
         public MessageBoxView(string title, string textMessage)
         {
-            InitializeComponent();
+            try
+            {
+                InitializeComponent();
 
-            Title = title;
-            tbkMessage.Text = textMessage;
+                Title = title;
+                tbkMessage.Text = textMessage;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("MBD.CONS", ex);
+            }
         }
 
         public void OkButton_Clicked(object sender, RoutedEventArgs args)
@@ -34,7 +42,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("MBWal.OBC", ex);
+                Logger.LogException("MBD.OKBC", ex);
             }
         }
 
@@ -51,7 +59,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("MBWal.CBC", ex);
+                Logger.LogException("MBD.CLBC", ex);
             }
         }
     }

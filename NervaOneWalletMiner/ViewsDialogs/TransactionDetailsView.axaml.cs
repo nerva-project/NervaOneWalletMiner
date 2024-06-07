@@ -13,19 +13,27 @@ namespace NervaOneWalletMiner.ViewsDialogs
         private string _transactionId = string.Empty;
         private uint _accountIndex = 0;
 
+        // Not used but designer will complain without it
         public TransactionDetailsView()
         {
             InitializeComponent();
         }
-
+        
         public TransactionDetailsView(string transactionId, uint accountIndex)
         {
-            InitializeComponent();
+            try
+            {
+                InitializeComponent();
 
-            _transactionId = transactionId;
-            _accountIndex = accountIndex;
+                _transactionId = transactionId;
+                _accountIndex = accountIndex;
 
-            GetAndShowTransactionDetails();
+                GetAndShowTransactionDetails();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("TDD.CONS", ex);
+            }
         }
 
         private async void GetAndShowTransactionDetails()
@@ -41,7 +49,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
 
                 if (response.Error.IsError)
                 {
-                    Logger.LogError("WalSV.RFK", "Failed to get transaction by ID. Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+                    Logger.LogError("TDD.GSTD", "Failed to get transaction by ID. Message: " + response.Error.Message + " | Code: " + response.Error.Code);
                 }
                 else
                 {
@@ -74,7 +82,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("TDVWal.GASTD", ex);
+                Logger.LogException("TDD.GSTD", ex);
             }
         }
 
@@ -91,7 +99,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("TDVWal.CBC", ex);
+                Logger.LogException("TDD.CLBC", ex);
             }
         }
 
@@ -103,7 +111,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("NWal.CYAC", ex);
+                Logger.LogException("TDD.CYAC", ex);
             }
         }
 
@@ -115,7 +123,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("NWal.CTIC", ex);
+                Logger.LogException("TDD.CTIC", ex);
             }
         }
     }

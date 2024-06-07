@@ -11,12 +11,19 @@ namespace NervaOneWalletMiner.ViewsDialogs
     {
         public CreateWalletView()
         {
-            InitializeComponent();
+            try
+            {
+                InitializeComponent();
 
-            var cbxLanguage = this.Get<ComboBox>("cbxLanguage");
+                var cbxLanguage = this.Get<ComboBox>("cbxLanguage");
 
-            cbxLanguage.ItemsSource = GlobalMethods.GetSupportedLanguages();
-            cbxLanguage.SelectedIndex = 0;
+                cbxLanguage.ItemsSource = GlobalMethods.GetSupportedLanguages();
+                cbxLanguage.SelectedIndex = 0;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("CWD.CONS", ex);
+            }
         }
 
         public void OkButtonClicked(object sender, RoutedEventArgs args)
@@ -47,7 +54,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("NWal.OBC", ex);
+                Logger.LogException("CWD.OKBC", ex);
             }
         }
 
@@ -64,7 +71,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("NWal.CBC", ex);
+                Logger.LogException("CWD.CLBC", ex);
             }
         }
 
@@ -90,7 +97,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("NWal.SHPBC", ex);
+                Logger.LogException("CWD.SHPC", ex);
             }
         }
     }

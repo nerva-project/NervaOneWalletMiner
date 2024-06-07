@@ -10,7 +10,14 @@ namespace NervaOneWalletMiner.ViewsDialogs
     {
         public RestartWithCommandView()
         {
-            InitializeComponent();
+            try
+            {
+                InitializeComponent();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("RCD.CONS", ex);
+            }            
         }
 
         public void OkButtonClicked(object sender, RoutedEventArgs args)
@@ -29,7 +36,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("RWCDem.OBC", ex);
+                Logger.LogException("RCD.OKBC", ex);
             }
         }
 
@@ -46,7 +53,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("RWCDem.CBC", ex);
+                Logger.LogException("RCD.CLBC", ex);
             }
         }
     }

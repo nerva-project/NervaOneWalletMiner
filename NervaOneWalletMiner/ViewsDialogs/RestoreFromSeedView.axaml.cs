@@ -11,12 +11,19 @@ namespace NervaOneWalletMiner.ViewsDialogs
     {
         public RestoreFromSeedView()
         {
-            InitializeComponent();
+            try
+            {
+                InitializeComponent();
 
-            var cbxLanguage = this.Get<ComboBox>("cbxLanguage");
+                var cbxLanguage = this.Get<ComboBox>("cbxLanguage");
 
-            cbxLanguage.ItemsSource = GlobalMethods.GetSupportedLanguages();
-            cbxLanguage.SelectedIndex = 0;
+                cbxLanguage.ItemsSource = GlobalMethods.GetSupportedLanguages();
+                cbxLanguage.SelectedIndex = 0;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("RSD.CONS", ex);
+            }
         }
 
         public void OkButtonClicked(object sender, RoutedEventArgs args)
@@ -53,7 +60,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("RFSWal.OBC", ex);
+                Logger.LogException("RSD.OKBC", ex);
             }
         }
 
@@ -70,7 +77,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("RFSWal.CBC", ex);
+                Logger.LogException("RSD.CLBC", ex);
             }
         }
 
@@ -96,7 +103,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("RFSWal.SHPBC", ex);
+                Logger.LogException("RSD.SHPC", ex);
             }
         }
     }

@@ -13,11 +13,18 @@ namespace NervaOneWalletMiner.ViewsDialogs
     {
         public DisplayKeysSeedView()
         {
-            InitializeComponent();
+            try
+            {
+                InitializeComponent();
 
-            // TODO: Check if wallet open and show error if not
+                // TODO: Check if wallet open and show error if not
 
-            GetAndShowKeys();
+                GetAndShowKeys();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DKD.CONS", ex);
+            }
         }
 
         private async void GetAndShowKeys()
@@ -30,7 +37,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
 
                 if (response.Error.IsError)
                 {
-                    Logger.LogError("WalSV.RFK", "Failed to query keys for " + GlobalData.OpenedWalletName + " | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+                    Logger.LogError("DKD.GASK", "Failed to query keys for " + GlobalData.OpenedWalletName + " | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
                 }
                 else
                 {
@@ -45,7 +52,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     response = await GlobalData.WalletService.QueryKey(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new QueryKeyRequest() { KeyType = KeyType.Mnemonic });
                     if (response.Error.IsError)
                     {
-                        Logger.LogError("WalSV.RFK", "Failed to query mnemonic seed for " + GlobalData.OpenedWalletName + " | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+                        Logger.LogError("DKD.GASK", "Failed to query mnemonic seed for " + GlobalData.OpenedWalletName + " | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
                     }
                     else
                     {
@@ -56,7 +63,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("DKSWal.GASK", ex);
+                Logger.LogException("DKD.GASK", ex);
             }
         }
 
@@ -80,7 +87,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("DKSWal.CBC", ex);
+                Logger.LogException("DKD.CLBC", ex);
             }
         }
     }
