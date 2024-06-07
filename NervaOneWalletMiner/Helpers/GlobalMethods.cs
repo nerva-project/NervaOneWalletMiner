@@ -36,43 +36,50 @@ namespace NervaOneWalletMiner.Helpers
         #region Directories, Paths and Names
         public static string GetDataDir()
         {
-            string dataDirectory;
+            string dataDirectory = string.Empty;
 
-            // Get data directory
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            try
             {
-                string? homeDir = Environment.GetEnvironmentVariable("HOME");
-                if (homeDir != null)
+                // Get data directory
+                if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    dataDirectory = Path.Combine(homeDir, GlobalData.AppName);
+                    string? homeDir = Environment.GetEnvironmentVariable("HOME");
+                    if (homeDir != null)
+                    {
+                        dataDirectory = Path.Combine(homeDir, GlobalData.AppName);
+                    }
+                    else
+                    {
+                        throw new DirectoryNotFoundException("Non-Windows dir not found");
+                    }
                 }
                 else
                 {
-                    throw new DirectoryNotFoundException("Non-Windows dir not found");
+                    string? appdataDir = Environment.GetEnvironmentVariable("APPDATA");
+                    if (appdataDir != null)
+                    {
+                        dataDirectory = Path.Combine(appdataDir, GlobalData.AppName);
+                    }
+                    else
+                    {
+                        throw new DirectoryNotFoundException("Windows dir not found");
+                    }
                 }
-            }
-            else
-            {
-                string? appdataDir = Environment.GetEnvironmentVariable("APPDATA");
-                if (appdataDir != null)
-                {
-                    dataDirectory = Path.Combine(appdataDir, GlobalData.AppName);
-                }
-                else
-                {
-                    throw new DirectoryNotFoundException("Windows dir not found");
-                }
-            }
 
-            // Create data directory if it does not exist
-            if (!Directory.Exists(dataDirectory))
-            {
-                Directory.CreateDirectory(dataDirectory);
-            }
+                // Create data directory if it does not exist
+                if (!Directory.Exists(dataDirectory))
+                {
+                    Directory.CreateDirectory(dataDirectory);
+                }
 
-            if(!Directory.Exists(dataDirectory))
+                if (!Directory.Exists(dataDirectory))
+                {
+                    throw new Exception("Data directory not set up. Application cannot continue");
+                }                
+            }
+            catch (Exception ex)
             {
-                throw new Exception("Data directory not set up. Application cannot continue");
+                Logger.LogException("GLM.GDDR", ex);
             }
 
             return dataDirectory;
@@ -80,62 +87,83 @@ namespace NervaOneWalletMiner.Helpers
 
         public static string GetLogDir()
         {
-            string logDirectory;
+            string logDirectory = string.Empty;
 
-            if (Directory.Exists(GlobalData.DataDir))
+            try
             {
-                // Create logs directory if it does not exist
-                logDirectory = Path.Combine(GlobalData.DataDir, GlobalData.LogsDirName);
-                if (!Directory.Exists(logDirectory))
+                if (Directory.Exists(GlobalData.DataDir))
                 {
-                    Directory.CreateDirectory(logDirectory);
+                    // Create logs directory if it does not exist
+                    logDirectory = Path.Combine(GlobalData.DataDir, GlobalData.LogsDirName);
+                    if (!Directory.Exists(logDirectory))
+                    {
+                        Directory.CreateDirectory(logDirectory);
+                    }
+                }
+                else
+                {
+                    throw new Exception("Data directory not set up. Application cannot continue");
                 }
             }
-            else
+            catch (Exception ex)
             {
-                throw new Exception("Data directory not set up. Application cannot continue");
+                Logger.LogException("GLM.GLDR", ex);
             }
-
+            
             return logDirectory;
         }
 
         public static string GetWalletDir()
         {
-            string walletDirectory;
+            string walletDirectory = string.Empty;
 
-            if (Directory.Exists(GlobalData.DataDir))
+            try
             {
-                // Create logs directory if it does not exist
-                walletDirectory = Path.Combine(GlobalData.DataDir, GlobalData.MainCoinsDirName, GlobalData.CoinDirName, GlobalData.WalletDirName);
-                if (!Directory.Exists(walletDirectory))
+                if (Directory.Exists(GlobalData.DataDir))
                 {
-                    Directory.CreateDirectory(walletDirectory);
+                    // Create logs directory if it does not exist
+                    walletDirectory = Path.Combine(GlobalData.DataDir, GlobalData.MainCoinsDirName, GlobalData.CoinDirName, GlobalData.WalletDirName);
+                    if (!Directory.Exists(walletDirectory))
+                    {
+                        Directory.CreateDirectory(walletDirectory);
+                    }
+                }
+                else
+                {
+                    throw new Exception("Data directory not set up. Application cannot continue");
                 }
             }
-            else
+            catch (Exception ex)
             {
-                throw new Exception("Data directory not set up. Application cannot continue");
+                Logger.LogException("GLM.GWDR", ex);
             }
-
+            
             return walletDirectory;
         }
 
         public static string GetCliToolsDir()
         {
-            string cliToolsDirectory;
+            string cliToolsDirectory = string.Empty;
 
-            if (Directory.Exists(GlobalData.DataDir))
+            try
             {
-                // Create logs directory if it does not exist
-                cliToolsDirectory = Path.Combine(GlobalData.DataDir, GlobalData.MainCoinsDirName, GlobalData.CoinDirName, GlobalData.CliToolsDirName);
-                if (!Directory.Exists(cliToolsDirectory))
+                if (Directory.Exists(GlobalData.DataDir))
                 {
-                    Directory.CreateDirectory(cliToolsDirectory);
+                    // Create logs directory if it does not exist
+                    cliToolsDirectory = Path.Combine(GlobalData.DataDir, GlobalData.MainCoinsDirName, GlobalData.CoinDirName, GlobalData.CliToolsDirName);
+                    if (!Directory.Exists(cliToolsDirectory))
+                    {
+                        Directory.CreateDirectory(cliToolsDirectory);
+                    }
+                }
+                else
+                {
+                    throw new Exception("Data directory not set up. Application cannot continue");
                 }
             }
-            else
+            catch (Exception ex)
             {
-                throw new Exception("Data directory not set up. Application cannot continue");
+                Logger.LogException("GLM.GCTD", ex);
             }
 
             return cliToolsDirectory;
@@ -163,8 +191,15 @@ namespace NervaOneWalletMiner.Helpers
         {
             Dictionary<string, ICoinSettings> defaultSettings = [];
 
-            defaultSettings.Add(Coin.XNV, new CoinSettingsXNV());
-            defaultSettings.Add(Coin.XMR, new CoinSettingsXMR());
+            try
+            {
+                defaultSettings.Add(Coin.XNV, new CoinSettingsXNV());
+                defaultSettings.Add(Coin.XMR, new CoinSettingsXMR());
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("GLM.GDCS", ex);
+            }
 
             return defaultSettings;
         }
@@ -177,23 +212,32 @@ namespace NervaOneWalletMiner.Helpers
 
             Dictionary<string, SettingsDaemon> daemonSettings = [];
 
-            daemonSettings.Add(Coin.XNV, new SettingsDaemon() { 
-                BlockSeconds = GlobalData.CoinSettings[Coin.XNV].BlockSeconds,
-                LogLevel = GlobalData.CoinSettings[Coin.XNV].LogLevelDaemon,
-                Rpc = new RpcBase() { 
-                    Port = GlobalData.CoinSettings[Coin.XNV].DaemonPort
-                }
-            });
-
-            daemonSettings.Add(Coin.XMR, new SettingsDaemon()
+            try
             {
-                BlockSeconds = GlobalData.CoinSettings[Coin.XMR].BlockSeconds,
-                LogLevel = GlobalData.CoinSettings[Coin.XMR].LogLevelDaemon,
-                Rpc = new RpcBase()
+                daemonSettings.Add(Coin.XNV, new SettingsDaemon()
                 {
-                    Port = GlobalData.CoinSettings[Coin.XMR].DaemonPort
-                }
-            });
+                    BlockSeconds = GlobalData.CoinSettings[Coin.XNV].BlockSeconds,
+                    LogLevel = GlobalData.CoinSettings[Coin.XNV].LogLevelDaemon,
+                    Rpc = new RpcBase()
+                    {
+                        Port = GlobalData.CoinSettings[Coin.XNV].DaemonPort
+                    }
+                });
+
+                daemonSettings.Add(Coin.XMR, new SettingsDaemon()
+                {
+                    BlockSeconds = GlobalData.CoinSettings[Coin.XMR].BlockSeconds,
+                    LogLevel = GlobalData.CoinSettings[Coin.XMR].LogLevelDaemon,
+                    Rpc = new RpcBase()
+                    {
+                        Port = GlobalData.CoinSettings[Coin.XMR].DaemonPort
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("GLM.GDST", ex);
+            }
 
             return daemonSettings;
         }
@@ -207,104 +251,118 @@ namespace NervaOneWalletMiner.Helpers
 
             Dictionary<string, SettingsWallet> walletSettings = [];
 
-            walletSettings.Add(Coin.XNV, new SettingsWallet()
+            try
             {
-                DisplayUnits = GlobalData.CoinSettings[Coin.XNV].DisplayUnits,
-                LogLevel = GlobalData.CoinSettings[Coin.XNV].LogLevelDaemon,
-                Rpc = new RpcBase()
+                walletSettings.Add(Coin.XNV, new SettingsWallet()
                 {
-                    Port = (uint)GlobalData.RandomGenerator.Next(10000, 50000)
-                }
-            });
+                    DisplayUnits = GlobalData.CoinSettings[Coin.XNV].DisplayUnits,
+                    LogLevel = GlobalData.CoinSettings[Coin.XNV].LogLevelDaemon,
+                    Rpc = new RpcBase()
+                    {
+                        Port = (uint)GlobalData.RandomGenerator.Next(10000, 50000)
+                    }
+                });
 
-            walletSettings.Add(Coin.XMR, new SettingsWallet()
-            {
-                DisplayUnits = GlobalData.CoinSettings[Coin.XMR].DisplayUnits,
-                LogLevel = GlobalData.CoinSettings[Coin.XMR].LogLevelDaemon,
-                Rpc = new RpcBase()
+                walletSettings.Add(Coin.XMR, new SettingsWallet()
                 {
-                    Port = (uint)GlobalData.RandomGenerator.Next(10000, 50000)
-                }
-            });
+                    DisplayUnits = GlobalData.CoinSettings[Coin.XMR].DisplayUnits,
+                    LogLevel = GlobalData.CoinSettings[Coin.XMR].LogLevelDaemon,
+                    Rpc = new RpcBase()
+                    {
+                        Port = (uint)GlobalData.RandomGenerator.Next(10000, 50000)
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("GLM.GWST", ex);
+            }
 
             return walletSettings;
         }
 
         public static void SetCoin(string newCoin)
         {
-            // TODO: Need to do certain tings when switching coins. RpcConnection? Wallet?
-
-            switch(newCoin)
+            try
             {
-                case Coin.XMR:
-                    Logger.LogDebug("GM.SC", "Setting up: " + Coin.XMR);
-                    GlobalData.CoinDirName = Coin.XMR;
-                    GlobalData.AppSettings.ActiveCoin = Coin.XMR;                   
-                    GlobalData.CliToolsDir = GetCliToolsDir();
-                    GlobalData.WalletDir = GetWalletDir();
+                // TODO: Need to do certain tings when switching coins. RpcConnection? Wallet?
 
-                    GlobalData.WalletProcessName = GetWalletProcessName();
-                    GlobalData.DaemonProcessName = GetDaemonProcessName();
-                    GlobalData.Logo = GetLogo();
-
-                    GlobalData.DaemonService = new DaemonServiceXMR();
-                    GlobalData.WalletService = new WalletServiceXMR();
-
-                    // TODO: Change this. App.config overwrites GetDaemonSettings with 0
-                    if (GlobalData.AppSettings.Daemon[Coin.XMR].BlockSeconds != GlobalData.CoinSettings[Coin.XMR].BlockSeconds)
-                    {
-                        GlobalData.AppSettings.Daemon[Coin.XMR].BlockSeconds = GlobalData.CoinSettings[Coin.XMR].BlockSeconds;
-                    }
-                    if (GlobalData.AppSettings.Daemon[Coin.XMR].LogLevel != GlobalData.CoinSettings[Coin.XMR].LogLevelDaemon)
-                    {
-                        GlobalData.AppSettings.Daemon[Coin.XMR].LogLevel = GlobalData.CoinSettings[Coin.XMR].LogLevelDaemon;
-                    }
-                    if (GlobalData.AppSettings.Wallet[Coin.XMR].DisplayUnits != GlobalData.CoinSettings[Coin.XMR].DisplayUnits)
-                    {
-                        GlobalData.AppSettings.Wallet[Coin.XMR].DisplayUnits = GlobalData.CoinSettings[Coin.XMR].DisplayUnits;
-                    }
-                    if (GlobalData.AppSettings.Wallet[Coin.XMR].LogLevel != GlobalData.CoinSettings[Coin.XMR].LogLevelWallet)
-                    {
-                        GlobalData.AppSettings.Wallet[Coin.XMR].LogLevel = GlobalData.CoinSettings[Coin.XMR].LogLevelWallet;
-                    }
-                    break;
-
-                default:
-                    // XNV or anything else not supported
-                    Logger.LogDebug("GM.SC", "Setting up: " + Coin.XNV);
-                    GlobalData.CoinDirName = Coin.XNV;
-                    GlobalData.AppSettings.ActiveCoin = Coin.XNV;
-                    GlobalData.CliToolsDir = GetCliToolsDir();
-                    GlobalData.WalletDir = GetWalletDir();
-
-                    GlobalData.WalletProcessName = GetWalletProcessName();
-                    GlobalData.DaemonProcessName = GetDaemonProcessName();
-                    GlobalData.Logo = GetLogo();
-
-                    GlobalData.DaemonService = new DaemonServiceXNV();
-                    GlobalData.WalletService = new WalletServiceXNV();
-
-                    // TODO: Change this. App.config overwrites GetDaemonSettings() with default 0
-                    if (GlobalData.AppSettings.Daemon[Coin.XNV].BlockSeconds != GlobalData.CoinSettings[Coin.XNV].BlockSeconds)
-                    {
-                        GlobalData.AppSettings.Daemon[Coin.XNV].BlockSeconds = GlobalData.CoinSettings[Coin.XNV].BlockSeconds;
-                    }
-                    break;
-            }
-
-            Logger.LogDebug("GM.SC", "Coin set up: " + GlobalData.AppSettings.ActiveCoin);
-
-
-            // Download CLI tools, if we do not have them already
-            if (!DirectoryContainsCliTools(GlobalData.CliToolsDir))
-            {
-                string cliToolsLink = GetCliToolsDownloadLink();
-                Logger.LogDebug("GM.SC", "CLI tools not found. Attempting to download from: " + cliToolsLink);
-                if (!string.IsNullOrEmpty(cliToolsLink))
+                switch (newCoin)
                 {
-                    SetUpCliTools(cliToolsLink, GlobalData.CliToolsDir);
+                    case Coin.XMR:
+                        Logger.LogDebug("GLM.STCN", "Setting up: " + Coin.XMR);
+                        GlobalData.CoinDirName = Coin.XMR;
+                        GlobalData.AppSettings.ActiveCoin = Coin.XMR;
+                        GlobalData.CliToolsDir = GetCliToolsDir();
+                        GlobalData.WalletDir = GetWalletDir();
+
+                        GlobalData.WalletProcessName = GetWalletProcessName();
+                        GlobalData.DaemonProcessName = GetDaemonProcessName();
+                        GlobalData.Logo = GetLogo();
+
+                        GlobalData.DaemonService = new DaemonServiceXMR();
+                        GlobalData.WalletService = new WalletServiceXMR();
+
+                        // TODO: Change this. App.config overwrites GetDaemonSettings with 0
+                        if (GlobalData.AppSettings.Daemon[Coin.XMR].BlockSeconds != GlobalData.CoinSettings[Coin.XMR].BlockSeconds)
+                        {
+                            GlobalData.AppSettings.Daemon[Coin.XMR].BlockSeconds = GlobalData.CoinSettings[Coin.XMR].BlockSeconds;
+                        }
+                        if (GlobalData.AppSettings.Daemon[Coin.XMR].LogLevel != GlobalData.CoinSettings[Coin.XMR].LogLevelDaemon)
+                        {
+                            GlobalData.AppSettings.Daemon[Coin.XMR].LogLevel = GlobalData.CoinSettings[Coin.XMR].LogLevelDaemon;
+                        }
+                        if (GlobalData.AppSettings.Wallet[Coin.XMR].DisplayUnits != GlobalData.CoinSettings[Coin.XMR].DisplayUnits)
+                        {
+                            GlobalData.AppSettings.Wallet[Coin.XMR].DisplayUnits = GlobalData.CoinSettings[Coin.XMR].DisplayUnits;
+                        }
+                        if (GlobalData.AppSettings.Wallet[Coin.XMR].LogLevel != GlobalData.CoinSettings[Coin.XMR].LogLevelWallet)
+                        {
+                            GlobalData.AppSettings.Wallet[Coin.XMR].LogLevel = GlobalData.CoinSettings[Coin.XMR].LogLevelWallet;
+                        }
+                        break;
+
+                    default:
+                        // XNV or anything else not supported
+                        Logger.LogDebug("GLM.STCN", "Setting up: " + Coin.XNV);
+                        GlobalData.CoinDirName = Coin.XNV;
+                        GlobalData.AppSettings.ActiveCoin = Coin.XNV;
+                        GlobalData.CliToolsDir = GetCliToolsDir();
+                        GlobalData.WalletDir = GetWalletDir();
+
+                        GlobalData.WalletProcessName = GetWalletProcessName();
+                        GlobalData.DaemonProcessName = GetDaemonProcessName();
+                        GlobalData.Logo = GetLogo();
+
+                        GlobalData.DaemonService = new DaemonServiceXNV();
+                        GlobalData.WalletService = new WalletServiceXNV();
+
+                        // TODO: Change this. App.config overwrites GetDaemonSettings() with default 0
+                        if (GlobalData.AppSettings.Daemon[Coin.XNV].BlockSeconds != GlobalData.CoinSettings[Coin.XNV].BlockSeconds)
+                        {
+                            GlobalData.AppSettings.Daemon[Coin.XNV].BlockSeconds = GlobalData.CoinSettings[Coin.XNV].BlockSeconds;
+                        }
+                        break;
+                }
+
+                Logger.LogDebug("GLM.STCN", "Coin set up: " + GlobalData.AppSettings.ActiveCoin);
+
+
+                // Download CLI tools, if we do not have them already
+                if (!DirectoryContainsCliTools(GlobalData.CliToolsDir))
+                {
+                    string cliToolsLink = GetCliToolsDownloadLink();
+                    Logger.LogDebug("GLM.STCN", "CLI tools not found. Attempting to download from: " + cliToolsLink);
+                    if (!string.IsNullOrEmpty(cliToolsLink))
+                    {
+                        SetUpCliTools(cliToolsLink, GlobalData.CliToolsDir);
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                Logger.LogException("GLM.STCN", ex);
+            }            
         }
 
         public static string GetCliToolsDownloadLink()
@@ -359,7 +417,7 @@ namespace NervaOneWalletMiner.Helpers
             }
             catch (Exception ex)
             {
-                Logger.LogException("GM.GCTDL", ex);
+                Logger.LogException("GLM.GCDL", ex);
             }
             
             return cliDownloadLink;
@@ -367,27 +425,34 @@ namespace NervaOneWalletMiner.Helpers
 
         public static async void SetUpCliTools(string downloadUrl, string cliToolsPath)
         {
-            // Check if we already downloaded the CLI package
-            string destFileWithPath = Path.Combine(cliToolsPath, Path.GetFileName(downloadUrl));
-
-            if (File.Exists(destFileWithPath))
+            try
             {
-                Logger.LogDebug("GM.SUCT", "Extracting existing CLI tools: " + destFileWithPath);
+                // Check if we already downloaded the CLI package
+                string destFileWithPath = Path.Combine(cliToolsPath, Path.GetFileName(downloadUrl));
 
-                ExtractFile(cliToolsPath, destFileWithPath);
-            }
-            else
-            {
-                Logger.LogDebug("GM.SUCT", "Downloading CLI tools. URL: " + downloadUrl);
-
-                bool isSuccess = await DownloadFileToFolder(downloadUrl, cliToolsPath);
-
-                if(isSuccess)
+                if (File.Exists(destFileWithPath))
                 {
-                    Logger.LogDebug("GM.SUCT", "Extracting CLI tools after download: " + destFileWithPath);
+                    Logger.LogDebug("GLM.SUCT", "Extracting existing CLI tools: " + destFileWithPath);
+
                     ExtractFile(cliToolsPath, destFileWithPath);
                 }
+                else
+                {
+                    Logger.LogDebug("GLM.SUCT", "Downloading CLI tools. URL: " + downloadUrl);
+
+                    bool isSuccess = await DownloadFileToFolder(downloadUrl, cliToolsPath);
+
+                    if (isSuccess)
+                    {
+                        Logger.LogDebug("GLM.SUCT", "Extracting CLI tools after download: " + destFileWithPath);
+                        ExtractFile(cliToolsPath, destFileWithPath);
+                    }
+                }
             }
+            catch (Exception ex)
+            {
+                Logger.LogException("GLM.SUCT", ex);
+            }            
         }
 
         public static async Task<bool> DownloadFileToFolder(string downloadUrl, string destinationDir)
@@ -403,7 +468,7 @@ namespace NervaOneWalletMiner.Helpers
 
                 string destFile = Path.Combine(destinationDir, Path.GetFileName(downloadUrl));
 
-                Logger.LogDebug("GM.DFTF", "Downloading file: " + downloadUrl + " to: " + destFile);
+                Logger.LogDebug("GLM.DFTF", "Downloading file: " + downloadUrl + " to: " + destFile);
                 using (HttpClient client = new())
                 {
                     using (var clientStream = await client.GetStreamAsync(downloadUrl))
@@ -411,7 +476,7 @@ namespace NervaOneWalletMiner.Helpers
                         using (var fileStream = new FileStream(destFile, FileMode.Create))
                         {
                             await clientStream.CopyToAsync(fileStream);
-                            Logger.LogDebug("GM.DFTF", "Setting success for: " + downloadUrl);
+                            Logger.LogDebug("GLM.DFTF", "Setting success for: " + downloadUrl);
                             isSuccess = true;
                         }
                     }
@@ -419,7 +484,7 @@ namespace NervaOneWalletMiner.Helpers
             }
             catch (Exception ex)
             {
-                Logger.LogException("GM.DFTF", ex);
+                Logger.LogException("GLM.DFTF", ex);
             }
 
             return isSuccess;
@@ -429,7 +494,7 @@ namespace NervaOneWalletMiner.Helpers
         {
             try
             {
-                Logger.LogDebug("GM.EF", "Closing Daemon and Wallet processes");
+                Logger.LogDebug("GLM.EXFL", "Closing Daemon and Wallet processes");
                 while (DaemonProcess.IsRunning())
                 {
                     DaemonProcess.ForceClose();
@@ -442,14 +507,14 @@ namespace NervaOneWalletMiner.Helpers
                     Thread.Sleep(1000);
                 }
 
-                Logger.LogDebug("GM.EF", "Extracting CLI tools");
+                Logger.LogDebug("GLM.EXFL", "Extracting CLI tools");
 
                 ZipArchive archive = ZipFile.Open(destFile, ZipArchiveMode.Read);
                 foreach (var entry in archive.Entries)
                 {
                     if (!string.IsNullOrEmpty(entry.Name))
                     {
-                        Logger.LogDebug("GM.EF", "Extracting: " + entry.Name);
+                        Logger.LogDebug("GLM.EXFL", "Extracting: " + entry.Name);
                         string extFile = Path.Combine(destDir, entry.Name);
                         entry.ExtractToFile(extFile, true);
 #if UNIX
@@ -460,23 +525,30 @@ namespace NervaOneWalletMiner.Helpers
             }
             catch (Exception ex)
             {
-                Logger.LogException("GM.EF", ex);
+                Logger.LogException("GLM.EXFL", ex);
             }
         }
 
         public static string GetDaemonProcessName()
         {
-            string daemonProcess;
+            string daemonProcess = string.Empty;
 
-            switch (GlobalData.AppSettings.ActiveCoin)
+            try
             {
-                case Coin.XMR:
-                    daemonProcess = GlobalMethods.IsWindows()? "monerod.exe" : "monerod";
-                    break;
-                default:
-                    // XNV or anything else not supported
-                    daemonProcess = GlobalMethods.IsWindows()? "nervad.exe" : "nervad";
-                    break;
+                switch (GlobalData.AppSettings.ActiveCoin)
+                {
+                    case Coin.XMR:
+                        daemonProcess = GlobalMethods.IsWindows() ? "monerod.exe" : "monerod";
+                        break;
+                    default:
+                        // XNV or anything else not supported
+                        daemonProcess = GlobalMethods.IsWindows() ? "nervad.exe" : "nervad";
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("GLM.GDPN", ex);
             }
 
             return daemonProcess;
@@ -484,17 +556,24 @@ namespace NervaOneWalletMiner.Helpers
 
         public static string GetWalletProcessName()
         {
-            string walletProcess;
+            string walletProcess = string.Empty;
 
-            switch (GlobalData.AppSettings.ActiveCoin)
+            try
             {
-                case Coin.XMR:
-                    walletProcess = GlobalMethods.IsWindows() ? "monero-wallet-rpc.exe" : "monero-wallet-rpc";
-                    break;
-                default:
-                    // XNV or anything else not supported
-                    walletProcess = GlobalMethods.IsWindows() ? "nerva-wallet-rpc.exe" : "nerva-wallet-rpc";
-                    break;
+                switch (GlobalData.AppSettings.ActiveCoin)
+                {
+                    case Coin.XMR:
+                        walletProcess = GlobalMethods.IsWindows() ? "monero-wallet-rpc.exe" : "monero-wallet-rpc";
+                        break;
+                    default:
+                        // XNV or anything else not supported
+                        walletProcess = GlobalMethods.IsWindows() ? "nerva-wallet-rpc.exe" : "nerva-wallet-rpc";
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("GLM.GWPN", ex);
             }
 
             return walletProcess;
@@ -552,7 +631,7 @@ namespace NervaOneWalletMiner.Helpers
             }
             catch (Exception ex)
             {
-                Logger.LogException("GM.SC", ex);
+                Logger.LogException("GLM.SVCF", ex);
             }
         }
 
@@ -575,7 +654,7 @@ namespace NervaOneWalletMiner.Helpers
             }
             catch (Exception ex)
             {
-                Logger.LogException("GM.LC", ex);
+                Logger.LogException("GLM.LDCF", ex);
             }
         }
 
@@ -603,7 +682,7 @@ namespace NervaOneWalletMiner.Helpers
             }
             catch (Exception ex)
             {
-                Logger.LogException("GM.LAB", ex);
+                Logger.LogException("GLM.LDAB", ex);
             }
         }
 
@@ -620,7 +699,7 @@ namespace NervaOneWalletMiner.Helpers
             }
             catch (Exception ex)
             {
-                Logger.LogException("GM.SAB", ex);
+                Logger.LogException("GLM.SVAB", ex);
             }
         }
 
@@ -657,7 +736,7 @@ namespace NervaOneWalletMiner.Helpers
             }
             catch (Exception)
             {
-                Logger.LogError("GM.CLF", $"Cannot cycle log file. New log will be written to {logFile}");
+                Logger.LogError("GLM.CLFL", "Cannot cycle log file. New log will be written to " + logFile);
                 return logFile;
             }
 
@@ -718,7 +797,7 @@ namespace NervaOneWalletMiner.Helpers
             }
             catch (Exception ex)
             {
-                Logger.LogException("GM.GSL", ex);
+                Logger.LogException("GLM.GTSL", ex);
             }
 
             return languages;
@@ -734,7 +813,7 @@ namespace NervaOneWalletMiner.Helpers
                     ThreadCount = threads
                 };
 
-                Logger.LogDebug("GM.StMA", "Calling StartMining. Address: " + GlobalMethods.GetShorterString(request.MiningAddress, 12) + " | Threads: " + request.ThreadCount);
+                Logger.LogDebug("GLM.STMA", "Calling StartMining. Address: " + GlobalMethods.GetShorterString(request.MiningAddress, 12) + " | Threads: " + request.ThreadCount);
                 StartMiningResponse response = await GlobalData.DaemonService.StartMining(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, request);
                 if (response.Error.IsError)
                 {
@@ -747,7 +826,7 @@ namespace NervaOneWalletMiner.Helpers
             }
             catch (Exception ex)
             {
-                Logger.LogException("GM.StMA", ex);
+                Logger.LogException("GLM.STMA", ex);
             }
         }
 
@@ -757,7 +836,7 @@ namespace NervaOneWalletMiner.Helpers
             {
                 StopMiningRequest request = new();
 
-                Logger.LogDebug("GM.SpMA", "Calling StopMining.");
+                Logger.LogDebug("GLM.SPMA", "Calling StopMining.");
                 StopMiningResponse response = await GlobalData.DaemonService.StopMining(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, request);
                 if (response.Error.IsError)
                 {
@@ -770,7 +849,7 @@ namespace NervaOneWalletMiner.Helpers
             }
             catch (Exception ex)
             {
-                Logger.LogException("GM.SpMA", ex);
+                Logger.LogException("GLM.SPMA", ex);
             }
         }
 
@@ -782,16 +861,16 @@ namespace NervaOneWalletMiner.Helpers
 
                 if (resStore.Error.IsError)
                 {
-                    Logger.LogError("GM.SW", "Error saving wallet: " + GlobalData.OpenedWalletName + ". Code: " + resStore.Error.Code + ", Message: " + resStore.Error.Message);
+                    Logger.LogError("GLM.SVWT", "Error saving wallet: " + GlobalData.OpenedWalletName + ". Code: " + resStore.Error.Code + ", Message: " + resStore.Error.Message);
                 }
                 else
                 {
-                    Logger.LogDebug("GM.SW", "Wallet " + GlobalData.OpenedWalletName + " saved!");
+                    Logger.LogDebug("GLM.SVWT", "Wallet " + GlobalData.OpenedWalletName + " saved!");
                 }
             }
             catch (Exception ex)
             {
-                Logger.LogException("GM.SW", ex);
+                Logger.LogException("GLM.SVWT", ex);
             }
         }
 
@@ -804,7 +883,7 @@ namespace NervaOneWalletMiner.Helpers
 
                 if (resGetAccounts.Error.IsError)
                 {
-                    Logger.LogError("GM.WUU", "GetAccounts Error Code: " + resGetAccounts.Error.Code + ", Message: " + resGetAccounts.Error.Message);
+                    Logger.LogError("GLM.WUIU", "GetAccounts Error Code: " + resGetAccounts.Error.Code + ", Message: " + resGetAccounts.Error.Message);
                 }
                 else
                 {
@@ -824,7 +903,7 @@ namespace NervaOneWalletMiner.Helpers
             }
             catch (Exception ex)
             {
-                Logger.LogException("GM.WUU", ex);
+                Logger.LogException("GLM.WUIU", ex);
             }
         }
 
@@ -855,7 +934,7 @@ namespace NervaOneWalletMiner.Helpers
             }
             catch (Exception ex)
             {
-                Logger.LogException("GM.CTC", ex);
+                Logger.LogException("GLM.CTCL", ex);
             }
         }
     }
