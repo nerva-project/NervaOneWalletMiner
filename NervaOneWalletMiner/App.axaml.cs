@@ -21,36 +21,43 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-        // Want those before UI loads
-        GlobalMethods.LoadConfig();
-
-        SetUpDefaults();
-
-        Logger.SetUpLogger();
-
-        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        try
         {
-            desktop.Exit += OnExit;
-            desktop.MainWindow = new MainWindow
-            {
-                DataContext = new MainViewModel()
-            };
-        }
-        else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
-        {
-            singleViewPlatform.MainView = new MainView
-            {
-                DataContext = new MainViewModel()
-            };
-        }
+            // Want those before UI loads
+            GlobalMethods.LoadConfig();
 
-        base.OnFrameworkInitializationCompleted();
-        Logger.LogDebug("App.IC", "Initialization completed");
+            SetUpDefaults();
+
+            Logger.SetUpLogger();
+
+            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                desktop.Exit += OnExit;
+                desktop.MainWindow = new MainWindow
+                {
+                    DataContext = new MainViewModel()
+                };
+            }
+            else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
+            {
+                singleViewPlatform.MainView = new MainView
+                {
+                    DataContext = new MainViewModel()
+                };
+            }
+
+            base.OnFrameworkInitializationCompleted();
+            Logger.LogDebug("APP.OFIC", "Initialization completed");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException("APP.OFIC", ex);
+        }       
     }
 
     private void OnExit(object? sender, ControlledApplicationLifetimeExitEventArgs e)
     {
-        Logger.LogDebug("App.AE", "Exiting...");
+        Logger.LogDebug("APP.OE01", "Exiting...");
 
         Shutdown();
     }
@@ -64,23 +71,23 @@ public partial class App : Application
                 ForceWalletClose();
             }
 
-            Logger.LogDebug("App.SD", "Forcing wallet process close.");
+            Logger.LogDebug("APP.SD01", "Forcing wallet process close.");
             WalletProcess.ForceClose();
 
             if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopOnExit)
             {
                 ForceDaemonStop();
 
-                Logger.LogDebug("App.SD", "Forcing daemon process close.");
+                Logger.LogDebug("APP.SD01", "Forcing daemon process close.");
                 DaemonProcess.ForceClose();
             }            
         }
         catch (Exception ex)
         {
-            Logger.LogException("App.SD", ex);
+            Logger.LogException("APP.SD01", ex);
         }
 
-        Logger.LogInfo("App.SD", "PROGRAM TERMINATED");
+        Logger.LogInfo("APP.SD01", "PROGRAM TERMINATED");
         Environment.Exit(0);
     }
 
@@ -88,12 +95,12 @@ public partial class App : Application
     {
         try
         {
-            Logger.LogDebug("App.FWC", "Closing wallet: " + GlobalData.OpenedWalletName);
+            Logger.LogDebug("APP.FWC1", "Closing wallet: " + GlobalData.OpenedWalletName);
             _ = await GlobalData.WalletService.CloseWallet(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new Rpc.Wallet.Requests.CloseWalletRequest());
         }
         catch (Exception ex)
         {
-            Logger.LogException("App.FWC", ex);
+            Logger.LogException("APP.FWC1", ex);
         }
     }
 
@@ -101,12 +108,12 @@ public partial class App : Application
     {
         try
         {
-            Logger.LogDebug("App.FDS", "Stopping Daemon.");
+            Logger.LogDebug("APP.FDS1", "Stopping Daemon.");
             _ = await GlobalData.DaemonService.StopDaemon(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new StopDaemonRequest());
         }
         catch (Exception ex)
         {
-            Logger.LogException("App.FDS", ex);
+            Logger.LogException("APP.FDS1", ex);
         }
     }
 
@@ -141,7 +148,7 @@ public partial class App : Application
         }
         catch (Exception ex)
         {
-            Logger.LogException("App.SUD", ex);
+            Logger.LogException("APP.SUD1", ex);
         }
     }
 }
