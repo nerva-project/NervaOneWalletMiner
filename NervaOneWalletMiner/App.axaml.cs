@@ -57,7 +57,7 @@ public partial class App : Application
 
     private void OnExit(object? sender, ControlledApplicationLifetimeExitEventArgs e)
     {
-        Logger.LogDebug("APP.OE01", "Exiting...");
+        Logger.LogDebug("APP.ONET", "Exiting...");
 
         Shutdown();
     }
@@ -71,23 +71,23 @@ public partial class App : Application
                 ForceWalletClose();
             }
 
-            Logger.LogDebug("APP.SD01", "Forcing wallet process close.");
+            Logger.LogDebug("APP.STDN", "Forcing wallet process close.");
             WalletProcess.ForceClose();
 
             if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopOnExit)
             {
                 ForceDaemonStop();
 
-                Logger.LogDebug("APP.SD01", "Forcing daemon process close.");
+                Logger.LogDebug("APP.STDN", "Forcing daemon process close.");
                 DaemonProcess.ForceClose();
             }            
         }
         catch (Exception ex)
         {
-            Logger.LogException("APP.SD01", ex);
+            Logger.LogException("APP.STDN", ex);
         }
 
-        Logger.LogInfo("APP.SD01", "PROGRAM TERMINATED");
+        Logger.LogInfo("APP.STDN", "PROGRAM TERMINATED");
         Environment.Exit(0);
     }
 
@@ -95,12 +95,12 @@ public partial class App : Application
     {
         try
         {
-            Logger.LogDebug("APP.FWC1", "Closing wallet: " + GlobalData.OpenedWalletName);
+            Logger.LogDebug("APP.FWCL", "Closing wallet: " + GlobalData.OpenedWalletName);
             _ = await GlobalData.WalletService.CloseWallet(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new Rpc.Wallet.Requests.CloseWalletRequest());
         }
         catch (Exception ex)
         {
-            Logger.LogException("APP.FWC1", ex);
+            Logger.LogException("APP.FWCL", ex);
         }
     }
 
@@ -108,12 +108,12 @@ public partial class App : Application
     {
         try
         {
-            Logger.LogDebug("APP.FDS1", "Stopping Daemon.");
+            Logger.LogDebug("APP.FDSP", "Stopping Daemon.");
             _ = await GlobalData.DaemonService.StopDaemon(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new StopDaemonRequest());
         }
         catch (Exception ex)
         {
-            Logger.LogException("APP.FDS1", ex);
+            Logger.LogException("APP.FDSP", ex);
         }
     }
 
@@ -148,7 +148,7 @@ public partial class App : Application
         }
         catch (Exception ex)
         {
-            Logger.LogException("APP.SUD1", ex);
+            Logger.LogException("APP.SUDF", ex);
         }
     }
 }
