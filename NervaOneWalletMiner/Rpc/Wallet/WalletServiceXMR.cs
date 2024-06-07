@@ -70,7 +70,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WOPW", ex);
+                Logger.LogException("RWXMR.OW", ex);
             }
 
             return responseObj;
@@ -121,7 +121,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WCLW", ex);
+                Logger.LogException("RWXMR.ClW", ex);
             }
 
             return responseObj;
@@ -182,7 +182,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WCRW", ex);
+                Logger.LogException("RWXMR.CrW", ex);
             }
 
             return responseObj;
@@ -240,7 +240,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WCRA", ex);
+                Logger.LogException("RWXMR.CrA", ex);
             }
 
             return responseObj;
@@ -304,7 +304,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WLAT", ex);
+                Logger.LogException("RWXMR.LA", ex);
             }
 
             return responseObj;
@@ -352,7 +352,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WSWT", ex);
+                Logger.LogException("RWXMR.SW", ex);
             }
 
             return responseObj;
@@ -427,7 +427,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WRFS", ex);
+                Logger.LogException("RWXMR.RFS", ex);
             }
 
             return responseObj;
@@ -511,7 +511,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WRFK", ex);
+                Logger.LogException("RWXMR.RFK", ex);
             }
 
             return responseObj;
@@ -603,7 +603,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WTRA", ex);
+                Logger.LogException("RWXMR.T", ex);
             }
 
             return responseObj;
@@ -713,7 +713,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WTRS", ex);
+                Logger.LogException("RWXMR.TS", ex);
             }
 
             return responseObj;
@@ -776,7 +776,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WRES", ex);
+                Logger.LogException("RWXMR.RS", ex);
             }
 
             return responseObj;
@@ -829,7 +829,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WRBN", ex);
+                Logger.LogException("RWXMR.RB", ex);
             }
 
             return responseObj;
@@ -891,7 +891,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WMIA", ex);
+                Logger.LogException("RWXMR.MIA", ex);
             }
 
             return responseObj;
@@ -970,7 +970,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WGTA", ex);
+                Logger.LogException("RWXMR.GA", ex);
             }
 
             return responseObj;
@@ -1114,7 +1114,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WGTF", ex);
+                Logger.LogException("RWXMR.GT", ex);
             }
 
             return responseObj;
@@ -1208,7 +1208,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WGTI", ex);
+                Logger.LogException("RWXMR.GTBT", ex);
             }
 
             return responseObj;
@@ -1265,7 +1265,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WGHT", ex);
+                Logger.LogException("RWXMR.GH", ex);
             }
 
             return responseObj;
@@ -1383,7 +1383,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WQUK", ex);
+                Logger.LogException("RWXMR.QK", ex);
             }
 
             return responseObj;

@@ -52,7 +52,7 @@ namespace NervaOneWalletMiner.Rpc.Common
             }
             catch (Exception ex)
             {
-                Logger.LogException("HTTP.GHER", ex);
+                Logger.LogException("HTTP.GHE", ex);
             }
 
             return httpError;
@@ -66,7 +66,7 @@ namespace NervaOneWalletMiner.Rpc.Common
             {
                 if (string.IsNullOrEmpty(rpc.HTProtocol) || string.IsNullOrEmpty(rpc.Host) || rpc.Port < 1)
                 {
-                    Logger.LogError("HTTP.GSUL", "Rpc missing. Protocol: " + rpc.HTProtocol + ", Host: " + rpc.Host + ", Port: " + rpc.Port);
+                    Logger.LogError("HTTP.GSU", "Rpc missing. Protocol: " + rpc.HTProtocol + ", Host: " + rpc.Host + ", Port: " + rpc.Port);
                 }
                 else
                 {
@@ -75,7 +75,7 @@ namespace NervaOneWalletMiner.Rpc.Common
             }
             catch (Exception ex)
             {
-                Logger.LogException("HTTP.GSUL", ex);
+                Logger.LogException("HTTP.GSU", ex);
             }
 
             return serviceUrl;

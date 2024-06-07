@@ -329,7 +329,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("WAS.RSSP", ex);
+                Logger.LogException("WAS.RSP1", ex);
             }
         }
 
@@ -341,7 +341,7 @@ namespace NervaOneWalletMiner.Views
 
                 if (response.Error.IsError)
                 {
-                    Logger.LogError("WAS.RSPT", "Failed to rescan spent. Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+                    Logger.LogError("WAS.RS01", "Failed to rescan spent. Message: " + response.Error.Message + " | Code: " + response.Error.Code);
                     await Dispatcher.UIThread.Invoke(async () =>
                     {
                         var box = MessageBoxManager.GetMessageBoxStandard("Rescan Spent", "Error rescanning\r\n" + response.Error.Message, ButtonEnum.Ok);
@@ -350,7 +350,7 @@ namespace NervaOneWalletMiner.Views
                 }
                 else
                 {
-                    Logger.LogDebug("WAS.RSPT", "Rescan spent returned successfully.");
+                    Logger.LogDebug("WAS.RS01", "Rescan spent returned successfully.");
                     await Dispatcher.UIThread.InvokeAsync(async () =>
                     {
                         var box = MessageBoxManager.GetMessageBoxStandard("Rescan Spent", "Rescan spent command submitted successfully.", ButtonEnum.Ok);
@@ -360,7 +360,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("WAS.RSPT", ex);
+                Logger.LogException("WAS.RS01", ex);
             }
         }
         #endregion // Rescan Spent
@@ -385,7 +385,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("WAS.RBCC", ex);
+                Logger.LogException("WAS.RBC1", ex);
             }
         }
 
@@ -397,7 +397,7 @@ namespace NervaOneWalletMiner.Views
 
                 if (response.Error.IsError)
                 {
-                    Logger.LogError("WAS.RSBC", "Failed to rescan Blockchain. Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+                    Logger.LogError("WAS.RB01", "Failed to rescan Blockchain. Message: " + response.Error.Message + " | Code: " + response.Error.Code);
                     await Dispatcher.UIThread.Invoke(async () =>
                     {
                         var box = MessageBoxManager.GetMessageBoxStandard("Rescan Blockchain", "Error rescanning\r\n" + response.Error.Message, ButtonEnum.Ok);
@@ -406,7 +406,7 @@ namespace NervaOneWalletMiner.Views
                 }
                 else
                 {
-                    Logger.LogDebug("WAS.RSBC", "Rescan Blockchain returned successfully.");
+                    Logger.LogDebug("WAS.RB01", "Rescan Blockchain returned successfully.");
                     await Dispatcher.UIThread.InvokeAsync(async () =>
                     {
                         var box = MessageBoxManager.GetMessageBoxStandard("Rescan Blockchain", "Rescan Blockchain command submitted successfully.", ButtonEnum.Ok);
@@ -416,7 +416,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("WAS.RSBC", ex);
+                Logger.LogException("WAS.RB01", ex);
             }
         }
         #endregion // Rescan Blockchain

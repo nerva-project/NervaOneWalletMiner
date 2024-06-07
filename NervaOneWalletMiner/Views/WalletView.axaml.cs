@@ -322,7 +322,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("WAL.MKTR", ex);
+                Logger.LogException("WAL.MT01", ex);
             }            
         }
 
