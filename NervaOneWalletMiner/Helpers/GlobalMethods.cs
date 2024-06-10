@@ -15,11 +15,6 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Net.Http;
-using Avalonia.Threading;
-using NervaOneWalletMiner.Rpc.Daemon.Requests;
-using NervaOneWalletMiner.Rpc.Daemon.Responses;
-using MsBox.Avalonia;
-using MsBox.Avalonia.Enums;
 using NervaOneWalletMiner.Rpc.Wallet.Requests;
 using NervaOneWalletMiner.Rpc.Wallet.Responses;
 using NervaOneWalletMiner.Objects.DataGrid;
@@ -826,56 +821,6 @@ namespace NervaOneWalletMiner.Helpers
             }
 
             return languages;
-        }
-
-        public static async void StartMiningAsync(int threads)
-        {
-            try
-            {
-                StartMiningRequest request = new()
-                {
-                    MiningAddress = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress,
-                    ThreadCount = threads
-                };
-
-                Logger.LogDebug("GLM.STMA", "Calling StartMining. Address: " + GlobalMethods.GetShorterString(request.MiningAddress, 12) + " | Threads: " + request.ThreadCount);
-                StartMiningResponse response = await GlobalData.DaemonService.StartMining(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, request);
-                if (response.Error.IsError)
-                {
-                    await Dispatcher.UIThread.Invoke(async () =>
-                    {
-                        var box = MessageBoxManager.GetMessageBoxStandard("Start Mining", "Error when starting mining\r\n\r\n" + response.Error.Message, ButtonEnum.Ok);
-                        _ = await box.ShowAsync();
-                    });
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException("GLM.STMA", ex);
-            }
-        }
-
-        public static async void StopMiningAsync()
-        {
-            try
-            {
-                StopMiningRequest request = new();
-
-                Logger.LogDebug("GLM.SPMA", "Calling StopMining.");
-                StopMiningResponse response = await GlobalData.DaemonService.StopMining(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, request);
-                if (response.Error.IsError)
-                {
-                    await Dispatcher.UIThread.Invoke(async () =>
-                    {
-                        var box = MessageBoxManager.GetMessageBoxStandard("Stop Mining", "Error when stopping mining\r\n\r\n" + response.Error.Message, ButtonEnum.Ok);
-                        _ = await box.ShowAsync();
-                    });
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException("GLM.SPMA", ex);
-            }
         }
 
         public static async void SaveWallet()

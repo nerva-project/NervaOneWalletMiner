@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.Selection;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
@@ -443,7 +444,7 @@ public class MainViewModel : ViewModelBase
                         && !GlobalData.IsManualStopMining)
                     {
                         Logger.LogDebug("MAM.MUPS", "Auto starting mining.");
-                        GlobalMethods.StartMiningAsync(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
+                        ((DaemonViewModel)ViewModelPagesDictionary[SplitViewPages.Daemon]).StartMining(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
                     }
                 }
 
@@ -526,6 +527,7 @@ public class MainViewModel : ViewModelBase
             }
         }
     }
+
     public void UpdateLogos()
     {
         // Update coins icons when coin changes

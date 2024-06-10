@@ -9,6 +9,10 @@ namespace NervaOneWalletMiner.ViewModels
 {
     internal class DaemonViewModel : ViewModelBase
     {
+        public delegate void StartMiningAction(int miningThreads);
+        public event StartMiningAction? StartMiningEvent;
+
+
         // TODO: Figure out how to do this in one place instead of on each view
         private Bitmap _CoinIcon = GlobalData.Logo;
         public Bitmap CoinIcon
@@ -96,9 +100,11 @@ namespace NervaOneWalletMiner.ViewModels
 
 
 
-        public DaemonViewModel()
+        public DaemonViewModel() { }
+
+        public void StartMining(int miningThreads)
         {
-            
+            StartMiningEvent!.Invoke(miningThreads);
         }
     }
 }
