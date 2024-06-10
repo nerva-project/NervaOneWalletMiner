@@ -1,8 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
-using MsBox.Avalonia;
-using MsBox.Avalonia.Enums;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects;
 using NervaOneWalletMiner.Rpc.Wallet.Requests;
@@ -87,7 +85,7 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
-        private static async void CreateNewWallet(string walletName, string walletPassword, string walletLanguage)
+        private async void CreateNewWallet(string walletName, string walletPassword, string walletLanguage)
         {
             try
             {
@@ -110,8 +108,8 @@ namespace NervaOneWalletMiner.Views
                     Logger.LogError("WAS.CNW1", "Failed to create wallet " + walletName + " | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
                     await Dispatcher.UIThread.Invoke(async () =>
                     {
-                        var box = MessageBoxManager.GetMessageBoxStandard("Create Wallet", "Error creating " + walletName + " wallet\r\n" + response.Error.Message, ButtonEnum.Ok);
-                        _ = await box.ShowAsync();
+                        MessageBoxView window = new("Create Wallet", "Error creating " + walletName + " wallet\r\n" + response.Error.Message, true);
+                        await window.ShowDialog(GetWindow());
                     });
                 }
                 else
@@ -124,8 +122,8 @@ namespace NervaOneWalletMiner.Views
                     Logger.LogDebug("WAS.CNW1", "Wallet " + walletName + " created successfully.");
                     await Dispatcher.UIThread.InvokeAsync(async () =>
                     {
-                        var box = MessageBoxManager.GetMessageBoxStandard("Create Wallet", walletName + " wallet created successfully!\r\n\r\nYour new wallet is now open. Make sure to save your seed phrase and keys!", ButtonEnum.Ok);
-                        _ = await box.ShowAsync();
+                        MessageBoxView window = new("Create Wallet", walletName + " wallet created successfully!\r\n\r\nYour new wallet is now open. Make sure to save your seed phrase and keys!", true);
+                        await window.ShowDialog(GetWindow());
                     });
                 }
             }
@@ -177,7 +175,7 @@ namespace NervaOneWalletMiner.Views
             }          
         }
 
-        private static async void RestoreFromSeed(string seed, string seedOffset, string walletName, string walletPassword, string walletLanguage)
+        private async void RestoreFromSeed(string seed, string seedOffset, string walletName, string walletPassword, string walletLanguage)
         {
             try
             {
@@ -201,8 +199,8 @@ namespace NervaOneWalletMiner.Views
                     Logger.LogError("WAS.RFS1", "Failed to restore wallet " + walletName + " | Message: " + response.Error.Message + " | Code: " + response.Error.Code + " | Info: " + response.Info);
                     await Dispatcher.UIThread.Invoke(async () =>
                     {
-                        var box = MessageBoxManager.GetMessageBoxStandard("Restore from Seed", "Error restoring " + walletName + " wallet\r\n" + response.Error.Message, ButtonEnum.Ok);
-                        _ = await box.ShowAsync();
+                        MessageBoxView window = new("Restore from Seed", "Error restoring " + walletName + " wallet\r\n" + response.Error.Message, true);
+                        await window.ShowDialog(GetWindow());
                     });
                 }
                 else
@@ -215,8 +213,8 @@ namespace NervaOneWalletMiner.Views
                     Logger.LogDebug("WAS.RFS1", "Wallet " + walletName + " restored successfully! Info: " + response.Info);
                     await Dispatcher.UIThread.InvokeAsync(async () =>
                     {
-                        var box = MessageBoxManager.GetMessageBoxStandard("Restore from Seed", walletName + " wallet restored\r\n\r\nYour new wallet is now open. It will take some time to synchronize your transactions.", ButtonEnum.Ok);
-                        _ = await box.ShowAsync();
+                        MessageBoxView window = new("Restore from Seed", walletName + " wallet restored\r\n\r\nYour new wallet is now open. It will take some time to synchronize your transactions.", true);
+                        await window.ShowDialog(GetWindow());
                     });
                 }
             }
@@ -253,11 +251,10 @@ namespace NervaOneWalletMiner.Views
                 {
                     RestoreFromKeys(result.WalletAddress, result.ViewKey, result.SpendKey, result.WalletName, result.WalletPassword, result.WalletLanguage);
                 }
-
             }
         }
 
-        private static async void RestoreFromKeys(string walletAddress, string viewKey, string spendKey, string walletName, string walletPassword, string walletLanguage)
+        private async void RestoreFromKeys(string walletAddress, string viewKey, string spendKey, string walletName, string walletPassword, string walletLanguage)
         {
             try
             {
@@ -279,11 +276,11 @@ namespace NervaOneWalletMiner.Views
                     GlobalData.IsWalletJustOpened = false;
                     GlobalData.OpenedWalletName = string.Empty;
 
-                    Logger.LogError("WAS.RFK1", "Failed to restore wallet " + walletName + " | Message: " + response.Error.Message + " | Code: " + response.Error.Code + " | Info: " + response.Info);
+                    Logger.LogError("WAS.RFKS", "Failed to restore wallet " + walletName + " | Message: " + response.Error.Message + " | Code: " + response.Error.Code + " | Info: " + response.Info);
                     await Dispatcher.UIThread.Invoke(async () =>
                     {
-                        var box = MessageBoxManager.GetMessageBoxStandard("Restore from Seed", "Error restoring " + walletName + " wallet\r\n" + response.Error.Message, ButtonEnum.Ok);
-                        _ = await box.ShowAsync();
+                        MessageBoxView window = new("Restore from Keys", "Error restoring " + walletName + " wallet\r\n" + response.Error.Message, true);
+                        await window.ShowDialog(GetWindow());
                     });
                 }
                 else
@@ -293,17 +290,17 @@ namespace NervaOneWalletMiner.Views
                     GlobalData.OpenedWalletName = walletName;
                     GlobalData.NewestTransactionHeight = 0;
 
-                    Logger.LogDebug("WAS.RFK1", "Wallet " + walletName + " restored successfully! Info: " + response.Info);
+                    Logger.LogDebug("WAS.RFKS", "Wallet " + walletName + " restored successfully! Info: " + response.Info);
                     await Dispatcher.UIThread.InvokeAsync(async () =>
                     {
-                        var box = MessageBoxManager.GetMessageBoxStandard("Restore from Seed", walletName + " wallet restored\r\n\r\nYour new wallet is now open. It will take some time to synchronize your transactions.", ButtonEnum.Ok);
-                        _ = await box.ShowAsync();
+                        MessageBoxView window = new("Restore from Keys", walletName + " wallet restored\r\n\r\nYour new wallet is now open. It will take some time to synchronize your transactions.", true);
+                        await window.ShowDialog(GetWindow());
                     });
                 }
             }
             catch (Exception ex)
             {
-                Logger.LogException("WAS.RFK1", ex);
+                Logger.LogException("WAS.RFKS", ex);
             }
 
         }
@@ -320,10 +317,11 @@ namespace NervaOneWalletMiner.Views
                 }
                 else
                 {
+                    Logger.LogDebug("WAS.RSTC", "Trying to rescan spent but wallet closed.");
                     Dispatcher.UIThread.Invoke(async () =>
-                    {
-                        var box = MessageBoxManager.GetMessageBoxStandard("Rescan Spent", "Please open wallet first.", ButtonEnum.Ok);
-                        _ = await box.ShowAsync();
+                    {                        
+                        MessageBoxView window = new("Rescan Spent", "Please open wallet first.", true);
+                        await window.ShowDialog(GetWindow());
                     });
                 }                
             }
@@ -333,7 +331,7 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
-        private static async void RescanSpent()
+        private async void RescanSpent()
         {
             try
             {
@@ -341,11 +339,11 @@ namespace NervaOneWalletMiner.Views
 
                 if (response.Error.IsError)
                 {
-                    Logger.LogError("WAS.RSPT", "Failed to rescan spent. Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+                    Logger.LogError("WAS.RSPT", "Failed to rescan spent | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
                     await Dispatcher.UIThread.Invoke(async () =>
                     {
-                        var box = MessageBoxManager.GetMessageBoxStandard("Rescan Spent", "Error rescanning\r\n" + response.Error.Message, ButtonEnum.Ok);
-                        _ = await box.ShowAsync();
+                        MessageBoxView window = new("Rescan Spent", "Error rescanning\r\n" + response.Error.Message, true);
+                        await window.ShowDialog(GetWindow());
                     });
                 }
                 else
@@ -353,8 +351,8 @@ namespace NervaOneWalletMiner.Views
                     Logger.LogDebug("WAS.RSPT", "Rescan spent returned successfully.");
                     await Dispatcher.UIThread.InvokeAsync(async () =>
                     {
-                        var box = MessageBoxManager.GetMessageBoxStandard("Rescan Spent", "Rescan spent command submitted successfully.", ButtonEnum.Ok);
-                        _ = await box.ShowAsync();
+                        MessageBoxView window = new("Rescan Spent", "Rescan spent command submitted successfully.", true);
+                        await window.ShowDialog(GetWindow());
                     });
                 }
             }
@@ -376,10 +374,11 @@ namespace NervaOneWalletMiner.Views
                 }
                 else
                 {
+                    Logger.LogDebug("WAS.RSTC", "Trying to rescan blockchain but wallet closed.");
                     Dispatcher.UIThread.Invoke(async () =>
                     {
-                        var box = MessageBoxManager.GetMessageBoxStandard("Rescan Blockchain", "Please open wallet first.", ButtonEnum.Ok);
-                        _ = await box.ShowAsync();
+                        MessageBoxView window = new("Rescan Blockchain", "Please open wallet first.", true);
+                        await window.ShowDialog(GetWindow());
                     });
                 }
             }
@@ -389,7 +388,7 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
-        private static async void RescanBlockchain()
+        private async void RescanBlockchain()
         {
             try
             {
@@ -397,11 +396,11 @@ namespace NervaOneWalletMiner.Views
 
                 if (response.Error.IsError)
                 {
-                    Logger.LogError("WAS.RSBC", "Failed to rescan Blockchain. Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+                    Logger.LogError("WAS.RSBC", "Failed to rescan Blockchain | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
                     await Dispatcher.UIThread.Invoke(async () =>
                     {
-                        var box = MessageBoxManager.GetMessageBoxStandard("Rescan Blockchain", "Error rescanning\r\n" + response.Error.Message, ButtonEnum.Ok);
-                        _ = await box.ShowAsync();
+                        MessageBoxView window = new("Rescan Blockchain", "Error rescanning\r\n" + response.Error.Message, true);
+                        await window.ShowDialog(GetWindow());
                     });
                 }
                 else
@@ -409,8 +408,8 @@ namespace NervaOneWalletMiner.Views
                     Logger.LogDebug("WAS.RSBC", "Rescan Blockchain returned successfully.");
                     await Dispatcher.UIThread.InvokeAsync(async () =>
                     {
-                        var box = MessageBoxManager.GetMessageBoxStandard("Rescan Blockchain", "Rescan Blockchain command submitted successfully.", ButtonEnum.Ok);
-                        _ = await box.ShowAsync();
+                        MessageBoxView window = new("Rescan Blockchain", "Rescan Blockchain command submitted successfully.", true);
+                        await window.ShowDialog(GetWindow());
                     });
                 }
             }

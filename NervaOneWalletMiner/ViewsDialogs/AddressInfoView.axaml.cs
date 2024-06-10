@@ -8,13 +8,13 @@ using System.Collections.Generic;
 using Avalonia.Threading;
 using NervaOneWalletMiner.Rpc.Wallet.Requests;
 using NervaOneWalletMiner.Rpc.Wallet.Responses;
-using MsBox.Avalonia.Enums;
-using MsBox.Avalonia;
 
 namespace NervaOneWalletMiner.ViewsDialogs
 {
     public partial class AddressInfoView : Window
     {
+        Window GetWindow() => TopLevel.GetTopLevel(this) as Window ?? throw new NullReferenceException("Invalid Owner");
+
         // <Label + AddressShort, AddressFull>
         Dictionary<string, string> _accounts = [];
 
@@ -96,8 +96,8 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     Logger.LogError("AID.MIA1", "Failed to make integrated address. Message: " + response.Error.Message + " | Code: " + response.Error.Code);
                     await Dispatcher.UIThread.Invoke(async () =>
                     {
-                        var box = MessageBoxManager.GetMessageBoxStandard("Make Integrated Address", "Error making integrated address\r\n" + response.Error.Message, ButtonEnum.Ok);
-                        _ = await box.ShowAsync();
+                        MessageBoxView window = new("Make Integrated Address", "Error making integrated address\r\n" + response.Error.Message, true);
+                        await window.ShowDialog(GetWindow());
                     });
                 }
                 else

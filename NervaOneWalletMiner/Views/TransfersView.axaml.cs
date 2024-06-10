@@ -1,8 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
-using MsBox.Avalonia;
-using MsBox.Avalonia.Enums;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects.DataGrid;
 using NervaOneWalletMiner.ViewsDialogs;
@@ -50,17 +48,18 @@ namespace NervaOneWalletMiner.Views
                 }
                 else
                 {
+                    Logger.LogDebug("TRA.OTDV", "Opening Transfer transaction details view");
                     Dispatcher.UIThread.Invoke(async () =>
-                    {
-                        var box = MessageBoxManager.GetMessageBoxStandard("Transaction Details", "Please select transaction", ButtonEnum.Ok);
-                        _ = await box.ShowAsync();
+                    {                        
+                        MessageBoxView window = new("Transaction Details", "Please select transaction", true);
+                        await window.ShowDialog(GetWindow());
                     });
                 }
 
             }
             catch (Exception ex)
             {
-                Logger.LogException("TRA.TDC", ex);
+                Logger.LogException("TRA.OTDV", ex);
             }
         }
     }

@@ -1,8 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
-using MsBox.Avalonia;
-using MsBox.Avalonia.Enums;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects;
 using NervaOneWalletMiner.Objects.Constants;
@@ -41,6 +39,7 @@ namespace NervaOneWalletMiner.Views
                 if (btnOpenCloseWallet.Content!.ToString()!.Equals(StatusWallet.OpenWallet))
                 {
                     // Open wallet dialog
+                    Logger.LogDebug("WAL.OCWC", "Opening wallet dialog.");
                     var window = new OpenWalletView();
                     window.ShowDialog(GetWindow()).ContinueWith(OpenWalletDialogClosed);
                 }
@@ -70,7 +69,7 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
-        private static async void OpenUserWallet(string walletName, string walletPassword)
+        private async void OpenUserWallet(string walletName, string walletPassword)
         {
             try
             {
@@ -88,10 +87,11 @@ namespace NervaOneWalletMiner.Views
                     GlobalData.IsWalletJustOpened = false;
                     GlobalData.OpenedWalletName = string.Empty;
 
+                    Logger.LogDebug("WAL.OUWT", "Error opening " + walletName + " wallet | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
                     await Dispatcher.UIThread.Invoke(async () =>
                     {
-                        var box = MessageBoxManager.GetMessageBoxStandard("Open Wallet", "Error opening " + walletName + " wallet\r\n" + response.Error.Message, ButtonEnum.Ok);
-                        _ = await box.ShowAsync();
+                        MessageBoxView window = new("Open Wallet", "Error opening " + walletName + " wallet\r\n" + response.Error.Message, true);
+                        await window.ShowDialog(GetWindow());
                     });
                 }
                 else
@@ -100,13 +100,15 @@ namespace NervaOneWalletMiner.Views
                     GlobalData.IsWalletJustOpened = true;
                     GlobalData.OpenedWalletName = walletName;
                     GlobalData.NewestTransactionHeight = 0;
+
+                    Logger.LogDebug("WAL.OUWT", "Wallet " + walletName + " opened successfully.");
                 }
 
                 GlobalData.WalletHeight = 0;
             }
             catch (Exception ex)
             {
-                Logger.LogException("WAL.OUW1", ex);
+                Logger.LogException("WAL.OUWT", ex);
             }            
         }
         #endregion // Open Wallet
@@ -126,7 +128,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("WAL.SCA1", ex);
+                Logger.LogException("WAL.SRCA", ex);
             }
         }
 
@@ -146,11 +148,11 @@ namespace NervaOneWalletMiner.Views
 
                     if (response.Error.IsError)
                     {
-                        Logger.LogError("WAL.CADC", "Failed to create account | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+                        Logger.LogError("WAL.CADC", "Failed to create account " + request.Label + " | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
                         await Dispatcher.UIThread.Invoke(async () =>
                         {
-                            var box = MessageBoxManager.GetMessageBoxStandard("Create Account", "Error creating account\r\n" + response.Error.Message, ButtonEnum.Ok);
-                            _ = await box.ShowAsync();
+                            MessageBoxView window = new("Create Account", "Error creating account\r\n" + response.Error.Message, true);
+                            await window.ShowDialog(GetWindow());
                         });
                     }
                     else
@@ -160,8 +162,8 @@ namespace NervaOneWalletMiner.Views
 
                         await Dispatcher.UIThread.InvokeAsync(async () =>
                         {
-                            var box = MessageBoxManager.GetMessageBoxStandard("Create Account", "Account created successfully!", ButtonEnum.Ok);
-                            _ = await box.ShowAsync();
+                            MessageBoxView window = new("Create Account", "Account created successfully!", true);
+                            await window.ShowDialog(GetWindow());
                         });
                     }
                 }
@@ -192,7 +194,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("WAL.SRL1", ex);
+                Logger.LogException("WAL.SHRL", ex);
             }
         }
 
@@ -215,7 +217,7 @@ namespace NervaOneWalletMiner.Views
 
                     if (response.Error.IsError)
                     {
-                        Logger.LogError("WAL.RLDC", "Failed to rename account | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+                        Logger.LogError("WAL.RLDC", "Failed to rename account " + request.Label + " | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
 
                         await Dispatcher.UIThread.InvokeAsync(async () =>
                         {
@@ -225,7 +227,7 @@ namespace NervaOneWalletMiner.Views
                     }
                     else
                     {
-                        Logger.LogDebug("WAL.RLDC", "Account label changed successfully.");
+                        Logger.LogDebug("WAL.RLDC", "Account label changed successfully to " + request.Label);
                         GlobalMethods.WalletUiUpdate();
                         GlobalMethods.SaveWallet();
 
@@ -266,7 +268,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("WAL.TFC1", ex);
+                Logger.LogException("WAL.TRFC", ex);
             }
         }
 
@@ -290,7 +292,7 @@ namespace NervaOneWalletMiner.Views
             }         
         }
 
-        private static async void MakeTransfer(uint sendFromAccountIndex, string sendToAddress, decimal amount, string paymentId, string priority)
+        private async void MakeTransfer(uint sendFromAccountIndex, string sendToAddress, decimal amount, string paymentId, string priority)
         {
             try
             {
@@ -306,18 +308,20 @@ namespace NervaOneWalletMiner.Views
 
                 if (response.Error.IsError)
                 {
+                    Logger.LogError("WAL.MKTR", "Transfer error | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
                     await Dispatcher.UIThread.Invoke(async () =>
                     {
-                        var box = MessageBoxManager.GetMessageBoxStandard("Transfer", "Transfer error\r\n\r\n" + response.Error.Message, ButtonEnum.Ok);
-                        _ = await box.ShowAsync();
+                        MessageBoxView window = new("Transfer", "Transfer error\r\n\r\n" + response.Error.Message, true);
+                        await window.ShowDialog(GetWindow());
                     });
                 }
                 else
                 {
+                    Logger.LogDebug("WAL.MKTR", "Transfer successful.");
                     await Dispatcher.UIThread.InvokeAsync(async () =>
                     {
-                        var box = MessageBoxManager.GetMessageBoxStandard("Transfer", "Transfer successful!", ButtonEnum.Ok);
-                        _ = await box.ShowAsync();
+                        MessageBoxView window = new("Transfer", "Transfer successful!", true);
+                        await window.ShowDialog(GetWindow());
                     });
                 }
             }
@@ -327,7 +331,7 @@ namespace NervaOneWalletMiner.Views
             }            
         }
 
-        private static async void MakeTransferSplit(uint sendFromAccountIndex, string sendToAddress, decimal amount, string paymentId, string priority)
+        private async void MakeTransferSplit(uint sendFromAccountIndex, string sendToAddress, decimal amount, string paymentId, string priority)
         {
             try
             {
@@ -343,24 +347,26 @@ namespace NervaOneWalletMiner.Views
 
                 if (response.Error.IsError)
                 {
+                    Logger.LogError("WAL.MTSP", "Split transfer error | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
                     await Dispatcher.UIThread.Invoke(async () =>
                     {
-                        var box = MessageBoxManager.GetMessageBoxStandard("Transfer Split", "Transfer error\r\n\r\n" + response.Error.Message, ButtonEnum.Ok);
-                        _ = await box.ShowAsync();
+                        MessageBoxView window = new("Transfer Split", "Transfer error\r\n\r\n" + response.Error.Message, true);
+                        await window.ShowDialog(GetWindow());
                     });
                 }
                 else
                 {
+                    Logger.LogDebug("WAL.MTSP", "Transfer Split successful.");
                     await Dispatcher.UIThread.InvokeAsync(async () =>
                     {
-                        var box = MessageBoxManager.GetMessageBoxStandard("Transfer Split", "Transfer successful!", ButtonEnum.Ok);
-                        _ = await box.ShowAsync();
+                        MessageBoxView window = new("Transfer Split", "Transfer successful!", true);
+                        await window.ShowDialog(GetWindow());
                     });
                 }
             }
             catch (Exception ex)
             {
-                Logger.LogException("WAL.MTS1", ex);
+                Logger.LogException("WAL.MTSP", ex);
             }            
         }
         #endregion // Transfer Funds
@@ -403,7 +409,7 @@ namespace NervaOneWalletMiner.Views
         #endregion // Address Info
 
         #region Close Wallet
-        private static async void CloseUserWallet()
+        private async void CloseUserWallet()
         {
             try
             {
@@ -413,27 +419,31 @@ namespace NervaOneWalletMiner.Views
 
                 if (response.Error.IsError)
                 {
+                    Logger.LogError("WAL.CLUW", "Error closing wallet " + GlobalData.OpenedWalletName + " | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+
                     GlobalData.IsWalletOpen = false;
                     GlobalData.IsWalletJustOpened = false;
                     GlobalData.OpenedWalletName = string.Empty;
-
+                   
                     await Dispatcher.UIThread.InvokeAsync(async () =>
                     {
-                        var box = MessageBoxManager.GetMessageBoxStandard("Close Wallet", "Error closing wallet\r\n" + response.Error.Message, ButtonEnum.Ok);
-                        _ = await box.ShowAsync();
+                        MessageBoxView window = new("Close Wallet", "Error closing wallet\r\n" + response.Error.Message, true);
+                        await window.ShowDialog(GetWindow());
                     });
                 }
                 else
                 {
+                    Logger.LogDebug("WAL.CLUW", "Wallet " + GlobalData.OpenedWalletName + " closed successfully.");
+
                     GlobalData.IsWalletOpen = false;
                     GlobalData.IsWalletJustOpened = false;
                     GlobalData.OpenedWalletName = string.Empty;
                     GlobalData.WalletStats = new();
-
+                    
                     await Dispatcher.UIThread.InvokeAsync(async () =>
                     {
-                        var box = MessageBoxManager.GetMessageBoxStandard("Close Wallet", "Wallet closed successfully!", ButtonEnum.Ok);
-                        _ = await box.ShowAsync();
+                        MessageBoxView window = new("Close Wallet", "Wallet closed successfully!", true);
+                        await window.ShowDialog(GetWindow());
                     });
                 }
 
@@ -441,7 +451,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("WAL.CUW1", ex);
+                Logger.LogException("WAL.CLUW", ex);
             }            
         }
         #endregion //Close Wallet
