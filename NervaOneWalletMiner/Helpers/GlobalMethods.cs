@@ -596,6 +596,31 @@ namespace NervaOneWalletMiner.Helpers
 
             return logo;
         }
+
+        public static WindowIcon? GetWindowIcon()
+        {
+            WindowIcon? icon = null;
+
+            try
+            {
+                switch (GlobalData.AppSettings.ActiveCoin)
+                {
+                    case Coin.XMR:
+                        icon = new WindowIcon(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/xmr/logo.png")));
+                        break;
+                    default:
+                        // XNV or anything else not supported
+                        icon = new WindowIcon(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/xnv/logo.png")));
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("GLM.GWIC", ex);
+            }
+
+            return icon;
+        }
         #endregion // Coin Specific Setup
 
         public static string GetShorterString(string? text, int shorterLength)

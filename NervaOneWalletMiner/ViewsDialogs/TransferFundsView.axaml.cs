@@ -1,8 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
-using MsBox.Avalonia;
-using MsBox.Avalonia.Enums;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects;
 using NervaOneWalletMiner.Objects.DataGrid;
@@ -45,10 +43,10 @@ namespace NervaOneWalletMiner.ViewsDialogs
                 List<string> priorityList =
                 [
                     SendPriority.Default,
-                SendPriority.Low,
-                SendPriority.Medium,
-                SendPriority.High,
-            ];
+                    SendPriority.Low,
+                    SendPriority.Medium,
+                    SendPriority.High,
+                ];
 
                 cbxPriority.ItemsSource = priorityList;
                 cbxPriority.SelectedIndex = 0;
@@ -75,8 +73,8 @@ namespace NervaOneWalletMiner.ViewsDialogs
                 {
                     await Dispatcher.UIThread.Invoke(async () =>
                     {
-                        var box = MessageBoxManager.GetMessageBoxStandard("Transfer Funds", "From Address, To Address and Amount are required", ButtonEnum.Ok);
-                        _ = await box.ShowAsync();
+                        MessageBoxView window = new("Transfer Funds", "From Address, To Address and Amount are required", true);
+                        await window.ShowDialog(GetWindow());
                     });
                 }
                 else
@@ -95,7 +93,8 @@ namespace NervaOneWalletMiner.ViewsDialogs
 
                     MessageBoxView window = new MessageBoxView("Confirm Transfer", "You're about to send " + tbxAmount.Text
                         + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits
-                        + ". Once transfer is started, it cannot be stopped. Do you want to continue?");
+                        + ". Once transfer is started, it cannot be stopped. Do you want to continue?",
+                        false);
                     DialogResult confirmRes = await window.ShowDialog<DialogResult>(this);
 
                     if (confirmRes != null && confirmRes.IsOk)

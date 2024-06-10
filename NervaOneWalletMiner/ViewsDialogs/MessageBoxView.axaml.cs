@@ -14,7 +14,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             InitializeComponent();         
         }
 
-        public MessageBoxView(string title, string textMessage)
+        public MessageBoxView(string title, string textMessage, bool hideCancelButton)
         {
             try
             {
@@ -22,6 +22,20 @@ namespace NervaOneWalletMiner.ViewsDialogs
 
                 Title = title;
                 tbkMessage.Text = textMessage;
+
+                if (hideCancelButton)
+                {
+                    btnCancel.IsVisible = false;                    
+                }
+                else
+                {
+                    btnCancel.IsVisible = true;
+                }
+
+                Icon = GlobalMethods.GetWindowIcon();
+
+                // TODO: Change view Height based on number of Message text lines
+
             }
             catch (Exception ex)
             {

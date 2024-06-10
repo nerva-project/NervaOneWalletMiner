@@ -216,10 +216,11 @@ namespace NervaOneWalletMiner.Views
                     if (response.Error.IsError)
                     {
                         Logger.LogError("WAL.RLDC", "Failed to rename account | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
-                        await Dispatcher.UIThread.Invoke(async () =>
+
+                        await Dispatcher.UIThread.InvokeAsync(async () =>
                         {
-                            var box = MessageBoxManager.GetMessageBoxStandard("Rename Account", "Error renaming account\r\n" + response.Error.Message, ButtonEnum.Ok);
-                            _ = await box.ShowAsync();
+                            MessageBoxView window = new("Rename Account", "Error renaming account\\r\\n\" + response.Error.Message", true);
+                            await window.ShowDialog(GetWindow());
                         });
                     }
                     else
@@ -230,8 +231,8 @@ namespace NervaOneWalletMiner.Views
 
                         await Dispatcher.UIThread.InvokeAsync(async () =>
                         {
-                            var box = MessageBoxManager.GetMessageBoxStandard("Rename Account", "Account label changed successfully!", ButtonEnum.Ok);
-                            _ = await box.ShowAsync();
+                            MessageBoxView window = new("Rename Account", "Account label changed successfully!", true);
+                            await window.ShowDialog(GetWindow());
                         });
                     }
                 }

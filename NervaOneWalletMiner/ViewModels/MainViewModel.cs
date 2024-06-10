@@ -235,12 +235,13 @@ public class MainViewModel : ViewModelBase
                 HashSet<uint> checkedIndexes = [];
 
                 foreach (Account wallet in ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses)
-                {
+                {                    
                     checkedIndexes.Add(wallet.Index);
 
                     if (GlobalData.WalletStats.Subaddresses.ContainsKey(wallet.Index))
                     {
                         // Update, only if value changed
+                        // GlobalData.WalletStats.Subaddresses get cleared in asynchronouse call so sometimes even though you check if key exists, it will not exist anymore
                         if (!wallet.Label.Equals(GlobalData.WalletStats.Subaddresses[wallet.Index].Label))
                         {
                             wallet.Label = GlobalData.WalletStats.Subaddresses[wallet.Index].Label;
