@@ -2,14 +2,20 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Styling;
+using Avalonia.Threading;
 using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Objects;
 using NervaOneWalletMiner.Rpc;
+using NervaOneWalletMiner.ViewsDialogs;
 using System;
+using System.Threading.Tasks;
 
 namespace NervaOneWalletMiner.Views
 {
     public partial class SettingsView : UserControl
     {
+        Window GetWindow() => TopLevel.GetTopLevel(this) as Window ?? throw new NullReferenceException("Invalid Owner");
+
         public SettingsView()
         {
             try
@@ -62,16 +68,21 @@ namespace NervaOneWalletMiner.Views
                 string selectedCoin = ((ComboBoxItem)cbxCoin.SelectedItem!).Name!;
                 if (!selectedCoin.Equals(GlobalData.AppSettings.ActiveCoin))
                 {
-                    GlobalData.AppSettings.ActiveCoin = selectedCoin;
-
                     // Close wallet process becasue you're switching to different coin
                     WalletProcess.ForceClose();
-
-                    GlobalData.AppSettings.ActiveCoin = selectedCoin;
+                    
                     isChanged = true;
                     GlobalMethods.SetCoin(selectedCoin);
 
-                    // TODO: Need to force Settings screen refersh
+                    if (!GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
+                    {
+                        // CLI tools missing. Need to download
+                        string cliToolsLink = GlobalMethods.GetCliToolsDownloadLink();
+                        Logger.LogDebug("SET.SSCL", "CLI tools not found. Asking user to confirm download link: " + cliToolsLink);
+                        
+                        var window = new TextBoxView("Get Client Tools", cliToolsLink, string.Empty, "Client Tools Download Link", true);
+                        window.ShowDialog(GetWindow()).ContinueWith(CliToolsLinkDialogClosed);
+                    }
                 }
 
                 if(isChanged)
@@ -82,7 +93,38 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("SET.SSC1", ex);
+                Logger.LogException("SET.SSCL", ex);
+            }
+        }
+
+        private async void CliToolsLinkDialogClosed(Task task)
+        {
+            try
+            {
+                DialogResult result = ((DialogResult)((Task<object>)task).Result);
+                if (result != null && result.IsOk)
+                {
+                    Logger.LogDebug("SET.CTLC", "Attempting to download CLI tools from: " + result.TextBoxValue);
+                    if (!string.IsNullOrEmpty(result.TextBoxValue))
+                    {
+                        // Download and extract CLI tools
+                        GlobalMethods.SetUpCliTools(result.TextBoxValue, GlobalData.CliToolsDir);
+                    }
+                }
+                else
+                {
+                    Logger.LogDebug("SET.CTLC", "CLI tools download cancelled.");
+                    await Dispatcher.UIThread.Invoke(async () =>
+                    {
+                        MessageBoxView window = new("Client Tools Missing", "Software cannot run without client tools. Switch coin or restart to download client tools.", true);
+                        await window.ShowDialog(GetWindow());
+                    });
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("SET.CTLC", ex);
             }
         }
     }

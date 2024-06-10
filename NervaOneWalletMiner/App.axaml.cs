@@ -30,6 +30,8 @@ public partial class App : Application
 
             Logger.SetUpLogger();
 
+            GlobalMethods.SetCoin(GlobalData.AppSettings.ActiveCoin);
+
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 desktop.Exit += OnExit;
@@ -141,10 +143,6 @@ public partial class App : Application
                 // By default use 50% of threads
                 GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads = GlobalData.CpuThreadCount > 1 ? Convert.ToInt32(Math.Floor(GlobalData.CpuThreadCount / 2.00)) : 1;
             }
-
-            GlobalMethods.SetCoin(GlobalData.AppSettings.ActiveCoin);
-
-            // TODO: Might need to set up other defaults
         }
         catch (Exception ex)
         {

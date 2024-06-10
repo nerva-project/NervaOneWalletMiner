@@ -280,8 +280,6 @@ namespace NervaOneWalletMiner.Helpers
         {
             try
             {
-                // TODO: Need to do certain tings when switching coins. RpcConnection? Wallet?
-
                 switch (newCoin)
                 {
                     case Coin.XMR:
@@ -341,18 +339,6 @@ namespace NervaOneWalletMiner.Helpers
                 }
 
                 Logger.LogDebug("GLM.STCN", "Coin set up: " + GlobalData.AppSettings.ActiveCoin);
-
-
-                // Download CLI tools, if we do not have them already
-                if (!DirectoryContainsCliTools(GlobalData.CliToolsDir))
-                {
-                    string cliToolsLink = GetCliToolsDownloadLink();
-                    Logger.LogDebug("GLM.STCN", "CLI tools not found. Attempting to download from: " + cliToolsLink);
-                    if (!string.IsNullOrEmpty(cliToolsLink))
-                    {
-                        SetUpCliTools(cliToolsLink, GlobalData.CliToolsDir);
-                    }
-                }
             }
             catch (Exception ex)
             {
