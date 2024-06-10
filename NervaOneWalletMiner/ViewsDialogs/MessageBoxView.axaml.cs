@@ -19,6 +19,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             try
             {
                 InitializeComponent();
+                Icon = GlobalMethods.GetWindowIcon();
 
                 Title = title;
                 tbkMessage.Text = textMessage;
@@ -31,8 +32,6 @@ namespace NervaOneWalletMiner.ViewsDialogs
                 {
                     btnCancel.IsVisible = true;
                 }
-
-                Icon = GlobalMethods.GetWindowIcon();
 
                 // TODO: Change view Height based on number of Message text lines
 

@@ -7,8 +7,7 @@
 		Width="500"
 		Height="150"
 		Topmost="True"
-		WindowStartupLocation="CenterOwner"
-		Icon="/Assets/nerva-logo.ico"        
+		WindowStartupLocation="CenterOwner"    
         Title="Text Box">
 	
 	<StackPanel Spacing="5" Margin="10">

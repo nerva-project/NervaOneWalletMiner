@@ -27,6 +27,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             try
             {
                 InitializeComponent();
+                Icon = GlobalMethods.GetWindowIcon();
 
                 foreach (Account account in GlobalData.WalletStats.Subaddresses.Values)
                 {

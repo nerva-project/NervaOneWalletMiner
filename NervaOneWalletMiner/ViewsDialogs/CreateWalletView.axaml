@@ -8,7 +8,6 @@
 		Height="330"
 		Topmost="True"
 		WindowStartupLocation="CenterOwner"
-		Icon="/Assets/nerva-logo.ico"
         Title="Create New Wallet">
 
 	<StackPanel Spacing="5" Margin="10">

@@ -574,47 +574,62 @@ namespace NervaOneWalletMiner.Helpers
             return walletProcess;
         }
 
-        public static Bitmap GetLogo()
+        public static Dictionary<string, Bitmap> LoadCoinLogos()
         {
-            Bitmap logo;
-
-            switch (GlobalData.AppSettings.ActiveCoin)
-            {
-                case Coin.XMR:
-                    logo = new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/xmr/logo.png")));
-                    break;
-                default:
-                    // XNV or anything else not supported
-                    logo = new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/xnv/logo.png")));
-                    break;
-            }
-
-            return logo;
-        }
-
-        public static WindowIcon? GetWindowIcon()
-        {
-            WindowIcon? icon = null;
+            Dictionary<string, Bitmap> logoDictionary = [];
 
             try
             {
-                switch (GlobalData.AppSettings.ActiveCoin)
+                if (!logoDictionary.ContainsKey(Coin.XNV))
                 {
-                    case Coin.XMR:
-                        icon = new WindowIcon(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/xmr/logo.png")));
-                        break;
-                    default:
-                        // XNV or anything else not supported
-                        icon = new WindowIcon(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/xnv/logo.png")));
-                        break;
+                    logoDictionary.Add(Coin.XNV, new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/xnv/logo.png"))));
+                }
+
+                if (!logoDictionary.ContainsKey(Coin.XMR))
+                {
+                    logoDictionary.Add(Coin.XMR, new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/xmr/logo.png"))));
                 }
             }
             catch (Exception ex)
             {
-                Logger.LogException("GLM.GWIC", ex);
+                Logger.LogException("GLM.LCLO", ex);
             }
 
-            return icon;
+            return logoDictionary;
+        }
+
+        public static Bitmap GetLogo()
+        {
+            return GlobalData.CoinLogoDictionary[GlobalData.AppSettings.ActiveCoin];        
+        }
+
+        public static Dictionary<string, WindowIcon> LoadCoinWindowIcons()
+        {
+            Dictionary<string, WindowIcon> iconDictionary = [];
+
+            try
+            {
+                if (!iconDictionary.ContainsKey(Coin.XNV))
+                {
+                    iconDictionary.Add(Coin.XNV, new WindowIcon(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/xnv/logo.png"))));
+                }
+
+                if (!iconDictionary.ContainsKey(Coin.XMR))
+                {
+                    iconDictionary.Add(Coin.XMR, new WindowIcon(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/xmr/logo.png"))));
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("GLM.LCWI", ex);
+            }
+
+            return iconDictionary;
+        }
+
+        public static WindowIcon GetWindowIcon()
+        {
+            return GlobalData.WindowIconsDictionary[GlobalData.AppSettings.ActiveCoin];
         }
         #endregion // Coin Specific Setup
 

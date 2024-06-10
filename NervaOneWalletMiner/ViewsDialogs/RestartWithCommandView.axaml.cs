@@ -13,6 +13,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             try
             {
                 InitializeComponent();
+                Icon = GlobalMethods.GetWindowIcon();
             }
             catch (Exception ex)
             {

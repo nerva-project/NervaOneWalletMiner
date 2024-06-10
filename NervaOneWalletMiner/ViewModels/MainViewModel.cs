@@ -40,8 +40,6 @@ public class MainViewModel : ViewModelBase
 
     public static bool _isTransfersUpdateComplete = true;
 
-    public static string _currentCoin = GlobalData.AppSettings.ActiveCoin;
-
     private bool? _isPaneOpen = false;
     private ViewModelBase _CurrentPage;
     public SelectionModel<ListBoxItem> Selection { get; }
@@ -106,14 +104,12 @@ public class MainViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _WalletStatus, value);
     }
 
-    // TODO: Figure out how to do this in one place instead of on each view
     private Bitmap _CoinIcon = GlobalData.Logo;
     public Bitmap CoinIcon
     {
         get => _CoinIcon;
         set => this.RaiseAndSetIfChanged(ref _CoinIcon, value);
     }
-
     void SelectionChanged(object? sender, SelectionModelSelectionChangedEventArgs e)
     {
         // TODO: Figoure out better way of doing this
@@ -422,9 +418,9 @@ public class MainViewModel : ViewModelBase
                 _masterUpdateTimer.Stop();
             }
 
-            if(_currentCoin != GlobalData.AppSettings.ActiveCoin)
+            if (CoinIcon != GlobalMethods.GetLogo())
             {
-                UpdateLogos();
+                CoinIcon = GlobalMethods.GetLogo();
             }
 
             // If kill master process is issued at any point, skip everything else and do not restrt master timer            
@@ -526,25 +522,6 @@ public class MainViewModel : ViewModelBase
                 _masterUpdateTimer.Start();
             }
         }
-    }
-
-    public void UpdateLogos()
-    {
-        // Update coins icons when coin changes
-
-        // TODO: I don't like how those icons work. Chage it!
-
-        CoinIcon = GlobalMethods.GetLogo();
-        ((DaemonViewModel)ViewModelPagesDictionary[SplitViewPages.Daemon]).CoinIcon = GlobalMethods.GetLogo();
-        ((WalletViewModel)ViewModelPagesDictionary[SplitViewPages.Wallet]).CoinIcon = GlobalMethods.GetLogo();
-        ((TransfersViewModel)ViewModelPagesDictionary[SplitViewPages.Transfers]).CoinIcon = GlobalMethods.GetLogo();
-        ((AddressBookViewModel)ViewModelPagesDictionary[SplitViewPages.AddressBook]).CoinIcon = GlobalMethods.GetLogo();
-        ((DaemonSetupViewModel)ViewModelPagesDictionary[SplitViewPages.DaemonSetup]).CoinIcon = GlobalMethods.GetLogo();
-        ((WalletSetupViewModel)ViewModelPagesDictionary[SplitViewPages.WalletSetup]).CoinIcon = GlobalMethods.GetLogo();
-        ((SettingsViewModel)ViewModelPagesDictionary[SplitViewPages.Settings]).CoinIcon = GlobalMethods.GetLogo();
-        ((AboutViewModel)ViewModelPagesDictionary[SplitViewPages.About]).CoinIcon = GlobalMethods.GetLogo();        
-
-        _currentCoin = GlobalData.AppSettings.ActiveCoin;
     }
 
     private static void KeepDaemonRunning()

@@ -1,6 +1,4 @@
-﻿using ReactiveUI;
-
-namespace NervaOneWalletMiner.ViewModels
+﻿namespace NervaOneWalletMiner.ViewModels
 {
     internal class StatusBarViewModel : ViewModelBase
     {

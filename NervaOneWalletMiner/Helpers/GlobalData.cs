@@ -1,4 +1,5 @@
-﻿using Avalonia.Media.Imaging;
+﻿using Avalonia.Controls;
+using Avalonia.Media.Imaging;
 using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Objects.DataGrid;
 using NervaOneWalletMiner.Objects.Settings;
@@ -48,6 +49,9 @@ namespace NervaOneWalletMiner.Helpers
         public static StatsTransfers TransfersStats = new();
         public static List<Connection> Connections = [];
         public static AddressBook AddressBook = new();
+
+        public static Dictionary<string, Bitmap> CoinLogoDictionary = GlobalMethods.LoadCoinLogos();
+        public static Dictionary<string, WindowIcon> WindowIconsDictionary = GlobalMethods.LoadCoinWindowIcons();
 
         public static bool IsDaemonRestarting = false;
         public static bool IsManualStopMining = false;

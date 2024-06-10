@@ -24,6 +24,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             try
             {
                 InitializeComponent();
+                Icon = GlobalMethods.GetWindowIcon();
 
                 _transactionId = transactionId;
                 _accountIndex = accountIndex;

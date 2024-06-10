@@ -22,6 +22,7 @@ namespace NervaOneWalletMiner.Views
             try
             {
                 InitializeComponent();
+                imgCoinIcon.Source = GlobalMethods.GetLogo();
             }
             catch (Exception ex)
             {

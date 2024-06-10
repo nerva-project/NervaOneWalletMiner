@@ -21,6 +21,7 @@ namespace NervaOneWalletMiner.Views
             try
             {
                 InitializeComponent();
+                imgCoinIcon.Source = GlobalMethods.GetLogo();
 
                 tbxLogLevel.Text = GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].LogLevel.ToString();
             }

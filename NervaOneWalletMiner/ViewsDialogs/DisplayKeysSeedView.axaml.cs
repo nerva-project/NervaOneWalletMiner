@@ -16,6 +16,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             try
             {
                 InitializeComponent();
+                Icon = GlobalMethods.GetWindowIcon();
 
                 // TODO: Check if wallet open and show error if not
 

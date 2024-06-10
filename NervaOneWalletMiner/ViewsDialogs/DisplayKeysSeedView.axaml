@@ -8,7 +8,6 @@
 		Height="550"
 		Topmost="True"
 		WindowStartupLocation="CenterOwner"
-		Icon="/Assets/nerva-logo.ico"
         Title="Wallet Restore Info">
 	
 	<StackPanel Spacing="5" Margin="10">

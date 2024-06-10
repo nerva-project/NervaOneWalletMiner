@@ -11,6 +11,7 @@ namespace NervaOneWalletMiner.Views
         public AboutView()
         {
             InitializeComponent();
+            imgCoinIcon.Source = GlobalMethods.GetLogo();
         }
 
         public void OpenGitHub_Clicked(object sender, RoutedEventArgs args)

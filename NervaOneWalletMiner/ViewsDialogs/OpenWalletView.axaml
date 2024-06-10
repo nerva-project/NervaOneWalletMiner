@@ -9,7 +9,6 @@
 		Height="230"
 		Topmost="True"
 		WindowStartupLocation="CenterOwner"
-		Icon="/Assets/nerva-logo.ico"
         Title="Open Wallet">
 
 	<Design.DataContext>

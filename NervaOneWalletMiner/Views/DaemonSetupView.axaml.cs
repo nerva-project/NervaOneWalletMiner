@@ -20,6 +20,7 @@ namespace NervaOneWalletMiner.Views
             try
             {
                 InitializeComponent();
+                imgCoinIcon.Source = GlobalMethods.GetLogo();
 
                 var tbxMiningAddress = this.Get<TextBox>("tbxMiningAddress");
                 tbxMiningAddress.Text = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress;

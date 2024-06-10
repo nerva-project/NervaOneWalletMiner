@@ -8,7 +8,6 @@
 		Height="150"
 		Topmost="True"
 		WindowStartupLocation="CenterOwner"
-		Icon="/Assets/nerva-logo.ico"
         Title="Restart With Command">
 	
 	<StackPanel Spacing="5" Margin="10">

@@ -15,6 +15,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             try
             {
                 InitializeComponent();
+                Icon = GlobalMethods.GetWindowIcon();
 
                 var walletName = this.Get<ComboBox>("cbxWalletName");
 

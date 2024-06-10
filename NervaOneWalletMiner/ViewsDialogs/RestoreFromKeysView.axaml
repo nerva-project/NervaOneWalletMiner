@@ -8,7 +8,6 @@
 		Height="600"
 		Topmost="True"
 		WindowStartupLocation="CenterOwner"
-		Icon="/Assets/nerva-logo.ico"
         Title="Restore From Keys">
 	
 	<StackPanel Spacing="5" Margin="10">

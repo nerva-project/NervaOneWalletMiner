@@ -20,6 +20,7 @@ namespace NervaOneWalletMiner.Views
             try
             {
                 InitializeComponent();
+                imgCoinIcon.Source = GlobalMethods.GetLogo();
 
                 var nupThreads = this.Get<NumericUpDown>("nupThreads");
                 nupThreads.Maximum = GlobalData.CpuThreadCount;

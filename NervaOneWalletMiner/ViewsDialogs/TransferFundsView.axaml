@@ -8,7 +8,6 @@
 		Height="500"
 		Topmost="True"
 		WindowStartupLocation="CenterOwner"
-		Icon="/Assets/nerva-logo.ico"
         Title="Transfer Funds">
 	
 	<StackPanel Spacing="5" Margin="10">

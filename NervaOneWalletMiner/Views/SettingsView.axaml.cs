@@ -15,6 +15,7 @@ namespace NervaOneWalletMiner.Views
             try
             {
                 InitializeComponent();
+                imgCoinIcon.Source = GlobalMethods.GetLogo();
 
                 var cbxThemeVariants = this.Get<ComboBox>("cbxThemeVariants");
                 cbxThemeVariants.SelectedItem = Application.Current!.RequestedThemeVariant;
@@ -75,6 +76,7 @@ namespace NervaOneWalletMiner.Views
 
                 if(isChanged)
                 {
+                    imgCoinIcon.Source = GlobalMethods.GetLogo();
                     GlobalMethods.SaveConfig();
                 }
             }
