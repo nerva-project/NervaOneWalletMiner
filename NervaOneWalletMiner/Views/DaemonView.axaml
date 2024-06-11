@@ -10,20 +10,28 @@
 		<vm:DaemonViewModel />
 	</Design.DataContext>
 	
-	<StackPanel Spacing="5" HorizontalAlignment="Stretch" MaxWidth="650">
-		<Grid ColumnDefinitions="100,*,100" Margin="10">
-			<Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="24,*">
-				<Image Grid.Row="0" Grid.Column="0" Name="imgCoinIcon"></Image>
-				<Label Grid.Row="0" Grid.Column="1" Height="24">Daemon</Label>
+	<StackPanel HorizontalAlignment="Stretch"
+				Spacing="5"
+				Margin="10"
+				MaxWidth="650">
+		<Grid ColumnDefinitions="100,*,100">
+			<Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="32,*">
+				<Image Grid.Row="0"
+					   Grid.Column="0"
+					   Name="imgCoinIcon"/>
+				<Label Grid.Row="0"
+					   Grid.Column="1"
+					   Height="24"
+					   Margin="5,0,0,0">Daemon</Label>
 			</Grid>
 
-			<DockPanel Grid.Row="0" Grid.Column="1" Margin="0,0,10,0" MinWidth="200" MaxWidth="250">
+			<DockPanel Grid.Row="0" Grid.Column="1" Margin="0,0,5,0" MinWidth="200" MaxWidth="250">
 				<Label Height="24">Threads:</Label>
 				<NumericUpDown Name="nupThreads"
 								Minimum="1"
 								Value="1"
 								FormatString="0"
-								MaxWidth="130"
+								MaxWidth="110"
 								IsEnabled="{Binding IsNumThreadsEnabled}"/>
 			</DockPanel>
 			<Button Name="btnStartStopMining"
@@ -34,8 +42,8 @@
 					Click="StartStopMiningClicked"/>
 		</Grid>
 
-		<Grid ColumnDefinitions="200,*,200" Margin="10">
-			<Grid ColumnDefinitions="100,100" Margin="10" Grid.Row="0" Grid.Column="0">
+		<Grid ColumnDefinitions="200,*,200" Margin="0,10,0,0">
+			<Grid ColumnDefinitions="100,100" Margin="0,10,0,0" Grid.Row="0" Grid.Column="0">
 				<Grid.RowDefinitions>
 					<RowDefinition Height="30" />
 					<RowDefinition Height="30" />
@@ -76,7 +84,7 @@
 				  GridLinesVisibility="Horizontal"
 				  IsReadOnly="True"	
 				  Height="300"
-				  Margin="10">
+				  Margin="0,10,0,0">
 			<DataGrid.Columns>
 				<DataGridTemplateColumn Header="">
 					<DataTemplate DataType="Bitmap">

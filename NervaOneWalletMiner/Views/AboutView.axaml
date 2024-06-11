@@ -10,10 +10,19 @@
 		<vm:DaemonSetupViewModel />
 	</Design.DataContext>
 
-	<StackPanel ScrollViewer.AllowAutoHide="True" Spacing="5" Margin="10" HorizontalAlignment="Stretch" MaxWidth="650">
-		<Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="24,*">
-			<Image Grid.Row="0" Grid.Column="0" Name="imgCoinIcon"/>
-			<Label Grid.Row="0" Grid.Column="1" Height="24">About NervaOne</Label>
+	<StackPanel HorizontalAlignment="Stretch"
+				Spacing="5"				
+				ScrollViewer.AllowAutoHide="True"
+				Margin="10"
+				MaxWidth="650">
+		<Grid ColumnDefinitions="32,*">
+			<Image Grid.Row="0"
+				   Grid.Column="0"
+				   Name="imgCoinIcon"/>
+			<Label Grid.Row="0"
+				   Grid.Column="1"
+				   Height="24"
+				   Margin="5,0,0,0">About NervaOne</Label>
 		</Grid>
 
 		<TextBlock TextWrapping="Wrap" Margin="0,10,0,0">

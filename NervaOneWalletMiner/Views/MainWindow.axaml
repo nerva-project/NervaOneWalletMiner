@@ -8,7 +8,7 @@
 		Height="650"
         mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="550"
         x:Class="NervaOneWalletMiner.Views.MainWindow"
-        Icon="/Assets/nerva-logo.ico"
+        Icon="/Assets/nervaone-logo.ico"
         Title="NervaOne Wallet and Miner">
 
 	<Grid>

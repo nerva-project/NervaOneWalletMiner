@@ -10,12 +10,19 @@
 		<vm:WalletViewModel />
 	</Design.DataContext>
 
-	<StackPanel Spacing="5" HorizontalAlignment="Stretch" MaxWidth="650">
-		<Grid ColumnDefinitions="200,*,120" Margin="10">
-			
-			<Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="24,*">
-				<Image Grid.Row="0" Grid.Column="0" Name="imgCoinIcon"></Image>
-				<Label Grid.Row="0" Grid.Column="1" Height="24">Wallet</Label>
+	<StackPanel HorizontalAlignment="Stretch"
+				Spacing="5"
+				Margin="10"
+				MaxWidth="650">
+		<Grid ColumnDefinitions="200,*,120">			
+			<Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="32,*">
+				<Image Grid.Row="0"
+					   Grid.Column="0"
+					   Name="imgCoinIcon"></Image>
+				<Label Grid.Row="0"
+					   Grid.Column="1"
+					   Height="24"
+					   Margin="5,0,0,0">Wallet</Label>
 			</Grid>
 
 			<Button Name="btnOpenCloseWallet"
@@ -26,7 +33,7 @@
 					Click="OpenCloseWalletClicked" />
 		</Grid>
 
-		<Grid ColumnDefinitions="200,*,200" Margin="10">
+		<Grid ColumnDefinitions="200,*,200" Margin="0,20,0,0">
 			<Grid ColumnDefinitions="110,100" Grid.Row="0" Grid.Column="0">
 				<Grid.RowDefinitions>
 					<RowDefinition Height="35" />
@@ -64,7 +71,7 @@
 				  GridLinesVisibility="Horizontal"
 				  IsReadOnly="True"
 				  Height="365"
-				  Margin="10,20,10,10"
+				  Margin="0,20,0,0"
 				  DoubleTapped="DtgAccounts_DoubleTapped">
 			<DataGrid.Columns>
 				<DataGridTemplateColumn Header="">
