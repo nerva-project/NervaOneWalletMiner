@@ -1,6 +1,8 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Objects.Constants;
+using NervaOneWalletMiner.ViewModels;
 using System;
 
 namespace NervaOneWalletMiner.Views
@@ -24,10 +26,9 @@ namespace NervaOneWalletMiner.Views
 
                 GlobalMethods.LoadConfig();
 
+                UIManager.SetUpPages();
 
-                // TODO: Load proper pages and start master process
-
-
+                ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CheckAndGetCliTools();
             }
             catch (Exception ex)
             {

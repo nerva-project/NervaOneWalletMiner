@@ -2,6 +2,7 @@
 using Avalonia.Threading;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects;
+using NervaOneWalletMiner.ViewModels;
 using NervaOneWalletMiner.ViewsDialogs;
 using System;
 using System.Threading.Tasks;
@@ -26,11 +27,26 @@ public partial class MainWindow : Window
 
     private void MainWindow_Loaded(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
+        try
+        {
+            MainViewModel vm = (MainViewModel)DataContext!;
+            vm.CheckAndGetCliEvent += CheckAndDownloadCliIfNeeded;
+
+            CheckAndDownloadCliIfNeeded();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException("MAW.MAWL", ex);
+        }
+    }
+
+    public void CheckAndDownloadCliIfNeeded()
+    {
         if (!GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
         {
             // CLI tools missing. Need to download
             string cliToolsLink = GlobalMethods.GetCliToolsDownloadLink();
-            Logger.LogDebug("MAW.MAWL", "CLI tools not found. Asking user to confirm download link: " + cliToolsLink);
+            Logger.LogDebug("MAW.CDCN", "CLI tools not found. Asking user to confirm download link: " + cliToolsLink);
 
             var window = new TextBoxView("Get Client Tools", cliToolsLink, string.Empty, "Client Tools Download Link", true);
             window.ShowDialog(this).ContinueWith(CliToolsLinkDialogClosed);

@@ -24,6 +24,15 @@ namespace NervaOneWalletMiner.Helpers
         public static readonly Bitmap _outImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/transfer_out.png")));
         public static readonly Bitmap _blockImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/transfer_block.png")));
 
+        private static ViewModelBase _mainView = new();
+
+
+        // TODO: I don't like this. Come up with a different way
+        public static void SetMainView(ViewModelBase mainView)
+        {
+            _mainView = mainView;
+        }
+
         public static void SetUpFirstRun()
         {
             // One page to rule them all
@@ -36,8 +45,12 @@ namespace NervaOneWalletMiner.Helpers
                 { SplitViewPages.DaemonSetup, new PickCoinViewModel() },
                 { SplitViewPages.WalletSetup, new PickCoinViewModel() },
                 { SplitViewPages.Settings, new PickCoinViewModel() },
-                { SplitViewPages.About, new PickCoinViewModel() }
+                { SplitViewPages.About, new PickCoinViewModel() },
+
+                { SplitViewPages.MainView, _mainView }
             };
+
+            ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.Daemon];
         }
 
         public static void SetUpPages()
@@ -52,12 +65,16 @@ namespace NervaOneWalletMiner.Helpers
                 { SplitViewPages.DaemonSetup, new DaemonSetupViewModel() },
                 { SplitViewPages.WalletSetup, new WalletSetupViewModel() },
                 { SplitViewPages.Settings, new SettingsViewModel() },
-                { SplitViewPages.About, new AboutViewModel() }                
+                { SplitViewPages.About, new AboutViewModel() },
+
+                { SplitViewPages.MainView, _mainView }
             };
+
+            ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.Daemon];
 
             MasterProcess.StartMasterUpdateProcess();
 
-            UpdateMainView();
+            UpdateMainView();            
         }
 
         public static void SelectionChanged(object? sender, SelectionModelSelectionChangedEventArgs e)

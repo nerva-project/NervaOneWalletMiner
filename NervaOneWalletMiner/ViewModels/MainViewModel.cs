@@ -9,16 +9,16 @@ using System.Windows.Input;
 namespace NervaOneWalletMiner.ViewModels;
 
 public class MainViewModel : ViewModelBase
-{             
-    private bool? _isPaneOpen = false;
-    
+{                    
     public SelectionModel<ListBoxItem> Selection { get; }
     public ICommand TriggerPaneCommand { get; }
-    
 
     public MainViewModel()
-    {
-        if(GlobalData.IsConfigFound)
+    {        
+        // Need MainViewModel in UIManager
+        UIManager.SetMainView(this);
+
+        if (GlobalData.IsConfigFound)
         {
             UIManager.SetUpPages();
         }
@@ -27,15 +27,14 @@ public class MainViewModel : ViewModelBase
             UIManager.SetUpFirstRun();            
         }
 
-        // Do not try to add this in above SetUp methods. You'll cause infinite loop
-        GlobalData.ViewModelPages.Add(SplitViewPages.MainView, this);
-
         _CurrentPage = GlobalData.ViewModelPages[SplitViewPages.Daemon];
+
         TriggerPaneCommand = ReactiveCommand.Create(TriggerPane);        
         Selection = new SelectionModel<ListBoxItem>();
         Selection.SelectionChanged += UIManager.SelectionChanged;
     }
 
+    private bool? _isPaneOpen = false;
     public bool? IsPaneOpen
     {
         get => _isPaneOpen;
@@ -81,5 +80,14 @@ public class MainViewModel : ViewModelBase
     private void TriggerPane()
     {
         IsPaneOpen = !IsPaneOpen;
+    }
+
+
+    public delegate void CheckAndGetCliAction();
+    public event CheckAndGetCliAction? CheckAndGetCliEvent;
+
+    public void CheckAndGetCliTools()
+    {
+        CheckAndGetCliEvent!.Invoke();
     }
 }
