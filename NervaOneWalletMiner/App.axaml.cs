@@ -4,8 +4,6 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects.Constants;
-using NervaOneWalletMiner.Rpc;
-using NervaOneWalletMiner.Rpc.Daemon.Requests;
 using NervaOneWalletMiner.ViewModels;
 using NervaOneWalletMiner.Views;
 using System;
@@ -61,62 +59,7 @@ public partial class App : Application
     {
         Logger.LogDebug("APP.ONET", "Exiting...");
 
-        Shutdown();
-    }
-
-    public static void Shutdown()
-    {
-        try
-        {            
-            if(GlobalData.IsWalletOpen)
-            {
-                ForceWalletClose();
-            }
-
-            Logger.LogDebug("APP.STDN", "Forcing wallet process close.");
-            WalletProcess.ForceClose();
-
-            if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopOnExit)
-            {
-                ForceDaemonStop();
-
-                Logger.LogDebug("APP.STDN", "Forcing daemon process close.");
-                DaemonProcess.ForceClose();
-            }            
-        }
-        catch (Exception ex)
-        {
-            Logger.LogException("APP.STDN", ex);
-        }
-
-        Logger.LogInfo("APP.STDN", "PROGRAM TERMINATED");
-        Environment.Exit(0);
-    }
-
-    public static async void ForceWalletClose()
-    {
-        try
-        {
-            Logger.LogDebug("APP.FWCL", "Closing wallet: " + GlobalData.OpenedWalletName);
-            _ = await GlobalData.WalletService.CloseWallet(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new Rpc.Wallet.Requests.CloseWalletRequest());
-        }
-        catch (Exception ex)
-        {
-            Logger.LogException("APP.FWCL", ex);
-        }
-    }
-
-    public static async void ForceDaemonStop()
-    {
-        try
-        {
-            Logger.LogDebug("APP.FDSP", "Stopping Daemon.");
-            _ = await GlobalData.DaemonService.StopDaemon(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new StopDaemonRequest());
-        }
-        catch (Exception ex)
-        {
-            Logger.LogException("APP.FDSP", ex);
-        }
+        GlobalMethods.Shutdown();
     }
 
     public static void SetUpDefaults()

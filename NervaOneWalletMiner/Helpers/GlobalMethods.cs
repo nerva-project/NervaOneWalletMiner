@@ -21,6 +21,7 @@ using NervaOneWalletMiner.Objects.DataGrid;
 using Avalonia.Input;
 using Avalonia.Controls;
 using NervaOneWalletMiner.Objects.Stats;
+using NervaOneWalletMiner.Rpc.Daemon.Requests;
 
 namespace NervaOneWalletMiner.Helpers
 {
@@ -662,6 +663,8 @@ namespace NervaOneWalletMiner.Helpers
             {
                 if(File.Exists(GlobalData.ConfigFileNameWithPath))
                 {
+                    GlobalData.IsConfigFound = true;
+
                     using (TextReader reader = new StreamReader(GlobalData.ConfigFileNameWithPath))
                     {
                         var fileContents = reader.ReadToEnd();
@@ -671,7 +674,11 @@ namespace NervaOneWalletMiner.Helpers
                             GlobalData.AppSettings = settings;
                         }
                     }
-                }            
+                }
+                else
+                {
+                    GlobalData.IsConfigFound = false;
+                }
             }
             catch (Exception ex)
             {
@@ -908,5 +915,62 @@ namespace NervaOneWalletMiner.Helpers
                 Logger.LogException("GLM.CTCL", ex);
             }
         }
+
+        #region Exit Application
+        public static void Shutdown()
+        {
+            try
+            {
+                if (GlobalData.IsWalletOpen)
+                {
+                    ForceWalletClose();
+                }
+
+                Logger.LogDebug("GLM.STDN", "Forcing wallet process close.");
+                WalletProcess.ForceClose();
+
+                if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopOnExit)
+                {
+                    ForceDaemonStop();
+
+                    Logger.LogDebug("GLM.STDN", "Forcing daemon process close.");
+                    DaemonProcess.ForceClose();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("GLM.STDN", ex);
+            }
+
+            Logger.LogInfo("GLM.STDN", "PROGRAM TERMINATED");
+            Environment.Exit(0);
+        }
+
+        public static async void ForceWalletClose()
+        {
+            try
+            {
+                Logger.LogDebug("GLM.FWCL", "Closing wallet: " + GlobalData.OpenedWalletName);
+                _ = await GlobalData.WalletService.CloseWallet(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new Rpc.Wallet.Requests.CloseWalletRequest());
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("GLM.FWCL", ex);
+            }
+        }
+
+        public static async void ForceDaemonStop()
+        {
+            try
+            {
+                Logger.LogDebug("GLM.FDSP", "Stopping Daemon.");
+                _ = await GlobalData.DaemonService.StopDaemon(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new StopDaemonRequest());
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("GLM.FDSP", ex);
+            }
+        }
+        #endregion // Exit Application
     }
 }

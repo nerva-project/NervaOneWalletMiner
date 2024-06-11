@@ -25,6 +25,8 @@ namespace NervaOneWalletMiner.Helpers
         public const string AddressBookFileName = "address.book";
         public static string CoinDirName = Coin.XNV;
 
+        public static bool IsConfigFound = false;
+
         public const string NervaOneGitHubLink = "https://github.com/nerva-project/NervaOneWalletMiner";
         public const string NervaDiscordLink = "https://discord.gg/KxjqZytC5Y";
         public const string NervaTelegramLink = "https://t.me/NervaCrypto";

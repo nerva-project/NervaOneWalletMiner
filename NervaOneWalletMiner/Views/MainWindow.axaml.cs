@@ -56,7 +56,8 @@ public partial class MainWindow : Window
                 Logger.LogDebug("MAW.CTLC", "CLI tools download cancelled.");
                 await Dispatcher.UIThread.Invoke(async () =>
                 {
-                    MessageBoxView window = new("Client Tools Missing", "Software cannot run without client tools. Switch coin or restart to download client tools.", true);
+                    MessageBoxView window = new("Client Tools Missing", "NervaOne cannot run without client tools. Switch coin or restart to download client tools. "
+                        + "Alternatively you can put your own client tools in Daemon Setup > Open Client Tools Folder", true);
                     await window.ShowDialog(this);
                 });               
             }

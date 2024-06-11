@@ -48,22 +48,52 @@ public class MainViewModel : ViewModelBase
 
     public MainViewModel()
     {
-        // Set up split view pages
-        ViewModelPagesDictionary.Add(SplitViewPages.Daemon, new DaemonViewModel());
-        ViewModelPagesDictionary.Add(SplitViewPages.Wallet, new WalletViewModel());        
-        ViewModelPagesDictionary.Add(SplitViewPages.Transfers, new TransfersViewModel());
-        ViewModelPagesDictionary.Add(SplitViewPages.AddressBook, new AddressBookViewModel());
-        ViewModelPagesDictionary.Add(SplitViewPages.DaemonSetup, new DaemonSetupViewModel());
-        ViewModelPagesDictionary.Add(SplitViewPages.WalletSetup, new WalletSetupViewModel());
-        ViewModelPagesDictionary.Add(SplitViewPages.Settings, new SettingsViewModel());
-        ViewModelPagesDictionary.Add(SplitViewPages.About, new AboutViewModel());        
-
-        TriggerPaneCommand = ReactiveCommand.Create(TriggerPane);
+        if(GlobalData.IsConfigFound)
+        {
+            SetUpPages();
+        }
+        else
+        {
+            SetUpFirstRun();            
+        }        
 
         _CurrentPage = ViewModelPagesDictionary[SplitViewPages.Daemon];
 
+        TriggerPaneCommand = ReactiveCommand.Create(TriggerPane);        
         Selection = new SelectionModel<ListBoxItem>();
         Selection.SelectionChanged += SelectionChanged;
+    }
+
+    public void SetUpFirstRun()
+    {
+        // One page to rule them all
+        ViewModelPagesDictionary = new()
+        {
+            { SplitViewPages.Daemon, new PickCoinViewModel() },
+            { SplitViewPages.Wallet, new PickCoinViewModel() },
+            { SplitViewPages.Transfers, new PickCoinViewModel() },
+            { SplitViewPages.AddressBook, new PickCoinViewModel() },
+            { SplitViewPages.DaemonSetup, new PickCoinViewModel() },
+            { SplitViewPages.WalletSetup, new PickCoinViewModel() },
+            { SplitViewPages.Settings, new PickCoinViewModel() },
+            { SplitViewPages.About, new PickCoinViewModel() }
+        };
+    }
+
+    public void SetUpPages()
+    {
+        // Set up split view pages
+        ViewModelPagesDictionary = new()
+        {
+            { SplitViewPages.Daemon, new DaemonViewModel() },
+            { SplitViewPages.Wallet, new WalletViewModel() },
+            { SplitViewPages.Transfers, new TransfersViewModel() },
+            { SplitViewPages.AddressBook, new AddressBookViewModel() },
+            { SplitViewPages.DaemonSetup, new DaemonSetupViewModel() },
+            { SplitViewPages.WalletSetup, new WalletSetupViewModel() },
+            { SplitViewPages.Settings, new SettingsViewModel() },
+            { SplitViewPages.About, new AboutViewModel() }
+        };
 
         StartMasterUpdateProcess();
 
@@ -97,7 +127,7 @@ public class MainViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _DaemonVersion, value);
     }
 
-    private string _WalletStatus = GlobalData.WalletClosedMessage;
+    private string _WalletStatus = "";
     public string WalletStatus
     {
         get => _WalletStatus;
