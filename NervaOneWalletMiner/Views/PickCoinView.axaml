@@ -20,7 +20,7 @@
 		</TextBlock>
 
 		<TextBlock TextWrapping="WrapWithOverflow">
-			We did not find configuration file so we'll assume it's your first time running NervaOne.
+			I did not find configuration file so I'll assume it's your first time running NervaOne.
 		</TextBlock>
 
 		<TextBlock TextWrapping="WrapWithOverflow">
