@@ -22,7 +22,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             InitializeComponent();
         }
 
-        public TransferFundsView(uint selectedAccountIndex)
+        public TransferFundsView(uint selectedAccountIndex, string toAddress = "", string paymentId = "")
         {
             try
             {
@@ -39,6 +39,16 @@ namespace NervaOneWalletMiner.ViewsDialogs
 
                 cbxSendFrom.ItemsSource = _accounts.Values;
                 cbxSendFrom.SelectedIndex = (int)selectedAccountIndex;
+
+                if(!string.IsNullOrEmpty(toAddress))
+                {
+                    tbxSendTo.Text = toAddress;
+                }
+
+                if (!string.IsNullOrEmpty(paymentId))
+                {
+                    tbxPaymentId.Text = paymentId;
+                }
 
                 // Can change this based on coin and what priories it has
                 List<string> priorityList =

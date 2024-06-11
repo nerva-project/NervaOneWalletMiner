@@ -46,7 +46,7 @@
 						<ListBoxItem Name="address_book" >
 							<StackPanel Spacing="12" Orientation="Horizontal">
 								<PathIcon Height="20" Data="{StaticResource AddressBookIcon}" />
-								<TextBlock Text="AddressBook" />
+								<TextBlock Text="Address Book" />
 							</StackPanel>
 						</ListBoxItem>
 

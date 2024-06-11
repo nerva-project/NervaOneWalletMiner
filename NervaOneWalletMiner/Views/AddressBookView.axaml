@@ -14,15 +14,25 @@
 				Spacing="5"
 				Margin="10"
 				MaxWidth="650">
-		<Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="32,*">
-			<Image Grid.Row="0"
-				   Grid.Column="0"
-				   Name="imgCoinIcon"/>
-			<Label Grid.Row="0"
-				   Grid.Column="1"
-				   Height="24"
-				   Margin="5,0,0,0">Address Book</Label>
+		<Grid ColumnDefinitions="200,*,120">
+			<Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="32,*">
+				<Image Grid.Row="0"
+					   Grid.Column="0"
+					   Name="imgCoinIcon"/>
+				<Label Grid.Row="0"
+					   Grid.Column="1"
+					   Height="24"
+					   Margin="5,0,0,0">Address Book</Label>
+			</Grid>
+
+			<Button Name="btnTransfer"
+					Grid.Row="0"
+					Grid.Column="2"
+					Content="Transfer Funds"
+					DockPanel.Dock="Right"
+					Click="Transfer_Clicked"/>
 		</Grid>
+		
 
 		<DataGrid Name="dtgAddressBook"
 				  AutoGenerateColumns="False"
@@ -35,8 +45,13 @@
 				<DataGridTextColumn Header="Name" Width="*" Binding="{Binding Name}" />
 				<DataGridTextColumn Header="Description" Width="*" Binding="{Binding Description}" />
 				<DataGridTextColumn Header="Address" MinWidth="120" Width="*" Binding="{Binding Address}" />
-				<DataGridTextColumn Header="Payment Id" Binding="{Binding PaymentId}" />
+				<DataGridTextColumn Header="Payment Id" Width="*" Binding="{Binding PaymentId}" />
 			</DataGrid.Columns>
+			<DataGrid.ContextMenu>
+				<ContextMenu>
+					<MenuItem Header="Transfer" Click="Transfer_Clicked"/>
+				</ContextMenu>
+			</DataGrid.ContextMenu>
 		</DataGrid>
 	</StackPanel>
 	

@@ -7,6 +7,7 @@ using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Objects.DataGrid;
 using NervaOneWalletMiner.Rpc.Wallet.Requests;
 using NervaOneWalletMiner.Rpc.Wallet.Responses;
+using NervaOneWalletMiner.ViewModels;
 using NervaOneWalletMiner.ViewsDialogs;
 using System;
 using System.Threading.Tasks;
@@ -23,11 +24,30 @@ namespace NervaOneWalletMiner.Views
             {
                 InitializeComponent();
                 imgCoinIcon.Source = GlobalMethods.GetLogo();
+
+                Initialized += WalletView_Initialized;
             }
             catch (Exception ex)
             {
                 Logger.LogException("WAL.CONS", ex);
             }            
+        }
+
+        private void WalletView_Initialized(object? sender, EventArgs e)
+        {
+            try
+            {
+                if (!GlobalData.IsWalletTransferRegistered)
+                {
+                    WalletViewModel vm = (WalletViewModel)DataContext!;
+                    vm.TransferEvent += (owner, toAddress, paymentId) => ShowTransferDialog(owner, toAddress, paymentId);
+                    GlobalData.IsWalletTransferRegistered = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("WAL.WAVI", ex);
+            }
         }
 
         #region Open Wallet        
@@ -250,26 +270,38 @@ namespace NervaOneWalletMiner.Views
         #region Transfer Funds
         private void TransferFunds_Clicked(object sender, RoutedEventArgs args)
         {
+            ShowTransferDialog(GetWindow(), string.Empty, string.Empty);
+        }
+
+        public void ShowTransferDialog(Window owner, string toAddress, string paymentId)
+        {
             try
             {
-                var dtgAccounts = this.Get<DataGrid>("dtgAccounts");
-                TransferFundsView window;
-
-                if (dtgAccounts.SelectedItem != null)
+                if(GlobalData.IsWalletOpen)
                 {
-                    Account selectedItem = (Account)dtgAccounts.SelectedItem;
-                    window = new TransferFundsView(selectedItem.Index);
+                    var dtgAccounts = this.Get<DataGrid>("dtgAccounts");
+                    TransferFundsView window;
+
+                    uint selectedIndex = 0;
+
+                    if (dtgAccounts.SelectedItem != null)
+                    {
+                        Account selectedItem = (Account)dtgAccounts.SelectedItem;
+                        selectedIndex = selectedItem.Index;
+                    }
+
+                    window = new TransferFundsView(selectedIndex, toAddress, paymentId);
+                    window.ShowDialog(owner).ContinueWith(TransferDialogClosed);
                 }
                 else
                 {
-                    window = new TransferFundsView(0);
+                    MessageBoxView window = new("Transfer", "Please open wallet first.", true);
+                    window.ShowDialog(owner);
                 }
-                
-                window.ShowDialog(GetWindow()).ContinueWith(TransferDialogClosed);
             }
             catch (Exception ex)
             {
-                Logger.LogException("WAL.TRFC", ex);
+                Logger.LogException("WAL.STRD", ex);
             }
         }
 

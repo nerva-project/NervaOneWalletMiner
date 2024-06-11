@@ -36,8 +36,19 @@ namespace NervaOneWalletMiner.Views
 
         private void DaemonView_Initialized(object? sender, EventArgs e)
         {
-            DaemonViewModel vm = (DaemonViewModel)DataContext!;
-            vm.StartMiningEvent += (threads) => StartMiningAsync(threads);
+            try
+            {
+                if (!GlobalData.IsDaemonStartMiningRegistered)
+                {
+                    DaemonViewModel vm = (DaemonViewModel)DataContext!;
+                    vm.StartMiningEvent += (threads) => StartMiningAsync(threads);
+                    GlobalData.IsDaemonStartMiningRegistered = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DMN.DAVI", ex); ;
+            }
         }
 
         public void StartStopMiningClicked(object sender, RoutedEventArgs args)

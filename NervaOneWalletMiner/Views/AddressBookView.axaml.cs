@@ -1,12 +1,18 @@
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Objects.DataGrid;
+using NervaOneWalletMiner.ViewModels;
+using NervaOneWalletMiner.ViewsDialogs;
 using System;
 
 namespace NervaOneWalletMiner.Views
 {
     public partial class AddressBookView : UserControl
     {
+        Window GetWindow() => TopLevel.GetTopLevel(this) as Window ?? throw new NullReferenceException("Invalid Owner");
+
         public AddressBookView()
         {
             try
@@ -57,6 +63,36 @@ namespace NervaOneWalletMiner.Views
             catch (Exception ex)
             {
                 Logger.LogException("ADB.ABRE", ex);
+            }
+        }
+
+        private void Transfer_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                AddressInfo selectedAddress = (AddressInfo)dtgAddressBook.SelectedItem;
+
+                if(selectedAddress == null)
+                {
+                    MessageBoxView window = new("Transfer", "Please select Address first.", true);
+                    window.ShowDialog(GetWindow());
+                }
+                else
+                {
+                    if(!GlobalData.IsWalletTransferRegistered)
+                    {
+                        MessageBoxView window = new("Transfer", "Please open wallet first.", true);
+                        window.ShowDialog(GetWindow());
+                    }
+                    else
+                    {
+                        ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).Transfer(GetWindow(), selectedAddress.Address, selectedAddress.PaymentId);
+                    }                    
+                }                
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("ADB.TRCL", ex);
             }
         }
 

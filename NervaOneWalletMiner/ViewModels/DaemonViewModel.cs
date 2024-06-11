@@ -9,6 +9,10 @@ namespace NervaOneWalletMiner.ViewModels
     {
         public delegate void StartMiningAction(int miningThreads);
         public event StartMiningAction? StartMiningEvent;
+        public void StartMining(int miningThreads)
+        {
+            StartMiningEvent!.Invoke(miningThreads);
+        }
 
 
         private string _StartStopMining = StatusMiner.StartMining;
@@ -86,15 +90,6 @@ namespace NervaOneWalletMiner.ViewModels
         {
             get => _Connections;
             set => this.RaiseAndSetIfChanged(ref _Connections, value);
-        }
-
-
-
-        public DaemonViewModel() { }
-
-        public void StartMining(int miningThreads)
-        {
-            StartMiningEvent!.Invoke(miningThreads);
         }
     }
 }
