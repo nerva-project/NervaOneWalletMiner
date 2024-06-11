@@ -7,6 +7,7 @@ using NervaOneWalletMiner.Objects.Settings.CoinSpecific;
 using NervaOneWalletMiner.Objects.Stats;
 using NervaOneWalletMiner.Rpc.Daemon;
 using NervaOneWalletMiner.Rpc.Wallet;
+using NervaOneWalletMiner.ViewModels;
 using System;
 using System.Collections.Generic;
 
@@ -41,6 +42,10 @@ namespace NervaOneWalletMiner.Helpers
         public static readonly string DataDir = GlobalMethods.GetDataDir();
         public static readonly string LogDir = GlobalMethods.GetLogDir();
         public static readonly string ConfigFileNameWithPath = GlobalMethods.GetConfigFileNameWithPath();
+
+        public static Dictionary<string, ViewModelBase> ViewModelPages = [];
+        public static bool IsInitialDaemonConnectionSuccess = false;
+        public static DateTime LastDaemonResponseTime = DateTime.Now;
 
         public static bool IsWalletOpen = false;
         public static bool IsWalletJustOpened = true;

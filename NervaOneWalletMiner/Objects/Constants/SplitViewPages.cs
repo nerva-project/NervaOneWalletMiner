@@ -10,5 +10,8 @@
         public const string Settings = "settings";
         public const string About = "about";
         public const string AddressBook = "address_book";
+
+        // Non-UI View. Needed so I have reference to it
+        public const string MainView = "main_view";
     }
 }
