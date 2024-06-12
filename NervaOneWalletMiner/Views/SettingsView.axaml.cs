@@ -50,7 +50,7 @@ namespace NervaOneWalletMiner.Views
             }            
         }
 
-        public void SaveSettingsClicked(object sender, RoutedEventArgs args)
+        public void SaveSettings_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {

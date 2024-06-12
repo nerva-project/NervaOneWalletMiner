@@ -8,7 +8,7 @@
         x:Class="NervaOneWalletMiner.Views.PickCoinView">
 
 	<Design.DataContext>
-		<vm:PickCoinViewModel />
+		<vm:PickCoinViewModel/>
 	</Design.DataContext>
 	
 	<StackPanel Spacing="30" Margin="40" HorizontalAlignment="Center">
@@ -74,5 +74,7 @@
 					Click="ExitButton_Clicked"
 					Margin="15,0,0,0"/>
 		</DockPanel>
+		
 	</StackPanel>
+	
 </UserControl>

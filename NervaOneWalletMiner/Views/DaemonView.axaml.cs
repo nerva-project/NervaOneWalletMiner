@@ -53,7 +53,7 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
-        public async void StartStopMiningClicked(object sender, RoutedEventArgs args)
+        public async void StartStopMining_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {

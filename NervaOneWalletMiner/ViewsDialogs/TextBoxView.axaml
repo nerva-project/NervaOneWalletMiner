@@ -17,12 +17,12 @@
 		<DockPanel Margin="0,15,0,0">
 			<Button Name="btnOk"
 					Content="OK"
-					Click="OkButtonClicked"
+					Click="OkButton_Clicked"
 					IsDefault="True"/>
 
 			<Button Name="btnCancel"
 					Content="Cancel"
-					Click="CancelButtonClicked"
+					Click="CancelButton_Clicked"
 					Margin="10,0,0,0"/>
 		</DockPanel>
 	</StackPanel>

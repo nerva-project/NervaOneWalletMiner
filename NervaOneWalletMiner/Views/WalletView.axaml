@@ -7,7 +7,7 @@
              x:Class="NervaOneWalletMiner.Views.WalletView">
 
 	<Design.DataContext>
-		<vm:WalletViewModel />
+		<vm:WalletViewModel/>
 	</Design.DataContext>
 
 	<StackPanel HorizontalAlignment="Stretch"
@@ -18,11 +18,12 @@
 			<Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="32,*">
 				<Image Grid.Row="0"
 					   Grid.Column="0"
-					   Name="imgCoinIcon"></Image>
+					   Name="imgCoinIcon"/>
 				<Label Grid.Row="0"
 					   Grid.Column="1"
+					   Content="Wallet"
 					   Height="24"
-					   Margin="5,0,0,0">Wallet</Label>
+					   Margin="5,0,0,0"/>
 			</Grid>
 
 			<Button Name="btnOpenCloseWallet"
@@ -30,39 +31,54 @@
 					Content="{Binding OpenCloseWallet}"
 					DockPanel.Dock="Right"
 					Width="120"
-					Click="OpenCloseWalletClicked" />
+					Click="OpenCloseWallet_Clicked"/>
 		</Grid>
 
 		<Grid ColumnDefinitions="200,*,200" Margin="0,20,0,0">
 			<Grid ColumnDefinitions="110,100" Grid.Row="0" Grid.Column="0">
 				<Grid.RowDefinitions>
-					<RowDefinition Height="35" />
-					<RowDefinition Height="35" />
+					<RowDefinition Height="35"/>
+					<RowDefinition Height="35"/>
 				</Grid.RowDefinitions>
 
-				<Label Grid.Row="0" Grid.Column="0" Content="{Binding TotalLockedLabel}" />
-				<Label Grid.Row="0" Grid.Column="1" Content="{Binding TotalCoins}" Width="160" HorizontalAlignment="Left" />
-				<Label Grid.Row="1" Grid.Column="0" Content="{Binding TotalUnlockedLabel}" />
-				<Label Grid.Row="1" Grid.Column="1" Content="{Binding UnlockedCoins}" Width="160" HorizontalAlignment="Left" />
+				<Label Grid.Row="0" 
+					   Grid.Column="0"
+					   Content="{Binding TotalLockedLabel}"/>
+				<Label Grid.Row="0"
+					   Grid.Column="1"
+					   Content="{Binding TotalCoins}"
+					   Width="160"
+					   HorizontalAlignment="Left"/>
+				<Label Grid.Row="1"
+					   Grid.Column="0"
+					   Content="{Binding TotalUnlockedLabel}"/>
+				<Label Grid.Row="1"
+					   Grid.Column="1"
+					   Content="{Binding UnlockedCoins}"
+					   Width="160"
+					   HorizontalAlignment="Left"/>
 			</Grid>
 
-			<Grid ColumnDefinitions="120" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right">
+			<Grid ColumnDefinitions="120"
+				  Grid.Row="0"
+				  Grid.Column="2"
+				  HorizontalAlignment="Right">
 				<Grid.RowDefinitions>
-					<RowDefinition Height="30" />
-					<RowDefinition Height="30" />
+					<RowDefinition Height="30"/>
+					<RowDefinition Height="30"/>
 				</Grid.RowDefinitions>
 
 				<Button Name="btnTransferFunds"
 						Content="Transfer Funds"
 						Grid.Row="0" Grid.Column="0"						
 						HorizontalAlignment="Stretch"
-						Click="TransferFunds_Clicked" />
+						Click="TransferFunds_Clicked"/>
 				
 				<Button Name="btnAddressInfo"
 						Grid.Row="1" Grid.Column="0"
 						Content="Address Info"
 						HorizontalAlignment="Stretch"
-						Click="AddressInfo_Clicked" />
+						Click="AddressInfo_Clicked"/>
 			</Grid>
 		</Grid>
 		<DataGrid Name="dtgAccounts"
@@ -76,27 +92,42 @@
 			<DataGrid.Columns>
 				<DataGridTemplateColumn Header="">
 					<DataTemplate DataType="Bitmap">
-						<Image Source="{Binding WalletIcon}" Height="15"></Image>
+						<Image Source="{Binding WalletIcon}" Height="15"/>
 					</DataTemplate>
 				</DataGridTemplateColumn>
-				<DataGridTextColumn Header="Id" Binding="{Binding Index}" />
-				<DataGridTextColumn Header="Label" MinWidth="120" Width="*" Binding="{Binding Label}" />
-				<DataGridTextColumn Header="Address" MinWidth="120" Width="*" Binding="{Binding AddressShort}" />
-				<DataGridTextColumn Header="Balance" Binding="{Binding BalanceLocked}" />
-				<DataGridTextColumn Header="Unlocked" Binding="{Binding BalanceUnlocked}" />
+				<DataGridTextColumn Header="Id"
+									Binding="{Binding Index}"/>
+				<DataGridTextColumn Header="Label"
+									MinWidth="120"
+									Width="*"
+									Binding="{Binding Label}"/>
+				<DataGridTextColumn Header="Address"
+									MinWidth="120"
+									Width="*"
+									Binding="{Binding AddressShort}"/>
+				<DataGridTextColumn Header="Balance"
+									Binding="{Binding BalanceLocked}"/>
+				<DataGridTextColumn Header="Unlocked"
+									Binding="{Binding BalanceUnlocked}"/>
 			</DataGrid.Columns>
 			<DataGrid.ContextMenu>
 				<ContextMenu>
-					<MenuItem Header="Address Info" Click="AddressInfo_Clicked"/>
+					<MenuItem Header="Address Info"
+							  Click="AddressInfo_Clicked"/>
 					<Separator/>
-					<MenuItem Header="Create New Account" Click="CreateAccount_Clicked"/>
-					<MenuItem Header="Rename Label" Click="RenameLabel_Clicked"/>
+					<MenuItem Header="Create New Account"
+							  Click="CreateAccount_Clicked"/>
+					<MenuItem Header="Rename Label"
+							  Click="RenameLabel_Clicked"/>
 					<Separator/>
-					<MenuItem Header="Transfer Funds" Click="TransferFunds_Clicked"/>					
-					<MenuItem Header="Start Mining" Click="StartMining_Clicked"/>
+					<MenuItem Header="Transfer Funds"
+							  Click="TransferFunds_Clicked"/>					
+					<MenuItem Header="Start Mining"
+							  Click="StartMining_Clicked"/>
 				</ContextMenu>
 			</DataGrid.ContextMenu>
 		</DataGrid>
 
 	</StackPanel>
+	
 </UserControl>

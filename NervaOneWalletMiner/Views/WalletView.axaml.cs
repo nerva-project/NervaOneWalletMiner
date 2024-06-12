@@ -51,7 +51,7 @@ namespace NervaOneWalletMiner.Views
         }
 
         #region Open Wallet        
-        public void OpenCloseWalletClicked(object sender, RoutedEventArgs args)
+        public void OpenCloseWallet_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
@@ -66,7 +66,7 @@ namespace NervaOneWalletMiner.Views
                 }
                 else
                 {
-                    // TODO: Close wallet
+                    // Close wallet
                     CloseUserWallet();
                     btnOpenCloseWallet.Content = StatusWallet.OpenWallet;
                 }

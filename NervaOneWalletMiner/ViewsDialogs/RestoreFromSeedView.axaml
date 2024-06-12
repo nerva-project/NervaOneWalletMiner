@@ -39,7 +39,7 @@
 			<Button Name="btnShowHidePassword"
 					Content="Show"
 					Margin="10,0,0,0"
-					Click="ShowHidePasswordButtonClicked"/>
+					Click="ShowHidePasswordButton_Clicked"/>
 		</DockPanel>
 		
 		<Label Content="Language" Margin="0,15,0,0"/>
@@ -48,12 +48,11 @@
 		<DockPanel Margin="0,15,0,0">
 			<Button Name="btnOk"
 					Content="OK"
-					Click="OkButtonClicked"
+					Click="OkButton_Clicked"
 					IsDefault="True"/>
 
 			<Button Name="btnCancel"
 					Content="Cancel"
-					Click="CancelButtonClicked"
 					Margin="10,0,0,0"/>
 		</DockPanel>
 	</StackPanel>

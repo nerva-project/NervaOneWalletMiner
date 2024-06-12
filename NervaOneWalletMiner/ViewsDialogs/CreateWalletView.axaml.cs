@@ -27,7 +27,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
         }
 
-        public void OkButtonClicked(object sender, RoutedEventArgs args)
+        public void OkButton_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
@@ -59,7 +59,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
         }
 
-        public void CancelButtonClicked(object sender, RoutedEventArgs args)
+        public void CancelButton_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
@@ -76,7 +76,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
         }
 
-        public void ShowHidePasswordButtonClicked(object sender, RoutedEventArgs args)
+        public void ShowHidePasswordButton_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {

@@ -7,7 +7,7 @@
              x:Class="NervaOneWalletMiner.Views.TransfersView">
 
 	<Design.DataContext>
-		<vm:TransfersViewModel />
+		<vm:TransfersViewModel/>
 	</Design.DataContext>
 
 	<StackPanel HorizontalAlignment="Stretch"
@@ -18,11 +18,12 @@
 			<Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="32,*">
 				<Image Grid.Row="0"
 					   Grid.Column="0"
-					   Name="imgCoinIcon"></Image>
+					   Name="imgCoinIcon"/>
 				<Label Grid.Row="0"
 					   Grid.Column="1"
+					   Content="Transfers"
 					   Height="24"
-					   Margin="5,0,0,0">Transfers</Label>
+					   Margin="5,0,0,0"/>
 			</Grid>
 
 			<Button Name="btnTransactionDetails"
@@ -30,7 +31,7 @@
 				Grid.Column="2"
 				Content="Transaction Details"
 				DockPanel.Dock="Right"
-				Click="TransactionDetailsClicked"/>
+				Click="TransactionDetails_Clicked"/>
 		</Grid>
 
 		<DataGrid ItemsSource="{Binding Transactions}"
@@ -44,15 +45,22 @@
 			<DataGrid.Columns>
 				<DataGridTemplateColumn Header="">
 					<DataTemplate DataType="Bitmap">
-						<Image Source="{Binding Icon}" Height="15"></Image>
+						<Image Source="{Binding Icon}" Height="15"/>
 					</DataTemplate>
 				</DataGridTemplateColumn>				
-				<DataGridTextColumn Header="Height" Binding="{Binding Height}" />
-				<DataGridTextColumn Header="Time" MinWidth="120" Width="*" Binding="{Binding Timestamp}" />
-				<DataGridTextColumn Header="Amount" Binding="{Binding Amount}" />
-				<DataGridTextColumn Header="Transaction Id" Binding="{Binding TransactionIdShort}" />				
+				<DataGridTextColumn Header="Height"
+									Binding="{Binding Height}"/>
+				<DataGridTextColumn Header="Time"
+									MinWidth="120"
+									Width="*"
+									Binding="{Binding Timestamp}"/>
+				<DataGridTextColumn Header="Amount"
+									Binding="{Binding Amount}"/>
+				<DataGridTextColumn Header="Transaction Id"
+									Binding="{Binding TransactionIdShort}"/>
 			</DataGrid.Columns>
 		</DataGrid>
+		
 	</StackPanel>
     
 </UserControl>

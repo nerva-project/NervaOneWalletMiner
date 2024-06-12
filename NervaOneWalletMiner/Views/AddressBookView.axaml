@@ -7,7 +7,7 @@
              x:Class="NervaOneWalletMiner.Views.AddressBookView">
 
 	<Design.DataContext>
-		<vm:AddressBookViewModel />
+		<vm:AddressBookViewModel/>
 	</Design.DataContext>
 
 	<StackPanel HorizontalAlignment="Stretch"
@@ -21,8 +21,9 @@
 					   Name="imgCoinIcon"/>
 				<Label Grid.Row="0"
 					   Grid.Column="1"
+					   Content="Address Book"
 					   Height="24"
-					   Margin="5,0,0,0">Address Book</Label>
+					   Margin="5,0,0,0"/>
 			</Grid>
 
 			<Button Name="btnTransfer"
@@ -31,8 +32,7 @@
 					Content="Transfer Funds"
 					DockPanel.Dock="Right"
 					Click="Transfer_Clicked"/>
-		</Grid>
-		
+		</Grid>		
 
 		<DataGrid Name="dtgAddressBook"
 				  AutoGenerateColumns="False"
@@ -42,18 +42,30 @@
 				  Margin="0,10,0,0"
 				  RowEditEnded="AddressBook_RowEditEnded">
 			<DataGrid.Columns>
-				<DataGridTextColumn Header="Name" Width="*" Binding="{Binding Name}" />
-				<DataGridTextColumn Header="Description" Width="*" Binding="{Binding Description}" />
-				<DataGridTextColumn Header="Address" MinWidth="120" Width="*" Binding="{Binding Address}" />
-				<DataGridTextColumn Header="Payment Id" Width="*" Binding="{Binding PaymentId}" />
+				<DataGridTextColumn Header="Name"
+									Width="*"
+									Binding="{Binding Name}"/>
+				<DataGridTextColumn Header="Description"
+									Width="*"
+									Binding="{Binding Description}"/>
+				<DataGridTextColumn Header="Address"
+									MinWidth="120"
+									Width="*"
+									Binding="{Binding Address}"/>
+				<DataGridTextColumn Header="Payment Id"
+									Width="*"
+									Binding="{Binding PaymentId}"/>
 			</DataGrid.Columns>
 			<DataGrid.ContextMenu>
 				<ContextMenu>
-					<MenuItem Header="Transfer to Address" Click="Transfer_Clicked"/>
-					<MenuItem Header="Delete Address" Click="Delete_Clicked"/>					
+					<MenuItem Header="Transfer to Address"
+							  Click="Transfer_Clicked"/>
+					<MenuItem Header="Delete Address"
+							  Click="Delete_Clicked"/>					
 				</ContextMenu>
 			</DataGrid.ContextMenu>
 		</DataGrid>
+		
 	</StackPanel>
 	
 </UserControl>

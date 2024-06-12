@@ -7,7 +7,7 @@
              x:Class="NervaOneWalletMiner.Views.AboutView">
 
 	<Design.DataContext>
-		<vm:DaemonSetupViewModel />
+		<vm:DaemonSetupViewModel/>
 	</Design.DataContext>
 
 	<StackPanel HorizontalAlignment="Stretch"
@@ -21,13 +21,14 @@
 				   Name="imgCoinIcon"/>
 			<Label Grid.Row="0"
 				   Grid.Column="1"
+				   Content="About NervaOne"
 				   Height="24"
-				   Margin="5,0,0,0">About NervaOne</Label>
+				   Margin="5,0,0,0"/>
 		</Grid>
 
 		<TextBlock TextWrapping="Wrap" Margin="0,10,0,0">
 			NervaOne Wallet and Miner is an open source, multi-coin
-			wallet and CPU miner created by Nerva team:
+			wallet and CPU miner created by The Nerva Project.
 		</TextBlock>
 
 		<Button Name="btnGitHub"
@@ -36,7 +37,7 @@
 			Click="OpenGitHub_Clicked"/>
 
 		<TextBlock TextWrapping="Wrap" Margin="0,10,0,0">
-			It is non-custodial wallet that uses core software from your device 
+			It is non-custodial software that uses core software from your device 
 			to manage miner and provide wallet functionality.
 		</TextBlock>
 
@@ -44,16 +45,17 @@
 			By using NervaOne, you are running your own nodes of the coins
 			you choose to support, decentralizing their blockchains
 			and at the same time being your own bank.
-			Everything runs on your device so there are no 3rd parties involved.
+			Everything runs on your device and there are no 3rd parties involved.
 		</TextBlock>
 
 		<TextBlock TextWrapping="Wrap" Margin="0,10,0,0">
-			The software has modern design that's easy to use for new users.
+			The software has modern design that's relatively easy to use for new users
+			but also puts advanced users in control.
 		</TextBlock>
 
 		<TextBlock TextWrapping="Wrap" Margin="0,10,0,0">
-			If you need help with NervaOne, or just want to say Hi,
-			stop by Nerva's Discord or Telegram:
+			If you need help with NervaOne or just want to say Hi,
+			stop by Nerva's Discord or Telegram.
 		</TextBlock>
 
 		<Button Name="btnDiscord"

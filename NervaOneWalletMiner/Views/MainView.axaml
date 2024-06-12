@@ -7,76 +7,81 @@
              mc:Ignorable="d" d:DesignWidth="650" d:DesignHeight="600"
              x:Class="NervaOneWalletMiner.Views.MainView"
              x:DataType="vm:MainViewModel">
-  <Design.DataContext>
-    <!-- This only sets the DataContext for the previewer in an IDE,
-         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-    <vm:MainViewModel />
-  </Design.DataContext>
+	
+	<Design.DataContext>
+	<!-- This only sets the DataContext for the previewer in an IDE,
+			to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+		<vm:MainViewModel/>
+	</Design.DataContext>
+	
 	<Grid RowDefinitions="*,50">
 		<SplitView IsPaneOpen="{Binding IsPaneOpen}"
-				   DisplayMode="CompactInline"
-				   OpenPaneLength="160"
-				   CompactPaneLength="46"
-				   Grid.Row="0">
+					DisplayMode="CompactInline"
+					OpenPaneLength="160"
+					CompactPaneLength="46"
+					Grid.Row="0">
 			<SplitView.Pane>
 				<StackPanel Spacing="3" Margin="2">
-					<Button Width="32" Height="32" Margin="4 7" Command="{Binding TriggerPaneCommand}">
-						<PathIcon Height="14" Data="{StaticResource LineHorizontal3Regular}" />
+					<Button Width="32"
+							Height="32"
+							Margin="4 7"
+							Command="{Binding TriggerPaneCommand}">
+						<PathIcon Height="14" Data="{StaticResource LineHorizontal3Regular}"/>
 					</Button>
 				
 					<ListBox Selection="{Binding Selection}">
 						<ListBoxItem Name="daemon" IsSelected="True">
 							<StackPanel Spacing="12" Orientation="Horizontal">
-								<PathIcon Height="20" Data="{StaticResource DaemonIcon}" />
-								<TextBlock Text="Daemon" />
+								<PathIcon Height="20" Data="{StaticResource DaemonIcon}"/>
+								<TextBlock Text="Daemon"/>
 							</StackPanel>										
 						</ListBoxItem>
 						<ListBoxItem Name="wallet">
 							<StackPanel Spacing="12" Orientation="Horizontal">
-								<PathIcon Height="20" Data="{StaticResource WalletIcon}" />
-								<TextBlock Text="Wallet" />
+								<PathIcon Height="20" Data="{StaticResource WalletIcon}"/>
+								<TextBlock Text="Wallet"/>
 							</StackPanel>
 						</ListBoxItem>
 						<ListBoxItem Name="transfers" >
 							<StackPanel Spacing="12" Orientation="Horizontal">
-								<PathIcon Height="20" Data="{StaticResource TransfersIcon}" />
-								<TextBlock Text="Transfers" />
+								<PathIcon Height="20" Data="{StaticResource TransfersIcon}"/>
+								<TextBlock Text="Transfers"/>
 							</StackPanel>
 						</ListBoxItem>
-						<ListBoxItem Name="address_book" >
+						<ListBoxItem Name="address_book">
 							<StackPanel Spacing="12" Orientation="Horizontal">
-								<PathIcon Height="20" Data="{StaticResource AddressBookIcon}" />
-								<TextBlock Text="Address Book" />
+								<PathIcon Height="20" Data="{StaticResource AddressBookIcon}"/>
+								<TextBlock Text="Address Book"/>
 							</StackPanel>
 						</ListBoxItem>
 
-						<ListBoxItem Name="space" Padding="10" IsEnabled="False" />
+						<ListBoxItem Name="space" Padding="10" IsEnabled="False"/>
 						
-						<ListBoxItem Name="daemon_setup" >
+						<ListBoxItem Name="daemon_setup">
 							<StackPanel Spacing="12" Orientation="Horizontal">
-								<PathIcon Height="20" Data="{StaticResource DaemonSetupIcon}" />
-								<TextBlock Text="Daemon Setup" />
+								<PathIcon Height="20" Data="{StaticResource DaemonSetupIcon}"/>
+								<TextBlock Text="Daemon Setup"/>
 							</StackPanel>
 						</ListBoxItem>
 						<ListBoxItem Name="wallet_setup">
 							<StackPanel Spacing="12" Orientation="Horizontal">
-								<PathIcon Height="20" Data="{StaticResource WalletSetupIcon}" />
-								<TextBlock Text="Wallet Setup" />
+								<PathIcon Height="20" Data="{StaticResource WalletSetupIcon}"/>
+								<TextBlock Text="Wallet Setup"/>
 							</StackPanel>
 						</ListBoxItem>
-						<ListBoxItem Name="settings" >
+						<ListBoxItem Name="settings">
 							<StackPanel Spacing="12" Orientation="Horizontal">
-								<PathIcon Height="20" Data="{StaticResource SettingsIcon}" />
-								<TextBlock Text="Settings" />
+								<PathIcon Height="20" Data="{StaticResource SettingsIcon}"/>
+								<TextBlock Text="Settings"/>
 							</StackPanel>
 						</ListBoxItem>
 
-						<ListBoxItem Name="space2" Padding="10" IsEnabled="False" />
+						<ListBoxItem Name="space2" Padding="10" IsEnabled="False"/>
 
 						<ListBoxItem Name="about" >
 							<StackPanel Spacing="12" Orientation="Horizontal">
-								<PathIcon Height="20" Data="{StaticResource AboutIcon}" />
-								<TextBlock Text="About" />
+								<PathIcon Height="20" Data="{StaticResource AboutIcon}"/>
+								<TextBlock Text="About"/>
 							</StackPanel>
 						</ListBoxItem>
 					</ListBox>
@@ -85,11 +90,12 @@
 		
 			<SplitView.Content>
 				<Grid RowDefinitions="*,Auto" Margin="10">
-				<TransitioningContentControl Content="{Binding CurrentPage}" />
+				<TransitioningContentControl Content="{Binding CurrentPage}"/>
 				</Grid>
 			</SplitView.Content>
 		</SplitView >
 
-		<uc:StatusBarView Grid.Row="1"></uc:StatusBarView>
+		<uc:StatusBarView Grid.Row="1"/>
 	</Grid>
+	
 </UserControl>

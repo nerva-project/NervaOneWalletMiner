@@ -25,7 +25,7 @@ namespace NervaOneWalletMiner.Views
             }            
         }
 
-        public void TransactionDetailsClicked(object sender, RoutedEventArgs args)
+        public void TransactionDetails_Clicked(object sender, RoutedEventArgs args)
         {
             OpenTransactionDetailsView();
         }

@@ -71,7 +71,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }            
         }
 
-        public async void OkButtonClicked(object sender, RoutedEventArgs args)
+        public async void OkButton_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
@@ -132,7 +132,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
         }
 
-        public void CancelButtonClicked(object sender, RoutedEventArgs args)
+        public void CancelButton_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
