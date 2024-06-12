@@ -37,11 +37,11 @@ namespace NervaOneWalletMiner.Views
         {
             try
             {
-                if (!GlobalData.IsWalletTransferRegistered)
+                if (!GlobalData.AreWalletEventsRegistered)
                 {
                     WalletViewModel vm = (WalletViewModel)DataContext!;
                     vm.TransferEvent += (owner, toAddress, paymentId) => ShowTransferDialog(owner, toAddress, paymentId);
-                    GlobalData.IsWalletTransferRegistered = true;
+                    GlobalData.AreWalletEventsRegistered = true;
                 }
             }
             catch (Exception ex)
@@ -295,7 +295,7 @@ namespace NervaOneWalletMiner.Views
                 }
                 else
                 {
-                    MessageBoxView window = new("Transfer", "Please open wallet first.", true);
+                    MessageBoxView window = new("Transfer Funds", "Please open wallet first.", true);
                     window.ShowDialog(owner);
                 }
             }
@@ -310,7 +310,7 @@ namespace NervaOneWalletMiner.Views
             DialogResult result = ((DialogResult)((Task<object>)task).Result);
             if (result != null && result.IsOk)
             {
-                // Submit trannsfer
+                // Submit transfer
                 if (!string.IsNullOrEmpty(result.SendToAddress) && result.SendAmount > 0)
                 {
                     if (result.IsSplitTranfer)
@@ -344,7 +344,7 @@ namespace NervaOneWalletMiner.Views
                     Logger.LogError("WAL.MKTR", "Transfer error | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
                     await Dispatcher.UIThread.Invoke(async () =>
                     {
-                        MessageBoxView window = new("Transfer", "Transfer error\r\n\r\n" + response.Error.Message, true);
+                        MessageBoxView window = new("Transfer Funds", "Transfer error\r\n\r\n" + response.Error.Message, true);
                         await window.ShowDialog(GetWindow());
                     });
                 }
@@ -353,7 +353,7 @@ namespace NervaOneWalletMiner.Views
                     Logger.LogDebug("WAL.MKTR", "Transfer successful.");
                     await Dispatcher.UIThread.InvokeAsync(async () =>
                     {
-                        MessageBoxView window = new("Transfer", "Transfer successful!", true);
+                        MessageBoxView window = new("Transfer Funds", "Transfer successful!", true);
                         await window.ShowDialog(GetWindow());
                     });
                 }
@@ -419,20 +419,28 @@ namespace NervaOneWalletMiner.Views
         {
             try
             {
-                var dtgAccounts = this.Get<DataGrid>("dtgAccounts");
-                AddressInfoView window;
-
-                if (dtgAccounts.SelectedItem != null)
+                if (GlobalData.IsWalletOpen)
                 {
-                    Account selectedItem = (Account)dtgAccounts.SelectedItem;
-                    window = new AddressInfoView((int)selectedItem.Index);
+                    var dtgAccounts = this.Get<DataGrid>("dtgAccounts");
+                    AddressInfoView window;
+
+                    if (dtgAccounts.SelectedItem != null)
+                    {
+                        Account selectedItem = (Account)dtgAccounts.SelectedItem;
+                        window = new AddressInfoView((int)selectedItem.Index);
+                    }
+                    else
+                    {
+                        window = new AddressInfoView(0);
+                    }
+
+                    window.ShowDialog(GetWindow());
                 }
                 else
                 {
-                    window = new AddressInfoView(0);
+                    MessageBoxView window = new("Address Info", "Please open wallet first.", true);
+                    window.ShowDialog(GetWindow());
                 }
-
-                window.ShowDialog(GetWindow());
             }
             catch (Exception ex)
             {

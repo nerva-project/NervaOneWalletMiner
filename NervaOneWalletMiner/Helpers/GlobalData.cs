@@ -83,7 +83,7 @@ namespace NervaOneWalletMiner.Helpers
         public static string WalletClosedMessage = "Wallet offline - see Wallet screen to open";
 
         // Views reaload when you switch pages so you will have the same event registered many times. This will prevent it
-        public static bool IsWalletTransferRegistered = false;
-        public static bool IsDaemonStartMiningRegistered = false;
+        public static bool AreWalletEventsRegistered = false;
+        public static bool AreDaemonEventsRegistered = false;
     }
 }

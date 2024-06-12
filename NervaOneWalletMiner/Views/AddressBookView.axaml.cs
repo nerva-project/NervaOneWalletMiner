@@ -85,7 +85,7 @@ namespace NervaOneWalletMiner.Views
                 }
                 else
                 {
-                    if(!GlobalData.IsWalletTransferRegistered)
+                    if(!GlobalData.AreWalletEventsRegistered)
                     {
                         MessageBoxView window = new("Transfer", "Please open wallet first.", true);
                         window.ShowDialog(GetWindow());

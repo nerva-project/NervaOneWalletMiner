@@ -39,12 +39,12 @@ namespace NervaOneWalletMiner.Views
         {
             try
             {
-                if (!GlobalData.IsDaemonStartMiningRegistered)
+                if (!GlobalData.AreDaemonEventsRegistered)
                 {
                     DaemonViewModel vm = (DaemonViewModel)DataContext!;
                     vm.StartMiningUIEvent += (owner, threads) => StartMiningAsync(owner, threads);
                     vm.StartMiningProcessEvent += StartMiningNonUiAsync;
-                    GlobalData.IsDaemonStartMiningRegistered = true;
+                    GlobalData.AreDaemonEventsRegistered = true;
                 }
             }
             catch (Exception ex)
