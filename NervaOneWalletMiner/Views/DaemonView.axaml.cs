@@ -2,6 +2,7 @@
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Objects;
 using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Rpc.Daemon.Requests;
 using NervaOneWalletMiner.Rpc.Daemon.Responses;
@@ -51,7 +52,7 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
-        public void StartStopMiningClicked(object sender, RoutedEventArgs args)
+        public async void StartStopMiningClicked(object sender, RoutedEventArgs args)
         {
             try
             {
@@ -69,18 +70,45 @@ namespace NervaOneWalletMiner.Views
                 }
                 else
                 {
-                    // Start mining
-                    if(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads != nupThreads.Value)
+                    if(string.IsNullOrEmpty(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress))
                     {
-                        GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads = Convert.ToInt32(nupThreads.Value);
-                        GlobalMethods.SaveConfig();
+                        // Get and save Mining Address
+                        Logger.LogDebug("DMN.SSMC", "Mining address missing. Asking user to provide it");
+                        var window = new TextBoxView("Start Mining", string.Empty, "Required - Mining Address", "Please provide mining address", true);
+                        DialogResult dialogRes = await window.ShowDialog<DialogResult>(GetWindow());
+
+                        if (dialogRes != null && dialogRes.IsOk)
+                        {
+                            if(!string.IsNullOrEmpty(dialogRes.TextBoxValue))
+                            {                                
+                                GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress = dialogRes.TextBoxValue;
+                                Logger.LogDebug("DMN.SSMC", "Setting and saving mining address: " + GlobalMethods.GetShorterString(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress, 12));
+                                GlobalMethods.SaveConfig();                                
+                            }
+                        }
                     }
 
-                    Logger.LogDebug("DMN.SSMC", "Starting mining");
-                    GlobalData.IsManualStopMining = false;
-                    StartMiningAsync(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
-                    btnStartStopMining.Content = StatusMiner.StopMining;
-                    nupThreads.IsEnabled = false;
+                    if (string.IsNullOrEmpty(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress))
+                    {
+                        Logger.LogDebug("DMN.SSMC", "Mining address still missing. Aborting mining");
+                        MessageBoxView window = new("Start Mining", "Cannot start mining without Mining Address", true);
+                        await window.ShowDialog(GetWindow());
+                    }
+                    else
+                    {
+                        // Start mining
+                        if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads != nupThreads.Value)
+                        {
+                            GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads = Convert.ToInt32(nupThreads.Value);
+                            GlobalMethods.SaveConfig();
+                        }
+
+                        Logger.LogDebug("DMN.SSMC", "Starting mining");
+                        GlobalData.IsManualStopMining = false;
+                        StartMiningAsync(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
+                        btnStartStopMining.Content = StatusMiner.StopMining;
+                        nupThreads.IsEnabled = false;
+                    }
                 }                
             }
             catch (Exception ex)
@@ -122,7 +150,7 @@ namespace NervaOneWalletMiner.Views
             {
                 StopMiningRequest request = new();
 
-                Logger.LogDebug("GLM.SPMA", "Calling StopMining.");
+                Logger.LogDebug("GLM.SPMA", "Calling StopMining");
                 StopMiningResponse response = await GlobalData.DaemonService.StopMining(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, request);
                 if (response.Error.IsError)
                 {
