@@ -22,23 +22,14 @@ namespace NervaOneWalletMiner.Views
                 InitializeComponent();
                 imgCoinIcon.Source = GlobalMethods.GetLogo();
 
-                var tbxMiningAddress = this.Get<TextBox>("tbxMiningAddress");
                 tbxMiningAddress.Text = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress;
-
-                var tbxDaemonDataDir = this.Get<TextBox>("tbxDaemonDataDir");
                 tbxDaemonDataDir.Text = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].DataDir;
-
-                var cbxAutoStartMining = this.Get<CheckBox>("cbxAutoStartMining");
-                cbxAutoStartMining.IsChecked = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AutoStartMining;
-
-                var cbxStopOnExit = this.Get<CheckBox>("cbxStopOnExit");
-                cbxStopOnExit.IsChecked = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopOnExit;
-
-                var tbxAdditionalArguments = this.Get<TextBox>("tbxAdditionalArguments");
                 tbxAdditionalArguments.Text = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AdditionalArguments;
-
-                var tbxLogLevel = this.Get<TextBox>("tbxLogLevel");
+                tbxPortNumber.Text = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc.Port.ToString();
                 tbxLogLevel.Text = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].LogLevel.ToString();
+
+                cbxAutoStartMining.IsChecked = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AutoStartMining;
+                cbxStopOnExit.IsChecked = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopOnExit;              
             }
             catch (Exception ex)
             {
@@ -46,7 +37,7 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
-        public void OpenCliToolsFolderClicked(object sender, RoutedEventArgs args)
+        public void OpenCliToolsFolder_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
@@ -63,56 +54,65 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
-        public void SaveSettingsClicked(object sender, RoutedEventArgs args)
+        public void SaveSettings_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
                 bool isChanged = false;
-
-                var tbxMiningAddress = this.Get<TextBox>("tbxMiningAddress");                             
+                         
                 if (!string.IsNullOrEmpty(tbxMiningAddress.Text) && GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress != tbxMiningAddress.Text)
                 {
                     GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress = tbxMiningAddress.Text;
                     isChanged = true;
                 }
 
-                var tbxDaemonDataDir = this.Get<TextBox>("tbxDaemonDataDir");
                 if (!string.IsNullOrEmpty(tbxDaemonDataDir.Text) && GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].DataDir != tbxDaemonDataDir.Text)
                 {
                     GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].DataDir = tbxDaemonDataDir.Text;
                     isChanged = true;
                 }
 
-                var cbxAutoStartMining = this.Get<CheckBox>("cbxAutoStartMining");
-                if (cbxAutoStartMining.IsChecked != GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AutoStartMining)
-                {
-                    GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AutoStartMining = ((bool)(cbxAutoStartMining.IsChecked == null ? false : cbxAutoStartMining.IsChecked));
-                    isChanged = true;
-                }
-
-                var cbxStopOnExit = this.Get<CheckBox>("cbxStopOnExit");
-                if (cbxStopOnExit.IsChecked != GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopOnExit)
-                {
-                    GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopOnExit = ((bool)(cbxStopOnExit.IsChecked == null ? false : cbxStopOnExit.IsChecked));
-                    isChanged = true;
-                }
-
-                var tbxAdditionalArguments = this.Get<TextBox>("tbxAdditionalArguments");
                 if (!string.IsNullOrEmpty(tbxAdditionalArguments.Text) && GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AdditionalArguments != tbxAdditionalArguments.Text)
                 {
                     GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AdditionalArguments = tbxAdditionalArguments.Text;
                     isChanged = true;
                 }
 
-                uint logLevel = Convert.ToUInt32(tbxLogLevel.Text);
-                if (!string.IsNullOrEmpty(tbxLogLevel.Text) && GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].LogLevel != logLevel)
+                if (!string.IsNullOrEmpty(tbxPortNumber.Text))
                 {
-                    GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].LogLevel = logLevel;
+                    uint portNumber = Convert.ToUInt32(tbxPortNumber.Text);
+                    if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc.Port != portNumber)
+                    {
+                        GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc.Port = portNumber;
+                        isChanged = true;
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(tbxLogLevel.Text))
+                {
+                    uint logLevel = Convert.ToUInt32(tbxLogLevel.Text);
+                    if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].LogLevel != logLevel)
+                    {
+                        GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].LogLevel = logLevel;
+                        isChanged = true;
+                    }
+                }
+                
+                if (cbxAutoStartMining.IsChecked != GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AutoStartMining)
+                {
+                    GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AutoStartMining = ((bool)(cbxAutoStartMining.IsChecked == null ? false : cbxAutoStartMining.IsChecked));
                     isChanged = true;
                 }
 
-                if (isChanged)
+                if (cbxStopOnExit.IsChecked != GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopOnExit)
                 {
+                    GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopOnExit = ((bool)(cbxStopOnExit.IsChecked == null ? false : cbxStopOnExit.IsChecked));
+                    isChanged = true;
+                }
+
+                // Save setting only if something changed
+                if (isChanged)
+                {                    
                     GlobalMethods.SaveConfig();
                 }
             }
@@ -122,7 +122,8 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
-        public void RestartWithQuickSyncClicked(object sender, RoutedEventArgs args)
+        #region Restart With QuickSync
+        public void RestartWithQuickSync_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
@@ -159,8 +160,10 @@ namespace NervaOneWalletMiner.Views
                 Logger.LogException("DMS.RSQS", ex);
             }
         }
+        #endregion // Restart With QuickSync
 
-        public void RestartWithCommandClicked(object sender, RoutedEventArgs args)
+        #region Restart with Command
+        public void RestartWithCommand_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
@@ -205,5 +208,6 @@ namespace NervaOneWalletMiner.Views
                 Logger.LogException("DMS.RWC1", ex);
             }
         }
+        #endregion // Restart with Command
     }
 }

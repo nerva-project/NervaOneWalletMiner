@@ -318,22 +318,29 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                         }
                         else
                         {
-                            // Set successful response
-                            List<ResGetConnections> getConnectionsResponse = JsonConvert.DeserializeObject<List<ResGetConnections>>(jsonObject.SelectToken("result.connections").ToString());
-
-                            foreach (ResGetConnections connection in getConnectionsResponse)
+                            if (jsonObject.SelectToken("result.connections") != null)
                             {
-                                responseObj.Connections.Add(new Connection
-                                {
-                                    Address = connection.address,
-                                    Height = connection.height,
-                                    LiveTime = TimeSpan.FromSeconds(connection.live_time).ToString(@"hh\:mm\:ss"),
-                                    State = connection.state,
-                                    IsIncoming = connection.incoming
-                                });
-                            }
+                                // Set successful response
+                                List<ResGetConnections> getConnectionsResponse = JsonConvert.DeserializeObject<List<ResGetConnections>>(jsonObject.SelectToken("result.connections").ToString());
 
-                            responseObj.Error.IsError = false;
+                                foreach (ResGetConnections connection in getConnectionsResponse)
+                                {
+                                    responseObj.Connections.Add(new Connection
+                                    {
+                                        Address = connection.address,
+                                        Height = connection.height,
+                                        LiveTime = TimeSpan.FromSeconds(connection.live_time).ToString(@"hh\:mm\:ss"),
+                                        State = connection.state,
+                                        IsIncoming = connection.incoming
+                                    });
+                                }
+
+                                responseObj.Error.IsError = false;
+                            }
+                            else
+                            {
+                                Logger.LogInfo("XMR.DGTC", "Connections missing in result");
+                            }
                         }
                     }
                 }
