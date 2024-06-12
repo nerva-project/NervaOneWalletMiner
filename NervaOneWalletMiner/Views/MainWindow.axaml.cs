@@ -31,12 +31,47 @@ public partial class MainWindow : Window
         {
             MainViewModel vm = (MainViewModel)DataContext!;
             vm.CheckAndGetCliEvent += CheckAndDownloadCliIfNeeded;
+            vm.SyncWithQuickSyncEvent += QuickSyncIfWanted;
 
             CheckAndDownloadCliIfNeeded();
         }
         catch (Exception ex)
         {
             Logger.LogException("MAW.MAWL", ex);
+        }
+    }
+
+    private async void QuickSyncIfWanted(double percentSynced)
+    {
+        try
+        {
+            Logger.LogDebug("MAW.QSIW", "Asking user if they want to use QuickSync");
+            await Dispatcher.UIThread.Invoke(async () =>
+            {
+                MessageBoxView window = new("QuickSync", "You're currently only " + percentSynced.ToString("P1") + " synchronized "
+                    + "\n\r\n\rWould you like to use QuickSync to synchronize faster?", false);
+                await window.ShowDialog(this).ContinueWith(QuickSyncConfirmDialogClosed);
+            });
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException("MAW.QSIW", ex);
+        }
+    }
+
+    private void QuickSyncConfirmDialogClosed(Task task)
+    {
+        try
+        {
+            DialogResult result = ((DialogResult)((Task<object>)task).Result);
+            if (result != null && result.IsOk)
+            {
+                GlobalMethods.RestartWithQuickSync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException("MAW.QSDC", ex);
         }
     }
 

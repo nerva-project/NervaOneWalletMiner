@@ -19,6 +19,7 @@ namespace NervaOneWalletMiner.Helpers
     public static class UIManager
     {
         public static bool _isTransfersUpdateComplete = true;
+        public static bool _askedToQuickSync = false;
 
         public static readonly Bitmap _inImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/transfer_in.png")));
         public static readonly Bitmap _outImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/transfer_out.png")));
@@ -451,6 +452,18 @@ namespace NervaOneWalletMiner.Helpers
                     if (infoRes.TargetHeight != 0 && infoRes.Height < infoRes.TargetHeight)
                     {
                         GlobalData.NetworkStats.StatusSync += " | Sync (Height " + infoRes.Height + " of " + infoRes.TargetHeight + ")";
+
+                        // See if user wants to use QuickSync if they're far behind
+                        if (!_askedToQuickSync && !string.IsNullOrEmpty(GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].QuickSyncUrl))
+                        {
+                            _askedToQuickSync = true;
+                            double percentSynced = infoRes.Height / Convert.ToDouble(infoRes.TargetHeight);
+
+                            if (percentSynced < 0.8)
+                            {
+                                ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).AskIfSyncWithQuickSync(percentSynced);
+                            }
+                        }                        
                     }
                     else
                     {

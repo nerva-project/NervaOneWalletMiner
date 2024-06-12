@@ -43,7 +43,7 @@ namespace NervaOneWalletMiner.Views
                 {
                     DaemonViewModel vm = (DaemonViewModel)DataContext!;
                     vm.StartMiningUIEvent += (owner, threads) => StartMiningAsync(owner, threads);
-                    vm.StartMiningProcessEvent += (threads) => StartMiningNonUiAsync(threads);
+                    vm.StartMiningProcessEvent += StartMiningNonUiAsync;
                     GlobalData.IsDaemonStartMiningRegistered = true;
                 }
             }

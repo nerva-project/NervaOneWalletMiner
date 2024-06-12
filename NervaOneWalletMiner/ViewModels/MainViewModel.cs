@@ -9,30 +9,25 @@ using System.Windows.Input;
 namespace NervaOneWalletMiner.ViewModels;
 
 public class MainViewModel : ViewModelBase
-{                    
+{
+    public delegate void CheckAndGetCliAction();
+    public event CheckAndGetCliAction? CheckAndGetCliEvent;
+    public void CheckAndGetCliTools()
+    {
+        CheckAndGetCliEvent!.Invoke();
+    }
+
+    public delegate void SyncWithQuickSyncAction(double percentSynced);
+    public event SyncWithQuickSyncAction? SyncWithQuickSyncEvent;
+    public void AskIfSyncWithQuickSync(double percentSynced)
+    {
+        SyncWithQuickSyncEvent!.Invoke(percentSynced);
+    }
+
+
     public SelectionModel<ListBoxItem> Selection { get; }
     public ICommand TriggerPaneCommand { get; }
 
-    public MainViewModel()
-    {        
-        // Need MainViewModel in UIManager
-        UIManager.SetMainView(this);
-
-        if (GlobalData.IsConfigFound)
-        {
-            UIManager.SetUpPages();
-        }
-        else
-        {
-            UIManager.SetUpFirstRun();            
-        }
-
-        _CurrentPage = GlobalData.ViewModelPages[SplitViewPages.Daemon];
-
-        TriggerPaneCommand = ReactiveCommand.Create(TriggerPane);        
-        Selection = new SelectionModel<ListBoxItem>();
-        Selection.SelectionChanged += UIManager.SelectionChanged;
-    }
 
     private bool? _isPaneOpen = false;
     public bool? IsPaneOpen
@@ -83,11 +78,24 @@ public class MainViewModel : ViewModelBase
     }
 
 
-    public delegate void CheckAndGetCliAction();
-    public event CheckAndGetCliAction? CheckAndGetCliEvent;
+    public MainViewModel()
+    {        
+        // Need MainViewModel in UIManager
+        UIManager.SetMainView(this);
 
-    public void CheckAndGetCliTools()
-    {
-        CheckAndGetCliEvent!.Invoke();
-    }
+        if (GlobalData.IsConfigFound)
+        {
+            UIManager.SetUpPages();
+        }
+        else
+        {
+            UIManager.SetUpFirstRun();            
+        }
+
+        _CurrentPage = GlobalData.ViewModelPages[SplitViewPages.Daemon];
+
+        TriggerPaneCommand = ReactiveCommand.Create(TriggerPane);        
+        Selection = new SelectionModel<ListBoxItem>();
+        Selection.SelectionChanged += UIManager.SelectionChanged;
+    }    
 }
