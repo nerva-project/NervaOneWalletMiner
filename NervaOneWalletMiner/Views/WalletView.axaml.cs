@@ -488,5 +488,38 @@ namespace NervaOneWalletMiner.Views
             }            
         }
         #endregion //Close Wallet
+
+        #region Start Mining
+        private void StartMining_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                if (dtgAccounts.SelectedItem != null)
+                {
+                    Account selectedItem = (Account)dtgAccounts.SelectedItem;
+
+                    if(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress != selectedItem.AddressFull)
+                    {
+                        GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress = selectedItem.AddressFull;
+                        Logger.LogDebug("WAL.STMC", "Setting and saving new mining address: " + GlobalMethods.GetShorterString(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress, 12));
+                        GlobalMethods.SaveConfig();
+                    }
+
+                    Logger.LogDebug("WAL.STMC", "Calling Start Mining Daemon method");
+                    ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).StartMining(GetWindow(), GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
+                }
+                else
+                {
+                    Logger.LogDebug("WAL.STMC", "No rows selected");
+                    MessageBoxView window = new("Start Mining", "Please select address to start mining to it", true);
+                    window.ShowDialog(GetWindow());
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("WAL.STMC", ex);
+            }
+        }
+        #endregion // Start Mining
     }
 }

@@ -88,9 +88,12 @@
 			<DataGrid.ContextMenu>
 				<ContextMenu>
 					<MenuItem Header="Address Info" Click="AddressInfo_Clicked"/>
+					<Separator/>
 					<MenuItem Header="Create New Account" Click="CreateAccount_Clicked"/>
 					<MenuItem Header="Rename Label" Click="RenameLabel_Clicked"/>
-					<MenuItem Header="Transfer Funds" Click="TransferFunds_Clicked"/>
+					<Separator/>
+					<MenuItem Header="Transfer Funds" Click="TransferFunds_Clicked"/>					
+					<MenuItem Header="Start Mining" Click="StartMining_Clicked"/>
 				</ContextMenu>
 			</DataGrid.ContextMenu>
 		</DataGrid>

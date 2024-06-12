@@ -42,7 +42,8 @@ namespace NervaOneWalletMiner.Views
                 if (!GlobalData.IsDaemonStartMiningRegistered)
                 {
                     DaemonViewModel vm = (DaemonViewModel)DataContext!;
-                    vm.StartMiningEvent += (threads) => StartMiningAsync(threads);
+                    vm.StartMiningUIEvent += (owner, threads) => StartMiningAsync(owner, threads);
+                    vm.StartMiningProcessEvent += (threads) => StartMiningNonUiAsync(threads);
                     GlobalData.IsDaemonStartMiningRegistered = true;
                 }
             }
@@ -105,7 +106,7 @@ namespace NervaOneWalletMiner.Views
 
                         Logger.LogDebug("DMN.SSMC", "Starting mining");
                         GlobalData.IsManualStopMining = false;
-                        StartMiningAsync(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
+                        StartMiningAsync(GetWindow(), GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
                         btnStartStopMining.Content = StatusMiner.StopMining;
                         nupThreads.IsEnabled = false;
                     }
@@ -116,25 +117,57 @@ namespace NervaOneWalletMiner.Views
                 Logger.LogException("DMN.SSMC", ex);
             }
         }
-        public async void StartMiningAsync(int threads)
+
+        // Master Process does not have owner so doing it this way
+        public void StartMiningNonUiAsync(int threads)
+        {
+            StartMiningAsync(GetWindow(), threads, true);
+        }
+        public async void StartMiningAsync(Window owner, int threads, bool isProcess = false)
         {
             try
             {
-                StartMiningRequest request = new()
+                if(string.IsNullOrEmpty(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress))
                 {
-                    MiningAddress = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress,
-                    ThreadCount = threads
-                };
-
-                Logger.LogDebug("GLM.STMA", "Calling StartMining. Address: " + GlobalMethods.GetShorterString(request.MiningAddress, 12) + " | Threads: " + request.ThreadCount);
-                StartMiningResponse response = await GlobalData.DaemonService.StartMining(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, request);
-                if (response.Error.IsError)
+                    Logger.LogError("GLM.STMA", "Mining address missing. Cannot start mining");
+                }
+                else
                 {
-                    await Dispatcher.UIThread.Invoke(async () =>
+                    StartMiningRequest request = new()
                     {
-                        MessageBoxView window = new("Start Mining", "Error when starting mining\r\n\r\n" + response.Error.Message, true);
-                        await window.ShowDialog(GetWindow());
-                    });
+                        MiningAddress = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress,
+                        ThreadCount = threads
+                    };
+
+                    Logger.LogDebug("GLM.STMA", "Calling StartMining. Address: " + GlobalMethods.GetShorterString(request.MiningAddress, 12) + " | Threads: " + request.ThreadCount);
+                    StartMiningResponse response = await GlobalData.DaemonService.StartMining(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, request);
+                    if (response.Error.IsError)
+                    {
+                        Logger.LogDebug("GLM.STMA", "Error starting mining | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+
+                        if(!isProcess)
+                        {
+                            await Dispatcher.UIThread.Invoke(async () =>
+                            {
+                                MessageBoxView window = new("Start Mining", "Error when starting mining\r\n\r\n" + response.Error.Message, true);
+                                await window.ShowDialog(owner);
+                            });
+                        }
+                    }
+                    else
+                    {
+                        // Some errors are not reported as errors, such as not being able to mine to subaddress
+                        Logger.LogDebug("GLM.STMA", "Start mining response status: " + response.Status);
+
+                        if(!isProcess)
+                        {
+                            await Dispatcher.UIThread.Invoke(async () =>
+                            {
+                                MessageBoxView window = new("Start Mining", "Response: " + response.Status, true);
+                                await window.ShowDialog(owner);
+                            });
+                        }
+                    }
                 }
             }
             catch (Exception ex)
