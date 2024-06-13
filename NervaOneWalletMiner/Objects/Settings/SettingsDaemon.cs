@@ -18,10 +18,10 @@ namespace NervaOneWalletMiner.Objects.Settings
 
         public string DataDir { get; set; } = string.Empty;
 
-        public uint LogLevel { get; set; } = 0;
+        public int LogLevel { get; set; } = -1;
 
         public bool IsTestnet { get; set; } = false;
 
-        public double BlockSeconds { get; set; } = 0.0;
+        public double BlockSeconds { get; set; } = -1.0;
     }
 }

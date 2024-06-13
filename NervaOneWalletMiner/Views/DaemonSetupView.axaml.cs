@@ -80,7 +80,7 @@ namespace NervaOneWalletMiner.Views
 
                 if (!string.IsNullOrEmpty(tbxPortNumber.Text))
                 {
-                    uint portNumber = Convert.ToUInt32(tbxPortNumber.Text);
+                    int portNumber = Convert.ToInt32(tbxPortNumber.Text);
                     if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc.Port != portNumber)
                     {
                         GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc.Port = portNumber;
@@ -90,7 +90,7 @@ namespace NervaOneWalletMiner.Views
 
                 if (!string.IsNullOrEmpty(tbxLogLevel.Text))
                 {
-                    uint logLevel = Convert.ToUInt32(tbxLogLevel.Text);
+                    int logLevel = Convert.ToInt32(tbxLogLevel.Text);
                     if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].LogLevel != logLevel)
                     {
                         GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].LogLevel = logLevel;

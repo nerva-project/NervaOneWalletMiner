@@ -7,8 +7,8 @@ namespace NervaOneWalletMiner.Objects.Settings
     public class ApplicationSettings
     {
         // Coin specific settings
-        public Dictionary<string, SettingsDaemon> Daemon = GlobalMethods.GetDaemonSettings();
-        public Dictionary<string, SettingsWallet> Wallet = GlobalMethods.GetWalletSettings();
+        public Dictionary<string, SettingsDaemon> Daemon = [];
+        public Dictionary<string, SettingsWallet> Wallet = [];
 
         // Common settings
         public string ActiveCoin { get; set; } = Coin.XNV;

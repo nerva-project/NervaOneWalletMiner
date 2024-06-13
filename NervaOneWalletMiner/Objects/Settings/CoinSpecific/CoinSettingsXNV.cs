@@ -3,11 +3,11 @@
     public class CoinSettingsXNV : ICoinSettings
     {
         #region Private Default Variables
-        private uint _DaemonPort = 17566;
+        private int _DaemonPort = 17566;
         private double _BlockSeconds = 60.0;
         private string _DisplayUnits = "XNV";
-        private uint _LogLevelDaemon = 1;
-        private uint _LogLevelWallet = 1;
+        private int _LogLevelDaemon = 1;
+        private int _LogLevelWallet = 1;
 
         private string _CliWin64Url = "https://github.com/nerva-project/nerva/releases/download/v0.1.8.0/nerva-v0.1.8.0_windows_minimal.zip";
         private string _CliWin32Url = "https://github.com/nerva-project/nerva/releases/download/v0.1.8.0/nerva-v0.1.8.0_windows_minimal.zip";
@@ -22,11 +22,11 @@
 
 
         #region Interface Implementation
-        public uint DaemonPort { get => _DaemonPort; set => _DaemonPort = value; }
+        public int DaemonPort { get => _DaemonPort; set => _DaemonPort = value; }
         public double BlockSeconds { get => _BlockSeconds; set => _BlockSeconds = value; }
         public string DisplayUnits { get => _DisplayUnits; set => _DisplayUnits = value; }
-        public uint LogLevelDaemon { get => _LogLevelDaemon; set => _LogLevelDaemon = value; }
-        public uint LogLevelWallet { get => _LogLevelWallet; set => _LogLevelWallet = value; }
+        public int LogLevelDaemon { get => _LogLevelDaemon; set => _LogLevelDaemon = value; }
+        public int LogLevelWallet { get => _LogLevelWallet; set => _LogLevelWallet = value; }
 
         public string CliWin64Url { get => _CliWin64Url; set => _CliWin64Url = value; }
         public string CliWin32Url { get => _CliWin32Url; set => _CliWin32Url = value; }

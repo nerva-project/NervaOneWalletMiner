@@ -199,88 +199,57 @@ namespace NervaOneWalletMiner.Helpers
 
             return defaultSettings;
         }
-        public static Dictionary<string, SettingsDaemon> GetDaemonSettings()
-        {
-            if (GlobalData.CoinSettings == null || GlobalData.CoinSettings.Count == 0)
-            {
-                GlobalData.CoinSettings = GetDefaultCoinSettings();
-            }
 
-            Dictionary<string, SettingsDaemon> daemonSettings = [];
-
-            try
-            {
-                daemonSettings.Add(Coin.XNV, new SettingsDaemon()
-                {
-                    BlockSeconds = GlobalData.CoinSettings[Coin.XNV].BlockSeconds,
-                    LogLevel = GlobalData.CoinSettings[Coin.XNV].LogLevelDaemon,
-                    Rpc = new RpcBase()
-                    {
-                        Port = GlobalData.CoinSettings[Coin.XNV].DaemonPort
-                    }
-                });
-
-                daemonSettings.Add(Coin.XMR, new SettingsDaemon()
-                {
-                    BlockSeconds = GlobalData.CoinSettings[Coin.XMR].BlockSeconds,
-                    LogLevel = GlobalData.CoinSettings[Coin.XMR].LogLevelDaemon,
-                    Rpc = new RpcBase()
-                    {
-                        Port = GlobalData.CoinSettings[Coin.XMR].DaemonPort
-                    }
-                });
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException("GLM.GDST", ex);
-            }
-
-            return daemonSettings;
-        }
-
-        public static Dictionary<string, SettingsWallet> GetWalletSettings()
+        public static void SetDefaultCoinSpecificSettings()
         {
             if(GlobalData.CoinSettings == null || GlobalData.CoinSettings.Count == 0)
             {
                 GlobalData.CoinSettings = GetDefaultCoinSettings();
             }
 
-            Dictionary<string, SettingsWallet> walletSettings = [];
-
             try
             {
-                walletSettings.Add(Coin.XNV, new SettingsWallet()
+                // Overwrite default or invalid settings with coin specific ones
+                foreach(string coin in GlobalData.CoinSettings.Keys)
                 {
-                    DisplayUnits = GlobalData.CoinSettings[Coin.XNV].DisplayUnits,
-                    LogLevel = GlobalData.CoinSettings[Coin.XNV].LogLevelDaemon,
-                    Rpc = new RpcBase()
+                    if (GlobalData.AppSettings.Daemon[coin].BlockSeconds < 0.0)
                     {
-                        Port = (uint)GlobalData.RandomGenerator.Next(10000, 50000)
+                        GlobalData.AppSettings.Daemon[coin].BlockSeconds = GlobalData.CoinSettings[coin].BlockSeconds;
                     }
-                });
 
-                walletSettings.Add(Coin.XMR, new SettingsWallet()
-                {
-                    DisplayUnits = GlobalData.CoinSettings[Coin.XMR].DisplayUnits,
-                    LogLevel = GlobalData.CoinSettings[Coin.XMR].LogLevelDaemon,
-                    Rpc = new RpcBase()
+                    if (GlobalData.AppSettings.Daemon[coin].Rpc.Port < 0)
                     {
-                        Port = (uint)GlobalData.RandomGenerator.Next(10000, 50000)
+                        GlobalData.AppSettings.Daemon[coin].Rpc.Port = GlobalData.CoinSettings[coin].DaemonPort;
                     }
-                });
+
+                    if (GlobalData.AppSettings.Daemon[coin].LogLevel < 0)
+                    {
+                        GlobalData.AppSettings.Daemon[coin].LogLevel = GlobalData.CoinSettings[coin].LogLevelDaemon;
+                    }
+
+                    if (string.IsNullOrEmpty(GlobalData.AppSettings.Wallet[coin].DisplayUnits))
+                    {
+                        GlobalData.AppSettings.Wallet[coin].DisplayUnits = GlobalData.CoinSettings[coin].DisplayUnits;
+                    }
+
+                    if (GlobalData.AppSettings.Wallet[coin].LogLevel < 0)
+                    {
+                        GlobalData.AppSettings.Wallet[coin].LogLevel = GlobalData.CoinSettings[coin].LogLevelWallet;
+                    }
+                }
             }
             catch (Exception ex)
             {
-                Logger.LogException("GLM.GWST", ex);
+                Logger.LogException("GLM.SDCS", ex);
             }
-
-            return walletSettings;
         }
 
         public static void SetCoin(string newCoin)
         {
             try
             {
+                SetDefaultCoinSpecificSettings();
+
                 switch (newCoin)
                 {
                     case Coin.XMR:
@@ -296,24 +265,6 @@ namespace NervaOneWalletMiner.Helpers
 
                         GlobalData.DaemonService = new DaemonServiceXMR();
                         GlobalData.WalletService = new WalletServiceXMR();
-
-                        // TODO: Change this. App.config overwrites GetDaemonSettings with 0
-                        if (GlobalData.AppSettings.Daemon[Coin.XMR].BlockSeconds != GlobalData.CoinSettings[Coin.XMR].BlockSeconds)
-                        {
-                            GlobalData.AppSettings.Daemon[Coin.XMR].BlockSeconds = GlobalData.CoinSettings[Coin.XMR].BlockSeconds;
-                        }
-                        if (GlobalData.AppSettings.Daemon[Coin.XMR].LogLevel != GlobalData.CoinSettings[Coin.XMR].LogLevelDaemon)
-                        {
-                            GlobalData.AppSettings.Daemon[Coin.XMR].LogLevel = GlobalData.CoinSettings[Coin.XMR].LogLevelDaemon;
-                        }
-                        if (GlobalData.AppSettings.Wallet[Coin.XMR].DisplayUnits != GlobalData.CoinSettings[Coin.XMR].DisplayUnits)
-                        {
-                            GlobalData.AppSettings.Wallet[Coin.XMR].DisplayUnits = GlobalData.CoinSettings[Coin.XMR].DisplayUnits;
-                        }
-                        if (GlobalData.AppSettings.Wallet[Coin.XMR].LogLevel != GlobalData.CoinSettings[Coin.XMR].LogLevelWallet)
-                        {
-                            GlobalData.AppSettings.Wallet[Coin.XMR].LogLevel = GlobalData.CoinSettings[Coin.XMR].LogLevelWallet;
-                        }
                         break;
 
                     default:
@@ -330,16 +281,10 @@ namespace NervaOneWalletMiner.Helpers
 
                         GlobalData.DaemonService = new DaemonServiceXNV();
                         GlobalData.WalletService = new WalletServiceXNV();
-
-                        // TODO: Change this. App.config overwrites GetDaemonSettings() with default 0
-                        if (GlobalData.AppSettings.Daemon[Coin.XNV].BlockSeconds != GlobalData.CoinSettings[Coin.XNV].BlockSeconds)
-                        {
-                            GlobalData.AppSettings.Daemon[Coin.XNV].BlockSeconds = GlobalData.CoinSettings[Coin.XNV].BlockSeconds;
-                        }
                         break;
                 }
-
-                Logger.LogDebug("GLM.STCN", "Coin set up: " + GlobalData.AppSettings.ActiveCoin);
+               
+                Logger.LogDebug("GLM.STCN", "Finished setting up: " + GlobalData.AppSettings.ActiveCoin.ToUpper());
             }
             catch (Exception ex)
             {
@@ -475,16 +420,17 @@ namespace NervaOneWalletMiner.Helpers
         private static void ExtractFile(string destDir, string destFile)
         {
             try
-            {
-                Logger.LogDebug("GLM.EXFL", "Closing Daemon and Wallet processes");
+            {                
                 while (DaemonProcess.IsRunning())
                 {
+                    Logger.LogDebug("GLM.EXFL", "Closing Daemon process");
                     DaemonProcess.ForceClose();
                     Thread.Sleep(1000);
                 }
 
                 while (WalletProcess.IsRunning())
                 {
+                    Logger.LogDebug("GLM.EXFL", "Closing Wallet process");
                     WalletProcess.ForceClose();
                     Thread.Sleep(1000);
                 }

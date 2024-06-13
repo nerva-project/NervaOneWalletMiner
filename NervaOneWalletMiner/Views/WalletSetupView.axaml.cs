@@ -54,7 +54,7 @@ namespace NervaOneWalletMiner.Views
             {
                 bool isChanged = false;
                
-                uint logLevel = Convert.ToUInt32(tbxLogLevel.Text);
+                int logLevel = Convert.ToInt32(tbxLogLevel.Text);
                 if (!string.IsNullOrEmpty(tbxLogLevel.Text) && GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].LogLevel != logLevel)
                 {
                     GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].LogLevel = logLevel;
