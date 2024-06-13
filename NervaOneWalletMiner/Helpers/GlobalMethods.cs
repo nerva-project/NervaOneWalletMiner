@@ -245,6 +245,9 @@ namespace NervaOneWalletMiner.Helpers
                     {
                         GlobalData.AppSettings.Wallet[coin].LogLevel = GlobalData.CoinSettings[coin].LogLevelWallet;
                     }
+
+                    // Always generate new port
+                    GlobalData.AppSettings.Wallet[coin].Rpc.Port = GlobalData.RandomGenerator.Next(10000, 50000);
                 }
             }
             catch (Exception ex)
