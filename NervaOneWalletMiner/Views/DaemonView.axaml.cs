@@ -42,8 +42,8 @@ namespace NervaOneWalletMiner.Views
                 if (!GlobalData.AreDaemonEventsRegistered)
                 {
                     DaemonViewModel vm = (DaemonViewModel)DataContext!;
-                    vm.StartMiningUIEvent += (owner, threads) => StartMiningAsync(owner, threads);
-                    vm.StartMiningProcessEvent += StartMiningNonUiAsync;
+                    vm.StartMiningUiEvent += (owner, threads) => StartMiningAsync(owner, threads);
+                    vm.StartMiningNonUiEvent += StartMiningNonUi;
                     GlobalData.AreDaemonEventsRegistered = true;
                 }
             }
@@ -117,13 +117,13 @@ namespace NervaOneWalletMiner.Views
                 Logger.LogException("DMN.SSMC", ex);
             }
         }
-
-        // Master Process does not have owner so doing it this way
-        public void StartMiningNonUiAsync(int threads)
+        
+        public void StartMiningNonUi(int threads)
         {
-            StartMiningAsync(GetWindow(), threads, true);
+            // Master Process does not have owner so do not attempt to show messages
+            StartMiningAsync(null, threads, false);
         }
-        public async void StartMiningAsync(Window owner, int threads, bool isProcess = false)
+        public async void StartMiningAsync(Window? owner, int threads, bool isUiThread = true)
         {
             try
             {
@@ -145,12 +145,12 @@ namespace NervaOneWalletMiner.Views
                     {
                         Logger.LogDebug("GLM.STMA", "Error starting mining | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
 
-                        if(!isProcess)
+                        if(isUiThread)
                         {
                             await Dispatcher.UIThread.Invoke(async () =>
                             {
                                 MessageBoxView window = new("Start Mining", "Error when starting mining\r\n\r\n" + response.Error.Message, true);
-                                await window.ShowDialog(owner);
+                                await window.ShowDialog(owner!);
                             });
                         }
                     }
@@ -159,12 +159,12 @@ namespace NervaOneWalletMiner.Views
                         // Some errors are not reported as errors, such as not being able to mine to subaddress
                         Logger.LogDebug("GLM.STMA", "Start mining response status: " + response.Status);
 
-                        if(!isProcess)
+                        if(isUiThread)
                         {
                             await Dispatcher.UIThread.Invoke(async () =>
                             {
                                 MessageBoxView window = new("Start Mining", "Response: " + response.Status, true);
-                                await window.ShowDialog(owner);
+                                await window.ShowDialog(owner!);
                             });
                         }
                     }

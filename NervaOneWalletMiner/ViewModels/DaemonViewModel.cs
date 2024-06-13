@@ -8,18 +8,18 @@ namespace NervaOneWalletMiner.ViewModels
 {
     internal class DaemonViewModel : ViewModelBase
     {
-        public delegate void StartMiningUIAction(Window owner, int miningThreads);
-        public event StartMiningUIAction? StartMiningUIEvent;
-        public void StartMining(Window owner,int miningThreads)
+        public delegate void StartMiningUiAction(Window owner, int miningThreads);
+        public event StartMiningUiAction? StartMiningUiEvent;
+        public void StartMiningUi(Window owner,int miningThreads)
         {
-            StartMiningUIEvent!.Invoke(owner, miningThreads);
+            StartMiningUiEvent!.Invoke(owner, miningThreads);
         }
 
-        public delegate void StartMiningProcessAction(int miningThreads);
-        public event StartMiningProcessAction? StartMiningProcessEvent;
-        public void StartMining(int miningThreads)
+        public delegate void StartMiningNonUiAction(int miningThreads);
+        public event StartMiningNonUiAction? StartMiningNonUiEvent;
+        public void StartMiningNonUi(int miningThreads)
         {
-            StartMiningProcessEvent!.Invoke(miningThreads);
+            StartMiningNonUiEvent!.Invoke(miningThreads);
         }
 
 

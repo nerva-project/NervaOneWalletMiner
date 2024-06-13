@@ -9,7 +9,7 @@ namespace NervaOneWalletMiner.Rpc
     {
         public static void ForceClose()
         {
-            Logger.LogDebug("WAP.FRCL", "Forcing wallet close...");
+            Logger.LogDebug("WAP.FRCL", "Forcing wallet process close...");
             ProcessManager.Kill(GlobalData.WalletProcessName);
         }
 

@@ -93,7 +93,7 @@ namespace NervaOneWalletMiner.Views
                     else
                     {
                         Logger.LogDebug("ADB.TRCL", "Calling Transfer passing address: " + GlobalMethods.GetShorterString(selectedAddress.Address, 12));
-                        ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).Transfer(GetWindow(), selectedAddress.Address, selectedAddress.PaymentId);
+                        ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).TransferUi(GetWindow(), selectedAddress.Address, selectedAddress.PaymentId);
                     }                    
                 }                
             }

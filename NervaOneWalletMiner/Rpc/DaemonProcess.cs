@@ -8,7 +8,7 @@ namespace NervaOneWalletMiner.Rpc
     {
         public static void ForceClose()
         {
-            Logger.LogDebug("DNP.FRCL", "Forcing daemon close...");
+            Logger.LogDebug("DNP.FRCL", "Forcing daemon process close...");
             ProcessManager.Kill(GlobalData.DaemonProcessName);
         }
 

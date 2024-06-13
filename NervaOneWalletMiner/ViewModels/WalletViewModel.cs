@@ -3,16 +3,24 @@ using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Objects.DataGrid;
 using ReactiveUI;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace NervaOneWalletMiner.ViewModels
 {
     internal class WalletViewModel : ViewModelBase
     {
-        public delegate void TransferAction(Window owner, string toAddress, string paymentId);
-        public event TransferAction? TransferEvent = null;
-        public void Transfer(Window owner, string toAddress, string paymentId)
+        public delegate void TransferUiAction(Window owner, string toAddress, string paymentId);
+        public event TransferUiAction? TransferUiEvent = null;
+        public void TransferUi(Window owner, string toAddress, string paymentId)
         {
-            TransferEvent!.Invoke(owner, toAddress, paymentId);
+            TransferUiEvent!.Invoke(owner, toAddress, paymentId);
+        }
+
+        public delegate Task<bool> CloseWalletNonUiAction();
+        public event CloseWalletNonUiAction? CloseWalletNonUiEvent = null;
+        public Task<bool> CloseWalletNonUi()
+        {
+            return CloseWalletNonUiEvent!.Invoke();
         }
 
 

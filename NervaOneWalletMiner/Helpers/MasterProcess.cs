@@ -35,7 +35,7 @@ namespace NervaOneWalletMiner.Helpers
                     Logger.LogDebug("MSP.SMUP", "Calling wallet ForceClose");
                     WalletProcess.ForceClose();
 
-                    Logger.LogDebug("MSP.SMUP", "Master timer running every " + _masterTimerInterval / 1000 + " seconds. Update every " + (_masterTimerInterval / 1000) * GlobalData.AppSettings.TimerIntervalMultiplier + " seconds.");
+                    Logger.LogDebug("MSP.SMUP", "Master timer running every " + _masterTimerInterval / 1000 + " seconds. Update every " + (_masterTimerInterval / 1000) * GlobalData.AppSettings.TimerIntervalMultiplier + " seconds");
                 }
             }
             catch (Exception ex)
@@ -74,8 +74,8 @@ namespace NervaOneWalletMiner.Helpers
                             && GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AutoStartMining
                             && !GlobalData.IsManualStopMining)
                         {
-                            Logger.LogDebug("MSP.MUPS", "Auto starting mining.");
-                            ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).StartMining(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
+                            Logger.LogDebug("MSP.MUPS", "Auto starting mining");
+                            ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).StartMiningNonUi(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
                         }
                     }
 

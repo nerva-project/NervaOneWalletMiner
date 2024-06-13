@@ -103,7 +103,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                 }
                 else
                 {
-                    Logger.LogError("AID.MIA1", "Integrated address created successfully.");
+                    Logger.LogError("AID.MIA1", "Integrated address created successfully");
                     tbxIntegratedAddress.Text = response.IntegratedAddress;
                     tbxPaymentId.Text = response.PaymentId;
                 }

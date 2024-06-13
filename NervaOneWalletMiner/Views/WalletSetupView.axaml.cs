@@ -120,7 +120,7 @@ namespace NervaOneWalletMiner.Views
                     GlobalData.OpenedWalletName = walletName;
                     GlobalData.NewestTransactionHeight = 0;
 
-                    Logger.LogDebug("WAS.CNW1", "Wallet " + walletName + " created successfully.");
+                    Logger.LogDebug("WAS.CNW1", "Wallet " + walletName + " created successfully");
                     await Dispatcher.UIThread.InvokeAsync(async () =>
                     {
                         MessageBoxView window = new("Create Wallet", walletName + " wallet created successfully!\r\n\r\nYour new wallet is now open. Make sure to save your seed phrase and keys!", true);
@@ -318,7 +318,7 @@ namespace NervaOneWalletMiner.Views
                 }
                 else
                 {
-                    Logger.LogDebug("WAS.RSTC", "Trying to rescan spent but wallet closed.");
+                    Logger.LogDebug("WAS.RSTC", "Trying to rescan spent but wallet closed");
                     Dispatcher.UIThread.Invoke(async () =>
                     {                        
                         MessageBoxView window = new("Rescan Spent", "Please open wallet first.", true);
@@ -349,7 +349,7 @@ namespace NervaOneWalletMiner.Views
                 }
                 else
                 {
-                    Logger.LogDebug("WAS.RSPT", "Rescan spent returned successfully.");
+                    Logger.LogDebug("WAS.RSPT", "Rescan spent returned successfully");
                     await Dispatcher.UIThread.InvokeAsync(async () =>
                     {
                         MessageBoxView window = new("Rescan Spent", "Rescan spent command submitted successfully.", true);
@@ -375,7 +375,7 @@ namespace NervaOneWalletMiner.Views
                 }
                 else
                 {
-                    Logger.LogDebug("WAS.RSTC", "Trying to rescan blockchain but wallet closed.");
+                    Logger.LogDebug("WAS.RSTC", "Trying to rescan blockchain but wallet closed");
                     Dispatcher.UIThread.Invoke(async () =>
                     {
                         MessageBoxView window = new("Rescan Blockchain", "Please open wallet first.", true);
@@ -406,7 +406,7 @@ namespace NervaOneWalletMiner.Views
                 }
                 else
                 {
-                    Logger.LogDebug("WAS.RSBC", "Rescan Blockchain returned successfully.");
+                    Logger.LogDebug("WAS.RSBC", "Rescan Blockchain returned successfully");
                     await Dispatcher.UIThread.InvokeAsync(async () =>
                     {
                         MessageBoxView window = new("Rescan Blockchain", "Rescan Blockchain command submitted successfully.", true);

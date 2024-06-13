@@ -253,7 +253,7 @@ namespace NervaOneWalletMiner.Helpers
                 switch (newCoin)
                 {
                     case Coin.XMR:
-                        Logger.LogDebug("GLM.STCN", "Setting up: " + Coin.XMR);
+                        Logger.LogDebug("GLM.STCN", "Setting up: " + Coin.XMR.ToUpper());
                         GlobalData.CoinDirName = Coin.XMR;
                         GlobalData.AppSettings.ActiveCoin = Coin.XMR;
                         GlobalData.CliToolsDir = GetCliToolsDir();
@@ -269,7 +269,7 @@ namespace NervaOneWalletMiner.Helpers
 
                     default:
                         // XNV or anything else not supported
-                        Logger.LogDebug("GLM.STCN", "Setting up: " + Coin.XNV);
+                        Logger.LogDebug("GLM.STCN", "Setting up: " + Coin.XNV.ToUpper());
                         GlobalData.CoinDirName = Coin.XNV;
                         GlobalData.AppSettings.ActiveCoin = Coin.XNV;
                         GlobalData.CliToolsDir = GetCliToolsDir();
@@ -898,14 +898,14 @@ namespace NervaOneWalletMiner.Helpers
                     ForceWalletClose();
                 }
 
-                Logger.LogDebug("GLM.STDN", "Forcing wallet process close.");
+                Logger.LogDebug("GLM.STDN", "Forcing wallet process close");
                 WalletProcess.ForceClose();
 
                 if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopOnExit)
                 {
                     ForceDaemonStop();
 
-                    Logger.LogDebug("GLM.STDN", "Forcing daemon process close.");
+                    Logger.LogDebug("GLM.STDN", "Forcing daemon process close");
                     DaemonProcess.ForceClose();
                 }
             }
@@ -935,7 +935,7 @@ namespace NervaOneWalletMiner.Helpers
         {
             try
             {
-                Logger.LogDebug("GLM.FDSP", "Stopping Daemon.");
+                Logger.LogDebug("GLM.FDSP", "Stopping Daemon");
                 _ = await GlobalData.DaemonService.StopDaemon(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new StopDaemonRequest());
             }
             catch (Exception ex)

@@ -40,7 +40,8 @@ namespace NervaOneWalletMiner.Views
                 if (!GlobalData.AreWalletEventsRegistered)
                 {
                     WalletViewModel vm = (WalletViewModel)DataContext!;
-                    vm.TransferEvent += (owner, toAddress, paymentId) => ShowTransferDialog(owner, toAddress, paymentId);
+                    vm.TransferUiEvent += (owner, toAddress, paymentId) => ShowTransferDialog(owner, toAddress, paymentId);
+                    vm.CloseWalletNonUiEvent += CloseUserWalletNonUi;
                     GlobalData.AreWalletEventsRegistered = true;
                 }
             }
@@ -51,7 +52,7 @@ namespace NervaOneWalletMiner.Views
         }
 
         #region Open Wallet        
-        public void OpenCloseWallet_Clicked(object sender, RoutedEventArgs args)
+        public async void OpenCloseWallet_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
@@ -60,14 +61,14 @@ namespace NervaOneWalletMiner.Views
                 if (btnOpenCloseWallet.Content!.ToString()!.Equals(StatusWallet.OpenWallet))
                 {
                     // Open wallet dialog
-                    Logger.LogDebug("WAL.OCWC", "Opening wallet dialog.");
+                    Logger.LogDebug("WAL.OCWC", "Opening wallet dialog");
                     var window = new OpenWalletView();
-                    window.ShowDialog(GetWindow()).ContinueWith(OpenWalletDialogClosed);
+                    await window.ShowDialog(GetWindow()).ContinueWith(OpenWalletDialogClosed);
                 }
                 else
                 {
                     // Close wallet
-                    CloseUserWallet();
+                    await CloseUserWallet(GetWindow());
                     btnOpenCloseWallet.Content = StatusWallet.OpenWallet;
                 }
             }
@@ -122,7 +123,7 @@ namespace NervaOneWalletMiner.Views
                     GlobalData.OpenedWalletName = walletName;
                     GlobalData.NewestTransactionHeight = 0;
 
-                    Logger.LogDebug("WAL.OUWT", "Wallet " + walletName + " opened successfully.");
+                    Logger.LogDebug("WAL.OUWT", "Wallet " + walletName + " opened successfully");
                 }
 
                 GlobalData.WalletHeight = 0;
@@ -178,7 +179,7 @@ namespace NervaOneWalletMiner.Views
                     }
                     else
                     {
-                        Logger.LogDebug("WAL.CADC", "New account created successfully.");
+                        Logger.LogDebug("WAL.CADC", "New account created successfully");
                         GlobalMethods.SaveWallet();
 
                         await Dispatcher.UIThread.InvokeAsync(async () =>
@@ -350,7 +351,7 @@ namespace NervaOneWalletMiner.Views
                 }
                 else
                 {
-                    Logger.LogDebug("WAL.MKTR", "Transfer successful.");
+                    Logger.LogDebug("WAL.MKTR", "Transfer successful");
                     await Dispatcher.UIThread.InvokeAsync(async () =>
                     {
                         MessageBoxView window = new("Transfer Funds", "Transfer successful!", true);
@@ -389,7 +390,7 @@ namespace NervaOneWalletMiner.Views
                 }
                 else
                 {
-                    Logger.LogDebug("WAL.MTSP", "Transfer Split successful.");
+                    Logger.LogDebug("WAL.MTSP", "Transfer Split successful");
                     await Dispatcher.UIThread.InvokeAsync(async () =>
                     {
                         MessageBoxView window = new("Transfer Split", "Transfer successful!", true);
@@ -449,14 +450,20 @@ namespace NervaOneWalletMiner.Views
         }
         #endregion // Address Info
 
-        #region Close Wallet
-        private async void CloseUserWallet()
+        #region Close Wallet        
+        private async Task<bool> CloseUserWalletNonUi()
         {
+            // Need to wait until wallet is closed or might as well not even atempt this
+            await CloseUserWallet(null, false);
+            return true;
+        }
+        private async Task<bool> CloseUserWallet(Window? owner, bool isUiThread = true)
+        {
+            bool isSuccess = false;
+
             try
             {
-                CloseWalletRequest request = new();
-
-                CloseWalletResponse response = await GlobalData.WalletService.CloseWallet(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
+                CloseWalletResponse response = await GlobalData.WalletService.CloseWallet(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new CloseWalletRequest());
 
                 if (response.Error.IsError)
                 {
@@ -465,27 +472,34 @@ namespace NervaOneWalletMiner.Views
                     GlobalData.IsWalletOpen = false;
                     GlobalData.IsWalletJustOpened = false;
                     GlobalData.OpenedWalletName = string.Empty;
-                   
-                    await Dispatcher.UIThread.InvokeAsync(async () =>
+
+                    if (isUiThread)
                     {
-                        MessageBoxView window = new("Close Wallet", "Error closing wallet\r\n" + response.Error.Message, true);
-                        await window.ShowDialog(GetWindow());
-                    });
+                        await Dispatcher.UIThread.InvokeAsync(async () =>
+                        {
+                            MessageBoxView window = new("Close Wallet", "Error closing wallet\r\n" + response.Error.Message, true);
+                            await window.ShowDialog(owner!);
+                        });
+                    }
                 }
                 else
                 {
-                    Logger.LogDebug("WAL.CLUW", "Wallet " + GlobalData.OpenedWalletName + " closed successfully.");
+                    isSuccess = true;
+                    Logger.LogDebug("WAL.CLUW", "Wallet " + GlobalData.OpenedWalletName + " closed successfully");
 
                     GlobalData.IsWalletOpen = false;
                     GlobalData.IsWalletJustOpened = false;
                     GlobalData.OpenedWalletName = string.Empty;
                     GlobalData.WalletStats = new();
-                    
-                    await Dispatcher.UIThread.InvokeAsync(async () =>
+
+                    if (isUiThread)
                     {
-                        MessageBoxView window = new("Close Wallet", "Wallet closed successfully!", true);
-                        await window.ShowDialog(GetWindow());
-                    });
+                        await Dispatcher.UIThread.InvokeAsync(async () =>
+                        {
+                            MessageBoxView window = new("Close Wallet", "Wallet closed successfully!", true);
+                            await window.ShowDialog(owner!);
+                        });
+                    }
                 }
 
                 GlobalData.WalletHeight = 0;
@@ -493,7 +507,9 @@ namespace NervaOneWalletMiner.Views
             catch (Exception ex)
             {
                 Logger.LogException("WAL.CLUW", ex);
-            }            
+            }
+
+            return isSuccess;
         }
         #endregion //Close Wallet
 
@@ -514,7 +530,7 @@ namespace NervaOneWalletMiner.Views
                     }
 
                     Logger.LogDebug("WAL.STMC", "Calling Start Mining Daemon method");
-                    ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).StartMining(GetWindow(), GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
+                    ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).StartMiningUi(GetWindow(), GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
                 }
                 else
                 {
