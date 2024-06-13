@@ -16,7 +16,7 @@ namespace NervaOneWalletMiner.Helpers
     public static class GlobalData
     {
         public const string AppName = "NervaOneWalletMiner";
-        public const string Version = "0.7.0";
+        public const string Version = "0.7.1.0";
 
         public const string CliToolsDirName = "cli";
         public const string WalletDirName = "wallets";

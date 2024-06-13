@@ -66,8 +66,10 @@ public partial class App : Application
     {
         try
         {
+            GlobalMethods.SetDefaultCoinSpecificSettings();
+
             // Set theme
-            if(GlobalData.AppSettings.Theme == Theme.Default)
+            if (GlobalData.AppSettings.Theme == Theme.Default)
             {
                 Application.Current!.RequestedThemeVariant = ThemeVariant.Default;
             }

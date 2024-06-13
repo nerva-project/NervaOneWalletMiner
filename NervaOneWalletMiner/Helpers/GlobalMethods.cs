@@ -212,6 +212,15 @@ namespace NervaOneWalletMiner.Helpers
                 // Overwrite default or invalid settings with coin specific ones
                 foreach(string coin in GlobalData.CoinSettings.Keys)
                 {
+                    if (!GlobalData.AppSettings.Daemon.ContainsKey(coin))
+                    {
+                        GlobalData.AppSettings.Daemon.Add(coin, new SettingsDaemon());
+                    }
+                    if (!GlobalData.AppSettings.Wallet.ContainsKey(coin))
+                    {
+                        GlobalData.AppSettings.Wallet.Add(coin, new SettingsWallet());
+                    }
+
                     if (GlobalData.AppSettings.Daemon[coin].BlockSeconds < 0.0)
                     {
                         GlobalData.AppSettings.Daemon[coin].BlockSeconds = GlobalData.CoinSettings[coin].BlockSeconds;
@@ -248,8 +257,6 @@ namespace NervaOneWalletMiner.Helpers
         {
             try
             {
-                SetDefaultCoinSpecificSettings();
-
                 switch (newCoin)
                 {
                     case Coin.XMR:
