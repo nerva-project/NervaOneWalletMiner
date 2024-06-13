@@ -31,6 +31,10 @@ namespace NervaOneWalletMiner.Helpers
                     _masterUpdateTimer.Elapsed += (s, e) => MasterUpdateProcess();
                     _masterUpdateTimer.Start();
 
+                    // If wallet process was not closed properly before, it could be running listening on different port so opening wallet will fail
+                    Logger.LogDebug("MSP.SMUP", "Calling wallet ForceClose");
+                    WalletProcess.ForceClose();
+
                     Logger.LogDebug("MSP.SMUP", "Master timer running every " + _masterTimerInterval / 1000 + " seconds. Update every " + (_masterTimerInterval / 1000) * GlobalData.AppSettings.TimerIntervalMultiplier + " seconds.");
                 }
             }
@@ -199,6 +203,7 @@ namespace NervaOneWalletMiner.Helpers
                 {
                     if (GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
                     {
+                        Logger.LogDebug("MSP.KWPR", "Calling Wallet ForceClose");
                         WalletProcess.ForceClose();
                         Logger.LogDebug("MSP.KWPR", "Starting wallet process");
                         ProcessManager.StartExternalProcess(GlobalMethods.GetRpcWalletProcess(), WalletProcess.GenerateOptions(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin], GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc));
