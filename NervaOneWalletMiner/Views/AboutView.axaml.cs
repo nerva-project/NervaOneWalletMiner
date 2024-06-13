@@ -12,6 +12,8 @@ namespace NervaOneWalletMiner.Views
         {
             InitializeComponent();
             imgCoinIcon.Source = GlobalMethods.GetLogo();
+
+            tbkVersion.Text = "Version " + GlobalData.Version + " running on " + Environment.OSVersion.Platform + " " + Environment.OSVersion.Version + " with " + Environment.ProcessorCount + " CPU threads.";
         }
 
         public void OpenGitHub_Clicked(object sender, RoutedEventArgs args)
