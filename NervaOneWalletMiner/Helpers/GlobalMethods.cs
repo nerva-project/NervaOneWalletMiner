@@ -22,6 +22,7 @@ using Avalonia.Input;
 using Avalonia.Controls;
 using NervaOneWalletMiner.Objects.Stats;
 using NervaOneWalletMiner.Rpc.Daemon.Requests;
+using Avalonia.Platform.Storage;
 
 namespace NervaOneWalletMiner.Helpers
 {
@@ -117,7 +118,7 @@ namespace NervaOneWalletMiner.Helpers
             {
                 if (Directory.Exists(GlobalData.DataDir))
                 {
-                    // Create logs directory if it does not exist
+                    // Create wallet directory if it does not exist
                     walletDirectory = Path.Combine(GlobalData.DataDir, GlobalData.MainCoinsDirName, GlobalData.CoinDirName, GlobalData.WalletDirName);
                     if (!Directory.Exists(walletDirectory))
                     {
@@ -145,7 +146,7 @@ namespace NervaOneWalletMiner.Helpers
             {
                 if (Directory.Exists(GlobalData.DataDir))
                 {
-                    // Create logs directory if it does not exist
+                    // Create client tools directory if it does not exist
                     cliToolsDirectory = Path.Combine(GlobalData.DataDir, GlobalData.MainCoinsDirName, GlobalData.CoinDirName, GlobalData.CliToolsDirName);
                     if (!Directory.Exists(cliToolsDirectory))
                     {
@@ -221,6 +222,7 @@ namespace NervaOneWalletMiner.Helpers
                         GlobalData.AppSettings.Wallet.Add(coin, new SettingsWallet());
                     }
 
+                    // Daemon
                     if (GlobalData.AppSettings.Daemon[coin].BlockSeconds < 0.0)
                     {
                         GlobalData.AppSettings.Daemon[coin].BlockSeconds = GlobalData.CoinSettings[coin].BlockSeconds;
@@ -236,6 +238,12 @@ namespace NervaOneWalletMiner.Helpers
                         GlobalData.AppSettings.Daemon[coin].LogLevel = GlobalData.CoinSettings[coin].LogLevelDaemon;
                     }
 
+                    if (string.IsNullOrEmpty(GlobalData.AppSettings.Daemon[coin].DataDir))
+                    {
+                        GlobalData.AppSettings.Daemon[coin].DataDir = GetDefaultDataDir();
+                    }
+
+                    // Wallet
                     if (string.IsNullOrEmpty(GlobalData.AppSettings.Wallet[coin].DisplayUnits))
                     {
                         GlobalData.AppSettings.Wallet[coin].DisplayUnits = GlobalData.CoinSettings[coin].DisplayUnits;
@@ -310,19 +318,7 @@ namespace NervaOneWalletMiner.Helpers
             {
                 Architecture arch = GetCpuArchitecture();
 
-                if (IsWindows())
-                {
-                    switch (arch)
-                    {
-                        case Architecture.X64:
-                            cliDownloadLink = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].CliWin64Url;
-                            break;
-                        default:
-                            cliDownloadLink = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].CliWin32Url;
-                            break;
-                    }
-                }
-                else if (IsLinux())
+                if (IsLinux())
                 {
                     switch (arch)
                     {
@@ -351,6 +347,18 @@ namespace NervaOneWalletMiner.Helpers
                             break;
                     }
                 }
+                else
+                {
+                    switch (arch)
+                    {
+                        case Architecture.X64:
+                            cliDownloadLink = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].CliWin64Url;
+                            break;
+                        default:
+                            cliDownloadLink = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].CliWin32Url;
+                            break;
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -358,6 +366,35 @@ namespace NervaOneWalletMiner.Helpers
             }
             
             return cliDownloadLink;
+        }
+
+        public static string GetDefaultDataDir()
+        {
+            string defaultDataDir = string.Empty;
+
+            try
+            {
+                Architecture arch = GetCpuArchitecture();
+
+                if (IsLinux())
+                {
+                    defaultDataDir = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].DataDirLin;
+                }
+                else if (IsOsx())
+                {
+                    defaultDataDir = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].DataDirMac;
+                }
+                else
+                {
+                    defaultDataDir = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].DataDirWin;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("GLM.GDCD", ex);
+            }
+
+            return defaultDataDir;
         }
 
         public static async void SetUpCliTools(string downloadUrl, string cliToolsPath)

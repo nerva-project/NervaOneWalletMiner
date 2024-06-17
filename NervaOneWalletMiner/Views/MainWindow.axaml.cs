@@ -77,7 +77,7 @@ public partial class MainWindow : Window
 
     public void CheckAndDownloadCliIfNeeded()
     {
-        if (!GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
+        if (GlobalData.IsConfigFound && !GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
         {
             // CLI tools missing. Need to download
             string cliToolsLink = GlobalMethods.GetCliToolsDownloadLink();

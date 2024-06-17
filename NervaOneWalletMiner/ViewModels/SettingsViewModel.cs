@@ -8,14 +8,14 @@ namespace NervaOneWalletMiner.ViewModels
 {
     internal class SettingsViewModel : ViewModelBase
     {
-        public ICommand OpenDebugFolderCommand { get; }
+        public ICommand OpenLogsFolderCommand { get; }
 
         public SettingsViewModel()
         {
-            OpenDebugFolderCommand = ReactiveCommand.Create(OpenDebugFolder);
+            OpenLogsFolderCommand = ReactiveCommand.Create(OpenLogsFolder);
         }
 
-        private void OpenDebugFolder()
+        private void OpenLogsFolder()
         {
             try
             {
@@ -28,7 +28,7 @@ namespace NervaOneWalletMiner.ViewModels
             }
             catch (Exception ex)
             {
-                Logger.LogException("Mai.ODF", ex);
+                Logger.LogException("SEM.OPLF", ex);
             }
         }
     }

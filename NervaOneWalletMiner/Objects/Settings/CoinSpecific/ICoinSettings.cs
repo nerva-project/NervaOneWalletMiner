@@ -16,6 +16,10 @@
         string CliMacIntelUrl { get; set; }
         string CliMacArmUrl { get; set; }
 
+        string DataDirWin { get; set; }
+        string DataDirLin { get; set; }
+        string DataDirMac { get; set; }
+
         string QuickSyncUrl { get; set; }
     }
 }

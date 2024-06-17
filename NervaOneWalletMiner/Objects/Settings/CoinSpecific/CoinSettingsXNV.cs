@@ -17,6 +17,10 @@
         private string _CliMacIntelUrl = "https://github.com/nerva-project/nerva/releases/download/v0.1.8.0/nerva-v0.1.8.0_osx_minimal.zip";
         private string _CliMacArmUrl = "https://github.com/nerva-project/nerva/releases/download/v0.1.8.0/nerva-v0.1.8.0_osx_minimal.zip";
 
+        private string _DataDirWin = "C:/ProgramData/nerva";
+        private string _DataDirLin = "~/.nerva";
+        private string _DataDirMac = "~/.nerva";
+
         private string _QuickSyncUrl = "https://nerva.one/quicksync/quicksync.raw";
         #endregion // Private Default Variables
 
@@ -35,6 +39,10 @@
         public string CliLinArmUrl { get => _CliLinArmUrl; set => _CliLinArmUrl = value; }
         public string CliMacIntelUrl { get => _CliMacIntelUrl; set => _CliMacIntelUrl = value; }
         public string CliMacArmUrl { get => _CliMacArmUrl; set => _CliMacArmUrl = value; }
+
+        public string DataDirWin { get => _DataDirWin; set => _DataDirWin = value; }
+        public string DataDirLin { get => _DataDirLin; set => _DataDirLin = value; }
+        public string DataDirMac { get => _DataDirMac; set => _DataDirMac = value; }
 
         public string QuickSyncUrl { get => _QuickSyncUrl; set => _QuickSyncUrl = value; }
         #endregion // Interface Implementation

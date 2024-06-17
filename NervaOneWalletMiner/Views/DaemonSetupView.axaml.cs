@@ -1,12 +1,13 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Platform.Storage;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects;
 using NervaOneWalletMiner.Rpc;
 using NervaOneWalletMiner.ViewsDialogs;
 using System;
 using System.Diagnostics;
-using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace NervaOneWalletMiner.Views
@@ -14,6 +15,7 @@ namespace NervaOneWalletMiner.Views
     public partial class DaemonSetupView : UserControl
     {
         Window GetWindow() => TopLevel.GetTopLevel(this) as Window ?? throw new NullReferenceException("Invalid Owner");
+        TopLevel GetTopLevel() => TopLevel.GetTopLevel(this) ?? throw new NullReferenceException("Invalid Owner");
 
         public DaemonSetupView()
         {
@@ -37,23 +39,7 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
-        public void OpenCliToolsFolder_Clicked(object sender, RoutedEventArgs args)
-        {
-            try
-            {
-                ProcessStartInfo psi = new ProcessStartInfo
-                {
-                    FileName = GlobalData.CliToolsDir,
-                    UseShellExecute = true
-                };
-                Process.Start(psi);
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException("DMS.OCFC", ex);
-            }
-        }
-
+        #region Save Settings
         public void SaveSettings_Clicked(object sender, RoutedEventArgs args)
         {
             try
@@ -121,6 +107,7 @@ namespace NervaOneWalletMiner.Views
                 Logger.LogException("DMS.SSC1", ex);
             }
         }
+        #endregion // Save Settings
 
         #region Restart With QuickSync
         public void RestartWithQuickSync_Clicked(object sender, RoutedEventArgs args)
@@ -191,5 +178,51 @@ namespace NervaOneWalletMiner.Views
             }
         }
         #endregion // Restart with Command
+
+        #region Other Event Methods
+        public void OpenCliToolsFolder_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    FileName = GlobalData.CliToolsDir,
+                    UseShellExecute = true
+                };
+                Process.Start(psi);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DMS.OCFC", ex);
+            }
+        }
+
+        public async void ChangeDataDir_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                var result = await GetStorageProvider().OpenFolderPickerAsync(new FolderPickerOpenOptions()
+                {
+                    Title = "Select Data Directory Folder",
+                    SuggestedStartLocation = await GetStorageProvider().TryGetFolderFromPathAsync(tbxDaemonDataDir.Text!),
+                    AllowMultiple = false
+                });
+
+                if(result.FirstOrDefault() is IStorageFolder item)
+                {
+                    tbxDaemonDataDir.Text = item.Path.AbsolutePath;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DMS.CDDC", ex);
+            }
+        }
+
+        public IStorageProvider GetStorageProvider()
+        {
+            return GetTopLevel().StorageProvider;
+        }
+        #endregion // Other Event Methods
     }
 }

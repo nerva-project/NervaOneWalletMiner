@@ -17,6 +17,10 @@
         private string _CliMacIntelUrl = "https://downloads.getmonero.org/cli/monero-mac-x64-v0.18.3.3.tar.bz2";
         private string _CliMacArmUrl = "https://downloads.getmonero.org/cli/monero-mac-armv8-v0.18.3.3.tar.bz2";
 
+        private string _DataDirWin = "C:/ProgramData/monero";
+        private string _DataDirLin = "~/.monero";
+        private string _DataDirMac = "~/.monero";
+
         private string _QuickSyncUrl = string.Empty;
         #endregion // Private Default Variables
 
@@ -35,6 +39,10 @@
         public string CliLinArmUrl { get => _CliLinArmUrl; set => _CliLinArmUrl = value; }
         public string CliMacIntelUrl { get => _CliMacIntelUrl; set => _CliMacIntelUrl = value; }
         public string CliMacArmUrl { get => _CliMacArmUrl; set => _CliMacArmUrl = value; }
+
+        public string DataDirWin { get => _DataDirWin; set => _DataDirWin = value; }
+        public string DataDirLin { get => _DataDirLin; set => _DataDirLin = value; }
+        public string DataDirMac { get => _DataDirMac; set => _DataDirMac = value; }
 
         public string QuickSyncUrl { get => _QuickSyncUrl; set => _QuickSyncUrl = value; }
         #endregion // Interface Implementation

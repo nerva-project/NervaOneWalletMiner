@@ -16,7 +16,7 @@
 					Spacing="5"
 					Margin="10"
 					MaxWidth="650">		
-			<Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="32,*">
+			<Grid ColumnDefinitions="32,*">
 				<Image Grid.Row="0"
 					   Grid.Column="0"
 					   Name="imgCoinIcon"/>
@@ -50,19 +50,35 @@
 			<Separator Margin="0,20,0,0"/>
 
 			<Label Content="Mining Address" Margin="0,10,0,0"/>
-			<TextBox Name="tbxMiningAddress"/>
+			<TextBox Name="tbxMiningAddress"
+					 Watermark="Address that will receive mining rewards"/>
 
-			<Label Content="Daemon Data Directory" Margin="0,10,0,0"/>
-			<TextBox Name="tbxDaemonDataDir"/>
+			<Label Content="Data Directory" Margin="0,10,0,0"/>
+			<Grid ColumnDefinitions="*,80">
+				<TextBox Grid.Row="0"
+						 Grid.Column="0"
+						 Name="tbxDaemonDataDir"
+						 Watermark="Blockchain database directory"/>
+
+				<Button Grid.Row="0"
+						Grid.Column="1"
+						Name="btnChangeDataDir"
+						Content="Change"
+						Margin="10,0,0,0"
+						Click="ChangeDataDir_Clicked"/>
+			</Grid>			
 
 			<Label Content="Additional Startup Arguments" Margin="0,10,0,0"/>
-			<TextBox Name="tbxAdditionalArguments"/>
+			<TextBox Name="tbxAdditionalArguments"
+					 Watermark="Additional arguments that will be sent to daemon when it starts"/>
 
 			<Label Content="Port Number" Margin="0,10,0,0"/>
-			<TextBox Name="tbxPortNumber"/>
+			<TextBox Name="tbxPortNumber"
+					 Watermark="Number - port that daemon will use to listen on"/>
 
 			<Label Content="Log Level" Margin="0,10,0,0"/>
-			<TextBox Name="tbxLogLevel"/>
+			<TextBox Name="tbxLogLevel"
+					 Watermark="Number - level at which daemon will write to log files"/>
 
 			<CheckBox Name="cbxAutoStartMining"
 					  Content="Auto start mining"
