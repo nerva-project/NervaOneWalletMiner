@@ -21,7 +21,5 @@ namespace NervaOneWalletMiner.Objects.Settings
         public int LogLevel { get; set; } = -1;
 
         public bool IsTestnet { get; set; } = false;
-
-        public double BlockSeconds { get; set; } = -1.0;
     }
 }

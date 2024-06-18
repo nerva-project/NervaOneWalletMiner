@@ -9,7 +9,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon.Responses
 
         public ulong Height { get; set; }
         public ulong TargetHeight { get; set; }
-        public ulong Difficulty { get; set; }
+        public ulong NetworkHashRate { get; set; }
         public ulong ConnectionCountOut { get; set; }
         public ulong ConnectionCountIn { get; set; }
         public DateTime StartTime { get; set; }

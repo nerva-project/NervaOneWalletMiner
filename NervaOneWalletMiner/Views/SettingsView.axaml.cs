@@ -76,9 +76,13 @@ namespace NervaOneWalletMiner.Views
                         Logger.LogDebug("SET.SSCL", "Closing wallet: " + GlobalData.OpenedWalletName);
                         await ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).CloseWalletNonUi();
                     }
-                   
-                    Logger.LogDebug("SET.SSCL", "Calling wallet ForceClose");
-                    WalletProcess.ForceClose();                   
+
+                    // TODO: Added this because DASH has the same process for daemon and wallet
+                    if (GlobalData.DaemonProcessName != GlobalData.WalletProcessName)
+                    {
+                        Logger.LogDebug("SET.SSCL", "Calling wallet ForceClose");
+                        ProcessManager.Kill(GlobalData.WalletProcessName);
+                    }
 
                     isChanged = true;
                     GlobalMethods.SetCoin(selectedCoin);
@@ -86,7 +90,7 @@ namespace NervaOneWalletMiner.Views
                     if (!GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
                     {
                         // CLI tools missing. Need to download
-                        string cliToolsLink = GlobalMethods.GetCliToolsDownloadLink();
+                        string cliToolsLink = GlobalMethods.GetCliToolsDownloadLink(GlobalData.AppSettings.ActiveCoin);
                         Logger.LogDebug("SET.SSCL", "CLI tools not found. Asking user to confirm download link: " + cliToolsLink);
                         
                         var window = new TextBoxView("Get Client Tools", cliToolsLink, string.Empty, "Client Tools Download Link", true);

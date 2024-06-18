@@ -427,17 +427,29 @@ namespace NervaOneWalletMiner.Helpers
                     GlobalData.NetworkStats.NetHeight = (infoRes.TargetHeight > infoRes.Height ? infoRes.TargetHeight : infoRes.Height);
                     GlobalData.NetworkStats.YourHeight = infoRes.Height;
 
-                    if (((infoRes.Difficulty / GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].BlockSeconds) / 1000000000.0d) > 1)
+                    if ((infoRes.NetworkHashRate / 1000000000000000.0d) > 1)
                     {
-                        GlobalData.NetworkStats.NetHash = Math.Round(((infoRes.Difficulty / GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].BlockSeconds) / 1000000000.0d), 2) + " GH/s";
+                        GlobalData.NetworkStats.NetHash = Math.Round((infoRes.NetworkHashRate / 1000000000000000.0d), 2) + " PH/s";
                     }
-                    else if (((infoRes.Difficulty / GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].BlockSeconds) / 1000000.0d) > 1)
+                    else if ((infoRes.NetworkHashRate / 1000000000000.0d) > 1)
                     {
-                        GlobalData.NetworkStats.NetHash = Math.Round(((infoRes.Difficulty / GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].BlockSeconds) / 1000000.0d), 2) + " MH/s";
+                        GlobalData.NetworkStats.NetHash = Math.Round((infoRes.NetworkHashRate / 1000000000000.0d), 2) + " TH/s";
+                    }
+                    else if ((infoRes.NetworkHashRate / 1000000000.0d) > 1)
+                    {
+                        GlobalData.NetworkStats.NetHash = Math.Round((infoRes.NetworkHashRate / 1000000000.0d), 2) + " GH/s";
+                    }
+                    else if ((infoRes.NetworkHashRate / 1000000.0d) > 1)
+                    {
+                        GlobalData.NetworkStats.NetHash = Math.Round((infoRes.NetworkHashRate / 1000000.0d), 2) + " MH/s";
+                    }
+                    else if ((infoRes.NetworkHashRate / 1000.0d) > 1)
+                    {
+                        GlobalData.NetworkStats.NetHash = Math.Round((infoRes.NetworkHashRate / 1000.0d), 2) + " KH/s";
                     }
                     else
                     {
-                        GlobalData.NetworkStats.NetHash = Math.Round(((infoRes.Difficulty / GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].BlockSeconds) / 1000.0d), 2) + " KH/s";
+                        GlobalData.NetworkStats.NetHash = infoRes.NetworkHashRate + " H/s";
                     }
 
                     DateTime miningStartTime = infoRes.StartTime;
@@ -445,7 +457,6 @@ namespace NervaOneWalletMiner.Helpers
 
                     GlobalData.NetworkStats.ConnectionsIn = infoRes.ConnectionCountIn;
                     GlobalData.NetworkStats.ConnectionsOut = infoRes.ConnectionCountOut;
-                    GlobalData.NetworkStats.Difficulty = infoRes.Difficulty;
 
                     GlobalData.NetworkStats.Version = infoRes.Version;
                     GlobalData.NetworkStats.StatusSync = "";
@@ -489,9 +500,9 @@ namespace NervaOneWalletMiner.Helpers
                             GlobalData.NetworkStats.YourHash = miningRes.Speed + " h/s";
                         }
 
-                        if (GlobalData.NetworkStats.Difficulty > 0)
+                        if (miningRes.Speed > 0)
                         {
-                            double blockMinutes = ((GlobalData.NetworkStats.Difficulty / GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].BlockSeconds) / miningRes.Speed);
+                            double blockMinutes = (double)infoRes.NetworkHashRate / miningRes.Speed;
 
                             if ((blockMinutes / 1440d) > 1)
                             {

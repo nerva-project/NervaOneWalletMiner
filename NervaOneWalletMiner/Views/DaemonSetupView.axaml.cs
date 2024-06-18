@@ -166,11 +166,11 @@ namespace NervaOneWalletMiner.Views
             try
             {
                 Logger.LogDebug("DMS.RWC1", "Restarting CLI");
-                WalletProcess.ForceClose();
-                DaemonProcess.ForceClose();
+                ProcessManager.Kill(GlobalData.WalletProcessName);
+                ProcessManager.Kill(GlobalData.DaemonProcessName);
 
                 GlobalData.IsDaemonRestarting = true;
-                ProcessManager.StartExternalProcess(GlobalMethods.GetDaemonProcess(), DaemonProcess.GenerateOptions(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]) + " " + restartOptions);
+                ProcessManager.StartExternalProcess(GlobalMethods.GetDaemonProcess(), GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].GenerateDaemonOptions(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]) + " " + restartOptions);
             }
             catch (Exception ex)
             {

@@ -1,35 +1,38 @@
 ﻿using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Rpc.Common;
+using System.IO;
 
 namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
 {
-    public class CoinSettingsXNV : ICoinSettings
+    internal class CoinSettingsDASH : ICoinSettings
     {
         #region Private Default Variables
-        private int _DaemonPort = 17566;
-        private string _DisplayUnits = "XNV";
-        private int _LogLevelDaemon = 1;
-        private int _LogLevelWallet = 1;
+        private int _DaemonPort = 9998;
+        private double _BlockSeconds = 150.0;
+        private string _DisplayUnits = "DASH";
+        private int _LogLevelDaemon = 0;
+        private int _LogLevelWallet = 0;
         private bool _IsCpuMiningPossible = true;
 
-        private string _CliWin64Url = "https://github.com/nerva-project/nerva/releases/download/v0.1.8.0/nerva-v0.1.8.0_windows_minimal.zip";
-        private string _CliWin32Url = "https://github.com/nerva-project/nerva/releases/download/v0.1.8.0/nerva-v0.1.8.0_windows_minimal.zip";
-        private string _CliLin64Url = "https://github.com/nerva-project/nerva/releases/download/v0.1.8.0/nerva-v0.1.8.0_linux_minimal.zip";
-        private string _CliLin32Url = "https://github.com/nerva-project/nerva/releases/download/v0.1.8.0/nerva-v0.1.8.0_linux_minimal.zip";
-        private string _CliLinArmUrl = "https://github.com/nerva-project/nerva/releases/download/v0.1.8.0/nerva-v0.1.8.0_linux_minimal.zip";
-        private string _CliMacIntelUrl = "https://github.com/nerva-project/nerva/releases/download/v0.1.8.0/nerva-v0.1.8.0_osx_minimal.zip";
-        private string _CliMacArmUrl = "https://github.com/nerva-project/nerva/releases/download/v0.1.8.0/nerva-v0.1.8.0_osx_minimal.zip";
+        private string _CliWin64Url = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-win64.zip";
+        private string _CliWin32Url = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-win64.zip";
+        private string _CliLin64Url = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-x86_64-linux-gnu.tar.gz";
+        private string _CliLin32Url = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-x86_64-linux-gnu.tar.gz";
+        private string _CliLinArmUrl = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-arm-linux-gnueabihf.tar.gz";
+        private string _CliMacIntelUrl = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-x86_64-apple-darwin.tar.gz";
+        private string _CliMacArmUrl = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-arm64-apple-darwin.tar.gz";
 
-        private string _DataDirWin = "C:/ProgramData/nerva";
-        private string _DataDirLin = "~/.nerva";
-        private string _DataDirMac = "~/.nerva";
+        private string _DataDirWin = Path.Combine(GlobalMethods.GetDataDir(), "DashCore");
+        private string _DataDirLin = Path.Combine(GlobalMethods.GetDataDir(), "DashCore");
+        private string _DataDirMac = Path.Combine(GlobalMethods.GetDataDir(), "DashCore");
 
-        private string _QuickSyncUrl = "https://nerva.one/quicksync/quicksync.raw";
+        private string _QuickSyncUrl = string.Empty;
         #endregion // Private Default Variables
 
 
         #region Interface Variables
         public int DaemonPort { get => _DaemonPort; set => _DaemonPort = value; }
+        public double BlockSeconds { get => _BlockSeconds; set => _BlockSeconds = value; }
         public string DisplayUnits { get => _DisplayUnits; set => _DisplayUnits = value; }
         public int LogLevelDaemon { get => _LogLevelDaemon; set => _LogLevelDaemon = value; }
         public int LogLevelWallet { get => _LogLevelWallet; set => _LogLevelWallet = value; }
@@ -53,32 +56,22 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         #region Interface Methods
         public string GenerateDaemonOptions(SettingsDaemon daemonSettings)
         {
-            string daemonCommand = "--rpc-bind-port " + daemonSettings.Rpc.Port;
-            daemonCommand += " --log-level " + daemonSettings.LogLevel;
-            daemonCommand += " --log-file \"" + GlobalMethods.CycleLogFile(GlobalMethods.GetDaemonProcess()) + "\"";
+            string daemonCommand = "-rpcport=" + daemonSettings.Rpc.Port;
+            //daemonCommand += " --log-level " + daemonSettings.LogLevel;
+            daemonCommand += " -debuglogfile=\"" + GlobalMethods.CycleLogFile(GlobalMethods.GetDaemonProcess()) + "\"";
 
             if (!string.IsNullOrEmpty(daemonSettings.DataDir))
             {
-                daemonCommand += " --data-dir \"" + daemonSettings.DataDir + "\"";
+                daemonCommand += " -datadir=\"" + daemonSettings.DataDir + "\"";
             }
 
             if (daemonSettings.IsTestnet)
             {
-                Logger.LogDebug("XNV.CGDO", "Connecting to testnet...");
-                daemonCommand += " --testnet";
+                Logger.LogDebug("DAS.CGDO", "Connecting to testnet...");
+                daemonCommand += " -testnet";
             }
 
-            if (daemonSettings.AutoStartMining)
-            {
-                string miningAddress = daemonSettings.MiningAddress;
-                Logger.LogDebug("XNV.CGDO", "Enabling startup mining @ " + miningAddress);
-                daemonCommand += " --start-mining " + miningAddress + " --mining-threads " + daemonSettings.MiningThreads;
-            }
-
-            if (GlobalMethods.IsLinux())
-            {
-                daemonCommand += " --detach";
-            }
+            daemonCommand += " -rpcuser=" + daemonSettings.Rpc.UserName + " -rpcpassword=" + daemonSettings.Rpc.Password;
 
             if (!string.IsNullOrEmpty(daemonSettings.AdditionalArguments))
             {
@@ -90,6 +83,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
 
         public string GenerateWalletOptions(SettingsWallet walletSettings, RpcBase daemonRpc)
         {
+            // TODO: This is just copied from XNV. Need to change
             string appCommand = "--daemon-address " + daemonRpc.Host + ":" + daemonRpc.Port;
             appCommand += " --rpc-bind-port " + walletSettings.Rpc.Port;
             appCommand += " --disable-rpc-login";
@@ -99,13 +93,9 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
 
             if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsTestnet)
             {
-                Logger.LogDebug("CGDO.CGWO", "Connecting to testnet...");
+                Logger.LogDebug("DAS.CGDO", "Connecting to testnet...");
                 appCommand += " --testnet";
             }
-
-            // TODO: Uncomment to enable rpc user:pass.
-            // string ip = d.IsPublic ? $" --rpc-bind-ip 0.0.0.0 --confirm-external-bind" : $" --rpc-bind-ip 127.0.0.1";
-            // appCommand += $"{ip} --rpc-login {d.Login}:{d.Pass}";
 
             return appCommand;
         }

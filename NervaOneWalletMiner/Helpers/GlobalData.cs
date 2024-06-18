@@ -39,7 +39,8 @@ namespace NervaOneWalletMiner.Helpers
 
         public static Dictionary<string, ICoinSettings> CoinSettings = GlobalMethods.GetDefaultCoinSettings();
 
-        public static readonly string DataDir = GlobalMethods.GetDataDir();
+        public static readonly string MainDataDir = GlobalMethods.GetDataDir();
+        public static readonly string AppDataDir = GlobalMethods.GetAppDataDir();
         public static readonly string LogDir = GlobalMethods.GetLogDir();
         public static readonly string ConfigFileNameWithPath = GlobalMethods.GetConfigFileNameWithPath();
 
@@ -75,8 +76,8 @@ namespace NervaOneWalletMiner.Helpers
         public static IWalletService WalletService = new WalletServiceXNV();
         public static IDaemonService DaemonService = new DaemonServiceXNV();
 
-        public static string WalletProcessName = GlobalMethods.GetWalletProcessName();
-        public static string DaemonProcessName = GlobalMethods.GetDaemonProcessName();
+        public static string WalletProcessName = GlobalMethods.GetWalletProcessName(AppSettings.ActiveCoin);
+        public static string DaemonProcessName = GlobalMethods.GetDaemonProcessName(AppSettings.ActiveCoin);
 
         public static Bitmap Logo = GlobalMethods.GetLogo();
 

@@ -13,9 +13,10 @@ using System.Threading.Tasks;
 namespace NervaOneWalletMiner.Rpc.Daemon
 {
     // Nerva implementation as of 5/10/24: https://github.com/nerva-project/nerva
-
     public class DaemonServiceXNV : IDaemonService
     {
+        private const double _blockSeconds = 60.0;
+
         #region Start Mining
         /* RPC request params:
          *  std::string miner_address;
@@ -207,7 +208,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
 
                             responseObj.Height = getInfoResponse.height;
                             responseObj.TargetHeight = getInfoResponse.target_height;
-                            responseObj.Difficulty = getInfoResponse.difficulty;
+                            responseObj.NetworkHashRate = (ulong)(getInfoResponse.difficulty / _blockSeconds);
                             responseObj.ConnectionCountOut = getInfoResponse.outgoing_connections_count;
                             responseObj.ConnectionCountIn = getInfoResponse.incoming_connections_count;
                             responseObj.StartTime = GlobalMethods.UnixTimeStampToDateTime(getInfoResponse.start_time);
@@ -319,7 +320,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                                     responseObj.Connections.Add(new Connection
                                     {
                                         Address = connection.address,
-                                        Height = connection.height,
+                                        Height = Convert.ToInt64(connection.height),
                                         LiveTime = TimeSpan.FromSeconds(connection.live_time).ToString(@"hh\:mm\:ss"),
                                         State = connection.state,
                                         IsIncoming = connection.incoming

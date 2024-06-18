@@ -1,4 +1,7 @@
-﻿namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
+﻿using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Rpc.Common;
+
+namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
 {
     public class CoinSettingsXMR : ICoinSettings
     {
@@ -8,6 +11,7 @@
         private string _DisplayUnits = "XMR";
         private int _LogLevelDaemon = 0;
         private int _LogLevelWallet = 0;
+        private bool _IsCpuMiningPossible = true;
 
         private string _CliWin64Url = "https://downloads.getmonero.org/cli/monero-win-x64-v0.18.3.3.zip";
         private string _CliWin32Url = "https://downloads.getmonero.org/cli/monero-win-x86-v0.18.3.3.zip";
@@ -25,12 +29,13 @@
         #endregion // Private Default Variables
 
 
-        #region Interface Implementation
+        #region Interface Variables
         public int DaemonPort { get => _DaemonPort; set => _DaemonPort = value; }
         public double BlockSeconds { get => _BlockSeconds; set => _BlockSeconds = value; }
         public string DisplayUnits { get => _DisplayUnits; set => _DisplayUnits = value; }
         public int LogLevelDaemon { get => _LogLevelDaemon; set => _LogLevelDaemon = value; }
         public int LogLevelWallet { get => _LogLevelWallet; set => _LogLevelWallet = value; }
+        public bool IsCpuMiningPossible { get => _IsCpuMiningPossible; set => _IsCpuMiningPossible = value; }
 
         public string CliWin64Url { get => _CliWin64Url; set => _CliWin64Url = value; }
         public string CliWin32Url { get => _CliWin32Url; set => _CliWin32Url = value; }
@@ -45,6 +50,63 @@
         public string DataDirMac { get => _DataDirMac; set => _DataDirMac = value; }
 
         public string QuickSyncUrl { get => _QuickSyncUrl; set => _QuickSyncUrl = value; }
-        #endregion // Interface Implementation
+        #endregion // Interface Variables
+
+        #region Interface Methods
+        public string GenerateDaemonOptions(SettingsDaemon daemonSettings)
+        {
+            string daemonCommand = "--rpc-bind-port " + daemonSettings.Rpc.Port;
+            daemonCommand += " --log-level " + daemonSettings.LogLevel;
+            daemonCommand += " --log-file \"" + GlobalMethods.CycleLogFile(GlobalMethods.GetDaemonProcess()) + "\"";
+
+            if (!string.IsNullOrEmpty(daemonSettings.DataDir))
+            {
+                daemonCommand += " --data-dir \"" + daemonSettings.DataDir + "\"";
+            }
+
+            if (daemonSettings.IsTestnet)
+            {
+                Logger.LogDebug("XMR.CGDO", "Connecting to testnet...");
+                daemonCommand += " --testnet";
+            }
+
+            if (daemonSettings.AutoStartMining)
+            {
+                string miningAddress = daemonSettings.MiningAddress;
+                Logger.LogDebug("XMR.CGDO", "Enabling startup mining @ " + miningAddress);
+                daemonCommand += " --start-mining " + miningAddress + " --mining-threads " + daemonSettings.MiningThreads;
+            }
+
+            if (GlobalMethods.IsLinux())
+            {
+                daemonCommand += " --detach";
+            }
+
+            if (!string.IsNullOrEmpty(daemonSettings.AdditionalArguments))
+            {
+                daemonCommand += " " + daemonSettings.AdditionalArguments;
+            }
+
+            return daemonCommand;
+        }
+
+        public string GenerateWalletOptions(SettingsWallet walletSettings, RpcBase daemonRpc)
+        {
+            string appCommand = "--daemon-address " + daemonRpc.Host + ":" + daemonRpc.Port;
+            appCommand += " --rpc-bind-port " + walletSettings.Rpc.Port;
+            appCommand += " --disable-rpc-login";
+            appCommand += " --wallet-dir \"" + GlobalData.WalletDir + "\"";
+            appCommand += " --log-level " + walletSettings.LogLevel;
+            appCommand += " --log-file \"" + GlobalMethods.CycleLogFile(GlobalMethods.GetRpcWalletProcess()) + "\"";
+
+            if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsTestnet)
+            {
+                Logger.LogDebug("XMR.CGWO", "Connecting to testnet...");
+                appCommand += " --testnet";
+            }
+
+            return appCommand;
+        }
+        #endregion // Interface Methods
     }
 }

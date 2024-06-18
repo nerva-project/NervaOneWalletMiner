@@ -1,10 +1,8 @@
 ﻿using NervaOneWalletMiner.Objects.Constants;
-using NervaOneWalletMiner.Rpc;
 using NervaOneWalletMiner.Rpc.Wallet.Requests;
 using NervaOneWalletMiner.Rpc.Wallet.Responses;
 using NervaOneWalletMiner.ViewModels;
 using System;
-using System.Diagnostics;
 
 namespace NervaOneWalletMiner.Helpers
 {
@@ -31,9 +29,13 @@ namespace NervaOneWalletMiner.Helpers
                     _masterUpdateTimer.Elapsed += (s, e) => MasterUpdateProcess();
                     _masterUpdateTimer.Start();
 
-                    // If wallet process was not closed properly before, it could be running listening on different port so opening wallet will fail
-                    Logger.LogDebug("MSP.SMUP", "Calling wallet ForceClose");
-                    WalletProcess.ForceClose();
+                    // TODO: Added this because DASH has the same process for daemon and wallet
+                    if (GlobalData.DaemonProcessName != GlobalData.WalletProcessName)
+                    {
+                        // If wallet process was not closed properly before, it could be running listening on different port so opening wallet will fail
+                        Logger.LogDebug("MSP.SMUP", "Calling wallet ForceClose");
+                        ProcessManager.Kill(GlobalData.WalletProcessName);
+                    }
 
                     Logger.LogDebug("MSP.SMUP", "Master timer running every " + _masterTimerInterval / 1000 + " seconds. Update every " + (_masterTimerInterval / 1000) * GlobalData.AppSettings.TimerIntervalMultiplier + " seconds");
                 }
@@ -172,13 +174,13 @@ namespace NervaOneWalletMiner.Helpers
                     Logger.LogDebug("MSP.KDNR", "No response from daemon since: " + GlobalData.LastDaemonResponseTime.ToLongTimeString() + " . Forcing restart...");
                 }
 
-                if (!ProcessManager.IsRunning(GlobalData.DaemonProcessName, out Process? process) || forceRestart)
+                if (!ProcessManager.IsRunning(GlobalData.DaemonProcessName) || forceRestart)
                 {
                     if (GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
                     {
-                        DaemonProcess.ForceClose();
+                        ProcessManager.Kill(GlobalData.DaemonProcessName);
                         Logger.LogDebug("MSP.KDNR", "Starting daemon process");
-                        ProcessManager.StartExternalProcess(GlobalMethods.GetDaemonProcess(), DaemonProcess.GenerateOptions(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]));
+                        ProcessManager.StartExternalProcess(GlobalMethods.GetDaemonProcess(), GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].GenerateDaemonOptions(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]));
                         GlobalData.IsInitialDaemonConnectionSuccess = false;
                         _cliToolsFound = true;
                     }
@@ -199,14 +201,14 @@ namespace NervaOneWalletMiner.Helpers
         {
             try
             {
-                if (!ProcessManager.IsRunning(GlobalData.WalletProcessName, out Process? process))
+                if (!ProcessManager.IsRunning(GlobalData.WalletProcessName))
                 {
                     if (GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
                     {
                         Logger.LogDebug("MSP.KWPR", "Calling Wallet ForceClose");
-                        WalletProcess.ForceClose();
+                        ProcessManager.Kill(GlobalData.WalletProcessName);
                         Logger.LogDebug("MSP.KWPR", "Starting wallet process");
-                        ProcessManager.StartExternalProcess(GlobalMethods.GetRpcWalletProcess(), WalletProcess.GenerateOptions(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin], GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc));
+                        ProcessManager.StartExternalProcess(GlobalMethods.GetRpcWalletProcess(), GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].GenerateWalletOptions(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin], GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc));
                     }
                     else
                     {

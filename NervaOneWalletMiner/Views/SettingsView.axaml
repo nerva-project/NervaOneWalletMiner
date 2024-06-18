@@ -54,6 +54,16 @@
 							Text="Monero (XMR)"/>
 				</Grid>
 			</ComboBoxItem>
+
+			<ComboBoxItem Name="dash">
+				<Grid ColumnDefinitions="24,*">
+					<Image Grid.Row="0" Grid.Column="0"
+						   Height="32" Source="avares://NervaOneWalletMiner/Assets/dash/logo.png"/>
+					<TextBlock Grid.Row="0" Grid.Column="1"
+							Padding="5,7,0,0"
+							Text="Dash (DASH)"/>
+				</Grid>
+			</ComboBoxItem>
 		</ComboBox>
 
 		<Label Content="Applicaiton Theme" Margin="0,10,0,0"/>

@@ -9,22 +9,22 @@ namespace NervaOneWalletMiner.Helpers
     {
         private static string ExeNameToProcessName(string exe) => Path.GetFileNameWithoutExtension(exe);
 
-        public static void Kill(string exe)
+        public static void Kill(string processName)
         {
             try
             {
                 //Logger.LogDebug("PM.KIL", "Exe: " + exe);
-                List<Process> processList = GetRunningByName(exe);
+                List<Process> processList = GetRunningByName(processName);
 
                 if (processList.Count == 0)
                 {
-                    Logger.LogDebug("PRM.KILL", "No instances of " + exe + " to kill");
+                    Logger.LogDebug("PRM.KILL", "No instances of " + processName + " to kill");
                     return;
                 }
 
                 foreach (Process process in processList)
                 {
-                    Logger.LogDebug("PRM.KILL", "Killing running instance of " + exe + " with id " + process.Id);
+                    Logger.LogDebug("PRM.KILL", "Killing running instance of " + processName + " with id " + process.Id);
 
 /*
 #if UNIX
@@ -46,14 +46,12 @@ namespace NervaOneWalletMiner.Helpers
             }
         }
 
-        public static bool IsRunning(string exe, out Process? process)
+        public static bool IsRunning(string processName)
         {
-            process = null;
-
             try
             {
-                //Logger.LogDebug("PM.IR", "Exe: " + exe);
-                List<Process> processList = GetRunningByName(exe);
+                //Logger.LogDebug("PM.IR", "Exe: " + processName);
+                List<Process> processList = GetRunningByName(processName);
 
                 //Logger.LogDebug("PM.IR", "Process count: " + processList.Count);
                 if (processList.Count == 0)
@@ -61,12 +59,10 @@ namespace NervaOneWalletMiner.Helpers
                     return false;
                 }
 
-                process = processList[0];
-
+                Process process = processList[0];
                 if (process == null || process.HasExited)
                 {
-                    Logger.LogDebug("PRM.ISRN", "CLI tool " + exe + " exited unexpectedly. Restarting");
-                    process = null;
+                    Logger.LogDebug("PRM.ISRN", "CLI tool " + processName + " exited unexpectedly");
                     return false;
                 }
                 else
