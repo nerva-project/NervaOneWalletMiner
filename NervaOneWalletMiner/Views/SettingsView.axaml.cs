@@ -101,6 +101,7 @@ namespace NervaOneWalletMiner.Views
                 if(isChanged)
                 {
                     imgCoinIcon.Source = GlobalMethods.GetLogo();
+                    GlobalData.NetworkStats = new();
                     GlobalMethods.SaveConfig();
                 }
             }

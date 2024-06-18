@@ -485,45 +485,48 @@ namespace NervaOneWalletMiner.Helpers
                     //Logger.LogDebug("UIM.DUUT", "GetInfo Response Height: " + infoRes.height);
 
 
-                    MiningStatusResponse miningRes = await GlobalData.DaemonService.MiningStatus(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new MiningStatusRequest());
-                    if (miningRes.IsActive)
+                    if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsCpuMiningPossible)
                     {
-                        GlobalData.NetworkStats.MinerStatus = StatusMiner.Mining;
-                        GlobalData.NetworkStats.MiningAddress = GlobalMethods.GetShorterString(miningRes.Address, 12);
-
-                        if (miningRes.Speed > 1000)
+                        MiningStatusResponse miningRes = await GlobalData.DaemonService.MiningStatus(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new MiningStatusRequest());
+                        if (miningRes.IsActive)
                         {
-                            GlobalData.NetworkStats.YourHash = miningRes.Speed / 1000.0d + " KH/s";
-                        }
-                        else
-                        {
-                            GlobalData.NetworkStats.YourHash = miningRes.Speed + " h/s";
-                        }
+                            GlobalData.NetworkStats.MinerStatus = StatusMiner.Mining;
+                            GlobalData.NetworkStats.MiningAddress = GlobalMethods.GetShorterString(miningRes.Address, 12);
 
-                        if (miningRes.Speed > 0)
-                        {
-                            double blockMinutes = (double)infoRes.NetworkHashRate / miningRes.Speed;
-
-                            if ((blockMinutes / 1440d) > 1)
+                            if (miningRes.Speed > 1000)
                             {
-                                GlobalData.NetworkStats.BlockTime = String.Format("{0:F1}", Math.Round(blockMinutes, 1) / 1440d) + " days (est)";
-                            }
-                            else if ((blockMinutes / 60.0d) > 1)
-                            {
-                                GlobalData.NetworkStats.BlockTime = String.Format("{0:F1}", Math.Round(blockMinutes, 1) / 60.0d) + " hours (est)";
+                                GlobalData.NetworkStats.YourHash = miningRes.Speed / 1000.0d + " KH/s";
                             }
                             else
                             {
-                                GlobalData.NetworkStats.BlockTime = String.Format("{0:F0}", Math.Round(blockMinutes, 0)) + " minutes (est)";
+                                GlobalData.NetworkStats.YourHash = miningRes.Speed + " h/s";
+                            }
+
+                            if (miningRes.Speed > 0)
+                            {
+                                double blockMinutes = (double)infoRes.NetworkHashRate / miningRes.Speed;
+
+                                if ((blockMinutes / 1440d) > 1)
+                                {
+                                    GlobalData.NetworkStats.BlockTime = String.Format("{0:F1}", Math.Round(blockMinutes, 1) / 1440d) + " days (est)";
+                                }
+                                else if ((blockMinutes / 60.0d) > 1)
+                                {
+                                    GlobalData.NetworkStats.BlockTime = String.Format("{0:F1}", Math.Round(blockMinutes, 1) / 60.0d) + " hours (est)";
+                                }
+                                else
+                                {
+                                    GlobalData.NetworkStats.BlockTime = String.Format("{0:F0}", Math.Round(blockMinutes, 0)) + " minutes (est)";
+                                }
                             }
                         }
-                    }
-                    else
-                    {
-                        GlobalData.NetworkStats.MinerStatus = StatusMiner.Inactive;
-                        GlobalData.NetworkStats.MiningAddress = "None";
-                        GlobalData.NetworkStats.YourHash = "0 h/s";
-                        GlobalData.NetworkStats.BlockTime = "∞";
+                        else
+                        {
+                            GlobalData.NetworkStats.MinerStatus = StatusMiner.Inactive;
+                            GlobalData.NetworkStats.MiningAddress = "None";
+                            GlobalData.NetworkStats.YourHash = "0 h/s";
+                            GlobalData.NetworkStats.BlockTime = "∞";
+                        }
                     }
 
 

@@ -12,7 +12,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private string _DisplayUnits = "DASH";
         private int _LogLevelDaemon = 0;
         private int _LogLevelWallet = 0;
-        private bool _IsCpuMiningPossible = true;
+        private bool _IsCpuMiningPossible = false;
 
         private string _CliWin64Url = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-win64.zip";
         private string _CliWin32Url = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-win64.zip";
