@@ -253,9 +253,16 @@ namespace NervaOneWalletMiner.Helpers
                     {
                         GlobalData.AppSettings.Wallet[coin].LogLevel = GlobalData.CoinSettings[coin].LogLevelWallet;
                     }
-
-                    // Always generate new port
-                    GlobalData.AppSettings.Wallet[coin].Rpc.Port = GlobalData.RandomGenerator.Next(10000, 50000);
+                    
+                    if(GlobalData.CoinSettings[coin].IsDaemonWalletSeparateApp)
+                    {
+                        // Always generate new port
+                        GlobalData.AppSettings.Wallet[coin].Rpc.Port = GlobalData.RandomGenerator.Next(10000, 50000);
+                    }
+                    else
+                    {
+                        GlobalData.AppSettings.Wallet[coin].Rpc.Port = GlobalData.CoinSettings[coin].DaemonPort;
+                    }                    
                 }
             }
             catch (Exception ex)
@@ -291,6 +298,12 @@ namespace NervaOneWalletMiner.Helpers
                         {
                             GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc.UserName = GenerateRandomString(24);
                             GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc.Password = GenerateRandomString(24);
+                        }
+
+                        if (string.IsNullOrEmpty(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc.UserName))
+                        {
+                            GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc.UserName = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc.UserName;
+                            GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc.Password = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc.Password;
                         }
                         break;
 

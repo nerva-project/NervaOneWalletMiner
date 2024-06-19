@@ -50,7 +50,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
 
                 if (response.Error.IsError)
                 {
-                    Logger.LogError("TDD.GSTD", "Failed to get transaction by ID. Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+                    Logger.LogError("TDD.GSTD", "Failed to get transaction by ID | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
                 }
                 else
                 {

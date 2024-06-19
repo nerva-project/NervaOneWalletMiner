@@ -94,7 +94,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
 
                 if (response.Error.IsError)
                 {
-                    Logger.LogError("AID.MIA1", "Failed to make integrated address. Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+                    Logger.LogError("AID.MIA1", "Failed to make integrated address | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
                     await Dispatcher.UIThread.Invoke(async () =>
                     {
                         MessageBoxView window = new("Make Integrated Address", "Error making integrated address\r\n" + response.Error.Message, true);

@@ -106,7 +106,7 @@ namespace NervaOneWalletMiner.Views
                     GlobalData.IsWalletJustOpened = false;
                     GlobalData.OpenedWalletName = string.Empty;
 
-                    Logger.LogError("WAS.CNW1", "Failed to create wallet " + walletName + " | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+                    Logger.LogError("WAS.CNW1", "Failed to create wallet " + walletName + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
                     await Dispatcher.UIThread.Invoke(async () =>
                     {
                         MessageBoxView window = new("Create Wallet", "Error creating " + walletName + " wallet\r\n" + response.Error.Message, true);
@@ -197,7 +197,7 @@ namespace NervaOneWalletMiner.Views
                     GlobalData.IsWalletJustOpened = false;
                     GlobalData.OpenedWalletName = string.Empty;
 
-                    Logger.LogError("WAS.RFS1", "Failed to restore wallet " + walletName + " | Message: " + response.Error.Message + " | Code: " + response.Error.Code + " | Info: " + response.Info);
+                    Logger.LogError("WAS.RFS1", "Failed to restore wallet " + walletName + " | Info: " + response.Info + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
                     await Dispatcher.UIThread.Invoke(async () =>
                     {
                         MessageBoxView window = new("Restore from Seed", "Error restoring " + walletName + " wallet\r\n" + response.Error.Message, true);
@@ -277,7 +277,7 @@ namespace NervaOneWalletMiner.Views
                     GlobalData.IsWalletJustOpened = false;
                     GlobalData.OpenedWalletName = string.Empty;
 
-                    Logger.LogError("WAS.RFKS", "Failed to restore wallet " + walletName + " | Message: " + response.Error.Message + " | Code: " + response.Error.Code + " | Info: " + response.Info);
+                    Logger.LogError("WAS.RFKS", "Failed to restore wallet " + walletName + " | Info: " + response.Info + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
                     await Dispatcher.UIThread.Invoke(async () =>
                     {
                         MessageBoxView window = new("Restore from Keys", "Error restoring " + walletName + " wallet\r\n" + response.Error.Message, true);
@@ -340,7 +340,7 @@ namespace NervaOneWalletMiner.Views
 
                 if (response.Error.IsError)
                 {
-                    Logger.LogError("WAS.RSPT", "Failed to rescan spent | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+                    Logger.LogError("WAS.RSPT", "Failed to rescan spent | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
                     await Dispatcher.UIThread.Invoke(async () =>
                     {
                         MessageBoxView window = new("Rescan Spent", "Error rescanning\r\n" + response.Error.Message, true);
@@ -397,7 +397,7 @@ namespace NervaOneWalletMiner.Views
 
                 if (response.Error.IsError)
                 {
-                    Logger.LogError("WAS.RSBC", "Failed to rescan Blockchain | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+                    Logger.LogError("WAS.RSBC", "Failed to rescan Blockchain | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
                     await Dispatcher.UIThread.Invoke(async () =>
                     {
                         MessageBoxView window = new("Rescan Blockchain", "Error rescanning\r\n" + response.Error.Message, true);

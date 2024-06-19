@@ -82,6 +82,7 @@ namespace NervaOneWalletMiner.Rpc.Common
                 httpError.IsError = true;
                 httpError.Code = httpResponse.StatusCode.ToString();
                 httpError.Message = httpResponse.ReasonPhrase;
+                httpError.Content = httpResponse.Content.ReadAsStringAsync().Result;
 
                 Logger.LogError("HTTP.GHE", source + " - response failed. Code: " + httpResponse.StatusCode + ", Phrase: " + httpResponse.ReasonPhrase);
             }

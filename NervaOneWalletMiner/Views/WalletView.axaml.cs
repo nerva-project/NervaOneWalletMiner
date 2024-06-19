@@ -109,7 +109,7 @@ namespace NervaOneWalletMiner.Views
                     GlobalData.IsWalletJustOpened = false;
                     GlobalData.OpenedWalletName = string.Empty;
 
-                    Logger.LogDebug("WAL.OUWT", "Error opening " + walletName + " wallet | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+                    Logger.LogDebug("WAL.OUWT", "Error opening " + walletName + " wallet | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
                     await Dispatcher.UIThread.Invoke(async () =>
                     {
                         MessageBoxView window = new("Open Wallet", "Error opening " + walletName + " wallet\r\n" + response.Error.Message, true);
@@ -170,7 +170,7 @@ namespace NervaOneWalletMiner.Views
 
                     if (response.Error.IsError)
                     {
-                        Logger.LogError("WAL.CADC", "Failed to create account " + request.Label + " | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+                        Logger.LogError("WAL.CADC", "Failed to create account " + request.Label + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
                         await Dispatcher.UIThread.Invoke(async () =>
                         {
                             MessageBoxView window = new("Create Account", "Error creating account\r\n" + response.Error.Message, true);
@@ -239,7 +239,7 @@ namespace NervaOneWalletMiner.Views
 
                     if (response.Error.IsError)
                     {
-                        Logger.LogError("WAL.RLDC", "Failed to rename account " + request.Label + " | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+                        Logger.LogError("WAL.RLDC", "Failed to rename account " + request.Label + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
 
                         await Dispatcher.UIThread.InvokeAsync(async () =>
                         {
@@ -342,7 +342,7 @@ namespace NervaOneWalletMiner.Views
 
                 if (response.Error.IsError)
                 {
-                    Logger.LogError("WAL.MKTR", "Transfer error | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+                    Logger.LogError("WAL.MKTR", "Transfer error | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
                     await Dispatcher.UIThread.Invoke(async () =>
                     {
                         MessageBoxView window = new("Transfer Funds", "Transfer error\r\n\r\n" + response.Error.Message, true);
@@ -381,7 +381,7 @@ namespace NervaOneWalletMiner.Views
 
                 if (response.Error.IsError)
                 {
-                    Logger.LogError("WAL.MTSP", "Split transfer error | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+                    Logger.LogError("WAL.MTSP", "Split transfer error | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
                     await Dispatcher.UIThread.Invoke(async () =>
                     {
                         MessageBoxView window = new("Transfer Split", "Transfer error\r\n\r\n" + response.Error.Message, true);
@@ -467,7 +467,7 @@ namespace NervaOneWalletMiner.Views
 
                 if (response.Error.IsError)
                 {
-                    Logger.LogError("WAL.CLUW", "Error closing wallet " + GlobalData.OpenedWalletName + " | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+                    Logger.LogError("WAL.CLUW", "Error closing wallet " + GlobalData.OpenedWalletName + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
 
                     GlobalData.IsWalletOpen = false;
                     GlobalData.IsWalletJustOpened = false;

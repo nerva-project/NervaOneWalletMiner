@@ -1,7 +1,10 @@
-﻿using NervaOneWalletMiner.Rpc.Common;
+﻿using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Rpc.Common;
 using NervaOneWalletMiner.Rpc.Wallet.Requests;
 using NervaOneWalletMiner.Rpc.Wallet.Responses;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace NervaOneWalletMiner.Rpc.Wallet
@@ -18,10 +21,59 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             throw new NotImplementedException();
         }
 
-        public Task<CreateWalletResponse> CreateWallet(RpcBase rpc, CreateWalletRequest requestObj)
+        #region Create Wallet
+        public async Task<CreateWalletResponse> CreateWallet(RpcBase rpc, CreateWalletRequest requestObj)
         {
-            throw new NotImplementedException();
+            CreateWalletResponse responseObj = new();
+
+            try
+            {
+                // Build request content json
+                var requestParams = new JObject
+                {
+                    ["wallet_name"] = requestObj.WalletName,
+                    ["passphrase"] = requestObj.Password
+                };
+
+                var requestJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = "0",
+                    ["method"] = "createwallet",
+                    ["params"] = requestParams
+                };
+
+                // Call service and process response
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+
+                    var error = JObject.Parse(jsonObject.ToString())["error"];
+                    if (error != null)
+                    {
+                        // Set Service error
+                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                    }
+                    else
+                    {
+                        responseObj.Error.IsError = false;
+                    }
+                }
+                else
+                {
+                    // Set HTTP error
+                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DAS.WCRW", ex);
+            }
+
+            return responseObj;
         }
+        #endregion // Create Wallet
 
         public Task<CreateAccountResponse> CreateAccount(RpcBase rpc, CreateAccountRequest requestObj)
         {

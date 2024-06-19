@@ -143,9 +143,9 @@ namespace NervaOneWalletMiner.Views
                     StartMiningResponse response = await GlobalData.DaemonService.StartMining(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, request);
                     if (response.Error.IsError)
                     {
-                        Logger.LogDebug("GLM.STMA", "Error starting mining | Message: " + response.Error.Message + " | Code: " + response.Error.Code);
+                        Logger.LogDebug("GLM.STMA", "Error starting mining | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
 
-                        if(isUiThread)
+                        if (isUiThread)
                         {
                             await Dispatcher.UIThread.Invoke(async () =>
                             {
