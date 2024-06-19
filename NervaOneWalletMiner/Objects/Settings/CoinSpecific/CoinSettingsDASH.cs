@@ -8,12 +8,14 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
     {
         #region Private Default Variables
         private int _DaemonPort = 9998;
-        private double _BlockSeconds = 150.0;
         private string _DisplayUnits = "DASH";
-        private int _LogLevelDaemon = 0;
-        private int _LogLevelWallet = 0;
+        private string _WalletExtension = "directory";
+
         private bool _IsCpuMiningPossible = false;
         private bool _IsDaemonWalletSeparateApp = false;
+
+        private int _LogLevelDaemon = 0;
+        private int _LogLevelWallet = 0;
 
         private string _CliWin64Url = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-win64.zip";
         private string _CliWin32Url = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-win64.zip";
@@ -33,12 +35,14 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
 
         #region Interface Variables
         public int DaemonPort { get => _DaemonPort; set => _DaemonPort = value; }
-        public double BlockSeconds { get => _BlockSeconds; set => _BlockSeconds = value; }
         public string DisplayUnits { get => _DisplayUnits; set => _DisplayUnits = value; }
-        public int LogLevelDaemon { get => _LogLevelDaemon; set => _LogLevelDaemon = value; }
-        public int LogLevelWallet { get => _LogLevelWallet; set => _LogLevelWallet = value; }
+        public string WalletExtension { get => _WalletExtension; set => _WalletExtension = value; }
+
         public bool IsCpuMiningPossible { get => _IsCpuMiningPossible; set => _IsCpuMiningPossible = value; }
         public bool IsDaemonWalletSeparateApp { get => _IsDaemonWalletSeparateApp; set => _IsDaemonWalletSeparateApp = value; }
+
+        public int LogLevelDaemon { get => _LogLevelDaemon; set => _LogLevelDaemon = value; }
+        public int LogLevelWallet { get => _LogLevelWallet; set => _LogLevelWallet = value; }
 
         public string CliWin64Url { get => _CliWin64Url; set => _CliWin64Url = value; }
         public string CliWin32Url { get => _CliWin32Url; set => _CliWin32Url = value; }

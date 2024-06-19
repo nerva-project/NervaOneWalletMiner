@@ -981,8 +981,7 @@ namespace NervaOneWalletMiner.Helpers
                     ForceWalletClose();
                 }
 
-                // TODO: Added this because DASH has the same process for daemon and wallet
-                if (GlobalData.DaemonProcessName != GlobalData.WalletProcessName)
+                if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsDaemonWalletSeparateApp)
                 {
                     Logger.LogDebug("GLM.STDN", "Forcing wallet process close");
                     ProcessManager.Kill(GlobalData.WalletProcessName);
@@ -1010,7 +1009,12 @@ namespace NervaOneWalletMiner.Helpers
             try
             {
                 Logger.LogDebug("GLM.FWCL", "Closing wallet: " + GlobalData.OpenedWalletName);
-                _ = await GlobalData.WalletService.CloseWallet(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new Rpc.Wallet.Requests.CloseWalletRequest());
+                CloseWalletRequest request = new CloseWalletRequest
+                {
+                    WalletName = GlobalData.OpenedWalletName
+                };
+
+                _ = await GlobalData.WalletService.CloseWallet(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, request);
             }
             catch (Exception ex)
             {

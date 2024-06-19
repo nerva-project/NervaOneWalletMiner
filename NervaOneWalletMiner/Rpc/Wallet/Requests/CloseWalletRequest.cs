@@ -2,5 +2,6 @@
 {
     public class CloseWalletRequest
     {
+        public string WalletName { get; set; } = string.Empty;
     }
 }

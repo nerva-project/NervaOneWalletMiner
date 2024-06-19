@@ -463,7 +463,12 @@ namespace NervaOneWalletMiner.Views
 
             try
             {
-                CloseWalletResponse response = await GlobalData.WalletService.CloseWallet(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new CloseWalletRequest());
+                CloseWalletRequest request = new CloseWalletRequest
+                {
+                    WalletName = GlobalData.OpenedWalletName
+                };
+
+                CloseWalletResponse response = await GlobalData.WalletService.CloseWallet(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
 
                 if (response.Error.IsError)
                 {

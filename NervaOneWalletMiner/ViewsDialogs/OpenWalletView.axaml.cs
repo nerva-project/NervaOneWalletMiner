@@ -30,25 +30,32 @@ namespace NervaOneWalletMiner.ViewsDialogs
 
         public List<string> GetWalletFileNames()
         {
-            List<string> walletFiles = [];
-            FileInfo[] files;
-
+            List<string> wallets = [];
+            
             try
             {
-                DirectoryInfo dir = new DirectoryInfo(GlobalMethods.GetWalletDir());
-                files = dir.GetFiles("*.cache", SearchOption.TopDirectoryOnly);
-
-                if(files.Length == 0)
+                DirectoryInfo walletsDir = new DirectoryInfo(GlobalMethods.GetWalletDir());
+                if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].WalletExtension.Equals("directory"))
                 {
-                    // TODO: XMR wallet files do not have extensions. Make this coin specific setting
-                    files = dir.GetFiles("*.", SearchOption.TopDirectoryOnly);
-                }
-
-                if (files.Length > 0)
-                {
-                    foreach (FileInfo file in files)
+                    DirectoryInfo[] dirs = walletsDir.GetDirectories();
+                    if(dirs.Length > 0)
                     {
-                        walletFiles.Add(Path.GetFileNameWithoutExtension(file.FullName));
+                        foreach(DirectoryInfo dir in dirs)
+                        {
+                            wallets.Add(dir.Name);
+                        }
+                    }
+                }
+                else
+                {
+                    FileInfo[] files = walletsDir.GetFiles("*" + GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].WalletExtension, SearchOption.TopDirectoryOnly);
+
+                    if (files.Length > 0)
+                    {
+                        foreach (FileInfo file in files)
+                        {
+                            wallets.Add(Path.GetFileNameWithoutExtension(file.FullName));
+                        }
                     }
                 }
             }
@@ -57,7 +64,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                 Logger.LogException("OWD.GWFN", ex);
             }
 
-            return walletFiles;
+            return wallets;
         }
 
         public void OkButton_Clicked(object sender, RoutedEventArgs args)

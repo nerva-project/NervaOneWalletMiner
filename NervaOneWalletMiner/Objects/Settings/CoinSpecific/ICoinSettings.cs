@@ -6,10 +6,13 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
     {
         int DaemonPort { get; set; }
         string DisplayUnits { get; set; }
-        int LogLevelDaemon { get; set; }
-        int LogLevelWallet { get; set; }
+        string WalletExtension { get; set; }
+
         bool IsCpuMiningPossible { get; set; }
         bool IsDaemonWalletSeparateApp { get; set; }
+
+        int LogLevelDaemon { get; set; }
+        int LogLevelWallet { get; set; }
 
         string CliWin64Url { get; set; }
         string CliWin32Url { get; set; }
@@ -23,7 +26,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         string DataDirLin { get; set; }
         string DataDirMac { get; set; }
 
-        string QuickSyncUrl { get; set; }
+        string QuickSyncUrl { get; set; }        
 
 
         string GenerateWalletOptions(SettingsWallet walletSettings, RpcBase daemonRpc);

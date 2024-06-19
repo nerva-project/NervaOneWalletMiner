@@ -7,12 +7,14 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
     {
         #region Private Default Variables
         private int _DaemonPort = 18081;
-        private double _BlockSeconds = 120.0;
         private string _DisplayUnits = "XMR";
-        private int _LogLevelDaemon = 0;
-        private int _LogLevelWallet = 0;
+        private string _WalletExtension = ".";
+
         private bool _IsCpuMiningPossible = true;
         private bool _IsDaemonWalletSeparateApp = true;
+
+        private int _LogLevelDaemon = 0;
+        private int _LogLevelWallet = 0;
 
         private string _CliWin64Url = "https://downloads.getmonero.org/cli/monero-win-x64-v0.18.3.3.zip";
         private string _CliWin32Url = "https://downloads.getmonero.org/cli/monero-win-x86-v0.18.3.3.zip";
@@ -32,12 +34,14 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
 
         #region Interface Variables
         public int DaemonPort { get => _DaemonPort; set => _DaemonPort = value; }
-        public double BlockSeconds { get => _BlockSeconds; set => _BlockSeconds = value; }
         public string DisplayUnits { get => _DisplayUnits; set => _DisplayUnits = value; }
-        public int LogLevelDaemon { get => _LogLevelDaemon; set => _LogLevelDaemon = value; }
-        public int LogLevelWallet { get => _LogLevelWallet; set => _LogLevelWallet = value; }
+        public string WalletExtension { get => _WalletExtension; set => _WalletExtension = value; }
+
         public bool IsCpuMiningPossible { get => _IsCpuMiningPossible; set => _IsCpuMiningPossible = value; }
         public bool IsDaemonWalletSeparateApp { get => _IsDaemonWalletSeparateApp; set => _IsDaemonWalletSeparateApp = value; }
+
+        public int LogLevelDaemon { get => _LogLevelDaemon; set => _LogLevelDaemon = value; }
+        public int LogLevelWallet { get => _LogLevelWallet; set => _LogLevelWallet = value; }
 
         public string CliWin64Url { get => _CliWin64Url; set => _CliWin64Url = value; }
         public string CliWin32Url { get => _CliWin32Url; set => _CliWin32Url = value; }

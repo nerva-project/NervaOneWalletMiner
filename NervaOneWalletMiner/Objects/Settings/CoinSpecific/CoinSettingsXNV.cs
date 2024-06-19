@@ -8,10 +8,13 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         #region Private Default Variables
         private int _DaemonPort = 17566;
         private string _DisplayUnits = "XNV";
-        private int _LogLevelDaemon = 1;
-        private int _LogLevelWallet = 1;
+        private string _WalletExtension = ".cache";
+
         private bool _IsCpuMiningPossible = true;
         private bool _IsDaemonWalletSeparateApp = true;
+
+        private int _LogLevelDaemon = 1;
+        private int _LogLevelWallet = 1;
 
         private string _CliWin64Url = "https://github.com/nerva-project/nerva/releases/download/v0.1.8.0/nerva-v0.1.8.0_windows_minimal.zip";
         private string _CliWin32Url = "https://github.com/nerva-project/nerva/releases/download/v0.1.8.0/nerva-v0.1.8.0_windows_minimal.zip";
@@ -25,17 +28,20 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private string _DataDirLin = "~/.nerva";
         private string _DataDirMac = "~/.nerva";
 
-        private string _QuickSyncUrl = "https://nerva.one/quicksync/quicksync.raw";
+        private string _QuickSyncUrl = "https://nerva.one/quicksync/quicksync.raw";        
         #endregion // Private Default Variables
 
 
         #region Interface Variables
         public int DaemonPort { get => _DaemonPort; set => _DaemonPort = value; }
         public string DisplayUnits { get => _DisplayUnits; set => _DisplayUnits = value; }
-        public int LogLevelDaemon { get => _LogLevelDaemon; set => _LogLevelDaemon = value; }
-        public int LogLevelWallet { get => _LogLevelWallet; set => _LogLevelWallet = value; }
+        public string WalletExtension { get => _WalletExtension; set => _WalletExtension = value; }
+
         public bool IsCpuMiningPossible { get => _IsCpuMiningPossible; set => _IsCpuMiningPossible = value; }
         public bool IsDaemonWalletSeparateApp { get => _IsDaemonWalletSeparateApp; set => _IsDaemonWalletSeparateApp = value; }
+
+        public int LogLevelDaemon { get => _LogLevelDaemon; set => _LogLevelDaemon = value; }
+        public int LogLevelWallet { get => _LogLevelWallet; set => _LogLevelWallet = value; }
 
         public string CliWin64Url { get => _CliWin64Url; set => _CliWin64Url = value; }
         public string CliWin32Url { get => _CliWin32Url; set => _CliWin32Url = value; }
@@ -49,7 +55,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public string DataDirLin { get => _DataDirLin; set => _DataDirLin = value; }
         public string DataDirMac { get => _DataDirMac; set => _DataDirMac = value; }
 
-        public string QuickSyncUrl { get => _QuickSyncUrl; set => _QuickSyncUrl = value; }
+        public string QuickSyncUrl { get => _QuickSyncUrl; set => _QuickSyncUrl = value; }        
         #endregion // Interface Variables
 
         #region Interface Methods

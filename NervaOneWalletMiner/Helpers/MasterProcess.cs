@@ -29,8 +29,7 @@ namespace NervaOneWalletMiner.Helpers
                     _masterUpdateTimer.Elapsed += (s, e) => MasterUpdateProcess();
                     _masterUpdateTimer.Start();
 
-                    // TODO: Added this because DASH has the same process for daemon and wallet
-                    if (GlobalData.DaemonProcessName != GlobalData.WalletProcessName)
+                    if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsDaemonWalletSeparateApp)
                     {
                         // If wallet process was not closed properly before, it could be running listening on different port so opening wallet will fail
                         Logger.LogDebug("MSP.SMUP", "Calling wallet ForceClose");
