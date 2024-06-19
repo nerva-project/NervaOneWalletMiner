@@ -1,9 +1,12 @@
 ﻿using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Objects.DataGrid;
 using NervaOneWalletMiner.Rpc.Common;
 using NervaOneWalletMiner.Rpc.Wallet.Requests;
 using NervaOneWalletMiner.Rpc.Wallet.Responses;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -29,6 +32,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
 
                 var requestJson = new JObject
                 {
+                    ["jsonrpc"] = "2.0",
                     ["id"] = _id++,
                     ["method"] = "loadwallet",
                     ["params"] = requestParams
@@ -84,6 +88,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
 
                 var requestJson = new JObject
                 {
+                    ["jsonrpc"] = "2.0",
                     ["id"] = _id++,
                     ["method"] = "unloadwallet",
                     ["params"] = requestParams
@@ -138,6 +143,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
 
                 var requestJson = new JObject
                 {
+                    ["jsonrpc"] = "2.0",
                     ["id"] = _id++,
                     ["method"] = "createwallet",
                     ["params"] = requestParams
@@ -175,10 +181,55 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         }
         #endregion // Create Wallet
 
-        public Task<CreateAccountResponse> CreateAccount(RpcBase rpc, CreateAccountRequest requestObj)
+        public async Task<CreateAccountResponse> CreateAccount(RpcBase rpc, CreateAccountRequest requestObj)
         {
-            // getnewaddress
-            throw new NotImplementedException();
+            CreateAccountResponse responseObj = new();
+
+            try
+            {
+                // Build request content json
+                var requestParams = new JObject
+                {
+                    ["label"] = requestObj.Label
+                };
+
+                var requestJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = "0",
+                    ["method"] = "getnewaddress",
+                    ["params"] = requestParams
+                };
+
+                // Call service and process response
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+
+                    var error = JObject.Parse(jsonObject.ToString())["error"];
+                    if (error != null)
+                    {
+                        // Set Service error
+                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                    }
+                    else
+                    {
+                        responseObj.Error.IsError = false;
+                    }
+                }
+                else
+                {
+                    // Set HTTP error
+                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DAS.WCRA", ex);
+            }
+
+            return responseObj;
         }
 
         public Task<LabelAccountResponse> LabelAccount(RpcBase rpc, LabelAccountRequest requestObj)
@@ -236,12 +287,131 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             throw new NotImplementedException();
         }
 
-        public Task<GetAccountsResponse> GetAccounts(RpcBase rpc, GetAccountsRequest requestObj)
+        public async Task<GetAccountsResponse> GetAccounts(RpcBase rpc, GetAccountsRequest requestObj)
         {
-            // listaddressbalances
-            // getaddressinfo
-            // getbalances
-            throw new NotImplementedException();
+            GetAccountsResponse responseObj = new();
+
+            try
+            {
+                bool isSuccess = false;
+
+
+                // Build request content json
+                var requestJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = _id++,
+                    ["method"] = "getwalletinfo"
+                };
+
+                // Call service and process response
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+
+                    var error = JObject.Parse(jsonObject.ToString())["error"];
+                    if (error != null)
+                    {
+                        // Set Service error
+                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                    }
+                    else
+                    {
+                        isSuccess = true;
+                        ResGetAccounts getAccountsResponse = JsonConvert.DeserializeObject<ResGetAccounts>(jsonObject.SelectToken("result").ToString());
+                        responseObj.BalanceUnlocked = getAccountsResponse.unconfirmed_balance;
+                        responseObj.BalanceLocked = getAccountsResponse.balance;
+
+                        responseObj.Error.IsError = false;
+                    }
+                }
+                else
+                {
+                    // Set HTTP error
+                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
+                }
+
+                if(isSuccess)
+                {
+                    // Build request content json
+                    var requestParams = new JObject
+                    {
+                        ["addlocked"] = true,
+                        ["include_empty"] = true,
+                        ["include_watchonly"] = true,
+                    };
+                    requestJson = new JObject
+                    {
+                        ["jsonrpc"] = "2.0",
+                        ["id"] = _id++,
+                        ["method"] = "listreceivedbyaddress",
+                        ["params"] = requestParams
+                    };
+
+                    // Call service and process response
+                    httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
+                    if (httpResponse.IsSuccessStatusCode)
+                    {
+                        dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+
+                        var error = JObject.Parse(jsonObject.ToString())["error"];
+                        if (error != null)
+                        {
+                            // Set Service error
+                            responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        }
+                        else
+                        {
+                            isSuccess = true;
+                            List<WalletAccount> getAccountsResponse = JsonConvert.DeserializeObject<List<WalletAccount>>(jsonObject.SelectToken("result").ToString());
+
+                            uint index = 0;
+
+                            foreach (WalletAccount account in getAccountsResponse)
+                            {
+                                Account newAccount = new()
+                                {
+                                    Index = index++,
+                                    Label = account.label,
+                                    AddressFull = account.address,
+                                    AddressShort = GlobalMethods.GetShorterString(account.address, 12),
+                                    BalanceLocked = account.amount,
+                                    // TODO: Need to do this another way. Also, rename those balances so they make more sense
+                                    BalanceUnlocked = account.confirmations > 10 ? account.amount : 0
+                                };
+
+                                responseObj.SubAccounts.Add(newAccount);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Set HTTP error
+                        responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DAS.WGTA", ex);
+            }
+
+            return responseObj;
+        }
+
+        private class ResGetAccounts
+        {
+            public decimal balance { get; set; }
+            public decimal unconfirmed_balance { get; set; }
+        }
+
+        private class WalletAccount
+        {
+            public string address { get; set; } = string.Empty;
+            public decimal amount { get; set; }
+            public int confirmations { get; set; }
+            public string label { get; set; } = string.Empty;
         }
 
         public Task<GetTransfersResponse> GetTransfers(RpcBase rpc, GetTransfersRequest requestObj)
