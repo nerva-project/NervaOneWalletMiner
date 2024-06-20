@@ -1179,11 +1179,9 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                         responseObj.Type = getTransfByTxIdResponse.transfer.type;
                         responseObj.Height = getTransfByTxIdResponse.transfer.height;
                         responseObj.Timestamp = GlobalMethods.UnixTimeStampToDateTime(getTransfByTxIdResponse.transfer.timestamp);
-                        responseObj.UnlockTime = GlobalMethods.UnixTimeStampToDateTime(getTransfByTxIdResponse.transfer.unlock_time);
                         responseObj.Amount = CommonXMR.DoubleAmountFromAtomicUnits(getTransfByTxIdResponse.transfer.amount, 6);
                         responseObj.Fee = CommonXMR.DoubleAmountFromAtomicUnits(getTransfByTxIdResponse.transfer.fee, 6);
                         responseObj.Note = getTransfByTxIdResponse.transfer.note;
-                        responseObj.IsLocked = getTransfByTxIdResponse.transfer.locked;
                         responseObj.Confirmations = getTransfByTxIdResponse.transfer.confirmations;
 
                         foreach (TransferDestination destination in getTransfByTxIdResponse.transfer.destinations)
@@ -1414,7 +1412,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             public List<SubaddressIndex> subaddr_indices { get; set; } = [];
             public string address { get; set; } = string.Empty;
             public bool double_spend_seen { get; set; }
-            public ulong confirmations { get; set; }
+            public long confirmations { get; set; }
             public ulong suggested_confirmations_threshold { get; set; }
         }
 

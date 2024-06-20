@@ -58,8 +58,8 @@
 
 			<Label Grid.Row="2" Grid.Column="0" Content="Time:"/>
 			<Label Grid.Row="2" Grid.Column="1" Name="lblTime" Content=""/>
-			<Label Grid.Row="2" Grid.Column="2" Content="Is Locked:"/>
-			<Label Grid.Row="2" Grid.Column="3" Name="lblIsLocked" Content=""/>
+			<Label Grid.Row="2" Grid.Column="2" Content="Confirmations:"/>
+			<Label Grid.Row="2" Grid.Column="3" Name="lblConfirmations" Content=""/>
 
 			<Label Grid.Row="3" Grid.Column="0" Content="Payment Id:"/>
 			<Label Grid.Row="3" Grid.Column="1" Name="lblPaymentId"/>

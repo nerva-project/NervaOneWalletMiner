@@ -23,11 +23,16 @@ namespace NervaOneWalletMiner.Views
                 InitializeComponent();
                 imgCoinIcon.Source = GlobalMethods.GetLogo();
 
+                if (!GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsCpuMiningSupported)
+                {
+                    btnStartStopMining.IsEnabled = false;
+                }
+
+                Initialized += DaemonView_Initialized;
+
                 var nupThreads = this.Get<NumericUpDown>("nupThreads");
                 nupThreads.Maximum = GlobalData.CpuThreadCount;
                 nupThreads.Value = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads;
-
-                Initialized += DaemonView_Initialized;
             }
             catch (Exception ex)
             {

@@ -31,6 +31,15 @@ namespace NervaOneWalletMiner.ViewsDialogs
                 InitializeComponent();
                 Icon = GlobalMethods.GetWindowIcon();
 
+                if (!GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].AreIntegratedAddressesSupported)
+                {
+                    btnMakeIntegratedAddress.IsEnabled = false;
+                    tbxIntegratedAddress.IsEnabled = false;
+                    btnCopyIntegratedAddressToClipboard.IsEnabled = false;
+                    tbxPaymentId.IsEnabled = false;
+                    btnCopyPaymentIdToClipboard.IsEnabled = false;
+                }
+
                 foreach (Account account in GlobalData.WalletStats.Subaddresses.Values)
                 {
                     string accountValue = string.IsNullOrEmpty(account.Label) ? "No label" + " (" + account.AddressShort + ")" : account.Label + " (" + account.AddressShort + ")";

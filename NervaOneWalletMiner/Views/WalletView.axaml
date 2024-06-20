@@ -122,7 +122,8 @@
 					<Separator/>
 					<MenuItem Header="Transfer Funds"
 							  Click="TransferFunds_Clicked"/>					
-					<MenuItem Header="Start Mining"
+					<MenuItem Name="miStartMining"
+							  Header="Start Mining"
 							  Click="StartMining_Clicked"/>
 				</ContextMenu>
 			</DataGrid.ContextMenu>

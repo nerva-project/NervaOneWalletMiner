@@ -334,7 +334,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
         }
         #endregion // Get Connections
 
-        #region // Unsupported Methods
+        #region Unsupported Methods
         public Task<MiningStatusResponse> GetMiningStatus(RpcBase rpc, MiningStatusRequest requestObj)
         {
             throw new NotImplementedException();

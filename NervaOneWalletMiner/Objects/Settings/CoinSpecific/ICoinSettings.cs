@@ -8,10 +8,11 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         string DisplayUnits { get; set; }
         string WalletExtension { get; set; }
 
-        bool IsCpuMiningPossible { get; set; }
+        bool IsCpuMiningSupported { get; set; }
         bool IsDaemonWalletSeparateApp { get; set; }
         bool IsSavingWalletSupported { get; set; }
-        bool IsWalletHeightSupported { get; set; }        
+        bool IsWalletHeightSupported { get; set; }      
+        bool AreIntegratedAddressesSupported { get; set; }
 
         int LogLevelDaemon { get; set; }
         int LogLevelWallet { get; set; }

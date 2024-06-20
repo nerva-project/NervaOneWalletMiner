@@ -15,11 +15,9 @@ namespace NervaOneWalletMiner.Rpc.Wallet.Responses
         public string Type { get; set; } = string.Empty;
         public ulong Height { get; set; } = 0;
         public DateTime Timestamp { get; set; } = DateTime.MinValue;
-        public DateTime UnlockTime { get; set; } = DateTime.MinValue;
         public decimal Amount { get; set; } = 0;
         public decimal Fee { get; set; } = 0;
         public string Note { get; set; } = string.Empty;           
-        public bool IsLocked { get; set; } = false;
-        public ulong Confirmations { get; set; } = 0;
+        public long Confirmations { get; set; } = 0;
     }
 }

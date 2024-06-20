@@ -188,7 +188,7 @@ namespace NervaOneWalletMiner.Helpers
 
             // Status Bar
             UpdateDaemonStatus("Connections: " + GlobalData.NetworkStats.ConnectionsOut + "(out) + " + GlobalData.NetworkStats.ConnectionsIn + "(in)" + GlobalData.NetworkStats.StatusSync);
-            UpdateDaemonVersion("Version: " + GlobalData.NetworkStats.Version);
+            UpdateDaemonVersion(GlobalData.NetworkStats.Version.ToLower().StartsWith("v") ? GlobalData.NetworkStats.Version : "v: " + GlobalData.NetworkStats.Version);
         }
 
         public static void UpdateWalletView()
@@ -280,7 +280,7 @@ namespace NervaOneWalletMiner.Helpers
                 ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).OpenCloseWallet = StatusWallet.CloseWallet;
 
                 // Status Bar
-                string statusBarMessage = GlobalData.OpenedWalletName + " | Account(s): " + GlobalData.WalletStats.Subaddresses.Count + " | Balance: " + GlobalData.WalletStats.BalanceTotal + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits + " | Height: " + GlobalData.WalletHeight;
+                string statusBarMessage = GlobalData.OpenedWalletName + " | Account(s): " + GlobalData.WalletStats.Subaddresses.Count + " | Balance: " + GlobalData.WalletStats.BalanceTotal + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits + (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletHeightSupported ? " | Height: " + GlobalData.WalletHeight : string.Empty);
                 if (((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).WalletStatus != statusBarMessage)
                 {
                     ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).WalletStatus = statusBarMessage;
@@ -488,7 +488,7 @@ namespace NervaOneWalletMiner.Helpers
                     //Logger.LogDebug("UIM.DUUT", "GetInfo Response Height: " + infoRes.height);
 
 
-                    if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsCpuMiningPossible)
+                    if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsCpuMiningSupported)
                     {
                         MiningStatusResponse miningRes = await GlobalData.DaemonService.GetMiningStatus(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new MiningStatusRequest());
                         if (miningRes.IsActive)

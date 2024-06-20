@@ -181,6 +181,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         }
         #endregion // Create Wallet
 
+        #region Create Account
         public async Task<CreateAccountResponse> CreateAccount(RpcBase rpc, CreateAccountRequest requestObj)
         {
             CreateAccountResponse responseObj = new();
@@ -231,16 +232,11 @@ namespace NervaOneWalletMiner.Rpc.Wallet
 
             return responseObj;
         }
+        #endregion // Create Account
 
         public Task<LabelAccountResponse> LabelAccount(RpcBase rpc, LabelAccountRequest requestObj)
         {
             // setlabel
-            throw new NotImplementedException();
-        }
-
-        public Task<SaveWalletResponse> SaveWallet(RpcBase rpc, SaveWalletRequest requestObj)
-        {
-            // TODO: If not needed, add coin specific flag indicating if wallet needs to be saved
             throw new NotImplementedException();
         }
 
@@ -287,6 +283,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             throw new NotImplementedException();
         }
 
+        #region Get Accounts
         public async Task<GetAccountsResponse> GetAccounts(RpcBase rpc, GetAccountsRequest requestObj)
         {
             GetAccountsResponse responseObj = new();
@@ -413,13 +410,11 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             public int confirmations { get; set; }
             public string label { get; set; } = string.Empty;
         }
+        #endregion // Get Accounts
 
+        #region Get Transfers
         public async Task<GetTransfersResponse> GetTransfers(RpcBase rpc, GetTransfersRequest requestObj)
         {
-            // listsinceblock
-            // listtransactions
-
-
             GetTransfersResponse responseObj = new();
 
             try
@@ -494,30 +489,126 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         {
             public string address { get; set; } = string.Empty;
             public string amount { get; set; } = string.Empty;
+            public string fee { get; set; } = string.Empty;
             public string blockheight { get; set; } = string.Empty;
             public string txid { get; set; } = string.Empty;
             public string category { get; set; } = string.Empty;
             public string label { get; set; } = string.Empty;
             public string blockhash { get; set; } = string.Empty;
             public ulong timereceived { get; set; }
+            public long confirmations { get; set; }
+            public string comment { get; set; } = string.Empty;
+            public List<TransferDetails> Details { get; set; } = [];
         }
 
-        public Task<GetTransferByTxIdResponse> GetTransferByTxId(RpcBase rpc, GetTranserByTxIdRequest requestObj)
+        private class TransferDetails
         {
-            // gettransaction
+            public string address { get; set; } = string.Empty;
+            public string category { get; set; } = string.Empty;
+
+        }
+        #endregion // Get Transfers
+
+        public async Task<GetTransferByTxIdResponse> GetTransferByTxId(RpcBase rpc, GetTranserByTxIdRequest requestObj)
+        {
+            GetTransferByTxIdResponse responseObj = new();
+
+            try
+            {
+                // Build request content json
+                var requestParams = new JObject
+                {
+                    ["txid"] = requestObj.TransactionId,
+                    ["include_watchonly"] = true,
+                    ["verbose"] = false
+                };
+
+                var requestJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = "0",
+                    ["method"] = "gettransaction",
+                    ["params"] = requestParams
+                };
+
+                // Call service and process response
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+
+                    var error = JObject.Parse(jsonObject.ToString())["error"];
+                    if (error != null)
+                    {
+                        // Set Service error
+                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                    }
+                    else
+                    {
+                        // Create success response object
+                        TransferEntry getTransfByTxIdResponse = JsonConvert.DeserializeObject<TransferEntry>(jsonObject.SelectToken("result").ToString());
+                        
+                        responseObj.TransactionId = getTransfByTxIdResponse.txid;                        
+                        responseObj.Height = Convert.ToUInt32(getTransfByTxIdResponse.blockheight);
+                        responseObj.Timestamp = GlobalMethods.UnixTimeStampToDateTime(getTransfByTxIdResponse.timereceived);
+                        responseObj.Amount = string.IsNullOrEmpty(getTransfByTxIdResponse.amount) ? 0 : Convert.ToDecimal(getTransfByTxIdResponse.amount);
+                        responseObj.Fee = string.IsNullOrEmpty(getTransfByTxIdResponse.fee) ? 0 : Convert.ToDecimal(getTransfByTxIdResponse.fee);
+                        responseObj.Confirmations = getTransfByTxIdResponse.confirmations;
+                        responseObj.Note = getTransfByTxIdResponse.comment;
+
+                        foreach(TransferDetails details in getTransfByTxIdResponse.Details)
+                        {
+                            // Grab first one. Adjust if need be
+                            responseObj.Address = details.address;
+                            responseObj.Type = details.category;
+                            break;
+                        }
+
+                        // TODO: If you want responseObj.Destinations, need to send true for ["verbose"] and try to pick it up that way
+                        //responseObj.Destinations.Add(destination.address + " | " + destination.amount);
+
+                        responseObj.Error.IsError = false;
+                    }
+                }
+                else
+                {
+                    // Set HTTP error
+                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DAS.WGTI", ex);
+            }
+
+            return responseObj;
+        }
+
+        private class ResGetTransferById
+        {
+            public TransferEntry transfer { get; set; } = new();
+            public List<TransferEntry> transfers { get; set; } = [];
+        }
+
+        public Task<QueryKeyResponse> QueryKey(RpcBase rpc, QueryKeyRequest requestObj)
+        {
+            // DumpWallet
+            throw new NotImplementedException();
+        }
+
+
+        #region Unsupported Methods
+        public Task<SaveWalletResponse> SaveWallet(RpcBase rpc, SaveWalletRequest requestObj)
+        {
+            // Not used. ICoinSettings.IsSavingWalletSupported
             throw new NotImplementedException();
         }
 
         public Task<GetHeightResponse> GetHeight(RpcBase rpc, GetHeightRequest requestObj)
         {
-            // TODO: Used to show wallet height in the status bar. Try to get it some way. If it does not apply, change how this works
+            // Not used. ICoinSettings.IsWalletHeightSupported
             throw new NotImplementedException();
         }
-
-        public Task<QueryKeyResponse> QueryKey(RpcBase rpc, QueryKeyRequest requestObj)
-        {
-            // // DumpWallet
-            throw new NotImplementedException();
-        }
+        #endregion // Unsupported Methods
     }
 }

@@ -10,10 +10,11 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private string _DisplayUnits = "XNV";
         private string _WalletExtension = ".cache";
 
-        private bool _IsCpuMiningPossible = true;
+        private bool _IsCpuMiningSupported = true;
         private bool _IsDaemonWalletSeparateApp = true;
         private bool _IsSavingWalletSupported = true;
-        private bool _IsWalletHeightSupported = true;        
+        private bool _IsWalletHeightSupported = true;
+        private bool _AreIntegratedAddressesSupported = true;
 
         private int _LogLevelDaemon = 1;
         private int _LogLevelWallet = 1;
@@ -39,10 +40,11 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public string DisplayUnits { get => _DisplayUnits; set => _DisplayUnits = value; }
         public string WalletExtension { get => _WalletExtension; set => _WalletExtension = value; }
 
-        public bool IsCpuMiningPossible { get => _IsCpuMiningPossible; set => _IsCpuMiningPossible = value; }
+        public bool IsCpuMiningSupported { get => _IsCpuMiningSupported; set => _IsCpuMiningSupported = value; }
         public bool IsDaemonWalletSeparateApp { get => _IsDaemonWalletSeparateApp; set => _IsDaemonWalletSeparateApp = value; }
         public bool IsSavingWalletSupported { get => _IsSavingWalletSupported; set => _IsSavingWalletSupported = value; }
         public bool IsWalletHeightSupported { get => _IsWalletHeightSupported; set => _IsWalletHeightSupported = value; }
+        public bool AreIntegratedAddressesSupported { get => _AreIntegratedAddressesSupported; set => _AreIntegratedAddressesSupported = value; }
 
         public int LogLevelDaemon { get => _LogLevelDaemon; set => _LogLevelDaemon = value; }
         public int LogLevelWallet { get => _LogLevelWallet; set => _LogLevelWallet = value; }

@@ -44,7 +44,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                 // TODO: For multi-coin support, need to make generic KeyType values and handle them in interface implementation
                 GetTranserByTxIdRequest request = new GetTranserByTxIdRequest();
                 request.TransactionId = _transactionId;
-                request.AccountIndex = Convert.ToUInt32(_accountIndex);
+                request.AccountIndex = _accountIndex;
 
                 GetTransferByTxIdResponse response = await GlobalData.WalletService.GetTransferByTxId(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
 
@@ -64,7 +64,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     this.Get<Label>("lblAmount").Content = response.Amount;
                     this.Get<Label>("lblFee").Content = response.Fee;                    
                     this.Get<Label>("lblTime").Content = response.Timestamp;
-                    this.Get<Label>("lblIsLocked").Content = response.IsLocked;
+                    this.Get<Label>("lblConfirmations").Content = response.Confirmations;
 
                     if (response.Destinations.Count > 0)
                     {

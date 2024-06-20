@@ -25,6 +25,11 @@ namespace NervaOneWalletMiner.Views
                 InitializeComponent();
                 imgCoinIcon.Source = GlobalMethods.GetLogo();
 
+                if (!GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsCpuMiningSupported)
+                {
+                    miStartMining.IsEnabled = false;
+                }
+
                 Initialized += WalletView_Initialized;
             }
             catch (Exception ex)

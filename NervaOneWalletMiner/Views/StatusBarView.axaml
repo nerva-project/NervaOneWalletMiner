@@ -11,7 +11,7 @@
 		<vm:StatusBarViewModel/>
 	</Design.DataContext>
 	
-	<Grid ColumnDefinitions="32,*,*" Margin="10" Height="50">
+	<Grid ColumnDefinitions="32,*,140" Margin="10" Height="50">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="25"/>
 			<RowDefinition Height="25"/>
@@ -27,6 +27,7 @@
 			   Content="{Binding DaemonStatus}"/>			
 		<Label Grid.Row="1"
 			   Grid.Column="1"
+			   Grid.ColumnSpan="2"
 			   Margin="10,0,0,0"
 			   Content="{Binding WalletStatus}"/>
 
