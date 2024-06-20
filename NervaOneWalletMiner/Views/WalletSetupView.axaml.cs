@@ -102,9 +102,7 @@ namespace NervaOneWalletMiner.Views
 
                 if (response.Error.IsError)
                 {
-                    GlobalData.IsWalletOpen = false;
-                    GlobalData.IsWalletJustOpened = false;
-                    GlobalData.OpenedWalletName = string.Empty;
+                    GlobalMethods.WalletClosedOrErrored();
 
                     Logger.LogError("WAS.CNW1", "Failed to create wallet " + walletName + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
                     await Dispatcher.UIThread.Invoke(async () =>
@@ -115,10 +113,7 @@ namespace NervaOneWalletMiner.Views
                 }
                 else
                 {
-                    GlobalData.IsWalletOpen = true;
-                    GlobalData.IsWalletJustOpened = true;
-                    GlobalData.OpenedWalletName = walletName;
-                    GlobalData.NewestTransactionHeight = 0;
+                    GlobalMethods.WalletJustOpened(walletName);
 
                     Logger.LogDebug("WAS.CNW1", "Wallet " + walletName + " created successfully");
                     await Dispatcher.UIThread.InvokeAsync(async () =>
@@ -193,9 +188,7 @@ namespace NervaOneWalletMiner.Views
 
                 if (response.Error.IsError)
                 {
-                    GlobalData.IsWalletOpen = false;
-                    GlobalData.IsWalletJustOpened = false;
-                    GlobalData.OpenedWalletName = string.Empty;
+                    GlobalMethods.WalletClosedOrErrored();
 
                     Logger.LogError("WAS.RFS1", "Failed to restore wallet " + walletName + " | Info: " + response.Info + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
                     await Dispatcher.UIThread.Invoke(async () =>
@@ -206,10 +199,7 @@ namespace NervaOneWalletMiner.Views
                 }
                 else
                 {
-                    GlobalData.IsWalletOpen = true;
-                    GlobalData.IsWalletJustOpened = true;
-                    GlobalData.OpenedWalletName = walletName;
-                    GlobalData.NewestTransactionHeight = 0;
+                    GlobalMethods.WalletJustOpened(walletName);
 
                     Logger.LogDebug("WAS.RFS1", "Wallet " + walletName + " restored successfully! Info: " + response.Info);
                     await Dispatcher.UIThread.InvokeAsync(async () =>
@@ -273,9 +263,7 @@ namespace NervaOneWalletMiner.Views
 
                 if (response.Error.IsError)
                 {
-                    GlobalData.IsWalletOpen = false;
-                    GlobalData.IsWalletJustOpened = false;
-                    GlobalData.OpenedWalletName = string.Empty;
+                    GlobalMethods.WalletClosedOrErrored();
 
                     Logger.LogError("WAS.RFKS", "Failed to restore wallet " + walletName + " | Info: " + response.Info + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
                     await Dispatcher.UIThread.Invoke(async () =>
@@ -286,10 +274,7 @@ namespace NervaOneWalletMiner.Views
                 }
                 else
                 {
-                    GlobalData.IsWalletOpen = true;
-                    GlobalData.IsWalletJustOpened = true;
-                    GlobalData.OpenedWalletName = walletName;
-                    GlobalData.NewestTransactionHeight = 0;
+                    GlobalMethods.WalletJustOpened(walletName);
 
                     Logger.LogDebug("WAS.RFKS", "Wallet " + walletName + " restored successfully! Info: " + response.Info);
                     await Dispatcher.UIThread.InvokeAsync(async () =>

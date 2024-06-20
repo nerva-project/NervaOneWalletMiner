@@ -1,4 +1,5 @@
 ﻿using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Objects.Constants;
 using System;
 
 namespace NervaOneWalletMiner.Rpc.Common
@@ -56,6 +57,32 @@ namespace NervaOneWalletMiner.Rpc.Common
         public static ulong AtomicUnitsFromDoubleAmount(decimal amount)
         {
             return (ulong)(amount * Convert.ToDecimal(1000000000000.0));
+        }
+
+        public static string GetTransactionType(string type)
+        {
+            string returnType = TransferType.Unknown;
+
+            switch (type.ToLower())
+            {
+                case "in":
+                    returnType = TransferType.In;
+                    break;
+                case "out":
+                    returnType = TransferType.Out;
+                    break;
+                case "block":
+                    returnType = TransferType.Block;
+                    break;
+                case "pending":
+                    returnType = TransferType.Pending;
+                    break;
+                default:
+                    returnType = TransferType.Unknown;
+                    break;
+            }
+
+            return returnType;
         }
     }
 }

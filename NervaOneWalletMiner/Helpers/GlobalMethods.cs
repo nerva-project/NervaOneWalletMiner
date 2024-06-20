@@ -971,6 +971,23 @@ namespace NervaOneWalletMiner.Helpers
             }
         }
 
+        public static void WalletJustOpened(string walletName)
+        {
+            GlobalData.IsWalletOpen = true;
+            GlobalData.IsWalletJustOpened = true;
+            GlobalData.OpenedWalletName = walletName;
+            GlobalData.NewestTransactionHeight = 0;
+            GlobalData.NewestTransactionBlockHash = string.Empty;
+        }
+
+        public static void WalletClosedOrErrored()
+        {
+            GlobalData.IsWalletOpen = false;
+            GlobalData.IsWalletJustOpened = false;
+            GlobalData.OpenedWalletName = string.Empty;
+            GlobalData.WalletStats = new();
+        }
+
         #region Exit Application
         public static void Shutdown()
         {

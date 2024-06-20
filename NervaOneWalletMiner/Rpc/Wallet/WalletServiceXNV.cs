@@ -1052,12 +1052,11 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                             {
                                 AccountIndex = entry.subaddr_index.major,
                                 TransactionId = entry.txid,
-                                TransactionIdShort = GlobalMethods.GetShorterString(entry.txid, 12),
-                                PaymentId = entry.payment_id,
+                                AddressShort = GlobalMethods.GetShorterString(entry.address, 12),
                                 Height = entry.height,
                                 Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp),
                                 Amount = CommonXNV.DoubleAmountFromAtomicUnits(entry.amount, 2),
-                                Type = entry.type
+                                Type = CommonXNV.GetTransactionType(entry.type)
                             };
 
                             responseObj.Transfers.Add(newTransfer);
@@ -1069,12 +1068,11 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                             {
                                 AccountIndex = entry.subaddr_index.major,
                                 TransactionId = entry.txid,
-                                TransactionIdShort = GlobalMethods.GetShorterString(entry.txid, 12),
-                                PaymentId = entry.payment_id,
+                                AddressShort = GlobalMethods.GetShorterString(entry.address, 12),
                                 Height = entry.height,
                                 Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp),
                                 Amount = CommonXNV.DoubleAmountFromAtomicUnits(entry.amount, 2),
-                                Type = entry.type
+                                Type = CommonXNV.GetTransactionType(entry.type)
                             };
 
                             responseObj.Transfers.Add(newTransfer);
@@ -1086,12 +1084,11 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                             {
                                 AccountIndex = entry.subaddr_index.major,
                                 TransactionId = entry.txid,
-                                TransactionIdShort = GlobalMethods.GetShorterString(entry.txid, 12),
-                                PaymentId = entry.payment_id,
+                                AddressShort = GlobalMethods.GetShorterString(entry.address, 12),
                                 Height = entry.height,
                                 Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp),
                                 Amount = CommonXNV.DoubleAmountFromAtomicUnits(entry.amount, 2),
-                                Type = entry.type
+                                Type = CommonXNV.GetTransactionType(entry.type)
                             };
 
                             responseObj.Transfers.Add(newTransfer);
@@ -1383,8 +1380,8 @@ namespace NervaOneWalletMiner.Rpc.Wallet
 
         private class SubaddressIndex
         {
-            public uint major { get; set; }
-            public uint minor { get; set; }
+            public int major { get; set; }
+            public int minor { get; set; }
         }
         #endregion // Common Internal Helper Objects
     }

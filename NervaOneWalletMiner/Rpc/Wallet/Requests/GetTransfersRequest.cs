@@ -11,9 +11,10 @@ namespace NervaOneWalletMiner.Rpc.Wallet.Requests
         public bool IncludePool { get; set; }
         public bool IsFilterByHeight { get; set; }
         public ulong MinHeight { get; set; }
-        public ulong MaxHeight { get; set; }
         public uint AccountIndex { get; set; }
         public List<uint> SubaddressIndices { get; set; } = [];
         public bool IsAllAccounts { get; set; }
+
+        public string SinceBlockHash { get; set; } = string.Empty;
     }
 }

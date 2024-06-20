@@ -35,7 +35,7 @@
 		</Grid>
 
 		<Grid ColumnDefinitions="200,*,200" Margin="0,20,0,0">
-			<Grid ColumnDefinitions="110,100" Grid.Row="0" Grid.Column="0">
+			<Grid ColumnDefinitions="120,100" Grid.Row="0" Grid.Column="0">
 				<Grid.RowDefinitions>
 					<RowDefinition Height="35"/>
 					<RowDefinition Height="35"/>

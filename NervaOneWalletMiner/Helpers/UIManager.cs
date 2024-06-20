@@ -370,8 +370,11 @@ namespace NervaOneWalletMiner.Helpers
 
                 if (!GlobalData.IsWalletJustOpened && newTransfersCount > 0)
                 {
-                    Logger.LogDebug("UIM.UPTV", "Auto-saving wallet. New transfers count: " + newTransfersCount);
-                    GlobalMethods.SaveWallet();
+                    if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsSavingWalletSupported)
+                    {
+                        Logger.LogDebug("UIM.UPTV", "Auto-saving wallet. New transfers count: " + newTransfersCount);
+                        GlobalMethods.SaveWallet();
+                    }
                 }
             }
             else
@@ -560,9 +563,6 @@ namespace NervaOneWalletMiner.Helpers
                     // Wait for one GetTransactions to finish before calling next one
                     _isTransfersUpdateComplete = false;
 
-                    // TODO: Kepp track of latest transaction height and set min_hight
-                    // Scanning from height 0 can take 15+ seconds and is CPU intensive
-
                     // Get transactions for Transfers view
                     GetTransfersRequest reqTransfers = new GetTransfersRequest();
                     reqTransfers.IncludeIn = true;
@@ -572,15 +572,12 @@ namespace NervaOneWalletMiner.Helpers
                     reqTransfers.IncludePool = false;
                     reqTransfers.IsFilterByHeight = true;
                     reqTransfers.MinHeight = GlobalData.NewestTransactionHeight;
+                    reqTransfers.SinceBlockHash = GlobalData.NewestTransactionBlockHash;
                     reqTransfers.AccountIndex = 0;
                     reqTransfers.SubaddressIndices = [];
                     reqTransfers.IsAllAccounts = true;
 
-                    // TODO: Remove stopwatch when no longer needed
-                    Stopwatch stopwatch = new Stopwatch();
-                    stopwatch.Start();
                     GetTransfersResponse resTransfers = await GlobalData.WalletService.GetTransfers(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, reqTransfers);
-                    stopwatch.Stop();
 
                     if (resTransfers.Error.IsError)
                     {
@@ -592,25 +589,29 @@ namespace NervaOneWalletMiner.Helpers
 
                         foreach (Transfer transfer in resTransfers.Transfers)
                         {
-                            if (transfer.Type.Equals("in"))
+                            if (transfer.Type.Equals(TransferType.In))
                             {
                                 transfer.Icon = _inImage;
                             }
-                            else if (transfer.Type.Equals("out"))
+                            else if (transfer.Type.Equals(TransferType.Out))
                             {
                                 transfer.Icon = _outImage;
                             }
-                            else if (transfer.Type.Equals("block"))
+                            else if (transfer.Type.Equals(TransferType.Block))
                             {
                                 transfer.Icon = _blockImage;
                             }
 
                             GlobalData.TransfersStats.Transactions.Add(transfer.TransactionId + "_" + transfer.Type, transfer);
 
-                            // TODO: Maybe do this in a different way
                             if (transfer.Height > GlobalData.NewestTransactionHeight)
                             {
                                 GlobalData.NewestTransactionHeight = transfer.Height;
+                            }
+
+                            if(transfer.BlockHash.Equals(GlobalData.NewestTransactionBlockHash))
+                            {
+                                GlobalData.NewestTransactionBlockHash = transfer.BlockHash;
                             }
                         }
                     }

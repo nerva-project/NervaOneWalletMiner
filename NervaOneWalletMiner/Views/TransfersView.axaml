@@ -56,8 +56,8 @@
 									Binding="{Binding Timestamp}"/>
 				<DataGridTextColumn Header="Amount"
 									Binding="{Binding Amount}"/>
-				<DataGridTextColumn Header="Transaction Id"
-									Binding="{Binding TransactionIdShort}"/>
+				<DataGridTextColumn Header="Address"
+									Binding="{Binding AddressShort}"/>
 			</DataGrid.Columns>
 		</DataGrid>
 		

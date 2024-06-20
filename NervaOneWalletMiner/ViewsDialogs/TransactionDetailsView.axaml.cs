@@ -11,7 +11,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
     public partial class TransactionDetailsView : Window
     {
         private string _transactionId = string.Empty;
-        private uint _accountIndex = 0;
+        private int _accountIndex = 0;
 
         // Not used but designer will complain without it
         public TransactionDetailsView()
@@ -19,7 +19,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             InitializeComponent();
         }
         
-        public TransactionDetailsView(string transactionId, uint accountIndex)
+        public TransactionDetailsView(string transactionId, int accountIndex)
         {
             try
             {
@@ -44,7 +44,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                 // TODO: For multi-coin support, need to make generic KeyType values and handle them in interface implementation
                 GetTranserByTxIdRequest request = new GetTranserByTxIdRequest();
                 request.TransactionId = _transactionId;
-                request.AccountIndex = _accountIndex;
+                request.AccountIndex = Convert.ToUInt32(_accountIndex);
 
                 GetTransferByTxIdResponse response = await GlobalData.WalletService.GetTransferByTxId(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
 

@@ -109,14 +109,20 @@ namespace NervaOneWalletMiner.Helpers
                     {
                         GlobalMethods.WalletUiUpdate();
                         UIManager.TransfersUiUpdate();
-                        SetWalletHeight();
+                        if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletHeightSupported)
+                        {
+                            SetWalletHeight();
+                        }
                     }
                     else if (_masterTimerCount % (GlobalData.AppSettings.TimerIntervalMultiplier * 2) == 0)
                     {
                         // Update wallet every 2nd call because you do not need to do it more often
                         GlobalMethods.WalletUiUpdate();
                         UIManager.TransfersUiUpdate();
-                        SetWalletHeight();
+                        if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletHeightSupported)
+                        {
+                            SetWalletHeight();
+                        }
                     }
                 }
 
@@ -132,9 +138,13 @@ namespace NervaOneWalletMiner.Helpers
 
                 if (GlobalData.IsWalletOpen & _masterTimerCount % 300 == 0)
                 {
-                    // Auto save wallet every 5 min
-                    Logger.LogDebug("MSP.MUPS", "Auto saving wallet: " + GlobalData.OpenedWalletName);
-                    GlobalMethods.SaveWallet();
+                    if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsSavingWalletSupported)
+                    {
+                        // Auto save wallet every 5 min
+                        Logger.LogDebug("MSP.MUPS", "Auto saving wallet: " + GlobalData.OpenedWalletName);
+
+                        GlobalMethods.SaveWallet();
+                    }
                 }
             }
             catch (Exception ex)

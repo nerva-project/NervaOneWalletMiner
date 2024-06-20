@@ -27,7 +27,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 var requestParams = new JObject
                 {
                     ["filename"] = requestObj.WalletName,
-                    ["load_on_startup"] = requestObj.LoadOnStartup
+                    ["load_on_startup"] = false
                 };
 
                 var requestJson = new JObject
@@ -414,11 +414,92 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             public string label { get; set; } = string.Empty;
         }
 
-        public Task<GetTransfersResponse> GetTransfers(RpcBase rpc, GetTransfersRequest requestObj)
+        public async Task<GetTransfersResponse> GetTransfers(RpcBase rpc, GetTransfersRequest requestObj)
         {
             // listsinceblock
             // listtransactions
-            throw new NotImplementedException();
+
+
+            GetTransfersResponse responseObj = new();
+
+            try
+            {
+                // Build request content json
+                var requestParams = new JObject
+                {
+                    ["blockhash"] = requestObj.SinceBlockHash,
+                    ["target_confirmations"] = 1,
+                    ["include_watchonly"] = true,
+                    ["include_removed"] = true
+                };
+
+                var requestJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = _id++,
+                    ["method"] = "listsinceblock",
+                    ["params"] = requestParams
+                };
+
+                // Call service and process response
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+
+                    var error = JObject.Parse(jsonObject.ToString())["error"];
+                    if (error != null)
+                    {
+                        // Set Service error
+                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                    }
+                    else
+                    {
+                        // Create success response object
+                        List<TransferEntry> getTransfersResponse = JsonConvert.DeserializeObject<List<TransferEntry>>(jsonObject.SelectToken("result.transactions").ToString());
+                        foreach (TransferEntry entry in getTransfersResponse)
+                        {
+                            Transfer newTransfer = new()
+                            {
+                                AccountIndex = -1,
+                                TransactionId = entry.txid,
+                                AddressShort = GlobalMethods.GetShorterString(entry.address, 12),
+                                Height = Convert.ToUInt32(entry.blockheight),
+                                Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timereceived),
+                                Amount = Convert.ToDecimal(entry.amount),
+                                Type = CommonDASH.GetTransactionType(entry.category)
+                            };
+
+                            responseObj.Transfers.Add(newTransfer);
+                        }
+
+                        responseObj.Error.IsError = false;
+                    }
+                }
+                else
+                {
+                    // Set HTTP error
+                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DAS.WGTF", ex);
+            }
+
+            return responseObj;
+        }
+
+        private class TransferEntry
+        {
+            public string address { get; set; } = string.Empty;
+            public string amount { get; set; } = string.Empty;
+            public string blockheight { get; set; } = string.Empty;
+            public string txid { get; set; } = string.Empty;
+            public string category { get; set; } = string.Empty;
+            public string label { get; set; } = string.Empty;
+            public string blockhash { get; set; } = string.Empty;
+            public ulong timereceived { get; set; }
         }
 
         public Task<GetTransferByTxIdResponse> GetTransferByTxId(RpcBase rpc, GetTranserByTxIdRequest requestObj)

@@ -66,6 +66,7 @@ namespace NervaOneWalletMiner.Helpers
 
         public static ulong NewestTransactionHeight = 0;
         public static ulong WalletHeight = 0;
+        public static string NewestTransactionBlockHash = string.Empty;
 
         public static int CpuThreadCount = Environment.ProcessorCount;
 

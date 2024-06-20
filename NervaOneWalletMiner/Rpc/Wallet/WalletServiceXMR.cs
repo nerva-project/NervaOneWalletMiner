@@ -1058,10 +1058,10 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                         foreach (TransferEntry entry in getTransfersResponse.In)
                         {
                             Transfer newTransfer = new()
-                            {                                
+                            {
+                                AccountIndex = entry.subaddr_index.major,
                                 TransactionId = entry.txid,
-                                TransactionIdShort = GlobalMethods.GetShorterString(entry.txid, 12),
-                                PaymentId = entry.payment_id,
+                                AddressShort = GlobalMethods.GetShorterString(entry.address, 12),
                                 Height = entry.height,
                                 Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp),
                                 Amount = CommonXMR.DoubleAmountFromAtomicUnits(entry.amount, 4),
@@ -1075,9 +1075,9 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                         {
                             Transfer newTransfer = new()
                             {
+                                AccountIndex = entry.subaddr_index.major,
                                 TransactionId = entry.txid,
-                                TransactionIdShort = GlobalMethods.GetShorterString(entry.txid, 12),
-                                PaymentId = entry.payment_id,
+                                AddressShort = GlobalMethods.GetShorterString(entry.address, 12),
                                 Height = entry.height,
                                 Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp),
                                 Amount = CommonXMR.DoubleAmountFromAtomicUnits(entry.amount, 4),
@@ -1091,9 +1091,9 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                         {
                             Transfer newTransfer = new()
                             {
+                                AccountIndex = entry.subaddr_index.major,
                                 TransactionId = entry.txid,
-                                TransactionIdShort = GlobalMethods.GetShorterString(entry.txid, 12),
-                                PaymentId = entry.payment_id,
+                                AddressShort = GlobalMethods.GetShorterString(entry.address, 12),
                                 Height = entry.height,
                                 Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp),
                                 Amount = CommonXMR.DoubleAmountFromAtomicUnits(entry.amount, 4),
@@ -1426,8 +1426,8 @@ namespace NervaOneWalletMiner.Rpc.Wallet
 
         private class SubaddressIndex
         {
-            public uint major { get; set; }
-            public uint minor { get; set; }
+            public int major { get; set; }
+            public int minor { get; set; }
         }
         #endregion // Common Internal Helper Objects
     }

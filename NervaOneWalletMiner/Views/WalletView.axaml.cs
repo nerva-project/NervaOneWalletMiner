@@ -105,9 +105,7 @@ namespace NervaOneWalletMiner.Views
 
                 if (response.Error.IsError)
                 {
-                    GlobalData.IsWalletOpen = false;
-                    GlobalData.IsWalletJustOpened = false;
-                    GlobalData.OpenedWalletName = string.Empty;
+                    GlobalMethods.WalletClosedOrErrored();
 
                     Logger.LogDebug("WAL.OUWT", "Error opening " + walletName + " wallet | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
                     await Dispatcher.UIThread.Invoke(async () =>
@@ -118,10 +116,7 @@ namespace NervaOneWalletMiner.Views
                 }
                 else
                 {
-                    GlobalData.IsWalletOpen = true;
-                    GlobalData.IsWalletJustOpened = true;
-                    GlobalData.OpenedWalletName = walletName;
-                    GlobalData.NewestTransactionHeight = 0;
+                    GlobalMethods.WalletJustOpened(walletName);
 
                     Logger.LogDebug("WAL.OUWT", "Wallet " + walletName + " opened successfully");
                 }
@@ -179,8 +174,11 @@ namespace NervaOneWalletMiner.Views
                     }
                     else
                     {
-                        Logger.LogDebug("WAL.CADC", "New account created successfully");
-                        GlobalMethods.SaveWallet();
+                        if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsSavingWalletSupported)
+                        {
+                            Logger.LogDebug("WAL.CADC", "New account created successfully");
+                            GlobalMethods.SaveWallet();
+                        }
 
                         await Dispatcher.UIThread.InvokeAsync(async () =>
                         {
@@ -251,7 +249,11 @@ namespace NervaOneWalletMiner.Views
                     {
                         Logger.LogDebug("WAL.RLDC", "Account label changed successfully to " + request.Label);
                         GlobalMethods.WalletUiUpdate();
-                        GlobalMethods.SaveWallet();
+
+                        if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsSavingWalletSupported)
+                        {
+                            GlobalMethods.SaveWallet();
+                        }
 
                         await Dispatcher.UIThread.InvokeAsync(async () =>
                         {
@@ -474,9 +476,7 @@ namespace NervaOneWalletMiner.Views
                 {
                     Logger.LogError("WAL.CLUW", "Error closing wallet " + GlobalData.OpenedWalletName + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
 
-                    GlobalData.IsWalletOpen = false;
-                    GlobalData.IsWalletJustOpened = false;
-                    GlobalData.OpenedWalletName = string.Empty;
+                    GlobalMethods.WalletClosedOrErrored();
 
                     if (isUiThread)
                     {
@@ -492,10 +492,7 @@ namespace NervaOneWalletMiner.Views
                     isSuccess = true;
                     Logger.LogDebug("WAL.CLUW", "Wallet " + GlobalData.OpenedWalletName + " closed successfully");
 
-                    GlobalData.IsWalletOpen = false;
-                    GlobalData.IsWalletJustOpened = false;
-                    GlobalData.OpenedWalletName = string.Empty;
-                    GlobalData.WalletStats = new();
+                    GlobalMethods.WalletClosedOrErrored();
 
                     if (isUiThread)
                     {
