@@ -6,8 +6,8 @@ namespace NervaOneWalletMiner.Objects.Stats
     public class StatsWallet
     {
         public Dictionary<uint, Account> Subaddresses { get; set; } = [];
-        public decimal TotalBalanceLocked { get; set; } = 0;
-        public decimal TotalBalanceUnlocked { get; set; } = 0;
+        public decimal BalanceTotal { get; set; } = 0;
+        public decimal BalanceUnlocked { get; set; } = 0;
 
     }
 }

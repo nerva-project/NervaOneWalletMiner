@@ -26,16 +26,16 @@ namespace NervaOneWalletMiner.Objects.DataGrid
             }
         }
 
-        private decimal _balanceLocked;
-        public decimal BalanceLocked
+        private decimal _balanceTotal;
+        public decimal BalanceTotal
         {
-            get { return _balanceLocked; }
+            get { return _balanceTotal; }
             set
             {
-                if(_balanceLocked != value)
+                if(_balanceTotal != value)
                 {
-                    _balanceLocked = value;
-                    OnPropertyChanged(nameof(BalanceLocked));
+                    _balanceTotal = value;
+                    OnPropertyChanged(nameof(BalanceTotal));
                 }
             }
         }
@@ -50,7 +50,7 @@ namespace NervaOneWalletMiner.Objects.DataGrid
                 if(_balanceUnlocked != value)
                 {
                     _balanceUnlocked = value;
-                    OnPropertyChanged(nameof(BalanceLocked));
+                    OnPropertyChanged(nameof(BalanceTotal));
                 }
             }
         }

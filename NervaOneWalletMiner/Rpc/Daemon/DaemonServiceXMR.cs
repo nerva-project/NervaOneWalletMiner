@@ -335,14 +335,14 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                                         State = connection.state,
                                         IsIncoming = connection.incoming
                                     });
-                                }
-
-                                responseObj.Error.IsError = false;
+                                }                                
                             }
                             else
                             {
-                                Logger.LogInfo("XMR.DGTC", "Connections missing in result");
+                                Logger.LogInfo("XMR.DGTC", "Connections missing: " + GlobalMethods.RemoveLineBreaksAndSpaces(httpResponse.Content.ReadAsStringAsync().Result));
                             }
+
+                            responseObj.Error.IsError = false;
                         }
                     }
                 }
@@ -392,7 +392,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
         #endregion // Get Connections
 
         #region Mining Status
-        public async Task<MiningStatusResponse> MiningStatus(RpcBase rpc, MiningStatusRequest requestObj)
+        public async Task<MiningStatusResponse> GetMiningStatus(RpcBase rpc, MiningStatusRequest requestObj)
         {
             MiningStatusResponse responseObj = new();
 

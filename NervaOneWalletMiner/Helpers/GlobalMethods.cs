@@ -894,8 +894,8 @@ namespace NervaOneWalletMiner.Helpers
                 }
                 else
                 {
-                    GlobalData.WalletStats.TotalBalanceLocked = resGetAccounts.BalanceLocked;
-                    GlobalData.WalletStats.TotalBalanceUnlocked = resGetAccounts.BalanceUnlocked;
+                    GlobalData.WalletStats.BalanceTotal = resGetAccounts.BalanceTotal;
+                    GlobalData.WalletStats.BalanceUnlocked = resGetAccounts.BalanceUnlocked;
 
                     GlobalData.WalletStats.Subaddresses = [];
 
@@ -986,6 +986,11 @@ namespace NervaOneWalletMiner.Helpers
             GlobalData.IsWalletJustOpened = false;
             GlobalData.OpenedWalletName = string.Empty;
             GlobalData.WalletStats = new();
+        }
+
+        public static string RemoveLineBreaksAndSpaces(string stringToClean)
+        {
+            return stringToClean.Replace("\r", "").Replace("\n", "").Replace("  ", " ");
         }
 
         #region Exit Application

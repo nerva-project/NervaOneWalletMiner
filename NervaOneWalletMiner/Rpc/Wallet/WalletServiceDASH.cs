@@ -320,8 +320,8 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     {
                         isSuccess = true;
                         ResGetAccounts getAccountsResponse = JsonConvert.DeserializeObject<ResGetAccounts>(jsonObject.SelectToken("result").ToString());
-                        responseObj.BalanceUnlocked = getAccountsResponse.unconfirmed_balance;
-                        responseObj.BalanceLocked = getAccountsResponse.balance;
+                        responseObj.BalanceUnlocked = getAccountsResponse.balance - getAccountsResponse.unconfirmed_balance;
+                        responseObj.BalanceTotal = getAccountsResponse.balance;
 
                         responseObj.Error.IsError = false;
                     }
@@ -376,7 +376,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                     Label = account.label,
                                     AddressFull = account.address,
                                     AddressShort = GlobalMethods.GetShorterString(account.address, 12),
-                                    BalanceLocked = account.amount,
+                                    BalanceTotal = account.amount,
                                     // TODO: Need to do this another way. Also, rename those balances so they make more sense
                                     BalanceUnlocked = account.confirmations > 10 ? account.amount : 0
                                 };

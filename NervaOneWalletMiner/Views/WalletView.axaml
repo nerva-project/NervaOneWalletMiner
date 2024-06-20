@@ -106,7 +106,7 @@
 									Width="*"
 									Binding="{Binding AddressShort}"/>
 				<DataGridTextColumn Header="Balance"
-									Binding="{Binding BalanceLocked}"/>
+									Binding="{Binding BalanceTotal}"/>
 				<DataGridTextColumn Header="Unlocked"
 									Binding="{Binding BalanceUnlocked}"/>
 			</DataGrid.Columns>

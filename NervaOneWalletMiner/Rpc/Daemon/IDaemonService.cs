@@ -17,6 +17,6 @@ namespace NervaOneWalletMiner.Rpc.Daemon
 
         Task<GetConnectionsResponse> GetConnections(RpcBase rpc, GetConnectionsRequest requestObj);
 
-        Task<MiningStatusResponse> MiningStatus(RpcBase rpc, MiningStatusRequest requestObj);
+        Task<MiningStatusResponse> GetMiningStatus(RpcBase rpc, MiningStatusRequest requestObj);
     }
 }

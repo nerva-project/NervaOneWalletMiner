@@ -62,7 +62,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                 cbxPriority.ItemsSource = priorityList;
                 cbxPriority.SelectedIndex = 0;
 
-                lblBalance.Content = GlobalData.WalletStats.Subaddresses[selectedAccountIndex].BalanceLocked + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
+                lblBalance.Content = GlobalData.WalletStats.Subaddresses[selectedAccountIndex].BalanceTotal + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
                 lblUnlocked.Content = GlobalData.WalletStats.Subaddresses[selectedAccountIndex].BalanceUnlocked + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
             }
             catch (Exception ex)
@@ -177,7 +177,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     }
                 }
 
-                lblBalance.Content = GlobalData.WalletStats.Subaddresses[fromAccountIndex].BalanceLocked + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
+                lblBalance.Content = GlobalData.WalletStats.Subaddresses[fromAccountIndex].BalanceTotal + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
                 lblUnlocked.Content = GlobalData.WalletStats.Subaddresses[fromAccountIndex].BalanceUnlocked + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
             }
             catch (Exception ex)

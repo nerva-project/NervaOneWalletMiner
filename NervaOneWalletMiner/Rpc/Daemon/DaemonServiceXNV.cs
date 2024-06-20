@@ -309,8 +309,8 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                             responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                         }
                         else
-                        {
-                            if(jsonObject.SelectToken("result.connections") != null)
+                        {                           
+                            if (jsonObject.SelectToken("result.connections") != null)
                             {
                                 // Set successful response
                                 List<ResGetConnections> getConnectionsResponse = JsonConvert.DeserializeObject<List<ResGetConnections>>(jsonObject.SelectToken("result.connections").ToString());
@@ -325,14 +325,14 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                                         State = connection.state,
                                         IsIncoming = connection.incoming
                                     });
-                                }
-
-                                responseObj.Error.IsError = false;
+                                }                                
                             }
                             else
                             {
-                                Logger.LogInfo("XNV.DGTC", "Connections missing in result");
+                                Logger.LogInfo("XNV.DGTC", "Connections missing: " + GlobalMethods.RemoveLineBreaksAndSpaces(httpResponse.Content.ReadAsStringAsync().Result));
                             }
+
+                            responseObj.Error.IsError = false;
                         }
                     }
                 }
@@ -381,7 +381,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
         #endregion // Get Connections
 
         #region Mining Status
-        public async Task<MiningStatusResponse> MiningStatus(RpcBase rpc, MiningStatusRequest requestObj)
+        public async Task<MiningStatusResponse> GetMiningStatus(RpcBase rpc, MiningStatusRequest requestObj)
         {
             MiningStatusResponse responseObj = new();
 

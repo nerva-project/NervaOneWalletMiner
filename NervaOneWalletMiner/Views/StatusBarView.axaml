@@ -11,7 +11,7 @@
 		<vm:StatusBarViewModel/>
 	</Design.DataContext>
 	
-	<Grid ColumnDefinitions="32,*,120" Margin="10" Height="50">
+	<Grid ColumnDefinitions="32,*,*" Margin="10" Height="50">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="25"/>
 			<RowDefinition Height="25"/>

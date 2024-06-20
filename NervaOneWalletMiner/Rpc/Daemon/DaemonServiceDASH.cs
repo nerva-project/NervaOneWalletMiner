@@ -300,13 +300,13 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                                         IsIncoming = connection.inbound
                                     });
                                 }
-
-                                responseObj.Error.IsError = false;
                             }
                             else
                             {
-                                Logger.LogInfo("DAS.DGTC", "Connections missing in result");
+                                Logger.LogInfo("DAS.DGTC", "Result missing: " + GlobalMethods.RemoveLineBreaksAndSpaces(httpResponse.Content.ReadAsStringAsync().Result));
                             }
+
+                            responseObj.Error.IsError = false;
                         }
                     }
                 }
@@ -335,7 +335,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
         #endregion // Get Connections
 
         #region // Unsupported Methods
-        public Task<MiningStatusResponse> MiningStatus(RpcBase rpc, MiningStatusRequest requestObj)
+        public Task<MiningStatusResponse> GetMiningStatus(RpcBase rpc, MiningStatusRequest requestObj)
         {
             throw new NotImplementedException();
         }

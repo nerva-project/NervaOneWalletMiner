@@ -942,7 +942,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     {
                         ResGetAccounts getAccountsResponse = JsonConvert.DeserializeObject<ResGetAccounts>(jsonObject.SelectToken("result").ToString());
                         responseObj.BalanceUnlocked = CommonXMR.DoubleAmountFromAtomicUnits(getAccountsResponse.total_unlocked_balance, 4);
-                        responseObj.BalanceLocked = CommonXMR.DoubleAmountFromAtomicUnits(getAccountsResponse.total_balance, 4);
+                        responseObj.BalanceTotal = CommonXMR.DoubleAmountFromAtomicUnits(getAccountsResponse.total_balance, 4);
 
                         foreach (WalletAccount account in getAccountsResponse.subaddress_accounts)
                         {
@@ -952,7 +952,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                 Label = account.label,
                                 AddressFull = account.base_address,
                                 AddressShort = GlobalMethods.GetShorterString(account.base_address, 12),
-                                BalanceLocked = CommonXMR.DoubleAmountFromAtomicUnits(account.balance, 4),
+                                BalanceTotal = CommonXMR.DoubleAmountFromAtomicUnits(account.balance, 4),
                                 BalanceUnlocked = CommonXMR.DoubleAmountFromAtomicUnits(account.unlocked_balance, 4)
                             };
 

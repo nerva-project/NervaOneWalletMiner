@@ -9,7 +9,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet.Responses
         public ServiceError Error { get; set; } = new();
 
         public decimal BalanceUnlocked { get; set; }
-        public decimal BalanceLocked { get; set; }
+        public decimal BalanceTotal { get; set; }
         public List<Account> SubAccounts { get; set; } = [];
     }
 }

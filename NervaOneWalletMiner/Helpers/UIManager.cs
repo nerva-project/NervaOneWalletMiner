@@ -195,14 +195,14 @@ namespace NervaOneWalletMiner.Helpers
         {
             if (GlobalData.IsWalletOpen)
             {
-                if (!((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).TotalCoins.Equals(GlobalData.WalletStats.TotalBalanceLocked.ToString()))
+                if (!((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).TotalCoins.Equals(GlobalData.WalletStats.BalanceTotal.ToString()))
                 {
-                    ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).TotalCoins = GlobalData.WalletStats.TotalBalanceLocked.ToString();
+                    ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).TotalCoins = GlobalData.WalletStats.BalanceTotal.ToString();
                 }
 
-                if (!((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).UnlockedCoins.Equals(GlobalData.WalletStats.TotalBalanceUnlocked.ToString()))
+                if (!((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).UnlockedCoins.Equals(GlobalData.WalletStats.BalanceUnlocked.ToString()))
                 {
-                    ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).UnlockedCoins = GlobalData.WalletStats.TotalBalanceUnlocked.ToString();
+                    ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).UnlockedCoins = GlobalData.WalletStats.BalanceUnlocked.ToString();
                 }
 
                 string totalLockedLabel = "Total " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits + ":";
@@ -246,9 +246,9 @@ namespace NervaOneWalletMiner.Helpers
                             {
                                 wallet.AddressShort = GlobalData.WalletStats.Subaddresses[wallet.Index].AddressShort;
                             }
-                            if (wallet.BalanceLocked != (GlobalData.WalletStats.Subaddresses[wallet.Index].BalanceLocked))
+                            if (wallet.BalanceTotal != (GlobalData.WalletStats.Subaddresses[wallet.Index].BalanceTotal))
                             {
-                                wallet.BalanceLocked = GlobalData.WalletStats.Subaddresses[wallet.Index].BalanceLocked;
+                                wallet.BalanceTotal = GlobalData.WalletStats.Subaddresses[wallet.Index].BalanceTotal;
                             }
                             if (wallet.BalanceUnlocked != (GlobalData.WalletStats.Subaddresses[wallet.Index].BalanceUnlocked))
                             {
@@ -280,7 +280,7 @@ namespace NervaOneWalletMiner.Helpers
                 ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).OpenCloseWallet = StatusWallet.CloseWallet;
 
                 // Status Bar
-                string statusBarMessage = GlobalData.OpenedWalletName + " | Account(s): " + GlobalData.WalletStats.Subaddresses.Count + " | Balance: " + GlobalData.WalletStats.TotalBalanceLocked + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits + " | Height: " + GlobalData.WalletHeight;
+                string statusBarMessage = GlobalData.OpenedWalletName + " | Account(s): " + GlobalData.WalletStats.Subaddresses.Count + " | Balance: " + GlobalData.WalletStats.BalanceTotal + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits + " | Height: " + GlobalData.WalletHeight;
                 if (((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).WalletStatus != statusBarMessage)
                 {
                     ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).WalletStatus = statusBarMessage;
@@ -490,7 +490,7 @@ namespace NervaOneWalletMiner.Helpers
 
                     if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsCpuMiningPossible)
                     {
-                        MiningStatusResponse miningRes = await GlobalData.DaemonService.MiningStatus(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new MiningStatusRequest());
+                        MiningStatusResponse miningRes = await GlobalData.DaemonService.GetMiningStatus(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new MiningStatusRequest());
                         if (miningRes.IsActive)
                         {
                             GlobalData.NetworkStats.MinerStatus = StatusMiner.Mining;
