@@ -39,8 +39,8 @@ function publish()
         # Copy launcher
         cp -R ${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/release/${targetFramework}/osx-x64/publish/* ${bundle}/Contents/MacOS/
 
-        cd ${ROOT_DIR}/bin
-        zip -r ${ROOT_DIR}/bin/nervaone-desk-v${APP_VERSION}_$1.zip ./NervaOneWalletMiner.Desktop.app
+        cd ${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin
+        zip -r ${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/nervaone-desk-v${APP_VERSION}_$1.zip ./NervaOneWalletMiner.Desktop.app
     elif [ "$1" == "linux-x64" ]; then
         bundle=${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/NervaOneWalletMiner.Desktop
         mkdir -p ${bundle}/Contents
