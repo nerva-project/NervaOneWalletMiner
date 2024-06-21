@@ -23,7 +23,7 @@ function publish()
     dotnet publish ${ROOT_DIR}/NervaOneWalletMiner.Desktop/NervaOneWalletMiner.Desktop.csproj -c release -r $1 -f ${targetFramework} -p:publishsinglefile=true
 
     if [ "$1" == "osx-x64" ]; then
-        bundle=${ROOT_DIR}/NervaOneWalletMiner.Desktop/Bin/NervaOneWalletMiner.Desktop.app
+        bundle=${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/NervaOneWalletMiner.Desktop.app
         mkdir -p ${bundle}/Contents
         mkdir -p ${bundle}/Contents/MacOS
         mkdir -p ${bundle}/Contents/Resources
@@ -37,26 +37,26 @@ function publish()
         cp ${BUILDER_DIR}/logos/nerva-logo-color-2.icns ${bundle}/Contents/Resources/nerva-logo-color-2.icns
 
         # Copy launcher
-        cp -R ${ROOT_DIR}/NervaOneWalletMiner.Desktop/Bin/Release/${targetFramework}/osx-x64/publish/* ${bundle}/Contents/MacOS/
+        cp -R ${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/release/${targetFramework}/osx-x64/publish/* ${bundle}/Contents/MacOS/
 
-        cd ${ROOT_DIR}/Bin
-        zip -r ${ROOT_DIR}/Bin/nervaone-desk-v${APP_VERSION}_$1.zip ./NervaOneWalletMiner.Desktop.app
+        cd ${ROOT_DIR}/bin
+        zip -r ${ROOT_DIR}/bin/nervaone-desk-v${APP_VERSION}_$1.zip ./NervaOneWalletMiner.Desktop.app
     elif [ "$1" == "linux-x64" ]; then
-        bundle=${ROOT_DIR}/NervaOneWalletMiner.Desktop/Bin/NervaOneWalletMiner.Desktop
+        bundle=${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/NervaOneWalletMiner.Desktop
         mkdir -p ${bundle}/Contents
         mkdir -p ${bundle}/Resources
 
         cp ${BUILDER_DIR}/logos/nerva-logo-color.png ${bundle}/Resources/nerva-logo-color.png
         cp ${BUILDER_DIR}/logos/nerva-logo-color-2.png ${bundle}/Resources/nerva-logo-color-2.png
 
-        cp ${ROOT_DIR}/NervaOneWalletMiner.Desktop/Bin/Release/${targetFramework}/linux-x64/publish/* ${bundle}/Contents/
+        cp ${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/release/${targetFramework}/linux-x64/publish/* ${bundle}/Contents/
         cp ${BUILDER_DIR}/install ${bundle}/install
 
-        cd ${ROOT_DIR}/NervaOneWalletMiner.Desktop/Bin/NervaOneWalletMiner.Desktop
-        zip -r ${ROOT_DIR}/NervaOneWalletMiner.Desktop/Bin/nervaone-desk-v${APP_VERSION}_$1.zip ./*
+        cd ${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/NervaOneWalletMiner.Desktop
+        zip -r ${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/nervaone-desk-v${APP_VERSION}_$1.zip ./*
     # else
-        # cd ${ROOT_DIR}/NervaOneWalletMiner.Desktop/Bin
-        # zip -j ${ROOT_DIR}/NervaOneWalletMiner.Desktop/Bin/nerva-one-v${APP_VERSION}_$1.zip ./Release/${targetFramework}/$1/publish/*
+        # cd ${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin
+        # zip -j ${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/nervaone-desk-v${APP_VERSION}_$1.zip ./release/${targetFramework}/$1/publish/*
     fi
 }
 
