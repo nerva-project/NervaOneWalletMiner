@@ -7,7 +7,7 @@ mkdir -p ~/.local/share/applications
 
 bd=$(~/.local)
 
-dd=${bd}/share/applications/nerva-one.desktop
+dd=${bd}/share/applications/nervaone.desktop
 
 echo "Copying files to ~/.local/bin/nervaone/"
 cp ${dir}/Contents/* ~/.local/bin/nervaone/

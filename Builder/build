@@ -39,8 +39,8 @@ function publish()
         # Copy launcher
         cp -R ${ROOT_DIR}/NervaOneWalletMiner.Desktop/Bin/Release/${targetFramework}/osx-x64/publish/* ${bundle}/Contents/MacOS/
 
-        # cd ${ROOT_DIR}/Bin
-        # zip -r ${ROOT_DIR}/Bin/nerva-gui-v${APP_VERSION}_$1.zip ./NervaOneWalletMiner.Desktop.app
+        cd ${ROOT_DIR}/Bin
+        zip -r ${ROOT_DIR}/Bin/nervaone-desk-v${APP_VERSION}_$1.zip ./NervaOneWalletMiner.Desktop.app
     elif [ "$1" == "linux-x64" ]; then
         bundle=${ROOT_DIR}/NervaOneWalletMiner.Desktop/Bin/NervaOneWalletMiner.Desktop
         mkdir -p ${bundle}/Contents
@@ -52,8 +52,8 @@ function publish()
         cp ${ROOT_DIR}/NervaOneWalletMiner.Desktop/Bin/Release/${targetFramework}/linux-x64/publish/* ${bundle}/Contents/
         cp ${BUILDER_DIR}/install ${bundle}/install
 
-        # cd ${ROOT_DIR}/NervaOneWalletMiner.Desktop/Bin/NervaOneWalletMiner.Desktop
-        # zip -r ${ROOT_DIR}/NervaOneWalletMiner.Desktop/Bin/nerva-one-v${APP_VERSION}_$1.zip ./*
+        cd ${ROOT_DIR}/NervaOneWalletMiner.Desktop/Bin/NervaOneWalletMiner.Desktop
+        zip -r ${ROOT_DIR}/NervaOneWalletMiner.Desktop/Bin/nervaone-desk-v${APP_VERSION}_$1.zip ./*
     # else
         # cd ${ROOT_DIR}/NervaOneWalletMiner.Desktop/Bin
         # zip -j ${ROOT_DIR}/NervaOneWalletMiner.Desktop/Bin/nerva-one-v${APP_VERSION}_$1.zip ./Release/${targetFramework}/$1/publish/*
