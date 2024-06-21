@@ -19,16 +19,16 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         int LogLevelDaemon { get; set; }
         int LogLevelWallet { get; set; }
 
-        string CliWin64Url { get; set; }
-        string CliWin32Url { get; set; }
-        string CliLin64Url{ get; set; }
-        string CliLin32Url { get; set; }
-        string CliLinArmUrl { get; set; }
-        string CliMacIntelUrl { get; set; }
-        string CliMacArmUrl { get; set; }
+        string CliUrlWindows64 { get; set; }
+        string CliUrlWindows32 { get; set; }
+        string CliUrlLinux64 { get; set; }
+        string CliUrlLinux32 { get; set; }
+        string CliUrlLinuxArm { get; set; }
+        string CliUrlMacIntel { get; set; }
+        string CliUrlMacArm { get; set; }
 
-        string DataDirWin { get; set; }
-        string DataDirLin { get; set; }
+        string DataDirWindows { get; set; }
+        string DataDirLinux { get; set; }
         string DataDirMac { get; set; }
 
         string QuickSyncUrl { get; set; }

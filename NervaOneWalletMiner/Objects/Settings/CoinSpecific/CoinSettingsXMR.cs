@@ -21,16 +21,16 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private int _LogLevelDaemon = 0;
         private int _LogLevelWallet = 0;
 
-        private string _CliWin64Url = "https://downloads.getmonero.org/cli/monero-win-x64-v0.18.3.3.zip";
-        private string _CliWin32Url = "https://downloads.getmonero.org/cli/monero-win-x86-v0.18.3.3.zip";
-        private string _CliLin64Url = "https://downloads.getmonero.org/cli/monero-linux-x64-v0.18.3.3.tar.bz2";
-        private string _CliLin32Url = "https://downloads.getmonero.org/cli/monero-linux-x86-v0.18.3.3.tar.bz2";
-        private string _CliLinArmUrl = "https://downloads.getmonero.org/cli/monero-linux-armv7-v0.18.3.3.tar.bz2";
-        private string _CliMacIntelUrl = "https://downloads.getmonero.org/cli/monero-mac-x64-v0.18.3.3.tar.bz2";
-        private string _CliMacArmUrl = "https://downloads.getmonero.org/cli/monero-mac-armv8-v0.18.3.3.tar.bz2";
+        private string _CliUrlWindows64 = "https://downloads.getmonero.org/cli/monero-win-x64-v0.18.3.3.zip";
+        private string _CliUrlWindows32 = "https://downloads.getmonero.org/cli/monero-win-x86-v0.18.3.3.zip";
+        private string _CliUrlLinux64 = "https://downloads.getmonero.org/cli/monero-linux-x64-v0.18.3.3.tar.bz2";
+        private string _CliUrlLinux32 = "https://downloads.getmonero.org/cli/monero-linux-x86-v0.18.3.3.tar.bz2";
+        private string _CliUrlLinuxArm = "https://downloads.getmonero.org/cli/monero-linux-armv7-v0.18.3.3.tar.bz2";
+        private string _CliUrlMacIntel = "https://downloads.getmonero.org/cli/monero-mac-x64-v0.18.3.3.tar.bz2";
+        private string _CliUrlMacArm = "https://downloads.getmonero.org/cli/monero-mac-armv8-v0.18.3.3.tar.bz2";
 
-        private string _DataDirWin = "C:/ProgramData/monero";
-        private string _DataDirLin = "~/.monero";
+        private string _DataDirWindows = "C:/ProgramData/monero";
+        private string _DataDirLinux = "~/.monero";
         private string _DataDirMac = "~/.monero";
 
         private string _QuickSyncUrl = string.Empty;
@@ -53,16 +53,16 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public int LogLevelDaemon { get => _LogLevelDaemon; set => _LogLevelDaemon = value; }
         public int LogLevelWallet { get => _LogLevelWallet; set => _LogLevelWallet = value; }
 
-        public string CliWin64Url { get => _CliWin64Url; set => _CliWin64Url = value; }
-        public string CliWin32Url { get => _CliWin32Url; set => _CliWin32Url = value; }
-        public string CliLin64Url { get => _CliLin64Url; set => _CliLin64Url = value; }
-        public string CliLin32Url { get => _CliLin32Url; set => _CliLin32Url = value; }
-        public string CliLinArmUrl { get => _CliLinArmUrl; set => _CliLinArmUrl = value; }
-        public string CliMacIntelUrl { get => _CliMacIntelUrl; set => _CliMacIntelUrl = value; }
-        public string CliMacArmUrl { get => _CliMacArmUrl; set => _CliMacArmUrl = value; }
+        public string CliUrlWindows64 { get => _CliUrlWindows64; set => _CliUrlWindows64 = value; }
+        public string CliUrlWindows32 { get => _CliUrlWindows32; set => _CliUrlWindows32 = value; }
+        public string CliUrlLinux64 { get => _CliUrlLinux64; set => _CliUrlLinux64 = value; }
+        public string CliUrlLinux32 { get => _CliUrlLinux32; set => _CliUrlLinux32 = value; }
+        public string CliUrlLinuxArm { get => _CliUrlLinuxArm; set => _CliUrlLinuxArm = value; }
+        public string CliUrlMacIntel { get => _CliUrlMacIntel; set => _CliUrlMacIntel = value; }
+        public string CliUrlMacArm { get => _CliUrlMacArm; set => _CliUrlMacArm = value; }
 
-        public string DataDirWin { get => _DataDirWin; set => _DataDirWin = value; }
-        public string DataDirLin { get => _DataDirLin; set => _DataDirLin = value; }
+        public string DataDirWindows { get => _DataDirWindows; set => _DataDirWindows = value; }
+        public string DataDirLinux { get => _DataDirLinux; set => _DataDirLinux = value; }
         public string DataDirMac { get => _DataDirMac; set => _DataDirMac = value; }
 
         public string QuickSyncUrl { get => _QuickSyncUrl; set => _QuickSyncUrl = value; }

@@ -1,9 +1,31 @@
-﻿using NervaOneWalletMiner.Objects.Constants;
+﻿using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Objects.Constants;
+using System;
 
 namespace NervaOneWalletMiner.Rpc.Common
 {
     public static class CommonDASH
     {
+        public static ServiceError GetServiceError(string source, dynamic error)
+        {
+            ServiceError serviceError = new();
+
+            try
+            {
+                serviceError.IsError = true;
+                serviceError.Code = error["code"].ToString();
+                serviceError.Message = error["message"].ToString();
+
+                Logger.LogError("DAS.CGSE", source + " - error from service. Code: " + serviceError.Code + ", Message: " + serviceError.Message);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DAS.CGSE", ex);
+            }
+
+            return serviceError;
+        }
+
         public static string GetTransactionType(string type)
         {
             string returnType = TransferType.Unknown;

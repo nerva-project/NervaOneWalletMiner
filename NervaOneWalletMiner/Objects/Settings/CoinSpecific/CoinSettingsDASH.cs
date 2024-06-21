@@ -1,5 +1,6 @@
 ﻿using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Rpc.Common;
+using System;
 using System.IO;
 
 namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
@@ -22,16 +23,16 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private int _LogLevelDaemon = 0;
         private int _LogLevelWallet = 0;
 
-        private string _CliWin64Url = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-win64.zip";
-        private string _CliWin32Url = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-win64.zip";
-        private string _CliLin64Url = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-x86_64-linux-gnu.tar.gz";
-        private string _CliLin32Url = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-x86_64-linux-gnu.tar.gz";
-        private string _CliLinArmUrl = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-arm-linux-gnueabihf.tar.gz";
-        private string _CliMacIntelUrl = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-x86_64-apple-darwin.tar.gz";
-        private string _CliMacArmUrl = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-arm64-apple-darwin.tar.gz";
+        private string _CliUrlWindows64 = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-win64.zip";
+        private string _CliUrlWindows32 = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-win64.zip";
+        private string _CliUrlLinux64 = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-x86_64-linux-gnu.tar.gz";
+        private string _CliUrlLinux32 = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-x86_64-linux-gnu.tar.gz";
+        private string _CliUrlLinuxArm = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-arm-linux-gnueabihf.tar.gz";
+        private string _CliUrlMacIntel = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-x86_64-apple-darwin.tar.gz";
+        private string _CliUrlMacArm = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-arm64-apple-darwin.tar.gz";
 
-        private string _DataDirWin = Path.Combine(GlobalMethods.GetDataDir(), "DashCore");
-        private string _DataDirLin = Path.Combine(GlobalMethods.GetDataDir(), "DashCore");
+        private string _DataDirWindows = Path.Combine(GlobalMethods.GetDataDir(), "DashCore");
+        private string _DataDirLinux = Path.Combine(GlobalMethods.GetDataDir(), "DashCore");
         private string _DataDirMac = Path.Combine(GlobalMethods.GetDataDir(), "DashCore");
 
         private string _QuickSyncUrl = string.Empty;
@@ -54,16 +55,16 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public int LogLevelDaemon { get => _LogLevelDaemon; set => _LogLevelDaemon = value; }
         public int LogLevelWallet { get => _LogLevelWallet; set => _LogLevelWallet = value; }
 
-        public string CliWin64Url { get => _CliWin64Url; set => _CliWin64Url = value; }
-        public string CliWin32Url { get => _CliWin32Url; set => _CliWin32Url = value; }
-        public string CliLin64Url { get => _CliLin64Url; set => _CliLin64Url = value; }
-        public string CliLin32Url { get => _CliLin32Url; set => _CliLin32Url = value; }
-        public string CliLinArmUrl { get => _CliLinArmUrl; set => _CliLinArmUrl = value; }
-        public string CliMacIntelUrl { get => _CliMacIntelUrl; set => _CliMacIntelUrl = value; }
-        public string CliMacArmUrl { get => _CliMacArmUrl; set => _CliMacArmUrl = value; }
+        public string CliUrlWindows64 { get => _CliUrlWindows64; set => _CliUrlWindows64 = value; }
+        public string CliUrlWindows32 { get => _CliUrlWindows32; set => _CliUrlWindows32 = value; }
+        public string CliUrlLinux64 { get => _CliUrlLinux64; set => _CliUrlLinux64 = value; }
+        public string CliUrlLinux32 { get => _CliUrlLinux32; set => _CliUrlLinux32 = value; }
+        public string CliUrlLinuxArm { get => _CliUrlLinuxArm; set => _CliUrlLinuxArm = value; }
+        public string CliUrlMacIntel { get => _CliUrlMacIntel; set => _CliUrlMacIntel = value; }
+        public string CliUrlMacArm { get => _CliUrlMacArm; set => _CliUrlMacArm = value; }
 
-        public string DataDirWin { get => _DataDirWin; set => _DataDirWin = value; }
-        public string DataDirLin { get => _DataDirLin; set => _DataDirLin = value; }
+        public string DataDirWindows { get => _DataDirWindows; set => _DataDirWindows = value; }
+        public string DataDirLinux { get => _DataDirLinux; set => _DataDirLinux = value; }
         public string DataDirMac { get => _DataDirMac; set => _DataDirMac = value; }
 
         public string QuickSyncUrl { get => _QuickSyncUrl; set => _QuickSyncUrl = value; }
@@ -100,21 +101,8 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
 
         public string GenerateWalletOptions(SettingsWallet walletSettings, RpcBase daemonRpc)
         {
-            // TODO: This is just copied from XNV. Need to change
-            string appCommand = "--daemon-address " + daemonRpc.Host + ":" + daemonRpc.Port;
-            appCommand += " --rpc-bind-port " + walletSettings.Rpc.Port;
-            appCommand += " --disable-rpc-login";
-            appCommand += " --wallet-dir \"" + GlobalData.WalletDir + "\"";
-            appCommand += " --log-level " + walletSettings.LogLevel;
-            appCommand += " --log-file \"" + GlobalMethods.CycleLogFile(GlobalMethods.GetRpcWalletProcess()) + "\"";
-
-            if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsTestnet)
-            {
-                Logger.LogDebug("DAS.CGDO", "Connecting to testnet...");
-                appCommand += " --testnet";
-            }
-
-            return appCommand;
+            // Should not call this because daemon and wallet are the same process
+            throw new NotImplementedException();
         }
         #endregion // Interface Methods
     }

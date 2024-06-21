@@ -49,7 +49,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                         if (error != null)
                         {
                             // Set Service error
-                            responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                            responseObj.Error = CommonDASH.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                         }
                         else
                         {
@@ -106,7 +106,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                         if (error != null)
                         {
                             // Set Service error
-                            responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                            responseObj.Error = CommonDASH.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                             responseObj.Status = "ERROR";
                         }
                         else
@@ -157,7 +157,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                             if (error != null)
                             {
                                 // Set Service error
-                                responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                                responseObj.Error = CommonDASH.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                             }
                             else
                             {
@@ -210,7 +210,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                             if (error != null)
                             {
                                 // Set Service error
-                                responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                                responseObj.Error = CommonDASH.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                             }
                             else
                             {
@@ -280,7 +280,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                         if (error != null)
                         {
                             // Set Service error
-                            responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                            responseObj.Error = CommonDASH.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                         }
                         else
                         {
