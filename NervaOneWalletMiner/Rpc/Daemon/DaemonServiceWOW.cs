@@ -14,7 +14,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
 {
     public class DaemonServiceWOW : IDaemonService
     {
-        private const double _blockSeconds = 120.0;
+        private const double _blockSeconds = 300.0;
 
         #region Start Mining
         /* RPC request params:
@@ -46,7 +46,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = CommonWOW.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -67,7 +67,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.DSTM", ex);
+                Logger.LogException("WOW.DSTM", ex);
             }
 
             return responseObj;
@@ -94,7 +94,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = CommonWOW.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -115,7 +115,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.DSPM", ex);
+                Logger.LogException("WOW.DSPM", ex);
             }
 
             return responseObj;
@@ -142,7 +142,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = CommonWOW.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -160,7 +160,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.DSPD", ex);
+                Logger.LogException("WOW.DSPD", ex);
             }
 
             return responseObj;
@@ -188,7 +188,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 {
                     if (string.IsNullOrEmpty(httpResponse.Content.ReadAsStringAsync().Result))
                     {
-                        Logger.LogInfo("XMR.DGTI", "Response Content is empty");
+                        Logger.LogInfo("WOW.DGTI", "Response Content is empty");
                     }
                     else
                     {
@@ -198,7 +198,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                         if (error != null)
                         {
                             // Set Service error
-                            responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                            responseObj.Error = CommonWOW.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                         }
                         else
                         {
@@ -226,7 +226,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.DGTI", ex);
+                Logger.LogException("WOW.DGTI", ex);
             }
 
             return responseObj;
@@ -304,7 +304,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 {
                     if (string.IsNullOrEmpty(httpResponse.Content.ReadAsStringAsync().Result))
                     {
-                        Logger.LogInfo("XMR.DGTC", "Response Content is empty");
+                        Logger.LogInfo("WOW.DGTC", "Response Content is empty");
                     }
                     else
                     {
@@ -314,7 +314,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                         if (error != null)
                         {
                             // Set Service error
-                            responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                            responseObj.Error = CommonWOW.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                         }
                         else
                         {
@@ -337,7 +337,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                             }
                             else
                             {
-                                Logger.LogInfo("XMR.DGTC", "Connections missing: " + GlobalMethods.RemoveLineBreaksAndSpaces(httpResponse.Content.ReadAsStringAsync().Result));
+                                Logger.LogInfo("WOW.DGTC", "Connections missing: " + GlobalMethods.RemoveLineBreaksAndSpaces(httpResponse.Content.ReadAsStringAsync().Result));
                             }
 
                             responseObj.Error.IsError = false;
@@ -352,7 +352,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.DGTC", ex);
+                Logger.LogException("WOW.DGTC", ex);
             }
 
             return responseObj;
@@ -405,7 +405,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 {
                     if (string.IsNullOrEmpty(httpResponse.Content.ReadAsStringAsync().Result))
                     {
-                        Logger.LogInfo("XMR.DMSS", "Response Content is empty");
+                        Logger.LogInfo("WOW.DMSS", "Response Content is empty");
                     }
                     else
                     {
@@ -415,7 +415,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                         if (error != null)
                         {
                             // Set Service error
-                            responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                            responseObj.Error = CommonWOW.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                         }
                         else
                         {
@@ -438,7 +438,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.DMSS", ex);
+                Logger.LogException("WOW.DMSS", ex);
             }
 
             return responseObj;

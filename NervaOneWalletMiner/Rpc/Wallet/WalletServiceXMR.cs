@@ -21,7 +21,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         /* RPC request params:
          *  std::string filename;
          *  std::string password;
-         *  std::string language;
+         *  bool autosave_current;
          */
         public async Task<OpenWalletResponse> OpenWallet(RpcBase rpc, OpenWalletRequest requestObj)
         {
