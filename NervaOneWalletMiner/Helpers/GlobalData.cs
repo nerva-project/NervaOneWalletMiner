@@ -24,6 +24,7 @@ namespace NervaOneWalletMiner.Helpers
         public const string MainCoinsDirName = "coins";
         public const string AppConfigFileName = "app.config";
         public const string AddressBookFileName = "address.book";
+        public const string WalletDumpFileName = "dump.txt";
         public static string CoinDirName = Coin.XNV;
 
         public static bool IsConfigFound = false;

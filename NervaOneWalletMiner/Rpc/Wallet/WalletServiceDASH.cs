@@ -1,6 +1,7 @@
 ﻿using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects.DataGrid;
 using NervaOneWalletMiner.Rpc.Common;
+using NervaOneWalletMiner.Rpc.Wallet.Objects;
 using NervaOneWalletMiner.Rpc.Wallet.Requests;
 using NervaOneWalletMiner.Rpc.Wallet.Responses;
 using Newtonsoft.Json;
@@ -293,7 +294,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
 
         public Task<LabelAccountResponse> LabelAccount(RpcBase rpc, LabelAccountRequest requestObj)
         {
-            // setlabel
+            // TODO: setlabel
             throw new NotImplementedException();
         }
 
@@ -305,7 +306,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
 
         public Task<RestoreFromKeysResponse> RestoreFromKeys(RpcBase rpc, RestoreFromKeysRequest requestObj)
         {
-            // importelectrumwallet
+            // TODO: importelectrumwallet
             // importwalle
             throw new NotImplementedException();
         }
@@ -370,27 +371,15 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         }
         #endregion // Transfer
 
-        public Task<TransferResponse> TransferSplit(RpcBase rpc, TransferRequest requestObj)
-        {
-            // Not supported
-            throw new NotImplementedException();
-        }
-
         public Task<RescanSpentResponse> RescanSpent(RpcBase rpc, RescanSpentRequest requestObj)
         {
-            // scantxoutset
+            // TODO: scantxoutset
             throw new NotImplementedException();
         }
 
         public Task<RescanBlockchainResponse> RescanBlockchain(RpcBase rpc, RescanBlockchainRequest requestObj)
         {
-            // rescanblockchain
-            throw new NotImplementedException();
-        }
-
-        public Task<MakeIntegratedAddressResponse> MakeIntegratedAddress(RpcBase rpc, MakeIntegratedAddressRequest requestObj)
-        {
-            // TODO: Add coin specific flag and show this option, only if coin supports it
+            // TODO: rescanblockchain
             throw new NotImplementedException();
         }
 
@@ -593,7 +582,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                 AccountIndex = -1,
                                 TransactionId = entry.txid,
                                 AddressShort = GlobalMethods.GetShorterString(entry.address, 12),
-                                Height = Convert.ToUInt32(entry.blockheight),
+                                Height = string.IsNullOrEmpty(entry.blockheight) ? 0 : Convert.ToUInt32(entry.blockheight),
                                 Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timereceived),
                                 Amount = Convert.ToDecimal(entry.amount),
                                 Type = CommonDASH.GetTransactionType(entry.category)
@@ -661,7 +650,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                         TransferEntry getTransfByTxIdResponse = JsonConvert.DeserializeObject<TransferEntry>(jsonObject.SelectToken("result").ToString());
                         
                         responseObj.TransactionId = getTransfByTxIdResponse.txid;                        
-                        responseObj.Height = Convert.ToUInt32(getTransfByTxIdResponse.blockheight);
+                        responseObj.Height = string.IsNullOrEmpty(getTransfByTxIdResponse.blockheight)? 0 : Convert.ToUInt32(getTransfByTxIdResponse.blockheight);
                         responseObj.Timestamp = GlobalMethods.UnixTimeStampToDateTime(getTransfByTxIdResponse.timereceived);
                         responseObj.Confirmations = getTransfByTxIdResponse.confirmations;
                         responseObj.Note = getTransfByTxIdResponse.comment;
@@ -705,10 +694,57 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         }
         #endregion // Get Transfer By TxId
 
-        public Task<QueryKeyResponse> QueryKey(RpcBase rpc, QueryKeyRequest requestObj)
+        public async Task<GetPrivateKeysResponse> GetPrivateKeys(RpcBase rpc, GetPrivateKeysRequest requestObj)
         {
-            // DumpWallet
-            throw new NotImplementedException();
+            // TODO: DumpWallet
+            GetPrivateKeysResponse responseObj = new();
+
+            try
+            {
+                // Build request content json
+                var requestParams = new JObject
+                {
+                    ["filename"] = requestObj.DumpFileWithPath
+                };
+
+                var requestJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = _id++,
+                    ["method"] = "dumpwallet",
+                    ["params"] = requestParams
+                };
+
+                // Call service and process response
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+
+                    var error = JObject.Parse(jsonObject.ToString())["error"];
+                    if (error != null)
+                    {
+                        // Set Service error
+                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                    }
+                    else
+                    {
+
+                        responseObj.Error.IsError = false;
+                    }
+                }
+                else
+                {
+                    // Set HTTP error
+                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DAS.WGPK", ex);
+            }
+
+            return responseObj;
         }
 
         #region Common Internal Helper Objects
@@ -748,6 +784,18 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         public Task<GetHeightResponse> GetHeight(RpcBase rpc, GetHeightRequest requestObj)
         {
             // Not used. ICoinSettings.IsWalletHeightSupported
+            throw new NotImplementedException();
+        }
+
+        public Task<MakeIntegratedAddressResponse> MakeIntegratedAddress(RpcBase rpc, MakeIntegratedAddressRequest requestObj)
+        {
+            // Not used. ICoinSettings.AreIntegratedAddressesSupported
+            throw new NotImplementedException();
+        }
+
+        public Task<TransferResponse> TransferSplit(RpcBase rpc, TransferRequest requestObj)
+        {
+            // Not supported
             throw new NotImplementedException();
         }
         #endregion // Unsupported Methods

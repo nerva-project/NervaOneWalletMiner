@@ -13,7 +13,8 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         bool IsSavingWalletSupported { get; set; }
         bool IsWalletHeightSupported { get; set; }
         bool IsPassRequiredToOpenWallet { get; set; }
-        bool AreIntegratedAddressesSupported { get; set; }       
+        bool AreIntegratedAddressesSupported { get; set; }
+        bool AreKeysDumpedToFile {  get; set; }
 
         int LogLevelDaemon { get; set; }
         int LogLevelWallet { get; set; }
@@ -30,7 +31,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         string DataDirLin { get; set; }
         string DataDirMac { get; set; }
 
-        string QuickSyncUrl { get; set; }        
+        string QuickSyncUrl { get; set; }
 
 
         string GenerateWalletOptions(SettingsWallet walletSettings, RpcBase daemonRpc);

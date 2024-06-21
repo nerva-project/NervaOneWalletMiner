@@ -34,7 +34,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             {
                 // TODO: For multi-coin support, need to make generic KeyType values and handle them in interface implementation
 
-                QueryKeyResponse response = await GlobalData.WalletService.QueryKey(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new QueryKeyRequest() { KeyType = KeyType.AllViewSpend });
+                GetPrivateKeysResponse response = await GlobalData.WalletService.GetPrivateKeys(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new GetPrivateKeysRequest() { KeyType = KeyType.AllViewSpend });
 
                 if (response.Error.IsError)
                 {
@@ -46,11 +46,11 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     this.Get<TextBox>("tbxPrivateViewKey").Text = response.PrivateViewKey;
                     this.Get<TextBox>("tbxPublicSpendKey").Text = response.PublicSpendKey;
                     this.Get<TextBox>("tbxPrivateSpendKey").Text = response.PrivateSpendKey;
-                    response = new QueryKeyResponse();
+                    response = new GetPrivateKeysResponse();
 
 
                     // Once you got keys, query mnemonic seed
-                    response = await GlobalData.WalletService.QueryKey(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new QueryKeyRequest() { KeyType = KeyType.Mnemonic });
+                    response = await GlobalData.WalletService.GetPrivateKeys(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new GetPrivateKeysRequest() { KeyType = KeyType.Mnemonic });
                     if (response.Error.IsError)
                     {
                         Logger.LogError("DKD.GASK", "Failed to query mnemonic seed for " + GlobalData.OpenedWalletName + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
@@ -58,7 +58,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     else
                     {
                         this.Get<TextBox>("tbxMnemonicSeed").Text = response.Mnemonic;
-                        response = new QueryKeyResponse();
+                        response = new GetPrivateKeysResponse();
                     }                        
                 }
             }

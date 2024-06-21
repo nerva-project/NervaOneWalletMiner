@@ -148,7 +148,7 @@ namespace NervaOneWalletMiner.Views
         {
             try
             {
-                var window = new TextBoxView("Create Account", string.Empty, "Enter new account label", "Account Label", false);
+                var window = new TextBoxView("Create Account", "Account Label", string.Empty, "Enter new account label", false);
                 window.ShowDialog(GetWindow()).ContinueWith(CreateAccounDialogClosed);
             }
             catch (Exception ex)
@@ -216,7 +216,7 @@ namespace NervaOneWalletMiner.Views
                 if (dtgAccounts.SelectedItem != null)
                 {
                     Account selectedItem = (Account)dtgAccounts.SelectedItem;
-                    var window = new TextBoxView("Change Account Label", selectedItem.Label, string.Empty, "Account Label", false);
+                    var window = new TextBoxView("Change Account Label", "Account Label", selectedItem.Label, string.Empty, false);
                     window.ShowDialog(GetWindow()).ContinueWith(RenameLabelDialogClosed);
                 }
             }

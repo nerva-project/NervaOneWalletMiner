@@ -2,7 +2,7 @@
 
 namespace NervaOneWalletMiner.Rpc.Wallet.Responses
 {
-    public class QueryKeyResponse
+    public class GetPrivateKeysResponse
     {
         public ServiceError Error { get; set; } = new();
 

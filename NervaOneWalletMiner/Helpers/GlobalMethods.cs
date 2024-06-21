@@ -170,6 +170,21 @@ namespace NervaOneWalletMiner.Helpers
             return cliToolsDirectory;
         }
 
+        public static void DeleteFileIfExists(string fileWithPath)
+        {
+            try
+            {
+                if (File.Exists(fileWithPath))
+                {
+                    File.Delete(fileWithPath);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("GLM.DFIE", ex);
+            }
+        }
+
         public static string GetDaemonProcess()
         {
             return Path.Combine(GlobalData.CliToolsDir, GlobalData.DaemonProcessName);
@@ -986,6 +1001,7 @@ namespace NervaOneWalletMiner.Helpers
             GlobalData.IsWalletJustOpened = false;
             GlobalData.OpenedWalletName = string.Empty;
             GlobalData.WalletStats = new();
+            GlobalData.WalletPassProvidedTime = DateTime.MinValue;
         }
 
         public static string RemoveLineBreaksAndSpaces(string stringToClean)

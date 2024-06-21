@@ -8,6 +8,7 @@ using NervaOneWalletMiner.Rpc.Wallet.Responses;
 using NervaOneWalletMiner.ViewsDialogs;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace NervaOneWalletMiner.Views
@@ -430,16 +431,110 @@ namespace NervaOneWalletMiner.Views
         #endregion // Rescan Blockchain
 
         #region View Keys/Seed
-        public void ViewKeysSeed_Clicked(object sender, RoutedEventArgs args)
+        public async void ViewKeysSeed_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
-                var window = new DisplayKeysSeedView();
-                window.ShowDialog(GetWindow());
+                bool isAuthorized = false;
+                if(!GlobalData.IsWalletOpen)
+                {
+                    MessageBoxView window = new("View Private Keys", "Please open wallet first.", true);
+                    await window.ShowDialog(GetWindow());
+                }
+                else if (DateTime.Now > GlobalData.WalletPassProvidedTime.AddMinutes(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].UnlockMinutes))
+                {
+                    // Password required
+                    TextBoxView textWindow = new TextBoxView("Provide Wallet Password", "Please provide wallet password", string.Empty, "Required - Wallet password", true, true);
+                    DialogResult passRes = await textWindow.ShowDialog<DialogResult>(GetWindow());
+                    if (passRes != null && passRes.IsOk)
+                    {
+                        if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPassRequiredToOpenWallet)
+                        {
+                            // Self managed lock
+                            if (passRes.TextBoxValue.Equals(GlobalData.WalletPassword))
+                            {
+                                isAuthorized = true;
+                                GlobalData.WalletPassProvidedTime = DateTime.Now;
+                            }
+                        }
+                        else
+                        {
+                            // Lock managed by wallet
+                            UnlockWithPassRequest request = new()
+                            {
+                                Password = passRes.TextBoxValue,
+                                TimeoutInSeconds = GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].UnlockMinutes * 60
+                            };
+
+                            UnlockWithPassResponse response = await GlobalData.WalletService.UnlockWithPass(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
+
+                            if (response.Error.IsError)
+                            {
+                                Logger.LogError("WAS.VKSC", "Unlock error | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
+                                await Dispatcher.UIThread.Invoke(async () =>
+                                {
+                                    MessageBoxView window = new("Unlock Wallet", "Unlock error\r\n\r\n" + response.Error.Message, true);
+                                    await window.ShowDialog(GetWindow());
+                                });
+                            }
+                            else
+                            {
+                                isAuthorized = true;
+                                GlobalData.WalletPassProvidedTime = DateTime.Now;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    isAuthorized = true;
+                }
+
+                if (isAuthorized)
+                {
+                    if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].AreKeysDumpedToFile)
+                    {
+                        DumpKeysToFile();
+                    }
+                    else
+                    {
+                        var window = new DisplayKeysSeedView();
+                        await window.ShowDialog(GetWindow());
+                    }
+                }
             }
             catch (Exception ex)
             {
                 Logger.LogException("WAS.VKSC", ex);
+            }
+        }
+
+        private async void DumpKeysToFile()
+        {
+            try
+            {
+                GetPrivateKeysRequest request = new GetPrivateKeysRequest()
+                {
+                    DumpFileWithPath = Path.Combine(GlobalData.WalletDir, GlobalData.WalletDumpFileName)
+                };
+
+                GlobalMethods.DeleteFileIfExists(request.DumpFileWithPath);
+
+                GetPrivateKeysResponse response = await GlobalData.WalletService.GetPrivateKeys(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
+
+                if (response.Error.IsError)
+                {
+                    Logger.LogError("WAS.GASK", "Failed to dump keys for " + GlobalData.OpenedWalletName + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
+                }
+                else
+                {
+                    var window = new TextBoxView("View Private Keys", "Keys have been exported to below file", request.DumpFileWithPath, string.Empty);
+                    await window.ShowDialog(GetWindow());
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("WAS.GASK", ex);
             }
         }
         #endregion // View Keys/Seed

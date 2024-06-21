@@ -16,6 +16,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private bool _IsWalletHeightSupported = true;
         private bool _IsPassRequiredToOpenWallet = true;
         private bool _AreIntegratedAddressesSupported = true;
+        private bool _AreKeysDumpedToFile = false;
 
         private int _LogLevelDaemon = 0;
         private int _LogLevelWallet = 0;
@@ -47,6 +48,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public bool IsWalletHeightSupported { get => _IsWalletHeightSupported; set => _IsWalletHeightSupported = value; }
         public bool IsPassRequiredToOpenWallet { get => _IsPassRequiredToOpenWallet; set => _IsPassRequiredToOpenWallet = value; }
         public bool AreIntegratedAddressesSupported { get => _AreIntegratedAddressesSupported; set => _AreIntegratedAddressesSupported = value; }
+        public bool AreKeysDumpedToFile { get => _AreKeysDumpedToFile; set => _AreKeysDumpedToFile = value; }
 
         public int LogLevelDaemon { get => _LogLevelDaemon; set => _LogLevelDaemon = value; }
         public int LogLevelWallet { get => _LogLevelWallet; set => _LogLevelWallet = value; }

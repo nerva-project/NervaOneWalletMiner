@@ -117,7 +117,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                         if (DateTime.Now > GlobalData.WalletPassProvidedTime.AddMinutes(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].UnlockMinutes))
                         {
                             // Password required
-                            TextBoxView textWindow = new TextBoxView("Provide Wallet Password", string.Empty, "Required - Wallet password", "Please provide wallet password", true);
+                            TextBoxView textWindow = new TextBoxView("Provide Wallet Password", "Please provide wallet password", string.Empty, "Required - Wallet password", true, true);
                             DialogResult passRes = await textWindow.ShowDialog<DialogResult>(GetWindow());
                             if (passRes != null && passRes.IsOk)
                             {
@@ -153,9 +153,14 @@ namespace NervaOneWalletMiner.ViewsDialogs
                                     else
                                     {
                                         isAuthorized = true;
+                                        GlobalData.WalletPassProvidedTime = DateTime.Now;
                                     }
                                 }
                             }
+                        }
+                        else
+                        {
+                            isAuthorized = true;
                         }
 
                         if(isAuthorized)

@@ -1270,9 +1270,9 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         /* RPC request params:
          *  std::string key_type;
          */
-        public async Task<QueryKeyResponse> QueryKey(RpcBase rpc, QueryKeyRequest requestObj)
+        public async Task<GetPrivateKeysResponse> GetPrivateKeys(RpcBase rpc, GetPrivateKeysRequest requestObj)
         {
-            QueryKeyResponse responseObj = new();
+            GetPrivateKeysResponse responseObj = new();
 
             try
             {
@@ -1332,7 +1332,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XNV.WQUK", ex);
+                Logger.LogException("XNV.WGPK", ex);
             }
 
             return responseObj;

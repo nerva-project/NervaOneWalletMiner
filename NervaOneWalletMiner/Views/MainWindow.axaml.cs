@@ -83,7 +83,7 @@ public partial class MainWindow : Window
             string cliToolsLink = GlobalMethods.GetCliToolsDownloadLink(GlobalData.AppSettings.ActiveCoin);
             Logger.LogDebug("MAW.CDCN", "CLI tools not found. Asking user to confirm download link: " + cliToolsLink);
 
-            var window = new TextBoxView("Get Client Tools", cliToolsLink, string.Empty, "Client Tools Download Link", true);
+            var window = new TextBoxView("Get Client Tools", "Client Tools Download Link", cliToolsLink, string.Empty);
             window.ShowDialog(this).ContinueWith(CliToolsLinkDialogClosed);
         }
     }

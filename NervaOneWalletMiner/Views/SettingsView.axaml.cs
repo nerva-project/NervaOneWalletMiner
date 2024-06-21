@@ -92,7 +92,7 @@ namespace NervaOneWalletMiner.Views
                         string cliToolsLink = GlobalMethods.GetCliToolsDownloadLink(GlobalData.AppSettings.ActiveCoin);
                         Logger.LogDebug("SET.SSCL", "CLI tools not found. Asking user to confirm download link: " + cliToolsLink);
                         
-                        var window = new TextBoxView("Get Client Tools", cliToolsLink, string.Empty, "Client Tools Download Link", true);
+                        var window = new TextBoxView("Get Client Tools", "Client Tools Download Link", cliToolsLink, string.Empty);
                         await window.ShowDialog(GetWindow()).ContinueWith(CliToolsLinkDialogClosed);
                     }
                 }
