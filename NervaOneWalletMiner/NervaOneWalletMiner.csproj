@@ -35,6 +35,7 @@
 
   <ItemGroup>
     <Folder Include="Assets\dash\" />
+    <Folder Include="Assets\wow\" />
     <Folder Include="Assets\xmr\" />
     <Folder Include="Assets\xnv\" />
   </ItemGroup>

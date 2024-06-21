@@ -211,6 +211,7 @@ namespace NervaOneWalletMiner.Helpers
             {
                 defaultSettings.Add(Coin.XNV, new CoinSettingsXNV());
                 defaultSettings.Add(Coin.XMR, new CoinSettingsXMR());
+                defaultSettings.Add(Coin.WOW, new CoinSettingsWOW());
                 defaultSettings.Add(Coin.DASH, new CoinSettingsDASH());
             }
             catch (Exception ex)
@@ -300,6 +301,14 @@ namespace NervaOneWalletMiner.Helpers
 
                         GlobalData.DaemonService = new DaemonServiceXMR();
                         GlobalData.WalletService = new WalletServiceXMR();
+                        break;
+
+                    case Coin.WOW:
+                        GlobalData.CoinDirName = Coin.WOW;
+                        GlobalData.AppSettings.ActiveCoin = Coin.WOW;
+
+                        GlobalData.DaemonService = new DaemonServiceWOW();
+                        GlobalData.WalletService = new WalletServiceWOW();
                         break;
 
                     case Coin.DASH:                        
@@ -552,6 +561,9 @@ namespace NervaOneWalletMiner.Helpers
                     case Coin.XMR:
                         daemonProcess = GlobalMethods.IsWindows() ? "monerod.exe" : "monerod";
                         break;
+                    case Coin.WOW:
+                        daemonProcess = GlobalMethods.IsWindows() ? "wownerod.exe" : "wownerod";
+                        break;
                     case Coin.DASH:
                         daemonProcess = GlobalMethods.IsWindows() ? "dashd.exe" : "dashd";
                         break;
@@ -579,6 +591,9 @@ namespace NervaOneWalletMiner.Helpers
                 {
                     case Coin.XMR:
                         walletProcess = IsWindows() ? "monero-wallet-rpc.exe" : "monero-wallet-rpc";
+                        break;
+                    case Coin.WOW:
+                        walletProcess = IsWindows() ? "wownero-wallet-rpc.exe" : "wownero-wallet-rpc";
                         break;
                     case Coin.DASH:
                         walletProcess = IsWindows() ? "dashd.exe" : "dashd";
@@ -613,6 +628,11 @@ namespace NervaOneWalletMiner.Helpers
                     logoDictionary.Add(Coin.XMR, new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/xmr/logo.png"))));
                 }
 
+                if (!logoDictionary.ContainsKey(Coin.WOW))
+                {
+                    logoDictionary.Add(Coin.WOW, new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/wow/logo.png"))));
+                }
+
                 if (!logoDictionary.ContainsKey(Coin.DASH))
                 {
                     logoDictionary.Add(Coin.DASH, new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/dash/logo.png"))));
@@ -645,6 +665,11 @@ namespace NervaOneWalletMiner.Helpers
                 if (!iconDictionary.ContainsKey(Coin.XMR))
                 {
                     iconDictionary.Add(Coin.XMR, new WindowIcon(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/xmr/logo.png"))));
+                }
+
+                if (!iconDictionary.ContainsKey(Coin.WOW))
+                {
+                    iconDictionary.Add(Coin.WOW, new WindowIcon(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/wow/logo.png"))));
                 }
 
                 if (!iconDictionary.ContainsKey(Coin.DASH))
