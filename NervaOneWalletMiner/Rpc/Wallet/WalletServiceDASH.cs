@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
-using System.Security.Principal;
 using System.Threading.Tasks;
 
 namespace NervaOneWalletMiner.Rpc.Wallet
@@ -398,19 +397,30 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         #region Get Accounts
         public async Task<GetAccountsResponse> GetAccounts(RpcBase rpc, GetAccountsRequest requestObj)
         {
+            // TODO: This is not really DASH way of doing things but should work for now.
+            // Do not need to show 0 balance addresses and can generate new address each time user wants to receive funds
             GetAccountsResponse responseObj = new();
 
             try
             {
                 bool isSuccess = false;
-
+                uint index = 0;
+                Dictionary<string, Account> accountsDictionary = [];
 
                 // Build request content json
+                var requestParams = new JObject
+                {
+                    ["addlocked"] = true,
+                    ["include_empty"] = true,
+                    ["include_watchonly"] = true,
+                };
+
                 var requestJson = new JObject
                 {
                     ["jsonrpc"] = "2.0",
                     ["id"] = _id++,
-                    ["method"] = "getwalletinfo"
+                    ["method"] = "listreceivedbyaddress",
+                    ["params"] = requestParams
                 };
 
                 // Call service and process response
@@ -426,13 +436,23 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                         responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
-                    {
-                        isSuccess = true;
-                        ResGetAccounts getAccountsResponse = JsonConvert.DeserializeObject<ResGetAccounts>(jsonObject.SelectToken("result").ToString());
-                        responseObj.BalanceUnlocked = getAccountsResponse.balance - getAccountsResponse.unconfirmed_balance;
-                        responseObj.BalanceTotal = getAccountsResponse.balance;
+                    {                        
+                        List<WalletAccount> getAccountsResponse = JsonConvert.DeserializeObject<List<WalletAccount>>(jsonObject.SelectToken("result").ToString());
+                                               
+                        foreach (WalletAccount account in getAccountsResponse)
+                        {
+                            Account newAccount = new()
+                            {
+                                Index = index++,
+                                AddressFull = account.address,
+                                AddressShort = GlobalMethods.GetShorterString(account.address, 12),
+                                Label = account.label
+                            };
 
-                        responseObj.Error.IsError = false;
+                            accountsDictionary.Add(newAccount.AddressFull, newAccount);
+                        }
+
+                        isSuccess = true;
                     }
                 }
                 else
@@ -441,31 +461,17 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
                 }
 
-                if(isSuccess)
+                if (isSuccess)
                 {
-                    // TODO: Need Listunspent 
-
                     // Build request content json
-                    var requestParams = new JObject
-                    {
-                        ["addlocked"] = true,
-                        ["include_empty"] = true,
-                        ["include_watchonly"] = true,
-                    };
-
-                    //listaddressbalances
-                    //var requestParams = new JObject
-                    //{
-                    //    ["minamount"] = 0
-                    //};
                     requestJson = new JObject
                     {
                         ["jsonrpc"] = "2.0",
                         ["id"] = _id++,
-                        ["method"] = "listaddressgroupings",
+                        ["method"] = "listunspent",
                         ["params"] = new JObject()
                     };
-                    
+
                     // Call service and process response
                     httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
                     if (httpResponse.IsSuccessStatusCode)
@@ -480,26 +486,41 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                         }
                         else
                         {
-                            List<List<List<string>>> getAccountsResponse = JsonConvert.DeserializeObject<List<List<List<string>>>>(jsonObject.SelectToken("result").ToString());
+                            List<WalletAccount> getAccountsResponse = JsonConvert.DeserializeObject<List<WalletAccount>>(jsonObject.SelectToken("result").ToString());
 
-                            uint index = 0;
-                            foreach (List<List<string>> outerArray in getAccountsResponse)
+                            foreach (WalletAccount account in getAccountsResponse)
                             {
-                                foreach(List<string> innerArray in outerArray)
+                                if(accountsDictionary.ContainsKey(account.address))
+                                {
+                                    accountsDictionary[account.address].BalanceTotal = account.amount;
+                                    accountsDictionary[account.address].BalanceUnlocked = account.amount;                                    
+                                }
+                                else
                                 {
                                     Account newAccount = new()
                                     {
-                                        Index = index++,                                        
-                                        AddressFull = innerArray[0],
-                                        AddressShort = GlobalMethods.GetShorterString(innerArray[0], 12),
-                                        BalanceTotal = decimal.Parse(innerArray[1], NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign),
-                                        BalanceUnlocked = decimal.Parse(innerArray[1], NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign),
-                                        Label = innerArray.Count > 2 ? innerArray[2] : string.Empty,
+                                        Index = index++,
+                                        AddressFull = account.address,
+                                        AddressShort = GlobalMethods.GetShorterString(account.address, 12),
+                                        BalanceTotal = account.amount,
+                                        BalanceUnlocked = account.amount,                                        
+                                        Label = account.label
                                     };
 
-                                    responseObj.SubAccounts.Add(newAccount);
+                                    accountsDictionary.Add(newAccount.AddressFull, newAccount);
                                 }
                             }
+
+                            responseObj.SubAccounts = accountsDictionary.Values.ToList();
+
+                            // Add up total balances
+                            foreach(Account account in responseObj.SubAccounts)
+                            {
+                                responseObj.BalanceTotal += account.BalanceTotal;
+                                responseObj.BalanceUnlocked += account.BalanceUnlocked;
+                            }
+
+                            responseObj.Error.IsError = false;
                         }
                     }
                     else
@@ -515,12 +536,6 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
 
             return responseObj;
-        }
-
-        private class ResGetAccounts
-        {
-            public decimal balance { get; set; }
-            public decimal unconfirmed_balance { get; set; }
         }
 
         private class WalletAccount
