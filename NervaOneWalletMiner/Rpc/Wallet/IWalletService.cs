@@ -9,6 +9,8 @@ namespace NervaOneWalletMiner.Rpc.Wallet
     {
         Task<OpenWalletResponse> OpenWallet(RpcBase rpc, OpenWalletRequest requestObj);
 
+        Task<UnlockWithPassResponse> UnlockWithPass(RpcBase rpc, UnlockWithPassRequest requestObj);
+
         Task<CloseWalletResponse> CloseWallet(RpcBase rpc, CloseWalletRequest requestObj);
 
         Task<CreateWalletResponse> CreateWallet(RpcBase rpc, CreateWalletRequest requestObj);

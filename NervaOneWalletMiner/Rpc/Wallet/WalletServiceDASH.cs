@@ -7,7 +7,10 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Net.Http;
+using System.Security.Principal;
 using System.Threading.Tasks;
 
 namespace NervaOneWalletMiner.Rpc.Wallet
@@ -70,6 +73,61 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             return responseObj;
         }
         #endregion // Open Wallet
+
+        #region Unlock with Passphrase
+        public async Task<UnlockWithPassResponse> UnlockWithPass(RpcBase rpc, UnlockWithPassRequest requestObj)
+        {
+            UnlockWithPassResponse responseObj = new();
+
+            try
+            {
+                // Build request content json
+                var requestParams = new JObject
+                {
+                    ["passphrase"] = requestObj.Password,
+                    ["timeout"] = requestObj.TimeoutInSeconds
+                };
+
+                var requestJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = _id++,
+                    ["method"] = "walletpassphrase",
+                    ["params"] = requestParams
+                };
+
+                // Call service and process response
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+
+                    var error = JObject.Parse(jsonObject.ToString())["error"];
+                    if (error != null)
+                    {
+                        // Set Service error
+                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                    }
+                    else
+                    {
+                        // Just set error to false
+                        responseObj.Error.IsError = false;
+                    }
+                }
+                else
+                {
+                    // Set HTTP error
+                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DAS.WOPW", ex);
+            }
+
+            return responseObj;
+        }
+        #endregion // Unlock wiht Passphrase
 
         #region Close Wallet
         public async Task<CloseWalletResponse> CloseWallet(RpcBase rpc, CloseWalletRequest requestObj)
@@ -197,7 +255,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 var requestJson = new JObject
                 {
                     ["jsonrpc"] = "2.0",
-                    ["id"] = "0",
+                    ["id"] = _id++,
                     ["method"] = "getnewaddress",
                     ["params"] = requestParams
                 };
@@ -253,11 +311,65 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             throw new NotImplementedException();
         }
 
-        public Task<TransferResponse> Transfer(RpcBase rpc, TransferRequest requestObj)
+        #region Transfer
+        public async Task<TransferResponse> Transfer(RpcBase rpc, TransferRequest requestObj)
         {
-            // sendtoaddress
-            throw new NotImplementedException();
+            TransferResponse responseObj = new();
+
+            try
+            {
+                // Build request content json
+                var requestParams = new JObject
+                {
+                    ["address"] = requestObj.Destinations.FirstOrDefault()!.Address,
+                    ["amount"] = requestObj.Destinations.FirstOrDefault()!.Amount,
+                    ["comment"] = requestObj.Comment,
+                    ["comment_to"] = requestObj.CommentTo,
+                    ["subtractfeefromamount"] = requestObj.SubtractFeeFromAmount
+                };
+
+                var requestJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = _id++,
+                    ["method"] = "sendtoaddress",
+                    ["params"] = requestParams
+                };
+
+                // Call service and process response
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+
+                    var error = JObject.Parse(jsonObject.ToString())["error"];
+                    if (error != null)
+                    {
+                        // Set Service error
+                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                    }
+                    else
+                    {
+                        // We don't use response values
+                        //ResTransfer transferResponse = JsonConvert.DeserializeObject<ResTransfer>(jsonObject.SelectToken("result").ToString());
+
+                        responseObj.Error.IsError = false;
+                    }
+                }
+                else
+                {
+                    // Set HTTP error
+                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DAS.WTRA", ex);
+            }
+
+            return responseObj;
         }
+        #endregion // Transfer
 
         public Task<TransferResponse> TransferSplit(RpcBase rpc, TransferRequest requestObj)
         {
@@ -331,6 +443,8 @@ namespace NervaOneWalletMiner.Rpc.Wallet
 
                 if(isSuccess)
                 {
+                    // TODO: Need Listunspent 
+
                     // Build request content json
                     var requestParams = new JObject
                     {
@@ -338,14 +452,20 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                         ["include_empty"] = true,
                         ["include_watchonly"] = true,
                     };
+
+                    //listaddressbalances
+                    //var requestParams = new JObject
+                    //{
+                    //    ["minamount"] = 0
+                    //};
                     requestJson = new JObject
                     {
                         ["jsonrpc"] = "2.0",
                         ["id"] = _id++,
-                        ["method"] = "listreceivedbyaddress",
-                        ["params"] = requestParams
+                        ["method"] = "listaddressgroupings",
+                        ["params"] = new JObject()
                     };
-
+                    
                     // Call service and process response
                     httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
                     if (httpResponse.IsSuccessStatusCode)
@@ -360,25 +480,25 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                         }
                         else
                         {
-                            isSuccess = true;
-                            List<WalletAccount> getAccountsResponse = JsonConvert.DeserializeObject<List<WalletAccount>>(jsonObject.SelectToken("result").ToString());
+                            List<List<List<string>>> getAccountsResponse = JsonConvert.DeserializeObject<List<List<List<string>>>>(jsonObject.SelectToken("result").ToString());
 
                             uint index = 0;
-
-                            foreach (WalletAccount account in getAccountsResponse)
+                            foreach (List<List<string>> outerArray in getAccountsResponse)
                             {
-                                Account newAccount = new()
+                                foreach(List<string> innerArray in outerArray)
                                 {
-                                    Index = index++,
-                                    Label = account.label,
-                                    AddressFull = account.address,
-                                    AddressShort = GlobalMethods.GetShorterString(account.address, 12),
-                                    BalanceTotal = account.amount,
-                                    // TODO: Need to do this another way. Also, rename those balances so they make more sense
-                                    BalanceUnlocked = account.confirmations > 10 ? account.amount : 0
-                                };
+                                    Account newAccount = new()
+                                    {
+                                        Index = index++,                                        
+                                        AddressFull = innerArray[0],
+                                        AddressShort = GlobalMethods.GetShorterString(innerArray[0], 12),
+                                        BalanceTotal = decimal.Parse(innerArray[1], NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign),
+                                        BalanceUnlocked = decimal.Parse(innerArray[1], NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign),
+                                        Label = innerArray.Count > 2 ? innerArray[2] : string.Empty,
+                                    };
 
-                                responseObj.SubAccounts.Add(newAccount);
+                                    responseObj.SubAccounts.Add(newAccount);
+                                }
                             }
                         }
                     }
@@ -407,7 +527,6 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         {
             public string address { get; set; } = string.Empty;
             public decimal amount { get; set; }
-            public int confirmations { get; set; }
             public string label { get; set; } = string.Empty;
         }
         #endregion // Get Accounts
@@ -484,31 +603,9 @@ namespace NervaOneWalletMiner.Rpc.Wallet
 
             return responseObj;
         }
-
-        private class TransferEntry
-        {
-            public string address { get; set; } = string.Empty;
-            public string amount { get; set; } = string.Empty;
-            public string fee { get; set; } = string.Empty;
-            public string blockheight { get; set; } = string.Empty;
-            public string txid { get; set; } = string.Empty;
-            public string category { get; set; } = string.Empty;
-            public string label { get; set; } = string.Empty;
-            public string blockhash { get; set; } = string.Empty;
-            public ulong timereceived { get; set; }
-            public long confirmations { get; set; }
-            public string comment { get; set; } = string.Empty;
-            public List<TransferDetails> Details { get; set; } = [];
-        }
-
-        private class TransferDetails
-        {
-            public string address { get; set; } = string.Empty;
-            public string category { get; set; } = string.Empty;
-
-        }
         #endregion // Get Transfers
 
+        #region Get Transfer By TxId
         public async Task<GetTransferByTxIdResponse> GetTransferByTxId(RpcBase rpc, GetTranserByTxIdRequest requestObj)
         {
             GetTransferByTxIdResponse responseObj = new();
@@ -526,7 +623,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 var requestJson = new JObject
                 {
                     ["jsonrpc"] = "2.0",
-                    ["id"] = "0",
+                    ["id"] = _id++,
                     ["method"] = "gettransaction",
                     ["params"] = requestParams
                 };
@@ -551,17 +648,19 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                         responseObj.TransactionId = getTransfByTxIdResponse.txid;                        
                         responseObj.Height = Convert.ToUInt32(getTransfByTxIdResponse.blockheight);
                         responseObj.Timestamp = GlobalMethods.UnixTimeStampToDateTime(getTransfByTxIdResponse.timereceived);
-                        responseObj.Amount = string.IsNullOrEmpty(getTransfByTxIdResponse.amount) ? 0 : Convert.ToDecimal(getTransfByTxIdResponse.amount);
-                        responseObj.Fee = string.IsNullOrEmpty(getTransfByTxIdResponse.fee) ? 0 : Convert.ToDecimal(getTransfByTxIdResponse.fee);
                         responseObj.Confirmations = getTransfByTxIdResponse.confirmations;
                         responseObj.Note = getTransfByTxIdResponse.comment;
 
                         foreach(TransferDetails details in getTransfByTxIdResponse.Details)
                         {
-                            // Grab first one. Adjust if need be
-                            responseObj.Address = details.address;
-                            responseObj.Type = details.category;
-                            break;
+                            if(decimal.Parse(details.amount, NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign) == requestObj.Amount)
+                            {
+                                responseObj.Address = details.address;
+                                responseObj.Type = details.category;
+                                responseObj.Amount = string.IsNullOrEmpty(details.amount) ? 0 : decimal.Parse(details.amount, NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign);
+                                responseObj.Fee = string.IsNullOrEmpty(details.fee) ? 0 : decimal.Parse(details.fee, NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign);
+                                break;
+                            }
                         }
 
                         // TODO: If you want responseObj.Destinations, need to send true for ["verbose"] and try to pick it up that way
@@ -589,6 +688,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             public TransferEntry transfer { get; set; } = new();
             public List<TransferEntry> transfers { get; set; } = [];
         }
+        #endregion // Get Transfer By TxId
 
         public Task<QueryKeyResponse> QueryKey(RpcBase rpc, QueryKeyRequest requestObj)
         {
@@ -596,6 +696,32 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             throw new NotImplementedException();
         }
 
+        #region Common Internal Helper Objects
+        private class TransferEntry
+        {
+            public string address { get; set; } = string.Empty;
+            public string amount { get; set; } = string.Empty;
+            public string fee { get; set; } = string.Empty;
+            public string blockheight { get; set; } = string.Empty;
+            public string txid { get; set; } = string.Empty;
+            public string category { get; set; } = string.Empty;
+            public string label { get; set; } = string.Empty;
+            public string blockhash { get; set; } = string.Empty;
+            public ulong timereceived { get; set; }
+            public long confirmations { get; set; }
+            public string comment { get; set; } = string.Empty;
+            public List<TransferDetails> Details { get; set; } = [];
+        }
+
+        private class TransferDetails
+        {
+            public string address { get; set; } = string.Empty;
+            public string category { get; set; } = string.Empty;
+            public string amount { get; set; } = string.Empty;
+            public string fee { get; set; } = string.Empty;
+
+        }
+        #endregion // Common Internal Helper Objects
 
         #region Unsupported Methods
         public Task<SaveWalletResponse> SaveWallet(RpcBase rpc, SaveWalletRequest requestObj)

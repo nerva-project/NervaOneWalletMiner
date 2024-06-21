@@ -89,10 +89,7 @@ namespace NervaOneWalletMiner.Views
             if (result != null && result.IsOk)
             {
                 // Open wallet
-                if (!string.IsNullOrEmpty(result.WalletName) && !string.IsNullOrEmpty(result.WalletPassword))
-                {
-                    OpenUserWallet(result.WalletName, result.WalletPassword);
-                }
+                OpenUserWallet(result.WalletName, result.WalletPassword);
             }
         }
 
@@ -122,6 +119,12 @@ namespace NervaOneWalletMiner.Views
                 else
                 {
                     GlobalMethods.WalletJustOpened(walletName);
+
+                    if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPassRequiredToOpenWallet)
+                    {
+                        GlobalData.WalletPassProvidedTime = DateTime.Now;                        
+                        GlobalData.WalletPassword = request.Password;
+                    }
 
                     Logger.LogDebug("WAL.OUWT", "Wallet " + walletName + " opened successfully");
                 }

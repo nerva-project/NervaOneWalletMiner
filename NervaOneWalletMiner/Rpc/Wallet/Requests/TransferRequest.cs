@@ -19,5 +19,10 @@ namespace NervaOneWalletMiner.Rpc.Wallet.Requests
         // XMR specific
         public List<uint> SubtractFeeFromOutputs { get; set; } = [];
         public ulong ring_size { get; set; } = 0;
+
+        // DASH specific
+        public string Comment { get; set; } = string.Empty;
+        public string CommentTo { get; set; } = string.Empty;
+        public bool SubtractFeeFromAmount { get; set;} = false;
     }
 }

@@ -79,7 +79,11 @@
 			<Label Content="Log Level" Margin="0,10,0,0"/>
 			<TextBox Name="tbxLogLevel"
 					 Watermark="Number - level at which wallet will write to log files"/>
-		
+
+			<Label Content="Wallet Unlock Minutes" Margin="0,10,0,0"/>
+			<TextBox Name="tbxWalletUnlockMinutes"
+					 Watermark="Number - minutes to keep wallet unlocked before password is required"/>
+			
 			<Button Name="btnSaveSettings"
 					Content="Save Settings"
 					Click="SaveSettings_Clicked"

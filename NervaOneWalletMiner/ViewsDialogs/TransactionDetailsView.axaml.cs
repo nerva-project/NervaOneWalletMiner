@@ -12,6 +12,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
     {
         private string _transactionId = string.Empty;
         private int _accountIndex = 0;
+        private decimal _amount = 0;
 
         // Not used but designer will complain without it
         public TransactionDetailsView()
@@ -19,7 +20,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             InitializeComponent();
         }
         
-        public TransactionDetailsView(string transactionId, int accountIndex)
+        public TransactionDetailsView(string transactionId, int accountIndex, decimal amount)
         {
             try
             {
@@ -28,6 +29,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
 
                 _transactionId = transactionId;
                 _accountIndex = accountIndex;
+                _amount = amount;
 
                 GetAndShowTransactionDetails();
             }
@@ -45,6 +47,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                 GetTranserByTxIdRequest request = new GetTranserByTxIdRequest();
                 request.TransactionId = _transactionId;
                 request.AccountIndex = _accountIndex;
+                request.Amount = _amount;
 
                 GetTransferByTxIdResponse response = await GlobalData.WalletService.GetTransferByTxId(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
 

@@ -14,7 +14,8 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private bool _IsDaemonWalletSeparateApp = true;
         private bool _IsSavingWalletSupported = true;
         private bool _IsWalletHeightSupported = true;
-        private bool _AreIntegratedAddressesSupported = true;
+        private bool _IsPassRequiredToOpenWallet = true;
+        private bool _AreIntegratedAddressesSupported = true;        
 
         private int _LogLevelDaemon = 1;
         private int _LogLevelWallet = 1;
@@ -44,6 +45,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public bool IsDaemonWalletSeparateApp { get => _IsDaemonWalletSeparateApp; set => _IsDaemonWalletSeparateApp = value; }
         public bool IsSavingWalletSupported { get => _IsSavingWalletSupported; set => _IsSavingWalletSupported = value; }
         public bool IsWalletHeightSupported { get => _IsWalletHeightSupported; set => _IsWalletHeightSupported = value; }
+        public bool IsPassRequiredToOpenWallet { get => _IsPassRequiredToOpenWallet; set => _IsPassRequiredToOpenWallet = value; }
         public bool AreIntegratedAddressesSupported { get => _AreIntegratedAddressesSupported; set => _AreIntegratedAddressesSupported = value; }
 
         public int LogLevelDaemon { get => _LogLevelDaemon; set => _LogLevelDaemon = value; }

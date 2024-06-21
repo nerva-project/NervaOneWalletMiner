@@ -1428,5 +1428,12 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             public int minor { get; set; }
         }
         #endregion // Common Internal Helper Objects
+
+        #region Unsupported Methods
+        public Task<UnlockWithPassResponse> UnlockWithPass(RpcBase rpc, UnlockWithPassRequest requestObj)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion // Unsupported Methods
     }
 }

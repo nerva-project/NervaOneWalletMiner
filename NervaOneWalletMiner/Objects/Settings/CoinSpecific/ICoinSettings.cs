@@ -11,8 +11,9 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         bool IsCpuMiningSupported { get; set; }
         bool IsDaemonWalletSeparateApp { get; set; }
         bool IsSavingWalletSupported { get; set; }
-        bool IsWalletHeightSupported { get; set; }      
-        bool AreIntegratedAddressesSupported { get; set; }
+        bool IsWalletHeightSupported { get; set; }
+        bool IsPassRequiredToOpenWallet { get; set; }
+        bool AreIntegratedAddressesSupported { get; set; }       
 
         int LogLevelDaemon { get; set; }
         int LogLevelWallet { get; set; }

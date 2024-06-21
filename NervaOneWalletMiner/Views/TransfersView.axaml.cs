@@ -44,7 +44,7 @@ namespace NervaOneWalletMiner.Views
                 if (dtgTransactions.SelectedItem != null)
                 {
                     Transfer selectedItem = (Transfer)dtgTransactions.SelectedItem;
-                    var window = new TransactionDetailsView(selectedItem.TransactionId, selectedItem.AccountIndex);
+                    var window = new TransactionDetailsView(selectedItem.TransactionId, selectedItem.AccountIndex, selectedItem.Amount);
                     window.ShowDialog(GetWindow());
                 }
                 else

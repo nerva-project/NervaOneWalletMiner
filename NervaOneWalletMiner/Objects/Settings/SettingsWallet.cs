@@ -9,5 +9,7 @@ namespace NervaOneWalletMiner.Objects.Settings
         public int LogLevel { get; set; } = -1;
 
         public string DisplayUnits { get; set; } = string.Empty;
+
+        public int UnlockMinutes { get; set; } = 10;
     }
 }

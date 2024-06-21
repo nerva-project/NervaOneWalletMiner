@@ -24,6 +24,7 @@ namespace NervaOneWalletMiner.Views
                 imgCoinIcon.Source = GlobalMethods.GetLogo();
 
                 tbxLogLevel.Text = GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].LogLevel.ToString();
+                tbxWalletUnlockMinutes.Text = GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].UnlockMinutes.ToString();
             }
             catch (Exception ex)
             {
@@ -53,12 +54,35 @@ namespace NervaOneWalletMiner.Views
             try
             {
                 bool isChanged = false;
-               
-                int logLevel = Convert.ToInt32(tbxLogLevel.Text);
-                if (!string.IsNullOrEmpty(tbxLogLevel.Text) && GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].LogLevel != logLevel)
+
+                bool isInt = int.TryParse(tbxLogLevel.Text, out int logLevel);
+                if(!isInt || logLevel < 0 || logLevel > 5)
                 {
-                    GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].LogLevel = logLevel;
-                    isChanged = true;
+                    MessageBoxView window = new("Save Settings", "Log level needs to be an integer between 0 and 5", true);
+                    window.ShowDialog(GetWindow());
+                }
+                else
+                {
+                    if (GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].LogLevel != logLevel)
+                    {
+                        GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].LogLevel = logLevel;
+                        isChanged = true;
+                    }
+                }
+
+                isInt = int.TryParse(tbxWalletUnlockMinutes.Text, out int unlockMinutes);
+                if (!isInt || unlockMinutes < 0 || unlockMinutes > 10000)
+                {
+                    MessageBoxView window = new("Save Settings", "Wallet Unlock Minutes needs to be an integer between 0 and 10000", true);
+                    window.ShowDialog(GetWindow());
+                }
+                else
+                {
+                    if (GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].UnlockMinutes != unlockMinutes)
+                    {
+                        GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].UnlockMinutes = unlockMinutes;
+                        isChanged = true;
+                    }
                 }
 
                 if (isChanged)
@@ -167,8 +191,7 @@ namespace NervaOneWalletMiner.Views
                 {
                     RestoreFromSeed(result.SeedPhrase, result.SeedOffset, result.WalletName, result.WalletPassword, result.WalletLanguage);
                 }
-
-            }          
+            }
         }
 
         private async void RestoreFromSeed(string seed, string seedOffset, string walletName, string walletPassword, string walletLanguage)

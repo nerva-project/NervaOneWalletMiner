@@ -5,6 +5,8 @@ using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects;
 using NervaOneWalletMiner.Objects.DataGrid;
 using NervaOneWalletMiner.Rpc.Common;
+using NervaOneWalletMiner.Rpc.Wallet.Requests;
+using NervaOneWalletMiner.Rpc.Wallet.Responses;
 using System;
 using System.Collections.Generic;
 
@@ -102,27 +104,81 @@ namespace NervaOneWalletMiner.ViewsDialogs
                         }
                     }
 
-                    MessageBoxView window = new MessageBoxView("Confirm Transfer", "You're about to send " + tbxAmount.Text
+                    MessageBoxView confirmWindow = new MessageBoxView("Confirm Transfer", "You're about to send " + tbxAmount.Text
                         + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits
                         + ". Once transfer is started, it cannot be stopped. Do you want to continue?",
                         false);
-                    DialogResult confirmRes = await window.ShowDialog<DialogResult>(this);
+                    DialogResult confirmRes = await confirmWindow.ShowDialog<DialogResult>(this);
 
                     if (confirmRes != null && confirmRes.IsOk)
                     {
-                        DialogResult result = new()
-                        {
-                            IsOk = true,
-                            SendFromAddress = fromAddress,
-                            SendFromAddressIndex = fromAccountIndex,
-                            SendToAddress = tbxSendTo.Text,
-                            SendAmount = Convert.ToDecimal(tbxAmount.Text),
-                            SendPaymentId = tbxPaymentId.Text!,
-                            Priority = (string)cbxPriority.SelectedValue!,
-                            IsSplitTranfer = (bool)cbxSplitTransfer.IsChecked!
-                        };
+                        bool isAuthorized = false;
 
-                        Close(result);
+                        if (DateTime.Now > GlobalData.WalletPassProvidedTime.AddMinutes(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].UnlockMinutes))
+                        {
+                            // Password required
+                            TextBoxView textWindow = new TextBoxView("Provide Wallet Password", string.Empty, "Required - Wallet password", "Please provide wallet password", true);
+                            DialogResult passRes = await textWindow.ShowDialog<DialogResult>(GetWindow());
+                            if (passRes != null && passRes.IsOk)
+                            {
+                                if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPassRequiredToOpenWallet)
+                                {
+                                    // Self managed lock
+                                    if (passRes.TextBoxValue.Equals(GlobalData.WalletPassword))
+                                    {
+                                        isAuthorized = true;
+                                        GlobalData.WalletPassProvidedTime = DateTime.Now;
+                                    }                                    
+                                }
+                                else
+                                {
+                                    // Lock managed by wallet
+                                    UnlockWithPassRequest request = new()
+                                    {
+                                        Password = passRes.TextBoxValue,
+                                        TimeoutInSeconds = GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].UnlockMinutes * 60
+                                    };
+
+                                    UnlockWithPassResponse response = await GlobalData.WalletService.UnlockWithPass(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
+
+                                    if (response.Error.IsError)
+                                    {
+                                        Logger.LogError("TFD.OKBC", "Unlock error | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
+                                        await Dispatcher.UIThread.Invoke(async () =>
+                                        {
+                                            MessageBoxView window = new("Unlock Wallet", "Unlock error\r\n\r\n" + response.Error.Message, true);
+                                            await window.ShowDialog(GetWindow());
+                                        });
+                                    }
+                                    else
+                                    {
+                                        isAuthorized = true;
+                                    }
+                                }
+                            }
+                        }
+
+                        if(isAuthorized)
+                        {
+                            DialogResult result = new()
+                            {
+                                IsOk = true,
+                                SendFromAddress = fromAddress,
+                                SendFromAddressIndex = fromAccountIndex,
+                                SendToAddress = tbxSendTo.Text,
+                                SendAmount = Convert.ToDecimal(tbxAmount.Text),
+                                SendPaymentId = tbxPaymentId.Text!,
+                                Priority = (string)cbxPriority.SelectedValue!,
+                                IsSplitTranfer = (bool)cbxSplitTransfer.IsChecked!
+                            };
+
+                            Close(result);
+                        }
+                        else
+                        {
+                            MessageBoxView window = new("Transfer Funds", "Autherization failed", true);
+                            await window.ShowDialog(GetWindow());
+                        }
                     }
                 }
             }

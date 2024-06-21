@@ -10,12 +10,21 @@ namespace NervaOneWalletMiner.ViewsDialogs
 {
     public partial class OpenWalletView : Window
     {
+        Window GetWindow() => TopLevel.GetTopLevel(this) as Window ?? throw new NullReferenceException("Invalid Owner");
+
         public OpenWalletView()
         {
             try
             {
                 InitializeComponent();
                 Icon = GlobalMethods.GetWindowIcon();
+
+                if(!GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPassRequiredToOpenWallet)
+                {
+                    tbxPassword.IsEnabled = false;
+                    tbxPassword.Watermark = "Password not required to open wallet";
+                    btnShowHidePassword.IsEnabled = false;
+                }
 
                 var walletName = this.Get<ComboBox>("cbxWalletName");
 
@@ -71,13 +80,15 @@ namespace NervaOneWalletMiner.ViewsDialogs
         {
             try
             {
-                var cbxWalletName = this.Get<ComboBox>("cbxWalletName");
-                var tbxPassword = this.Get<TextBox>("tbxPassword");
-
-                if (string.IsNullOrEmpty(cbxWalletName.SelectedValue!.ToString()) || string.IsNullOrEmpty(tbxPassword.Text))
+                if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPassRequiredToOpenWallet && string.IsNullOrEmpty(tbxPassword.Text))
                 {
-                    // TODO:  Let user know that both Wallet Name and Password are required
-
+                    MessageBoxView window = new("Open Wallet", "Password cannot be empty", true);
+                    window.ShowDialog(GetWindow());
+                }
+                else if(string.IsNullOrEmpty(cbxWalletName.SelectedValue!.ToString()))
+                {
+                    MessageBoxView window = new("Open Wallet", "Wallet Name cannot be empty", true);
+                    window.ShowDialog(GetWindow());
                 }
                 else
                 {
@@ -85,7 +96,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     {
                         IsOk = true,
                         WalletName = cbxWalletName.SelectedValue.ToString()!,
-                        WalletPassword = tbxPassword.Text
+                        WalletPassword = tbxPassword.Text!
                     };
 
                     Close(result);
