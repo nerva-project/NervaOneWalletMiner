@@ -235,15 +235,15 @@ namespace NervaOneWalletMiner.Helpers
         {
             try
             {
-                GetHeightResponse resGetHeight = await GlobalData.WalletService.GetHeight(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new GetHeightRequest());
+                GetHeightResponse response = await GlobalData.WalletService.GetHeight(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new GetHeightRequest());
 
-                if (resGetHeight.Error.IsError)
+                if (response.Error.IsError)
                 {
-                    Logger.LogError("MSP.SWHT", "GetTransfers Error Code: " + resGetHeight.Error.Code + ", Message: " + resGetHeight.Error.Message);
+                    Logger.LogError("MSP.SWHT", "GetTransfers Error | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
                 }
                 else
                 {
-                    GlobalData.WalletHeight = resGetHeight.Height;
+                    GlobalData.WalletHeight = response.Height;
                 }
             }
             catch (Exception ex)

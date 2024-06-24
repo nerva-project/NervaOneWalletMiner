@@ -515,7 +515,7 @@ namespace NervaOneWalletMiner.Views
             {
                 GetPrivateKeysRequest request = new GetPrivateKeysRequest()
                 {
-                    DumpFileWithPath = Path.Combine(GlobalData.WalletDir, GlobalData.WalletDumpFileName)
+                    DumpFileWithPath = Path.Combine(GlobalData.ExportsDir, GlobalData.WalletDumpFileName)
                 };
 
                 GlobalMethods.DeleteFileIfExists(request.DumpFileWithPath);

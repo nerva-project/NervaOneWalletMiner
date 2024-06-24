@@ -577,17 +577,17 @@ namespace NervaOneWalletMiner.Helpers
                     reqTransfers.SubaddressIndices = [];
                     reqTransfers.IsAllAccounts = true;
 
-                    GetTransfersResponse resTransfers = await GlobalData.WalletService.GetTransfers(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, reqTransfers);
+                    GetTransfersResponse response = await GlobalData.WalletService.GetTransfers(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, reqTransfers);
 
-                    if (resTransfers.Error.IsError)
+                    if (response.Error.IsError)
                     {
-                        Logger.LogError("UIM.TUUD", "GetTransfers Error Code: " + resTransfers.Error.Code + ", Message: " + resTransfers.Error.Message);
+                        Logger.LogError("UIM.TUUD", "GetTransfers Error | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
                     }
                     else
                     {
                         GlobalData.TransfersStats.Transactions = [];
 
-                        foreach (Transfer transfer in resTransfers.Transfers)
+                        foreach (Transfer transfer in response.Transfers)
                         {
                             if (transfer.Type.Equals(TransferType.In))
                             {

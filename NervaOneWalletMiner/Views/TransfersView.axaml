@@ -59,6 +59,15 @@
 				<DataGridTextColumn Header="Address"
 									Binding="{Binding AddressShort}"/>
 			</DataGrid.Columns>
+			<DataGrid.ContextMenu>
+				<ContextMenu>
+					<MenuItem Header="Transaction Details"
+							  Click="TransactionDetails_Clicked"/>
+					<Separator/>
+					<MenuItem Header="Export All"
+							  Click="ExportAll_Clicked"/>
+				</ContextMenu>
+			</DataGrid.ContextMenu>
 		</DataGrid>
 		
 	</StackPanel>

@@ -15,8 +15,6 @@ namespace NervaOneWalletMiner.Rpc.Common
                 serviceError.IsError = true;
                 serviceError.Code = error["code"].ToString();
                 serviceError.Message = error["message"].ToString();
-
-                Logger.LogError("XNV.CGSE", source + " - error from service. Code: " + serviceError.Code + ", Message: " + serviceError.Message);
             }
             catch (Exception ex)
             {
@@ -49,12 +47,12 @@ namespace NervaOneWalletMiner.Rpc.Common
             return priority;
         }
 
-        public static decimal DoubleAmountFromAtomicUnits(ulong balanceAtomic, int decimalPlaces)
+        public static decimal DecimalAmountFromAtomicUnits(ulong balanceAtomic, int decimalPlaces)
         {
             return Math.Round(Convert.ToDecimal(balanceAtomic / 1000000000000.0), decimalPlaces);
         }
 
-        public static ulong AtomicUnitsFromDoubleAmount(decimal amount)
+        public static ulong AtomicUnitsFromDecimalAmount(decimal amount)
         {
             return (ulong)(amount * Convert.ToDecimal(1000000000000.0));
         }

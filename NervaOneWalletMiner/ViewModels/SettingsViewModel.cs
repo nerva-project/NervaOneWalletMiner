@@ -21,7 +21,7 @@ namespace NervaOneWalletMiner.ViewModels
             {
                 ProcessStartInfo psi = new ProcessStartInfo
                 {
-                    FileName = GlobalData.LogDir,
+                    FileName = GlobalData.LogsDir,
                     UseShellExecute = true
                 };
                 Process.Start(psi);

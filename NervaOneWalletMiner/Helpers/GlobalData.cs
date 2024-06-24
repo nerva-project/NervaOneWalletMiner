@@ -20,11 +20,14 @@ namespace NervaOneWalletMiner.Helpers
 
         public const string CliToolsDirName = "cli";
         public const string WalletDirName = "wallets";
-        public const string LogsDirName = "logs";
+        public const string LogsDirName = "logs";        
         public const string MainCoinsDirName = "coins";
+        public const string ExportDirName = "exports";
+
         public const string AppConfigFileName = "app.config";
         public const string AddressBookFileName = "address.book";
-        public const string WalletDumpFileName = "dump.txt";
+        public const string WalletDumpFileName = "dump.txt";        
+        public const string WalletExportFileName = "export";    // .csv will be appended after timestamp
 
         public static string WalletClosedMessage = "Wallet offline - see Wallet screen to open";
         public static string CoinDirName = Coin.XNV;
@@ -52,7 +55,8 @@ namespace NervaOneWalletMiner.Helpers
 
         public static readonly string MainDataDir = GlobalMethods.GetDataDir();
         public static readonly string AppDataDir = GlobalMethods.GetAppDataDir();
-        public static readonly string LogDir = GlobalMethods.GetLogDir();
+        public static readonly string LogsDir = GlobalMethods.GetLogsDir();
+        public static readonly string ExportsDir = GlobalMethods.GetExportsDir();
         public static readonly string ConfigFileNameWithPath = GlobalMethods.GetConfigFileNameWithPath();
 
         public static bool IsDaemonRestarting = false;

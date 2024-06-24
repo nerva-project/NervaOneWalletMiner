@@ -114,17 +114,21 @@
 				<ContextMenu>
 					<MenuItem Header="Address Info"
 							  Click="AddressInfo_Clicked"/>
+					<MenuItem Header="Transfer Funds"
+							  Click="TransferFunds_Clicked"/>
 					<Separator/>
 					<MenuItem Header="Create New Account"
 							  Click="CreateAccount_Clicked"/>
 					<MenuItem Header="Rename Label"
-							  Click="RenameLabel_Clicked"/>
-					<Separator/>
-					<MenuItem Header="Transfer Funds"
-							  Click="TransferFunds_Clicked"/>					
+							  Click="RenameLabel_Clicked"/>	
 					<MenuItem Name="miStartMining"
 							  Header="Start Mining"
 							  Click="StartMining_Clicked"/>
+					<Separator/>
+					<MenuItem Header="Export Selected"
+							  Click="ExportSelected_Clicked"/>
+					<MenuItem Header="Export All"
+							  Click="ExportAll_Clicked"/>
 				</ContextMenu>
 			</DataGrid.ContextMenu>
 		</DataGrid>

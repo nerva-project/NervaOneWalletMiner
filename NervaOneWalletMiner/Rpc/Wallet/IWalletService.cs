@@ -46,5 +46,8 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         Task<GetHeightResponse> GetHeight(RpcBase rpc, GetHeightRequest requestObj);
 
         Task<GetPrivateKeysResponse> GetPrivateKeys(RpcBase rpc, GetPrivateKeysRequest requestObj);
+
+
+        Task<GetExportResponse> GetExport(RpcBase rpc, GetExportRequest requestObj);
     }
 }

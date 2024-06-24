@@ -17,7 +17,7 @@ namespace NervaOneWalletMiner.Helpers
             hierarchy.Root.RemoveAllAppenders(); // Remove any appenders
 
             RollingFileAppender fileAppender = new RollingFileAppender();
-            fileAppender.File = Path.Combine(GlobalData.LogDir, "log");
+            fileAppender.File = Path.Combine(GlobalData.LogsDir, "log");
             fileAppender.AppendToFile = true;
             fileAppender.RollingStyle = RollingFileAppender.RollingMode.Date;
             fileAppender.DatePattern = "_yyyMMdd.'log'";

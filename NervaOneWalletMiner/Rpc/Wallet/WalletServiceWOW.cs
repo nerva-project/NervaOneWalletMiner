@@ -1391,6 +1391,11 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         }
         #endregion // Query Key
 
+        public Task<GetExportResponse> GetExport(RpcBase rpc, GetExportRequest requestObj)
+        {
+            throw new NotImplementedException();
+        }
+
         #region Common Internal Helper Objects
         private class TransferEntry
         {

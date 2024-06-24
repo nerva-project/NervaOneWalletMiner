@@ -86,7 +86,7 @@ namespace NervaOneWalletMiner.Helpers
             return appDataDir;
         }
 
-        public static string GetLogDir()
+        public static string GetLogsDir()
         {
             string logDirectory = string.Empty;
 
@@ -170,6 +170,34 @@ namespace NervaOneWalletMiner.Helpers
             return cliToolsDirectory;
         }
 
+        public static string GetExportsDir()
+        {
+            string logDirectory = string.Empty;
+
+            try
+            {
+                if (Directory.Exists(GlobalData.AppDataDir))
+                {
+                    // Create logs directory if it does not exist
+                    logDirectory = Path.Combine(GlobalData.AppDataDir, GlobalData.ExportDirName);
+                    if (!Directory.Exists(logDirectory))
+                    {
+                        Directory.CreateDirectory(logDirectory);
+                    }
+                }
+                else
+                {
+                    throw new Exception("Export directory not set up. Application cannot continue");
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("GLM.GEDR", ex);
+            }
+
+            return logDirectory;
+        }
+
         public static void DeleteFileIfExists(string fileWithPath)
         {
             try
@@ -182,6 +210,21 @@ namespace NervaOneWalletMiner.Helpers
             catch (Exception ex)
             {
                 Logger.LogException("GLM.DFIE", ex);
+            }
+        }
+
+        public static void ExportToFile(string stringToWrite, string fileWithPath)
+        {
+            try
+            {
+                using (TextWriter writer = new StreamWriter(fileWithPath))
+                {
+                    writer.Write(stringToWrite);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("GLM.EXTF", ex);
             }
         }
 
@@ -851,11 +894,11 @@ namespace NervaOneWalletMiner.Helpers
         {
             try
             {
-                SaveWalletResponse resStore = await GlobalData.WalletService.SaveWallet(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new SaveWalletRequest());
+                SaveWalletResponse response = await GlobalData.WalletService.SaveWallet(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new SaveWalletRequest());
 
-                if (resStore.Error.IsError)
+                if (response.Error.IsError)
                 {
-                    Logger.LogError("GLM.SVWT", "Error saving wallet: " + GlobalData.OpenedWalletName + ". Code: " + resStore.Error.Code + ", Message: " + resStore.Error.Message);
+                    Logger.LogError("GLM.SVWT", "Error saving wallet | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
                 }
                 else
                 {
@@ -873,21 +916,21 @@ namespace NervaOneWalletMiner.Helpers
             try
             {
                 // Get accounts for Wallets view
-                GetAccountsResponse resGetAccounts = await GlobalData.WalletService.GetAccounts(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new GetAccountsRequest());
+                GetAccountsResponse response = await GlobalData.WalletService.GetAccounts(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new GetAccountsRequest());
 
-                if (resGetAccounts.Error.IsError)
+                if (response.Error.IsError)
                 {
-                    Logger.LogError("GLM.WUIU", "GetAccounts Error Code: " + resGetAccounts.Error.Code + ", Message: " + resGetAccounts.Error.Message);
+                    Logger.LogError("GLM.WUIU", "GetAccounts Error | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
                 }
                 else
                 {
-                    GlobalData.WalletStats.BalanceTotal = resGetAccounts.BalanceTotal;
-                    GlobalData.WalletStats.BalanceUnlocked = resGetAccounts.BalanceUnlocked;
+                    GlobalData.WalletStats.BalanceTotal = response.BalanceTotal;
+                    GlobalData.WalletStats.BalanceUnlocked = response.BalanceUnlocked;
 
                     GlobalData.WalletStats.Subaddresses = [];
 
                     // TODO: Set icon inside CallAsync method above?
-                    foreach (Account account in resGetAccounts.SubAccounts)
+                    foreach (Account account in response.SubAccounts)
                     {
                         account.WalletIcon = _walletImage;
 
@@ -925,6 +968,27 @@ namespace NervaOneWalletMiner.Helpers
             {
                 Logger.LogException("GLM.RSQS", ex);
             }
+        }
+
+        public static async Task<GetExportResponse> ExportTranfers(GetExportRequest exportRequest, string fileWithPath)
+        {
+            GetExportResponse exportResponse = new();
+
+            try
+            {
+                exportResponse = await GlobalData.WalletService.GetExport(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, exportRequest);
+
+                if (!exportResponse.Error.IsError)
+                {
+                    ExportToFile(exportResponse.ExportString, fileWithPath);                    
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("GLM.EXTR", ex);
+            }
+
+            return exportResponse;
         }
         #endregion // RPC Interface
 

@@ -10,6 +10,7 @@ using NervaOneWalletMiner.Rpc.Wallet.Responses;
 using NervaOneWalletMiner.ViewModels;
 using NervaOneWalletMiner.ViewsDialogs;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace NervaOneWalletMiner.Views
@@ -555,5 +556,90 @@ namespace NervaOneWalletMiner.Views
             }
         }
         #endregion // Start Mining
+
+        public async void ExportSelected_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                if (dtgAccounts.SelectedItem != null)
+                {
+                    Account selectedItem = (Account)dtgAccounts.SelectedItem;
+
+                    string fileName = GlobalData.WalletExportFileName + "_" + DateTime.Now.ToString("yyyMMdd_hhmmss") + ".csv";
+                    string exportFile = Path.Combine(GlobalData.ExportsDir, fileName);
+
+                    GetExportRequest request = new()
+                    {
+                        AccountIndex = selectedItem.Index,
+                        IsAllAccounts = false
+                    };
+
+                    GetExportResponse response = await GlobalMethods.ExportTranfers(request, exportFile);
+                    if (response.Error.IsError)
+                    {
+                        Logger.LogError("WAL.EXSC", "GetExport Error | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
+                        MessageBoxView window = new("Export Selected", "Please select addres to export", true);
+                        await window.ShowDialog(GetWindow());
+                    }
+                    else
+                    {
+                        var window = new TextBoxView("Export Selected", "Transactions have been exported to below file", exportFile, string.Empty);
+                        await window.ShowDialog(GetWindow());
+                    }
+                }
+                else
+                {
+                    Logger.LogDebug("WAL.EXSC", "No rows selected");
+                    MessageBoxView window = new("Export Selected", "Please select addres to export", true);
+                    await window.ShowDialog(GetWindow());
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("WAL.EXSC", ex);
+            }
+        }
+
+        public async void ExportAll_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                if (dtgAccounts.SelectedItem != null)
+                {
+                    Account selectedItem = (Account)dtgAccounts.SelectedItem;
+
+                    string fileName = GlobalData.WalletExportFileName + "_" + DateTime.Now.ToString("yyyMMdd_hhmmss") + ".csv";
+                    string exportFile = Path.Combine(GlobalData.ExportsDir, fileName);
+
+                    GetExportRequest request = new()
+                    {
+                        IsAllAccounts = true
+                    };
+
+                    GetExportResponse response = await GlobalMethods.ExportTranfers(request, exportFile);
+                    if (response.Error.IsError)
+                    {
+                        Logger.LogError("WAL.EXAC", "GetExport Error | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
+                        MessageBoxView window = new("Export Selected", "Please select addres to export", true);
+                        await window.ShowDialog(GetWindow());
+                    }
+                    else
+                    {
+                        var window = new TextBoxView("Export All", "Transactions have been exported to below file", exportFile, string.Empty);
+                        await window.ShowDialog(GetWindow());
+                    }
+                }
+                else
+                {
+                    Logger.LogDebug("WAL.EXAC", "No rows selected");
+                    MessageBoxView window = new("Export Selected", "Please select addres to export", true);
+                    await window.ShowDialog(GetWindow());
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("WAL.EXAC", ex);
+            }
+        }
     }
 }
