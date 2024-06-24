@@ -40,8 +40,7 @@ namespace NervaOneWalletMiner.Views
             {
                 if (GlobalData.IsWalletOpen)
                 {
-                    string fileName = GlobalData.WalletExportFileName + "_" + DateTime.Now.ToString("yyyMMdd_hhmmss") + ".csv";
-                    string exportFile = Path.Combine(GlobalData.ExportsDir, fileName);
+                    string exportFile = GlobalMethods.GetExportFileNameWithPath();
 
                     GetTransfersExportRequest request = new()
                     {

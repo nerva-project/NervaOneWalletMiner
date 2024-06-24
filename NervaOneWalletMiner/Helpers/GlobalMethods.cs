@@ -244,6 +244,11 @@ namespace NervaOneWalletMiner.Helpers
             return Path.Combine(dataDir, GlobalData.AppConfigFileName);
         }
 
+        public static string GetExportFileNameWithPath()
+        {
+            return Path.Combine(GlobalData.ExportsDir, "export_" + DateTime.Now.ToString("yyyMMdd_HHmmss") + ".csv");
+        }
+
         public static string CycleLogFile(string path)
         {
             string logFile = path + ".log";

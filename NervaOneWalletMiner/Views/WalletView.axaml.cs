@@ -561,9 +561,7 @@ namespace NervaOneWalletMiner.Views
                 if (dtgAccounts.SelectedItem != null)
                 {
                     Account selectedItem = (Account)dtgAccounts.SelectedItem;
-
-                    string fileName = GlobalData.WalletExportFileName + "_" + DateTime.Now.ToString("yyyMMdd_hhmmss") + ".csv";
-                    string exportFile = Path.Combine(GlobalData.ExportsDir, fileName);
+                    string exportFile = GlobalMethods.GetExportFileNameWithPath();
 
                     GetTransfersExportRequest request = new()
                     {
@@ -601,12 +599,9 @@ namespace NervaOneWalletMiner.Views
         {
             try
             {
-                if (dtgAccounts.SelectedItem != null)
+                if (GlobalData.IsWalletOpen)
                 {
-                    Account selectedItem = (Account)dtgAccounts.SelectedItem;
-
-                    string fileName = GlobalData.WalletExportFileName + "_" + DateTime.Now.ToString("yyyMMdd_hhmmss") + ".csv";
-                    string exportFile = Path.Combine(GlobalData.ExportsDir, fileName);
+                    string exportFile = GlobalMethods.GetExportFileNameWithPath();
 
                     GetTransfersExportRequest request = new()
                     {
@@ -628,8 +623,7 @@ namespace NervaOneWalletMiner.Views
                 }
                 else
                 {
-                    Logger.LogDebug("WAL.EXAC", "No rows selected");
-                    MessageBoxView window = new("Export All", "Please select addres to export", true);
+                    MessageBoxView window = new("Export All", "Please open wallet first.", true);
                     await window.ShowDialog(GetWindow());
                 }
             }

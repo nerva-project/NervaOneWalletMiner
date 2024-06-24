@@ -26,8 +26,7 @@ namespace NervaOneWalletMiner.Helpers
 
         public const string AppConfigFileName = "app.config";
         public const string AddressBookFileName = "address.book";
-        public const string WalletDumpFileName = "dump.txt";        
-        public const string WalletExportFileName = "export";    // .csv will be appended after timestamp
+        public const string WalletDumpFileName = "dump.txt";
 
         public static string WalletClosedMessage = "Wallet offline - see Wallet screen to open";
         public static string CoinDirName = Coin.XNV;

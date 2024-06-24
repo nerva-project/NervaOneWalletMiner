@@ -1057,7 +1057,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                 TransactionId = entry.txid,
                                 AddressShort = GlobalMethods.GetShorterString(entry.address, 12),
                                 Height = entry.height,
-                                Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp),
+                                Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp).ToLocalTime(),
                                 Amount = CommonXNV.DecimalAmountFromAtomicUnits(entry.amount, 2),
                                 Type = CommonXNV.GetTransactionType(entry.type)
                             };
@@ -1073,7 +1073,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                 TransactionId = entry.txid,
                                 AddressShort = GlobalMethods.GetShorterString(entry.address, 12),
                                 Height = entry.height,
-                                Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp),
+                                Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp).ToLocalTime(),
                                 Amount = CommonXNV.DecimalAmountFromAtomicUnits(entry.amount, 2),
                                 Type = CommonXNV.GetTransactionType(entry.type)
                             };
@@ -1089,7 +1089,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                 TransactionId = entry.txid,
                                 AddressShort = GlobalMethods.GetShorterString(entry.address, 12),
                                 Height = entry.height,
-                                Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp),
+                                Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp).ToLocalTime(),
                                 Amount = CommonXNV.DecimalAmountFromAtomicUnits(entry.amount, 2),
                                 Type = CommonXNV.GetTransactionType(entry.type)
                             };
@@ -1172,7 +1172,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                         responseObj.PaymentId = getTransfByTxIdResponse.transfer.payment_id;
                         responseObj.Type = getTransfByTxIdResponse.transfer.type;
                         responseObj.Height = getTransfByTxIdResponse.transfer.height;
-                        responseObj.Timestamp = GlobalMethods.UnixTimeStampToDateTime(getTransfByTxIdResponse.transfer.timestamp);
+                        responseObj.Timestamp = GlobalMethods.UnixTimeStampToDateTime(getTransfByTxIdResponse.transfer.timestamp).ToLocalTime();
                         responseObj.Amount = CommonXNV.DecimalAmountFromAtomicUnits(getTransfByTxIdResponse.transfer.amount, 6);
                         responseObj.Fee = CommonXNV.DecimalAmountFromAtomicUnits(getTransfByTxIdResponse.transfer.fee, 6);
                         responseObj.Note = getTransfByTxIdResponse.transfer.note;

@@ -583,7 +583,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                 TransactionId = entry.txid,
                                 AddressShort = GlobalMethods.GetShorterString(entry.address, 12),
                                 Height = string.IsNullOrEmpty(entry.blockheight) ? 0 : Convert.ToUInt32(entry.blockheight),
-                                Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timereceived),
+                                Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timereceived).ToLocalTime(),
                                 Amount = Convert.ToDecimal(entry.amount),
                                 Type = CommonDASH.GetTransactionType(entry.category)
                             };
@@ -651,7 +651,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                         
                         responseObj.TransactionId = getTransfByTxIdResponse.txid;                        
                         responseObj.Height = string.IsNullOrEmpty(getTransfByTxIdResponse.blockheight)? 0 : Convert.ToUInt32(getTransfByTxIdResponse.blockheight);
-                        responseObj.Timestamp = GlobalMethods.UnixTimeStampToDateTime(getTransfByTxIdResponse.timereceived);
+                        responseObj.Timestamp = GlobalMethods.UnixTimeStampToDateTime(getTransfByTxIdResponse.timereceived).ToLocalTime();
                         responseObj.Confirmations = getTransfByTxIdResponse.confirmations;
                         responseObj.Note = getTransfByTxIdResponse.comment;
 
