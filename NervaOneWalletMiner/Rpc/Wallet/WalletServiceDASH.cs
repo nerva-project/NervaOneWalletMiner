@@ -747,7 +747,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             return responseObj;
         }
 
-        public Task<GetExportResponse> GetExport(RpcBase rpc, GetExportRequest requestObj)
+        public Task<GetTransfersExportResponse> GetTransfersExport(RpcBase rpc, GetTransfersExportRequest requestObj)
         {
             throw new NotImplementedException();
         }

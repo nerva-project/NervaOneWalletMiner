@@ -40,20 +40,19 @@ namespace NervaOneWalletMiner.Views
             {
                 if (GlobalData.IsWalletOpen)
                 {
-
                     string fileName = GlobalData.WalletExportFileName + "_" + DateTime.Now.ToString("yyyMMdd_hhmmss") + ".csv";
                     string exportFile = Path.Combine(GlobalData.ExportsDir, fileName);
 
-                    GetExportRequest request = new()
+                    GetTransfersExportRequest request = new()
                     {
                         IsAllAccounts = true
                     };
 
-                    GetExportResponse response = await GlobalMethods.ExportTranfers(request, exportFile);
+                    GetTransfersExportResponse response = await GlobalMethods.ExportTranfers(request, exportFile);
                     if (response.Error.IsError)
                     {
                         Logger.LogError("TRA.EXAC", "ExportTranfers Error | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
-                        MessageBoxView window = new("Export Selected", "Please select addres to export", true);
+                        MessageBoxView window = new("Export All", "Error exporting:\r\n" + response.Error.Message, true);
                         await window.ShowDialog(GetWindow());
                     }
                     else

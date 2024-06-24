@@ -2,7 +2,7 @@
 
 namespace NervaOneWalletMiner.Rpc.Wallet.Responses
 {
-    public class GetExportResponse
+    public class GetTransfersExportResponse
     {
         public ServiceError Error { get; set; } = new();
 

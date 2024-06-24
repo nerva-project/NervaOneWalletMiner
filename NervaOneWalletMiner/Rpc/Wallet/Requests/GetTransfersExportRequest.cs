@@ -2,7 +2,7 @@
 
 namespace NervaOneWalletMiner.Rpc.Wallet.Requests
 {
-    public class GetExportRequest
+    public class GetTransfersExportRequest
     {
         public uint AccountIndex { get; set; }
         public List<uint> SubaddressIndices { get; set; } = [];

@@ -1351,10 +1351,10 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         }
         #endregion // Query Key
 
-        #region Get Export String
-        public async Task<GetExportResponse> GetExport(RpcBase rpc, GetExportRequest requestObj)
+        #region Get Transfers Export
+        public async Task<GetTransfersExportResponse> GetTransfersExport(RpcBase rpc, GetTransfersExportRequest requestObj)
         {
-            GetExportResponse responseObj = new();
+            GetTransfersExportResponse responseObj = new();
             StringBuilder exportBuilder = new();
 
             try
@@ -1513,7 +1513,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             public string Destination { get; set; } = string.Empty;
             public string Note { get; set; } = string.Empty;
         }
-        #endregion // Get Export String
+        #endregion // Get Transfers Export
 
         #region Common Internal Helper Objects
         private class TransferEntry

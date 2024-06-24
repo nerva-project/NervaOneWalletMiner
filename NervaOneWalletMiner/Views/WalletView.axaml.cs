@@ -485,8 +485,6 @@ namespace NervaOneWalletMiner.Views
                 {
                     Logger.LogError("WAL.CLUW", "Error closing wallet " + GlobalData.OpenedWalletName + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
 
-                    GlobalMethods.WalletClosedOrErrored();
-
                     if (isUiThread)
                     {
                         await Dispatcher.UIThread.InvokeAsync(async () =>
@@ -501,8 +499,6 @@ namespace NervaOneWalletMiner.Views
                     isSuccess = true;
                     Logger.LogDebug("WAL.CLUW", "Wallet " + GlobalData.OpenedWalletName + " closed successfully");
 
-                    GlobalMethods.WalletClosedOrErrored();
-
                     if (isUiThread)
                     {
                         await Dispatcher.UIThread.InvokeAsync(async () =>
@@ -513,6 +509,7 @@ namespace NervaOneWalletMiner.Views
                     }
                 }
 
+                GlobalMethods.WalletClosedOrErrored();
                 GlobalData.WalletHeight = 0;
             }
             catch (Exception ex)
@@ -568,17 +565,17 @@ namespace NervaOneWalletMiner.Views
                     string fileName = GlobalData.WalletExportFileName + "_" + DateTime.Now.ToString("yyyMMdd_hhmmss") + ".csv";
                     string exportFile = Path.Combine(GlobalData.ExportsDir, fileName);
 
-                    GetExportRequest request = new()
+                    GetTransfersExportRequest request = new()
                     {
                         AccountIndex = selectedItem.Index,
                         IsAllAccounts = false
                     };
 
-                    GetExportResponse response = await GlobalMethods.ExportTranfers(request, exportFile);
+                    GetTransfersExportResponse response = await GlobalMethods.ExportTranfers(request, exportFile);
                     if (response.Error.IsError)
                     {
                         Logger.LogError("WAL.EXSC", "GetExport Error | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
-                        MessageBoxView window = new("Export Selected", "Please select addres to export", true);
+                        MessageBoxView window = new("Export Selected", "Error exporting:\r\n" + response.Error.Message, true);
                         await window.ShowDialog(GetWindow());
                     }
                     else
@@ -611,16 +608,16 @@ namespace NervaOneWalletMiner.Views
                     string fileName = GlobalData.WalletExportFileName + "_" + DateTime.Now.ToString("yyyMMdd_hhmmss") + ".csv";
                     string exportFile = Path.Combine(GlobalData.ExportsDir, fileName);
 
-                    GetExportRequest request = new()
+                    GetTransfersExportRequest request = new()
                     {
                         IsAllAccounts = true
                     };
 
-                    GetExportResponse response = await GlobalMethods.ExportTranfers(request, exportFile);
+                    GetTransfersExportResponse response = await GlobalMethods.ExportTranfers(request, exportFile);
                     if (response.Error.IsError)
                     {
                         Logger.LogError("WAL.EXAC", "GetExport Error | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
-                        MessageBoxView window = new("Export Selected", "Please select addres to export", true);
+                        MessageBoxView window = new("Export All", "Error exporting:\r\n" + response.Error.Message, true);
                         await window.ShowDialog(GetWindow());
                     }
                     else
@@ -632,7 +629,7 @@ namespace NervaOneWalletMiner.Views
                 else
                 {
                     Logger.LogDebug("WAL.EXAC", "No rows selected");
-                    MessageBoxView window = new("Export Selected", "Please select addres to export", true);
+                    MessageBoxView window = new("Export All", "Please select addres to export", true);
                     await window.ShowDialog(GetWindow());
                 }
             }

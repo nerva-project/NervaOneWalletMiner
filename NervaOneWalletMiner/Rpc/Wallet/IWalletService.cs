@@ -48,6 +48,6 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         Task<GetPrivateKeysResponse> GetPrivateKeys(RpcBase rpc, GetPrivateKeysRequest requestObj);
 
 
-        Task<GetExportResponse> GetExport(RpcBase rpc, GetExportRequest requestObj);
+        Task<GetTransfersExportResponse> GetTransfersExport(RpcBase rpc, GetTransfersExportRequest requestObj);
     }
 }

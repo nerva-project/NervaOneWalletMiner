@@ -352,6 +352,8 @@ namespace NervaOneWalletMiner.Helpers
                 GlobalData.DaemonProcessName = GetDaemonProcessName(GlobalData.AppSettings.ActiveCoin);
                 GlobalData.Logo = GetLogo();
 
+                GlobalMethods.CoinChanged();
+
                 Logger.LogDebug("GLM.STCN", "Finished setting up: " + GlobalData.AppSettings.ActiveCoin.ToUpper());
             }
             catch (Exception ex)
@@ -970,13 +972,13 @@ namespace NervaOneWalletMiner.Helpers
             }
         }
 
-        public static async Task<GetExportResponse> ExportTranfers(GetExportRequest exportRequest, string fileWithPath)
+        public static async Task<GetTransfersExportResponse> ExportTranfers(GetTransfersExportRequest exportRequest, string fileWithPath)
         {
-            GetExportResponse exportResponse = new();
+            GetTransfersExportResponse exportResponse = new();
 
             try
             {
-                exportResponse = await GlobalData.WalletService.GetExport(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, exportRequest);
+                exportResponse = await GlobalData.WalletService.GetTransfersExport(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, exportRequest);
 
                 if (!exportResponse.Error.IsError)
                 {
@@ -986,6 +988,8 @@ namespace NervaOneWalletMiner.Helpers
             catch (Exception ex)
             {
                 Logger.LogException("GLM.EXTR", ex);
+                exportResponse.Error.IsError = true;
+                exportResponse.Error.Message = ex.Message;
             }
 
             return exportResponse;
@@ -1106,6 +1110,12 @@ namespace NervaOneWalletMiner.Helpers
             GlobalData.OpenedWalletName = string.Empty;
             GlobalData.WalletStats = new();
             GlobalData.WalletPassProvidedTime = DateTime.MinValue;
+        }
+
+        public static void CoinChanged()
+        {
+            GlobalData.NetworkStats = new();
+            GlobalData.Connections = [];
         }
         #endregion // Misc Methods
 
