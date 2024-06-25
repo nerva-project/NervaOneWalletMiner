@@ -14,7 +14,8 @@ namespace NervaOneWalletMiner.Objects.DataGrid
 
         // Properties that need to be refreshed
         private string _label = string.Empty;        
-        public string Label {
+        public string Label
+        {
             get { return _label; }
             set
             {
@@ -56,7 +57,7 @@ namespace NervaOneWalletMiner.Objects.DataGrid
         }
 
 
-        // Properties that do not need ot be refreshed
+        // Properties that do not need to be refreshed
         public uint Index { get; set; }
         public string AddressFull { get; set; } = string.Empty;
         public string AddressShort { get; set; } = string.Empty;                       

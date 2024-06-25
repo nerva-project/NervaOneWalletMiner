@@ -1,7 +1,7 @@
 ﻿using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Objects.DataGrid;
 using ReactiveUI;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace NervaOneWalletMiner.ViewModels
 {
@@ -14,8 +14,8 @@ namespace NervaOneWalletMiner.ViewModels
             set => this.RaiseAndSetIfChanged(ref _OpenCloseWallet, value);
         }
 
-        private List<Transfer> _Transactions = new();
-        public List<Transfer> Transactions
+        private ObservableCollection<Transfer> _Transactions = [];
+        public ObservableCollection<Transfer> Transactions
         {
             get => _Transactions;
             set => this.RaiseAndSetIfChanged(ref _Transactions, value);

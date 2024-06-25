@@ -2,7 +2,7 @@
 using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Objects.DataGrid;
 using ReactiveUI;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
 namespace NervaOneWalletMiner.ViewModels
@@ -59,8 +59,8 @@ namespace NervaOneWalletMiner.ViewModels
             set => this.RaiseAndSetIfChanged(ref _TotalUnlockedLabel, value);
         }
 
-        private List<Account> _WalletAddresses = new();
-        public List<Account> WalletAddresses
+        private ObservableCollection<Account> _WalletAddresses = new();
+        public ObservableCollection<Account> WalletAddresses
         {
             get => _WalletAddresses;
             set => this.RaiseAndSetIfChanged(ref _WalletAddresses, value);

@@ -1,14 +1,12 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
-using DynamicData;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects.DataGrid;
 using NervaOneWalletMiner.Rpc.Wallet.Requests;
 using NervaOneWalletMiner.Rpc.Wallet.Responses;
 using NervaOneWalletMiner.ViewsDialogs;
 using System;
-using System.IO;
 
 namespace NervaOneWalletMiner.Views
 {

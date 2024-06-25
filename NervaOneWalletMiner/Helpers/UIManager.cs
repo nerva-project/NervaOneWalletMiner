@@ -9,10 +9,11 @@ using NervaOneWalletMiner.Rpc.Wallet.Responses;
 using NervaOneWalletMiner.ViewModels;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using System.Collections.ObjectModel;
+using Avalonia.Threading;
 
 namespace NervaOneWalletMiner.Helpers
 {
@@ -219,13 +220,18 @@ namespace NervaOneWalletMiner.Helpers
 
                 if (((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).WalletAddresses.Count == 0 && GlobalData.WalletStats.Subaddresses.Values.Count > 0)
                 {
-                    ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).WalletAddresses = GlobalData.WalletStats.Subaddresses.Values.ToList<Account>();
+                    ObservableCollection<Account> initialAccounts = [.. GlobalData.WalletStats.Subaddresses.Values];
+
+                    if (initialAccounts.Count > 0)
+                    {
+                        Dispatcher.UIThread.Invoke(() =>
+                        {
+                            ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).WalletAddresses = [.. initialAccounts];
+                        });
+                    }
                 }
                 else
                 {
-                    // TODO: ((WalletViewModel)GlobalData.ViewModelPagesDictionary[SplitViewPages.Wallet]).WalletAddresses RaiseAndSetIfChanged not firing on updates. Find another way
-
-
                     // Trying to avoid loop within a loop
                     List<Account> deleteWallets = [];
                     HashSet<uint> checkedIndexes = [];
@@ -272,7 +278,10 @@ namespace NervaOneWalletMiner.Helpers
                         if (!checkedIndexes.Contains(index))
                         {
                             // Need to add new wallet
-                            ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).WalletAddresses.Add(GlobalData.WalletStats.Subaddresses[index]);
+                            Dispatcher.UIThread.Invoke(() =>
+                            {
+                                ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).WalletAddresses.Add(GlobalData.WalletStats.Subaddresses[index]);
+                            });                            
                         }
                     }
                 }
@@ -313,7 +322,7 @@ namespace NervaOneWalletMiner.Helpers
 
                 if (((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).WalletAddresses.Count != 0)
                 {
-                    ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).WalletAddresses = new List<Account>();
+                    ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).WalletAddresses = [];
                 }
 
                 ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).OpenCloseWallet = StatusWallet.OpenWallet;
@@ -334,13 +343,22 @@ namespace NervaOneWalletMiner.Helpers
             {
                 if (((TransfersViewModel)GlobalData.ViewModelPages[SplitViewPages.Transfers]).Transactions.Count == 0)
                 {
-                    ((TransfersViewModel)GlobalData.ViewModelPages[SplitViewPages.Transfers]).Transactions = GlobalData.TransfersStats.Transactions.Values.ToList<Transfer>().OrderByDescending(tr => tr.Height).ToList();
+                    ObservableCollection<Transfer> initialTransfers = [.. GlobalData.TransfersStats.Transactions.Values];
+
+                    if(initialTransfers.Count > 0)
+                    {
+                        Dispatcher.UIThread.Invoke(() =>
+                        {
+                            ((TransfersViewModel)GlobalData.ViewModelPages[SplitViewPages.Transfers]).Transactions = [.. initialTransfers.OrderByDescending(t => t.Height)];
+                        });
+                    }
+
                     // Need to reset so we do not process transactions every second until next update
                     GlobalData.TransfersStats.Transactions = [];
 
                     if (((TransfersViewModel)GlobalData.ViewModelPages[SplitViewPages.Transfers]).Transactions.Count > 0)
                     {
-                        // TODO: This will also save after initial open BUT it will cover restoring wallet
+                        // This will also save after initial open BUT it will cover restoring wallet
                         newTransfersCount = ((TransfersViewModel)GlobalData.ViewModelPages[SplitViewPages.Transfers]).Transactions.Count;
                     }
                 }
@@ -351,8 +369,17 @@ namespace NervaOneWalletMiner.Helpers
                     foreach (string newTransferKey in GlobalData.TransfersStats.Transactions.Keys)
                     {
                         // Check if transaction already exists in datagrid and add it to the top if it does not
-                        // TODO: If for some reason, you keep getting a lot of transactions (that might already be in memory), this is very expensive and can block updating process
-                        if (!((TransfersViewModel)GlobalData.ViewModelPages[SplitViewPages.Transfers]).Transactions.Any(transfer => transfer.TransactionId + "_" + transfer.Type == newTransferKey))
+                        bool isFound = false;
+                        foreach (Transfer transfer in ((TransfersViewModel)GlobalData.ViewModelPages[SplitViewPages.Transfers]).Transactions)
+                        {                            
+                            if(transfer.TransactionId + "_" + transfer.Type == newTransferKey)
+                            {
+                                isFound = true;
+                                break;
+                            }
+                        }
+
+                        if(!isFound)
                         {
                             newTransfers.Add(GlobalData.TransfersStats.Transactions[newTransferKey]);
                         }
@@ -362,8 +389,14 @@ namespace NervaOneWalletMiner.Helpers
 
                     if (newTransfers.Count > 0)
                     {
-                        // TODO: If you scroll in the datagrid, new rows show up, otherwise, they do not. Figure out how to force refresh
-                        ((TransfersViewModel)GlobalData.ViewModelPages[SplitViewPages.Transfers]).Transactions.InsertRange(0, newTransfers.OrderByDescending(tr => tr.Height).ToList());
+                        foreach(Transfer transfer in newTransfers)
+                        {
+                            Dispatcher.UIThread.Invoke(() =>
+                            {
+                                ((TransfersViewModel)GlobalData.ViewModelPages[SplitViewPages.Transfers]).Transactions.Insert(0, transfer);
+                            });                            
+                        }
+                        
                         newTransfersCount = newTransfers.Count;
                     }
                 }
