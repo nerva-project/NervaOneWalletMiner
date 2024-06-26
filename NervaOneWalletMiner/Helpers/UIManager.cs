@@ -25,6 +25,7 @@ namespace NervaOneWalletMiner.Helpers
         public static readonly Bitmap _inImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/transfer_in.png")));
         public static readonly Bitmap _outImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/transfer_out.png")));
         public static readonly Bitmap _blockImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/transfer_block.png")));
+        public static readonly Bitmap _pendingImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/transfer_pending.png")));
 
         private static ViewModelBase _mainView = new();
 
@@ -744,6 +745,10 @@ namespace NervaOneWalletMiner.Helpers
                                 else if (transfer.Type.Equals(TransferType.Block))
                                 {
                                     transfer.Icon = _blockImage;
+                                }
+                                else if(transfer.Type.Equals(TransferType.Pending))
+                                {
+                                    transfer.Icon= _pendingImage;
                                 }
 
                                 GlobalData.TransfersStats.Transactions.Add(transfer.TransactionId + transfer.Type, transfer);
