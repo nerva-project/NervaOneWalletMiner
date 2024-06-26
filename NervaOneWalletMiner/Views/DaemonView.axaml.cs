@@ -102,18 +102,27 @@ namespace NervaOneWalletMiner.Views
                     }
                     else
                     {
-                        // Start mining
-                        if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads != nupThreads.Value)
+                        if (GlobalData.NetworkStats.NetHeight > GlobalData.NetworkStats.YourHeight)
                         {
-                            GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads = Convert.ToInt32(nupThreads.Value);
-                            GlobalMethods.SaveConfig();
+                            Logger.LogDebug("DMN.SSMC", "Incorrect height. Aborting mining. NetHeight: " + GlobalData.NetworkStats.NetHeight + " | YourHeight: " + GlobalData.NetworkStats.YourHeight);
+                            MessageBoxView window = new("Start Mining", "Cannot start mining because you're not fully synchronized.\r\nPlease try again later.", true);
+                            await window.ShowDialog(GetWindow());
                         }
+                        else
+                        {
+                            // Start mining
+                            if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads != nupThreads.Value)
+                            {
+                                GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads = Convert.ToInt32(nupThreads.Value);
+                                GlobalMethods.SaveConfig();
+                            }
 
-                        Logger.LogDebug("DMN.SSMC", "Starting mining");
-                        GlobalData.IsManualStopMining = false;
-                        StartMiningAsync(GetWindow(), GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
-                        btnStartStopMining.Content = StatusMiner.StopMining;
-                        nupThreads.IsEnabled = false;
+                            Logger.LogDebug("DMN.SSMC", "Starting mining");
+                            GlobalData.IsManualStopMining = false;
+                            StartMiningAsync(GetWindow(), GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
+                            btnStartStopMining.Content = StatusMiner.StopMining;
+                            nupThreads.IsEnabled = false;
+                        }
                     }
                 }                
             }
