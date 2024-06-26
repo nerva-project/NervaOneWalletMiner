@@ -2,7 +2,7 @@
 using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Objects.DataGrid;
 using ReactiveUI;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace NervaOneWalletMiner.ViewModels
 {
@@ -93,8 +93,8 @@ namespace NervaOneWalletMiner.ViewModels
             set => this.RaiseAndSetIfChanged(ref _MiningAddress, value);
         }
 
-        private List<Connection> _Connections = new();
-        public List<Connection> Connections
+        private ObservableCollection<Connection> _Connections = new();
+        public ObservableCollection<Connection> Connections
         {
             get => _Connections;
             set => this.RaiseAndSetIfChanged(ref _Connections, value);

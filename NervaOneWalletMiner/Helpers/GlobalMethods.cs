@@ -1120,7 +1120,6 @@ namespace NervaOneWalletMiner.Helpers
         public static void CoinChanged()
         {
             GlobalData.NetworkStats = new();
-            GlobalData.Connections = [];
         }
         #endregion // Misc Methods
 

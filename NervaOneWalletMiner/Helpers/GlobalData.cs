@@ -74,8 +74,7 @@ namespace NervaOneWalletMiner.Helpers
         // Grid and other UI data
         public static StatsDaemon NetworkStats = new();
         public static StatsWallet WalletStats = new();
-        public static StatsTransfers TransfersStats = new();
-        public static List<Connection> Connections = [];
+        public static StatsTransfers TransfersStats = new();        
         public static AddressBook AddressBook = new();
 
         public static string CliToolsDir = GlobalMethods.GetCliToolsDir();

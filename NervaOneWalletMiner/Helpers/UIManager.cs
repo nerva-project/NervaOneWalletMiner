@@ -76,7 +76,7 @@ namespace NervaOneWalletMiner.Helpers
 
             MasterProcess.StartMasterUpdateProcess();
 
-            UpdateMainView();            
+            UpdateDaemonView();            
         }
 
         public static void SelectionChanged(object? sender, SelectionModelSelectionChangedEventArgs e)
@@ -147,7 +147,7 @@ namespace NervaOneWalletMiner.Helpers
             }
         }
 
-        public static void UpdateMainView()
+        public static void UpdateDaemonView()
         {
             // Daemon View
             ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).NetHeight = GlobalData.NetworkStats.NetHeight.ToString();
@@ -160,7 +160,74 @@ namespace NervaOneWalletMiner.Helpers
             ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).BlockTime = GlobalData.NetworkStats.BlockTime;
             ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).MiningAddress = GlobalData.NetworkStats.MiningAddress;
 
-            ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).Connections = GlobalData.Connections;
+            if (((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).Connections.Count == 0)
+            {
+                ObservableCollection<Connection> initialConnections = [.. GlobalData.NetworkStats.Connections.Values];
+
+                if (initialConnections.Count > 0)
+                {
+                    Dispatcher.UIThread.Invoke(() =>
+                    {
+                        ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).Connections = [.. initialConnections];
+                    });
+                }
+
+                // Need to reset so we do not process transactions every second until next update
+                GlobalData.NetworkStats.Connections = [];
+            }
+            else
+            {
+                // Trying to avoid loop within a loop
+                List<Connection> deleteConnections = [];
+                HashSet<string> checkedAddresses = [];
+
+                foreach (Connection connection in ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).Connections)
+                {
+                    checkedAddresses.Add(connection.Address);
+
+                    if (GlobalData.NetworkStats.Connections.ContainsKey(connection.Address))
+                    {
+                        // Update, only if value changed
+                        if (!connection.Height.Equals(GlobalData.NetworkStats.Connections[connection.Address].Height))
+                        {
+                            connection.Height = GlobalData.NetworkStats.Connections[connection.Address].Height;
+                        }
+                        if (!connection.LiveTime.Equals(GlobalData.NetworkStats.Connections[connection.Address].LiveTime))
+                        {
+                            connection.LiveTime = GlobalData.NetworkStats.Connections[connection.Address].LiveTime;
+                        }
+                        if (!connection.State.Equals(GlobalData.NetworkStats.Connections[connection.Address].State))
+                        {
+                            connection.State = GlobalData.NetworkStats.Connections[connection.Address].State;
+                        }
+                    }
+                    else
+                    {
+                        // Connections to remove
+                        deleteConnections.Add(connection);
+                    }
+                }
+
+                foreach (Connection connection in deleteConnections)
+                {
+                    Dispatcher.UIThread.Invoke(() =>
+                    {
+                        ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).Connections.Remove(connection);
+                    });                    
+                }
+
+                foreach (string address in GlobalData.NetworkStats.Connections.Keys)
+                {
+                    if (!checkedAddresses.Contains(address))
+                    {
+                        // Need to add new wallet
+                        Dispatcher.UIThread.Invoke(() =>
+                        {
+                            ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).Connections.Add(GlobalData.NetworkStats.Connections[address]);
+                        });
+                    }
+                }                
+            }
 
             if (GlobalData.NetworkStats.MinerStatus.Equals(StatusMiner.Mining))
             {
@@ -389,7 +456,7 @@ namespace NervaOneWalletMiner.Helpers
 
                     if (newTransfers.Count > 0)
                     {
-                        foreach(Transfer transfer in newTransfers)
+                        foreach(Transfer transfer in newTransfers.OrderBy(t => t.Height))
                         {
                             Dispatcher.UIThread.Invoke(() =>
                             {
@@ -430,8 +497,8 @@ namespace NervaOneWalletMiner.Helpers
                     {
                         StatusSync = " | Trying to establish connection with daemon..."
                     };
-                    GlobalData.Connections = [];
-                    UpdateMainView();
+                    GlobalData.NetworkStats.Connections = [];
+                    UpdateDaemonView();
                 }
 
                 if (GlobalData.IsDaemonRestarting)
@@ -440,8 +507,8 @@ namespace NervaOneWalletMiner.Helpers
                     {
                         StatusSync = " | Restarting daemon..."
                     };
-                    GlobalData.Connections = [];
-                    UpdateMainView();
+                    GlobalData.NetworkStats.Connections = [];
+                    UpdateDaemonView();
                 }
 
                 GetInfoResponse infoRes = await GlobalData.DaemonService.GetInfo(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new GetInfoRequest());
@@ -570,14 +637,25 @@ namespace NervaOneWalletMiner.Helpers
 
                     if (!connectResp.Error.IsError)
                     {
-                        // TODO: For now just recreate items in grid. Consider, removing disconnected and adding new ones to List instead.
-                        GlobalData.Connections = connectResp.Connections;
-                        foreach (Connection connection in GlobalData.Connections)
+                        GlobalData.NetworkStats.Connections = [];
+
+                        foreach (Connection connection in connectResp.Connections)
                         {
-                            connection.InOutIcon = connection.IsIncoming ? _inImage : _outImage;
+                            if(connection.Address != null)
+                            {
+                                connection.InOutIcon = connection.IsIncoming ? _inImage : _outImage;
+                                if(GlobalData.NetworkStats.Connections.ContainsKey(connection.Address))
+                                {
+                                    Logger.LogInfo("UIM.DUUT", "Connection already exists: " + connection.Address);
+                                }
+                                else
+                                {
+                                    GlobalData.NetworkStats.Connections.Add(connection.Address, connection);
+                                }                                
+                            }
                         }
 
-                        UpdateMainView();
+                        UpdateDaemonView();
                     }
                 }
             }
