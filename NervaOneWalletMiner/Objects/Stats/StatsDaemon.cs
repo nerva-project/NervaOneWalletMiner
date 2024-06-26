@@ -6,6 +6,7 @@ namespace NervaOneWalletMiner.Objects.Stats
 {
     public class StatsDaemon
     {
+        // Key is Address + IsIncoming
         public Dictionary<string, Connection> Connections = [];
 
         public ulong NetHeight { get; set; } = 0;

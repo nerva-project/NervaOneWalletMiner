@@ -89,6 +89,11 @@
 				  Height="365"
 				  Margin="0,20,0,0"
 				  DoubleTapped="DtgAccounts_DoubleTapped">
+			<DataGrid.Styles>
+				<Style Selector="DataGridCell:current /template/ Grid#FocusVisual">
+					<Setter Property="IsVisible" Value="false" />
+				</Style>
+			</DataGrid.Styles>
 			<DataGrid.Columns>
 				<DataGridTemplateColumn Header="">
 					<DataTemplate DataType="Bitmap">

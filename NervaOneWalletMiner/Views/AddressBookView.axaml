@@ -41,6 +41,11 @@
 				  Height="455"
 				  Margin="0,10,0,0"
 				  RowEditEnded="AddressBook_RowEditEnded">
+			<DataGrid.Styles>
+				<Style Selector="DataGridCell:current /template/ Grid#FocusVisual">
+					<Setter Property="IsVisible" Value="false" />
+				</Style>
+			</DataGrid.Styles>
 			<DataGrid.Columns>
 				<DataGridTextColumn Header="Name"
 									Width="*"

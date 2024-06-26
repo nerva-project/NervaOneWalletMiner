@@ -145,6 +145,11 @@
 				  IsReadOnly="True"	
 				  Height="300"
 				  Margin="0,10,0,0">
+			<DataGrid.Styles>
+				<Style Selector="DataGridCell:current /template/ Grid#FocusVisual">
+					<Setter Property="IsVisible" Value="false" />
+				</Style>
+			</DataGrid.Styles>
 			<DataGrid.Columns>
 				<DataGridTemplateColumn Header="">
 					<DataTemplate DataType="Bitmap">

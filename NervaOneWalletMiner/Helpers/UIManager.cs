@@ -183,22 +183,23 @@ namespace NervaOneWalletMiner.Helpers
 
                 foreach (Connection connection in ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).Connections)
                 {
-                    checkedAddresses.Add(connection.Address);
+                    string connectionsKey = connection.Address + connection.IsIncoming;
+                    checkedAddresses.Add(connectionsKey);
 
-                    if (GlobalData.NetworkStats.Connections.ContainsKey(connection.Address))
+                    if (GlobalData.NetworkStats.Connections.ContainsKey(connectionsKey))
                     {
                         // Update, only if value changed
-                        if (!connection.Height.Equals(GlobalData.NetworkStats.Connections[connection.Address].Height))
+                        if (!connection.Height.Equals(GlobalData.NetworkStats.Connections[connectionsKey].Height))
                         {
-                            connection.Height = GlobalData.NetworkStats.Connections[connection.Address].Height;
+                            connection.Height = GlobalData.NetworkStats.Connections[connectionsKey].Height;
                         }
-                        if (!connection.LiveTime.Equals(GlobalData.NetworkStats.Connections[connection.Address].LiveTime))
+                        if (!connection.LiveTime.Equals(GlobalData.NetworkStats.Connections[connectionsKey].LiveTime))
                         {
-                            connection.LiveTime = GlobalData.NetworkStats.Connections[connection.Address].LiveTime;
+                            connection.LiveTime = GlobalData.NetworkStats.Connections[connectionsKey].LiveTime;
                         }
-                        if (!connection.State.Equals(GlobalData.NetworkStats.Connections[connection.Address].State))
+                        if (!connection.State.Equals(GlobalData.NetworkStats.Connections[connectionsKey].State))
                         {
-                            connection.State = GlobalData.NetworkStats.Connections[connection.Address].State;
+                            connection.State = GlobalData.NetworkStats.Connections[connectionsKey].State;
                         }
                     }
                     else
@@ -216,14 +217,14 @@ namespace NervaOneWalletMiner.Helpers
                     });                    
                 }
 
-                foreach (string address in GlobalData.NetworkStats.Connections.Keys)
+                foreach (string key in GlobalData.NetworkStats.Connections.Keys)
                 {
-                    if (!checkedAddresses.Contains(address))
+                    if (!checkedAddresses.Contains(key))
                     {
                         // Need to add new wallet
                         Dispatcher.UIThread.Invoke(() =>
                         {
-                            ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).Connections.Add(GlobalData.NetworkStats.Connections[address]);
+                            ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).Connections.Add(GlobalData.NetworkStats.Connections[key]);
                         });
                     }
                 }                
@@ -439,7 +440,7 @@ namespace NervaOneWalletMiner.Helpers
                         bool isFound = false;
                         foreach (Transfer transfer in ((TransfersViewModel)GlobalData.ViewModelPages[SplitViewPages.Transfers]).Transactions)
                         {                            
-                            if(transfer.TransactionId + "_" + transfer.Type == newTransferKey)
+                            if(transfer.TransactionId + transfer.Type == newTransferKey)
                             {
                                 isFound = true;
                                 break;
@@ -641,17 +642,17 @@ namespace NervaOneWalletMiner.Helpers
 
                         foreach (Connection connection in connectResp.Connections)
                         {
-                            if(connection.Address != null)
-                            {
-                                connection.InOutIcon = connection.IsIncoming ? _inImage : _outImage;
-                                if(GlobalData.NetworkStats.Connections.ContainsKey(connection.Address))
+                            if(!string.IsNullOrEmpty(connection.Address))
+                            {                                
+                                if(GlobalData.NetworkStats.Connections.ContainsKey(connection.Address + connection.IsIncoming))
                                 {
-                                    Logger.LogInfo("UIM.DUUT", "Connection already exists: " + connection.Address);
+                                    Logger.LogInfo("UIM.DUUT", "Connection already exists: " + connection.Address + connection.IsIncoming);
                                 }
                                 else
                                 {
-                                    GlobalData.NetworkStats.Connections.Add(connection.Address, connection);
-                                }                                
+                                    connection.InOutIcon = connection.IsIncoming ? _inImage : _outImage;
+                                    GlobalData.NetworkStats.Connections.Add(connection.Address + connection.IsIncoming, connection);
+                                }
                             }
                         }
 
@@ -713,7 +714,7 @@ namespace NervaOneWalletMiner.Helpers
                                 transfer.Icon = _blockImage;
                             }
 
-                            GlobalData.TransfersStats.Transactions.Add(transfer.TransactionId + "_" + transfer.Type, transfer);
+                            GlobalData.TransfersStats.Transactions.Add(transfer.TransactionId + transfer.Type, transfer);
 
                             if (transfer.Height > GlobalData.NewestTransactionHeight)
                             {
