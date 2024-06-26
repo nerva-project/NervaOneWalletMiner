@@ -932,16 +932,15 @@ namespace NervaOneWalletMiner.Helpers
                 else
                 {
                     GlobalData.WalletStats.BalanceTotal = response.BalanceTotal;
-                    GlobalData.WalletStats.BalanceUnlocked = response.BalanceUnlocked;
+                    GlobalData.WalletStats.BalanceUnlocked = response.BalanceUnlocked;                    
 
-                    GlobalData.WalletStats.Subaddresses = [];
-
-                    // TODO: Set icon inside CallAsync method above?
                     foreach (Account account in response.SubAccounts)
-                    {
-                        account.WalletIcon = _walletImage;
-
-                        GlobalData.WalletStats.Subaddresses.Add(account.Index, account);
+                    {                       
+                        if(!GlobalData.WalletStats.Subaddresses.ContainsKey(account.Index))
+                        {
+                            account.WalletIcon = _walletImage;
+                            GlobalData.WalletStats.Subaddresses.Add(account.Index, account);
+                        }                        
                     }
                 }
             }

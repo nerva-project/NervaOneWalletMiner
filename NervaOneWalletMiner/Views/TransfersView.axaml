@@ -39,7 +39,7 @@
 				  AutoGenerateColumns="False"
 				  GridLinesVisibility="Horizontal"
 				  IsReadOnly="True"
-				  Height="455"
+				  Height="500"
 				  Margin="0,20,0,0"
 				  DoubleTapped="TransactionDetails_DoubleTapped">
 			<DataGrid.Styles>

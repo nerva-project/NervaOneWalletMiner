@@ -143,7 +143,7 @@
 				  AutoGenerateColumns="False"				  			  
 				  GridLinesVisibility="Horizontal"
 				  IsReadOnly="True"	
-				  Height="300"
+				  Height="330"
 				  Margin="0,10,0,0">
 			<DataGrid.Styles>
 				<Style Selector="DataGridCell:current /template/ Grid#FocusVisual">

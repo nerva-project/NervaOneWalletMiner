@@ -1,7 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using NervaOneWalletMiner.Objects.Constants;
-using NervaOneWalletMiner.Objects.DataGrid;
 using NervaOneWalletMiner.Objects.Settings;
 using NervaOneWalletMiner.Objects.Settings.CoinSpecific;
 using NervaOneWalletMiner.Objects.Stats;
@@ -16,7 +15,7 @@ namespace NervaOneWalletMiner.Helpers
     public static class GlobalData
     {
         public const string AppName = "NervaOneWalletMiner";
-        public const string Version = "0.8.0.0";
+        public const string Version = "0.8.1.0";
 
         public const string CliToolsDirName = "cli";
         public const string WalletDirName = "wallets";

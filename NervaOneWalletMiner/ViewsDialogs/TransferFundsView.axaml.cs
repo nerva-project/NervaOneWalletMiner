@@ -3,10 +3,12 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects;
+using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Objects.DataGrid;
 using NervaOneWalletMiner.Rpc.Common;
 using NervaOneWalletMiner.Rpc.Wallet.Requests;
 using NervaOneWalletMiner.Rpc.Wallet.Responses;
+using NervaOneWalletMiner.ViewModels;
 using System;
 using System.Collections.Generic;
 
@@ -31,7 +33,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                 InitializeComponent();
                 Icon = GlobalMethods.GetWindowIcon();
 
-                foreach (Account account in GlobalData.WalletStats.Subaddresses.Values)
+                foreach (Account account in ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).WalletAddresses)
                 {
                     if (!_accounts.ContainsKey(account.Index))
                     {
@@ -64,8 +66,21 @@ namespace NervaOneWalletMiner.ViewsDialogs
                 cbxPriority.ItemsSource = priorityList;
                 cbxPriority.SelectedIndex = 0;
 
-                lblBalance.Content = GlobalData.WalletStats.Subaddresses[selectedAccountIndex].BalanceTotal + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
-                lblUnlocked.Content = GlobalData.WalletStats.Subaddresses[selectedAccountIndex].BalanceUnlocked + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
+                decimal balanceTotal = 0;
+                decimal balanceUnlocked = 0;
+
+                foreach(Account account in ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).WalletAddresses)
+                {
+                    if(account.Index == selectedAccountIndex)
+                    {
+                        balanceTotal = account.BalanceTotal;
+                        balanceUnlocked = account.BalanceUnlocked;
+                        break;
+                    }
+                }
+
+                lblBalance.Content = balanceTotal + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
+                lblUnlocked.Content = balanceUnlocked + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
             }
             catch (Exception ex)
             {
@@ -238,8 +253,21 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     }
                 }
 
-                lblBalance.Content = GlobalData.WalletStats.Subaddresses[fromAccountIndex].BalanceTotal + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
-                lblUnlocked.Content = GlobalData.WalletStats.Subaddresses[fromAccountIndex].BalanceUnlocked + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
+                decimal balanceTotal = 0;
+                decimal balanceUnlocked = 0;
+
+                foreach (Account account in ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).WalletAddresses)
+                {
+                    if (account.Index == fromAccountIndex)
+                    {
+                        balanceTotal = account.BalanceTotal;
+                        balanceUnlocked = account.BalanceUnlocked;
+                        break;
+                    }
+                }
+
+                lblBalance.Content = balanceTotal + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
+                lblUnlocked.Content = balanceUnlocked + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
             }
             catch (Exception ex)
             {

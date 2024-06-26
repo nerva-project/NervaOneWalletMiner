@@ -86,7 +86,7 @@
 				  AutoGenerateColumns="False"
 				  GridLinesVisibility="Horizontal"
 				  IsReadOnly="True"
-				  Height="365"
+				  Height="395"
 				  Margin="0,20,0,0"
 				  DoubleTapped="DtgAccounts_DoubleTapped">
 			<DataGrid.Styles>
