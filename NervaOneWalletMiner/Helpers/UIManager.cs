@@ -441,7 +441,7 @@ namespace NervaOneWalletMiner.Helpers
                                 ((TransfersViewModel)GlobalData.ViewModelPages[SplitViewPages.Transfers]).Transactions = [.. initialTransfers.OrderByDescending(t => t.Height)];
                             });
 
-                            // Clear transfers here because this is initial pull so it could have a lot of transactions. Do not to process them next time
+                            // Need to clear transfers AFTER we process them otherwise we might clear them before we process them
                             GlobalData.TransfersStats.Transactions = [];
                         }
 
@@ -483,7 +483,9 @@ namespace NervaOneWalletMiner.Helpers
                                     ((TransfersViewModel)GlobalData.ViewModelPages[SplitViewPages.Transfers]).Transactions.Insert(0, transfer);
                                 });
                             }
-
+                            
+                            // Need to clear transfers AFTER we process them otherwise we might clear them before we process them
+                            GlobalData.TransfersStats.Transactions = [];
                             newTransfersCount = newTransfers.Count;
                         }
                     }
@@ -754,16 +756,12 @@ namespace NervaOneWalletMiner.Helpers
                     reqTransfers.IsAllAccounts = true;
 
                     GetTransfersResponse response = await GlobalData.WalletService.GetTransfers(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, reqTransfers);
-
                     if (response.Error.IsError)
                     {
                         Logger.LogError("UIM.GSTD", "GetTransfers Error | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
                     }
                     else
                     {
-                        // We only want new Transfers. This should alredy be cleared but do it anyways
-                        GlobalData.TransfersStats.Transactions = [];
-
                         foreach (Transfer transfer in response.Transfers)
                         {
                             if (!GlobalData.TransfersStats.Transactions.ContainsKey(transfer.TransactionId + transfer.Type))
@@ -786,18 +784,18 @@ namespace NervaOneWalletMiner.Helpers
                                 }
 
                                 GlobalData.TransfersStats.Transactions.Add(transfer.TransactionId + transfer.Type, transfer);
-                            }
 
-                            if (transfer.Height > GlobalData.NewestTransactionHeight)
-                            {
-                                GlobalData.NewestTransactionHeight = transfer.Height;
-                            }
+                                if (transfer.Height > GlobalData.NewestTransactionHeight)
+                                {
+                                    GlobalData.NewestTransactionHeight = transfer.Height;
+                                }
 
-                            if (transfer.BlockHash.Equals(GlobalData.NewestTransactionBlockHash))
-                            {
-                                GlobalData.NewestTransactionBlockHash = transfer.BlockHash;
+                                if (transfer.BlockHash.Equals(GlobalData.NewestTransactionBlockHash))
+                                {
+                                    GlobalData.NewestTransactionBlockHash = transfer.BlockHash;
+                                }
                             }
-                        }
+                        }                        
                     }
 
                     GlobalData.IsGetAndSetTransfersDataComplete = true;

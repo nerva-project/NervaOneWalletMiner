@@ -1069,6 +1069,7 @@ namespace NervaOneWalletMiner.Helpers
             GlobalData.IsWalletJustOpened = true;
             GlobalData.OpenedWalletName = walletName;
             GlobalData.NewestTransactionHeight = 0;
+            GlobalData.WalletHeight = 0;
             GlobalData.NewestTransactionBlockHash = string.Empty;
         }
 
@@ -1077,6 +1078,8 @@ namespace NervaOneWalletMiner.Helpers
             GlobalData.IsWalletOpen = false;
             GlobalData.IsWalletJustOpened = false;
             GlobalData.OpenedWalletName = string.Empty;
+            GlobalData.WalletHeight = 0;
+            GlobalData.NewestTransactionHeight = 0;
             GlobalData.WalletStats = new();
             GlobalData.WalletPassProvidedTime = DateTime.MinValue;
         }

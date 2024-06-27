@@ -129,8 +129,6 @@ namespace NervaOneWalletMiner.Views
 
                     Logger.LogDebug("WAL.OUWT", "Wallet " + walletName + " opened successfully");
                 }
-
-                GlobalData.WalletHeight = 0;
             }
             catch (Exception ex)
             {
@@ -474,6 +472,8 @@ namespace NervaOneWalletMiner.Views
 
             try
             {
+                GlobalMethods.WalletClosedOrErrored();                
+
                 CloseWalletRequest request = new CloseWalletRequest
                 {
                     WalletName = GlobalData.OpenedWalletName
@@ -508,9 +508,6 @@ namespace NervaOneWalletMiner.Views
                         });
                     }
                 }
-
-                GlobalMethods.WalletClosedOrErrored();
-                GlobalData.WalletHeight = 0;
             }
             catch (Exception ex)
             {
