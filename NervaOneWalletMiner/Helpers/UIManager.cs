@@ -22,6 +22,7 @@ namespace NervaOneWalletMiner.Helpers
         public static bool _isTransfersUpdateComplete = true;
         public static bool _askedToQuickSync = false;
 
+        public static readonly Bitmap _walletImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/wallet.png")));
         public static readonly Bitmap _inImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/transfer_in.png")));
         public static readonly Bitmap _outImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/transfer_out.png")));
         public static readonly Bitmap _blockImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/transfer_block.png")));
@@ -148,6 +149,7 @@ namespace NervaOneWalletMiner.Helpers
             }
         }
 
+        #region Actual UI Update
         public static void UpdateDaemonView()
         {
             try
@@ -163,6 +165,7 @@ namespace NervaOneWalletMiner.Helpers
                 ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).BlockTime = GlobalData.NetworkStats.BlockTime;
                 ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).MiningAddress = GlobalData.NetworkStats.MiningAddress;
 
+
                 if (((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).Connections.Count == 0)
                 {
                     ObservableCollection<Connection> initialConnections = [.. GlobalData.NetworkStats.Connections.Values];
@@ -177,9 +180,10 @@ namespace NervaOneWalletMiner.Helpers
                 }
                 else
                 {
-                    // Trying to avoid loop within a loop
-                    List<Connection> deleteConnections = [];
-                    HashSet<string> checkedAddresses = [];
+                // Trying to avoid loop within a loop
+                List<Connection> deleteConnections = [];
+                HashSet<string> checkedAddresses = [];
+
 
                     foreach (Connection connection in ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).Connections)
                     {
@@ -262,14 +266,9 @@ namespace NervaOneWalletMiner.Helpers
             catch (Exception ex)
             {
                 Logger.LogException("UIM.UPDV", ex);
-            }
-            finally
-            {
-                // Reset it here because you do not control when GlobalData.DaemonService.GetConnections returns and resets it
-                GlobalData.NetworkStats.Connections = [];
-            }            
+            }          
         }
-
+        
         public static void UpdateWalletView()
         {
             try
@@ -316,58 +315,55 @@ namespace NervaOneWalletMiner.Helpers
                         List<Account> deleteWallets = [];
                         HashSet<uint> checkedIndexes = [];
 
-                        if (GlobalData.WalletStats.Subaddresses.Count > 0)
+                        foreach (Account wallet in ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).WalletAddresses)
                         {
-                            foreach (Account wallet in ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).WalletAddresses)
-                            {
-                                checkedIndexes.Add(wallet.Index);
+                            checkedIndexes.Add(wallet.Index);
 
-                                if (GlobalData.WalletStats.Subaddresses.ContainsKey(wallet.Index))
+                            if (GlobalData.WalletStats.Subaddresses.ContainsKey(wallet.Index))
+                            {
+                                // Update, only if value changed
+                                // GlobalData.WalletStats.Subaddresses get cleared in asynchronouse call so sometimes even though you check if key exists, it will not exist anymore
+                                if (!wallet.Label.Equals(GlobalData.WalletStats.Subaddresses[wallet.Index].Label))
                                 {
-                                    // Update, only if value changed
-                                    // GlobalData.WalletStats.Subaddresses get cleared in asynchronouse call so sometimes even though you check if key exists, it will not exist anymore
-                                    if (!wallet.Label.Equals(GlobalData.WalletStats.Subaddresses[wallet.Index].Label))
-                                    {
-                                        wallet.Label = GlobalData.WalletStats.Subaddresses[wallet.Index].Label;
-                                    }
-                                    if (!wallet.AddressShort.Equals(GlobalData.WalletStats.Subaddresses[wallet.Index].AddressShort))
-                                    {
-                                        wallet.AddressShort = GlobalData.WalletStats.Subaddresses[wallet.Index].AddressShort;
-                                    }
-                                    if (wallet.BalanceTotal != (GlobalData.WalletStats.Subaddresses[wallet.Index].BalanceTotal))
-                                    {
-                                        wallet.BalanceTotal = GlobalData.WalletStats.Subaddresses[wallet.Index].BalanceTotal;
-                                    }
-                                    if (wallet.BalanceUnlocked != (GlobalData.WalletStats.Subaddresses[wallet.Index].BalanceUnlocked))
-                                    {
-                                        wallet.BalanceUnlocked = GlobalData.WalletStats.Subaddresses[wallet.Index].BalanceUnlocked;
-                                    }
+                                    wallet.Label = GlobalData.WalletStats.Subaddresses[wallet.Index].Label;
                                 }
-                                else
+                                if (!wallet.AddressShort.Equals(GlobalData.WalletStats.Subaddresses[wallet.Index].AddressShort))
                                 {
-                                    // Wallets to remove
-                                    deleteWallets.Add(wallet);
+                                    wallet.AddressShort = GlobalData.WalletStats.Subaddresses[wallet.Index].AddressShort;
+                                }
+                                if (wallet.BalanceTotal != (GlobalData.WalletStats.Subaddresses[wallet.Index].BalanceTotal))
+                                {
+                                    wallet.BalanceTotal = GlobalData.WalletStats.Subaddresses[wallet.Index].BalanceTotal;
+                                }
+                                if (wallet.BalanceUnlocked != (GlobalData.WalletStats.Subaddresses[wallet.Index].BalanceUnlocked))
+                                {
+                                    wallet.BalanceUnlocked = GlobalData.WalletStats.Subaddresses[wallet.Index].BalanceUnlocked;
                                 }
                             }
-
-                            foreach (Account wallet in deleteWallets)
+                            else
                             {
+                                // Wallets to remove
+                                deleteWallets.Add(wallet);
+                            }
+                        }
+
+                        foreach (Account wallet in deleteWallets)
+                        {
+                            Dispatcher.UIThread.Invoke(() =>
+                            {
+                                ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).WalletAddresses.Remove(wallet);
+                            });
+                        }
+
+                        foreach (uint index in GlobalData.WalletStats.Subaddresses.Keys)
+                        {
+                            if (!checkedIndexes.Contains(index))
+                            {
+                                // Need to add new wallet
                                 Dispatcher.UIThread.Invoke(() =>
                                 {
-                                    ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).WalletAddresses.Remove(wallet);
+                                    ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).WalletAddresses.Add(GlobalData.WalletStats.Subaddresses[index]);
                                 });
-                            }
-
-                            foreach (uint index in GlobalData.WalletStats.Subaddresses.Keys)
-                            {
-                                if (!checkedIndexes.Contains(index))
-                                {
-                                    // Need to add new wallet
-                                    Dispatcher.UIThread.Invoke(() =>
-                                    {
-                                        ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).WalletAddresses.Add(GlobalData.WalletStats.Subaddresses[index]);
-                                    });
-                                }
                             }
                         }
                     }
@@ -423,12 +419,7 @@ namespace NervaOneWalletMiner.Helpers
             catch (Exception ex)
             {
                 Logger.LogException("UIM.UPWV", ex);
-            }
-            finally
-            {
-                // Reset it here because you do not control when GlobalData.WalletService.GetAccounts returns and resets it
-                GlobalData.WalletStats.Subaddresses = [];
-            }            
+            }      
         }
 
         public static void UpdateTransfersView()
@@ -449,6 +440,9 @@ namespace NervaOneWalletMiner.Helpers
                             {
                                 ((TransfersViewModel)GlobalData.ViewModelPages[SplitViewPages.Transfers]).Transactions = [.. initialTransfers.OrderByDescending(t => t.Height)];
                             });
+
+                            // Clear transfers here because this is initial pull so it could have a lot of transactions. Do not to process them next time
+                            GlobalData.TransfersStats.Transactions = [];
                         }
 
                         if (((TransfersViewModel)GlobalData.ViewModelPages[SplitViewPages.Transfers]).Transactions.Count > 0)
@@ -516,14 +510,11 @@ namespace NervaOneWalletMiner.Helpers
             {
                 Logger.LogException("UIM.UPTV", ex);
             }
-            finally
-            {
-                // Reset it here because you do not control when GlobalData.WalletService.GetTransfers returns and resets it
-                GlobalData.TransfersStats.Transactions = [];
-            }            
         }
+        #endregion // Actual UI Update
 
-        public static async void DaemonUiUpdate()
+        #region Get Data for UI
+        public static async void GetAndSetDaemonData()
         {
             try
             {
@@ -533,8 +524,7 @@ namespace NervaOneWalletMiner.Helpers
                     {
                         StatusSync = " | Trying to establish connection with daemon..."
                     };
-                    GlobalData.NetworkStats.Connections = [];
-                    UpdateDaemonView();
+                    GlobalData.NetworkStats.Connections = [];                    
                 }
 
                 if (GlobalData.IsDaemonRestarting)
@@ -543,170 +533,211 @@ namespace NervaOneWalletMiner.Helpers
                     {
                         StatusSync = " | Restarting daemon..."
                     };
-                    GlobalData.NetworkStats.Connections = [];
-                    UpdateDaemonView();
+                    GlobalData.NetworkStats.Connections = [];                    
                 }
 
-                GetInfoResponse infoRes = await GlobalData.DaemonService.GetInfo(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new GetInfoRequest());
-
-                if (!infoRes.Error.IsError)
+                if (GlobalData.IsGetAndSetDaemonDataComplete)
                 {
-                    GlobalData.LastDaemonResponseTime = DateTime.Now;
-                    if (GlobalData.IsInitialDaemonConnectionSuccess == false)
-                    {
-                        // This will be used to get rid of establishing connection message and to StartWalletUiUpdate 
-                        GlobalData.IsInitialDaemonConnectionSuccess = true;
-                    }
+                    GlobalData.IsGetAndSetDaemonDataComplete = false;
 
-                    if (GlobalData.IsDaemonRestarting)
-                    {
-                        GlobalData.IsDaemonRestarting = false;
-                    }
+                    GetInfoResponse infoRes = await GlobalData.DaemonService.GetInfo(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new GetInfoRequest());
 
-                    GlobalData.NetworkStats.NetHeight = (infoRes.TargetHeight > infoRes.Height ? infoRes.TargetHeight : infoRes.Height);
-                    GlobalData.NetworkStats.YourHeight = infoRes.Height;
-
-                    if ((infoRes.NetworkHashRate / 1000000000000000.0d) > 1)
+                    if (!infoRes.Error.IsError)
                     {
-                        GlobalData.NetworkStats.NetHash = Math.Round((infoRes.NetworkHashRate / 1000000000000000.0d), 2) + " PH/s";
-                    }
-                    else if ((infoRes.NetworkHashRate / 1000000000000.0d) > 1)
-                    {
-                        GlobalData.NetworkStats.NetHash = Math.Round((infoRes.NetworkHashRate / 1000000000000.0d), 2) + " TH/s";
-                    }
-                    else if ((infoRes.NetworkHashRate / 1000000000.0d) > 1)
-                    {
-                        GlobalData.NetworkStats.NetHash = Math.Round((infoRes.NetworkHashRate / 1000000000.0d), 2) + " GH/s";
-                    }
-                    else if ((infoRes.NetworkHashRate / 1000000.0d) > 1)
-                    {
-                        GlobalData.NetworkStats.NetHash = Math.Round((infoRes.NetworkHashRate / 1000000.0d), 2) + " MH/s";
-                    }
-                    else if ((infoRes.NetworkHashRate / 1000.0d) > 1)
-                    {
-                        GlobalData.NetworkStats.NetHash = Math.Round((infoRes.NetworkHashRate / 1000.0d), 2) + " KH/s";
-                    }
-                    else
-                    {
-                        GlobalData.NetworkStats.NetHash = infoRes.NetworkHashRate + " H/s";
-                    }
-
-                    DateTime miningStartTime = infoRes.StartTime;
-                    GlobalData.NetworkStats.RunTime = (DateTime.Now.ToUniversalTime() - miningStartTime).ToString(@"%d\.hh\:mm\:ss");
-
-                    GlobalData.NetworkStats.ConnectionsIn = infoRes.ConnectionCountIn;
-                    GlobalData.NetworkStats.ConnectionsOut = infoRes.ConnectionCountOut;
-
-                    GlobalData.NetworkStats.Version = infoRes.Version;
-                    GlobalData.NetworkStats.StatusSync = "";
-                    if (infoRes.TargetHeight != 0 && infoRes.Height < infoRes.TargetHeight)
-                    {
-                        GlobalData.NetworkStats.StatusSync += " | Sync (Height " + infoRes.Height + " of " + infoRes.TargetHeight + ")";
-
-                        // See if user wants to use QuickSync if they're far behind
-                        if (!_askedToQuickSync && !string.IsNullOrEmpty(GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].QuickSyncUrl))
+                        GlobalData.LastDaemonResponseTime = DateTime.Now;
+                        if (GlobalData.IsInitialDaemonConnectionSuccess == false)
                         {
-                            _askedToQuickSync = true;
-                            double percentSynced = infoRes.Height / Convert.ToDouble(infoRes.TargetHeight);
+                            // This will be used to get rid of establishing connection message and to StartWalletUiUpdate 
+                            GlobalData.IsInitialDaemonConnectionSuccess = true;
+                        }
 
-                            if (percentSynced < 0.8)
-                            {
-                                ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).AskIfSyncWithQuickSync(percentSynced);
-                            }
-                        }                        
-                    }
-                    else
-                    {
-                        GlobalData.NetworkStats.StatusSync += " | Sync OK | Status " + infoRes.Status;
-                    }
-
-
-                    //Logger.LogDebug("UIM.DUUT", "GetInfo Response Height: " + infoRes.height);
-
-
-                    if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsCpuMiningSupported)
-                    {
-                        MiningStatusResponse miningRes = await GlobalData.DaemonService.GetMiningStatus(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new MiningStatusRequest());
-                        if (miningRes.IsActive)
+                        if (GlobalData.IsDaemonRestarting)
                         {
-                            GlobalData.NetworkStats.MinerStatus = StatusMiner.Mining;
-                            GlobalData.NetworkStats.MiningAddress = GlobalMethods.GetShorterString(miningRes.Address, 12);
+                            GlobalData.IsDaemonRestarting = false;
+                        }
 
-                            if (miningRes.Speed > 1000)
-                            {
-                                GlobalData.NetworkStats.YourHash = miningRes.Speed / 1000.0d + " KH/s";
-                            }
-                            else
-                            {
-                                GlobalData.NetworkStats.YourHash = miningRes.Speed + " h/s";
-                            }
+                        GlobalData.NetworkStats.NetHeight = (infoRes.TargetHeight > infoRes.Height ? infoRes.TargetHeight : infoRes.Height);
+                        GlobalData.NetworkStats.YourHeight = infoRes.Height;
 
-                            if (miningRes.Speed > 0)
-                            {
-                                double blockMinutes = (double)infoRes.NetworkHashRate / miningRes.Speed;
+                        if ((infoRes.NetworkHashRate / 1000000000000000.0d) > 1)
+                        {
+                            GlobalData.NetworkStats.NetHash = Math.Round((infoRes.NetworkHashRate / 1000000000000000.0d), 2) + " PH/s";
+                        }
+                        else if ((infoRes.NetworkHashRate / 1000000000000.0d) > 1)
+                        {
+                            GlobalData.NetworkStats.NetHash = Math.Round((infoRes.NetworkHashRate / 1000000000000.0d), 2) + " TH/s";
+                        }
+                        else if ((infoRes.NetworkHashRate / 1000000000.0d) > 1)
+                        {
+                            GlobalData.NetworkStats.NetHash = Math.Round((infoRes.NetworkHashRate / 1000000000.0d), 2) + " GH/s";
+                        }
+                        else if ((infoRes.NetworkHashRate / 1000000.0d) > 1)
+                        {
+                            GlobalData.NetworkStats.NetHash = Math.Round((infoRes.NetworkHashRate / 1000000.0d), 2) + " MH/s";
+                        }
+                        else if ((infoRes.NetworkHashRate / 1000.0d) > 1)
+                        {
+                            GlobalData.NetworkStats.NetHash = Math.Round((infoRes.NetworkHashRate / 1000.0d), 2) + " KH/s";
+                        }
+                        else
+                        {
+                            GlobalData.NetworkStats.NetHash = infoRes.NetworkHashRate + " H/s";
+                        }
 
-                                if ((blockMinutes / 1440d) > 1)
+                        DateTime miningStartTime = infoRes.StartTime;
+                        GlobalData.NetworkStats.RunTime = (DateTime.Now.ToUniversalTime() - miningStartTime).ToString(@"%d\.hh\:mm\:ss");
+
+                        GlobalData.NetworkStats.ConnectionsIn = infoRes.ConnectionCountIn;
+                        GlobalData.NetworkStats.ConnectionsOut = infoRes.ConnectionCountOut;
+
+                        GlobalData.NetworkStats.Version = infoRes.Version;
+                        GlobalData.NetworkStats.StatusSync = "";
+                        if (infoRes.TargetHeight != 0 && infoRes.Height < infoRes.TargetHeight)
+                        {
+                            GlobalData.NetworkStats.StatusSync += " | Sync (Height " + infoRes.Height + " of " + infoRes.TargetHeight + ")";
+
+                            // See if user wants to use QuickSync if they're far behind
+                            if (!_askedToQuickSync && !string.IsNullOrEmpty(GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].QuickSyncUrl))
+                            {
+                                _askedToQuickSync = true;
+                                double percentSynced = infoRes.Height / Convert.ToDouble(infoRes.TargetHeight);
+
+                                if (percentSynced < 0.8)
                                 {
-                                    GlobalData.NetworkStats.BlockTime = String.Format("{0:F1}", Math.Round(blockMinutes, 1) / 1440d) + " days (est)";
-                                }
-                                else if ((blockMinutes / 60.0d) > 1)
-                                {
-                                    GlobalData.NetworkStats.BlockTime = String.Format("{0:F1}", Math.Round(blockMinutes, 1) / 60.0d) + " hours (est)";
-                                }
-                                else
-                                {
-                                    GlobalData.NetworkStats.BlockTime = String.Format("{0:F0}", Math.Round(blockMinutes, 0)) + " minutes (est)";
+                                    ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).AskIfSyncWithQuickSync(percentSynced);
                                 }
                             }
                         }
                         else
                         {
-                            GlobalData.NetworkStats.MinerStatus = StatusMiner.Inactive;
-                            GlobalData.NetworkStats.MiningAddress = "None";
-                            GlobalData.NetworkStats.YourHash = "0 h/s";
-                            GlobalData.NetworkStats.BlockTime = "∞";
+                            GlobalData.NetworkStats.StatusSync += " | Sync OK | Status " + infoRes.Status;
                         }
-                    }
 
-
-                    GetConnectionsResponse connectResp = await GlobalData.DaemonService.GetConnections(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new GetConnectionsRequest());
-
-                    if (!connectResp.Error.IsError)
-                    {
-                        foreach (Connection connection in connectResp.Connections)
+                        if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsCpuMiningSupported)
                         {
-                            if(!string.IsNullOrEmpty(connection.Address))
-                            {                                
-                                if(GlobalData.NetworkStats.Connections.ContainsKey(connection.Address + connection.IsIncoming))
+                            MiningStatusResponse miningRes = await GlobalData.DaemonService.GetMiningStatus(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new MiningStatusRequest());
+                            if (miningRes.IsActive)
+                            {
+                                GlobalData.NetworkStats.MinerStatus = StatusMiner.Mining;
+                                GlobalData.NetworkStats.MiningAddress = GlobalMethods.GetShorterString(miningRes.Address, 12);
+
+                                if (miningRes.Speed > 1000)
                                 {
-                                    Logger.LogInfo("UIM.DUUT", "Connection already exists: " + connection.Address + connection.IsIncoming);
+                                    GlobalData.NetworkStats.YourHash = miningRes.Speed / 1000.0d + " KH/s";
                                 }
                                 else
                                 {
-                                    connection.InOutIcon = connection.IsIncoming ? _inImage : _outImage;
-                                    GlobalData.NetworkStats.Connections.Add(connection.Address + connection.IsIncoming, connection);
+                                    GlobalData.NetworkStats.YourHash = miningRes.Speed + " h/s";
                                 }
+
+                                if (miningRes.Speed > 0)
+                                {
+                                    double blockMinutes = (double)infoRes.NetworkHashRate / miningRes.Speed;
+
+                                    if ((blockMinutes / 1440d) > 1)
+                                    {
+                                        GlobalData.NetworkStats.BlockTime = String.Format("{0:F1}", Math.Round(blockMinutes, 1) / 1440d) + " days (est)";
+                                    }
+                                    else if ((blockMinutes / 60.0d) > 1)
+                                    {
+                                        GlobalData.NetworkStats.BlockTime = String.Format("{0:F1}", Math.Round(blockMinutes, 1) / 60.0d) + " hours (est)";
+                                    }
+                                    else
+                                    {
+                                        GlobalData.NetworkStats.BlockTime = String.Format("{0:F0}", Math.Round(blockMinutes, 0)) + " minutes (est)";
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                GlobalData.NetworkStats.MinerStatus = StatusMiner.Inactive;
+                                GlobalData.NetworkStats.MiningAddress = "None";
+                                GlobalData.NetworkStats.YourHash = "0 h/s";
+                                GlobalData.NetworkStats.BlockTime = "∞";
                             }
                         }
 
-                        UpdateDaemonView();
+
+                        GetConnectionsResponse connectResp = await GlobalData.DaemonService.GetConnections(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new GetConnectionsRequest());
+                        if (!connectResp.Error.IsError)
+                        {
+                            GlobalData.NetworkStats.Connections = [];
+
+                            foreach (Connection connection in connectResp.Connections)
+                            {
+                                if (!string.IsNullOrEmpty(connection.Address))
+                                {
+                                    if (!GlobalData.NetworkStats.Connections.ContainsKey(connection.Address + connection.IsIncoming))
+                                    {
+                                        connection.InOutIcon = connection.IsIncoming ? _inImage : _outImage;
+                                        GlobalData.NetworkStats.Connections.Add(connection.Address + connection.IsIncoming, connection);
+                                    }
+                                }
+                            }
+                        }
                     }
+
+                    GlobalData.IsGetAndSetDaemonDataComplete = true;
                 }
             }
             catch (Exception ex)
             {
-                Logger.LogException("UIM.DUUT", ex);
+                GlobalData.IsGetAndSetDaemonDataComplete = true;
+                Logger.LogException("UIM.GSDD", ex);
             }
         }
 
-        public static async void TransfersUiUpdate()
+        public static async void GetAndSetWalletData()
         {
             try
             {
-                if (_isTransfersUpdateComplete)
+                if (GlobalData.IsGetAndSetWalletDataComplete)
                 {
-                    // Wait for one GetTransactions to finish before calling next one
-                    _isTransfersUpdateComplete = false;
+                    // Wait for GetAccounts to finish before calling next one or updating UI
+                    GlobalData.IsGetAndSetWalletDataComplete = false;
+
+                    // Get accounts for Wallets view
+                    GetAccountsResponse response = await GlobalData.WalletService.GetAccounts(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new GetAccountsRequest());
+
+                    if (response.Error.IsError)
+                    {
+                        Logger.LogError("UIM.GSWD", "GetAccounts Error | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
+                    }
+                    else
+                    {
+                        GlobalData.WalletStats.BalanceTotal = response.BalanceTotal;
+                        GlobalData.WalletStats.BalanceUnlocked = response.BalanceUnlocked;
+
+                        GlobalData.WalletStats.Subaddresses = [];
+
+                        foreach (Account account in response.SubAccounts)
+                        {
+                            if (!GlobalData.WalletStats.Subaddresses.ContainsKey(account.Index))
+                            {
+                                account.WalletIcon = _walletImage;
+                                GlobalData.WalletStats.Subaddresses.Add(account.Index, account);
+                            }
+                        }
+                    }
+
+                    GlobalData.IsGetAndSetWalletDataComplete = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                GlobalData.IsGetAndSetWalletDataComplete = true;
+                Logger.LogException("UIM.GSWD", ex);
+            }
+        }
+
+        public static async void GetAndSetTransfersData()
+        {
+            try
+            {
+                if (GlobalData.IsGetAndSetTransfersDataComplete)
+                {
+                    // Wait for GetTransactions to finish before calling next one or updating UI
+                    GlobalData.IsGetAndSetTransfersDataComplete = false;
 
                     // Get transactions for Transfers view
                     GetTransfersRequest reqTransfers = new GetTransfersRequest();
@@ -726,10 +757,13 @@ namespace NervaOneWalletMiner.Helpers
 
                     if (response.Error.IsError)
                     {
-                        Logger.LogError("UIM.TUUD", "GetTransfers Error | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
+                        Logger.LogError("UIM.GSTD", "GetTransfers Error | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
                     }
                     else
                     {
+                        // We only want new Transfers. This should alredy be cleared but do it anyways
+                        GlobalData.TransfersStats.Transactions = [];
+
                         foreach (Transfer transfer in response.Transfers)
                         {
                             if (!GlobalData.TransfersStats.Transactions.ContainsKey(transfer.TransactionId + transfer.Type))
@@ -746,9 +780,9 @@ namespace NervaOneWalletMiner.Helpers
                                 {
                                     transfer.Icon = _blockImage;
                                 }
-                                else if(transfer.Type.Equals(TransferType.Pending))
+                                else if (transfer.Type.Equals(TransferType.Pending))
                                 {
-                                    transfer.Icon= _pendingImage;
+                                    transfer.Icon = _pendingImage;
                                 }
 
                                 GlobalData.TransfersStats.Transactions.Add(transfer.TransactionId + transfer.Type, transfer);
@@ -759,20 +793,22 @@ namespace NervaOneWalletMiner.Helpers
                                 GlobalData.NewestTransactionHeight = transfer.Height;
                             }
 
-                            if(transfer.BlockHash.Equals(GlobalData.NewestTransactionBlockHash))
+                            if (transfer.BlockHash.Equals(GlobalData.NewestTransactionBlockHash))
                             {
                                 GlobalData.NewestTransactionBlockHash = transfer.BlockHash;
                             }
                         }
                     }
 
-                    _isTransfersUpdateComplete = true;
+                    GlobalData.IsGetAndSetTransfersDataComplete = true;
                 }
             }
             catch (Exception ex)
             {
-                Logger.LogException("UIM.TUUD", ex);
+                GlobalData.IsGetAndSetTransfersDataComplete = true;
+                Logger.LogException("UIM.GSTD", ex);
             }
         }
+        #endregion // Get Data for UI
     }
 }

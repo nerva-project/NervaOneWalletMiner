@@ -15,7 +15,6 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using NervaOneWalletMiner.Rpc.Wallet.Requests;
 using NervaOneWalletMiner.Rpc.Wallet.Responses;
-using NervaOneWalletMiner.Objects.DataGrid;
 using Avalonia.Input;
 using Avalonia.Controls;
 using NervaOneWalletMiner.Objects.Stats;
@@ -25,8 +24,6 @@ namespace NervaOneWalletMiner.Helpers
 {
     public static class GlobalMethods
     {
-        public static readonly Bitmap _walletImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/wallet.png")));
-
         #region Directories, Paths and Names
         public static string GetDataDir()
         {
@@ -916,40 +913,8 @@ namespace NervaOneWalletMiner.Helpers
             {
                 Logger.LogException("GLM.SVWT", ex);
             }
-        }
-
-        public static async void WalletUiUpdate()
-        {
-            try
-            {
-                // Get accounts for Wallets view
-                GetAccountsResponse response = await GlobalData.WalletService.GetAccounts(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new GetAccountsRequest());
-
-                if (response.Error.IsError)
-                {
-                    Logger.LogError("GLM.WUIU", "GetAccounts Error | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
-                }
-                else
-                {
-                    GlobalData.WalletStats.BalanceTotal = response.BalanceTotal;
-                    GlobalData.WalletStats.BalanceUnlocked = response.BalanceUnlocked;                    
-
-                    foreach (Account account in response.SubAccounts)
-                    {                       
-                        if(!GlobalData.WalletStats.Subaddresses.ContainsKey(account.Index))
-                        {
-                            account.WalletIcon = _walletImage;
-                            GlobalData.WalletStats.Subaddresses.Add(account.Index, account);
-                        }                        
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException("GLM.WUIU", ex);
-            }
-        }
-
+        }        
+       
         public static async void RestartWithQuickSync()
         {
             try

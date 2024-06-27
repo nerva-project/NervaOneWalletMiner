@@ -8,8 +8,6 @@ using System.Collections.Generic;
 using Avalonia.Threading;
 using NervaOneWalletMiner.Rpc.Wallet.Requests;
 using NervaOneWalletMiner.Rpc.Wallet.Responses;
-using NervaOneWalletMiner.Objects.Constants;
-using NervaOneWalletMiner.ViewModels;
 
 namespace NervaOneWalletMiner.ViewsDialogs
 {
@@ -42,7 +40,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     btnCopyPaymentIdToClipboard.IsEnabled = false;
                 }
 
-                foreach (Account account in ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).WalletAddresses)
+                foreach (Account account in GlobalData.WalletStats.Subaddresses.Values)
                 {
                     string accountValue = string.IsNullOrEmpty(account.Label) ? "No label" + " (" + account.AddressShort + ")" : account.Label + " (" + account.AddressShort + ")";
                     if (!_accounts.ContainsKey(accountValue))

@@ -257,7 +257,7 @@ namespace NervaOneWalletMiner.Views
                     else
                     {
                         Logger.LogDebug("WAL.RLDC", "Account label changed successfully to " + request.Label);
-                        GlobalMethods.WalletUiUpdate();
+                        UIManager.GetAndSetWalletData();
 
                         if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsSavingWalletSupported)
                         {

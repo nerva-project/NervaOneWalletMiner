@@ -3,12 +3,10 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects;
-using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Objects.DataGrid;
 using NervaOneWalletMiner.Rpc.Common;
 using NervaOneWalletMiner.Rpc.Wallet.Requests;
 using NervaOneWalletMiner.Rpc.Wallet.Responses;
-using NervaOneWalletMiner.ViewModels;
 using System;
 using System.Collections.Generic;
 
@@ -33,7 +31,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                 InitializeComponent();
                 Icon = GlobalMethods.GetWindowIcon();
 
-                foreach (Account account in ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).WalletAddresses)
+                foreach (Account account in GlobalData.WalletStats.Subaddresses.Values)
                 {
                     if (!_accounts.ContainsKey(account.Index))
                     {
@@ -69,7 +67,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                 decimal balanceTotal = 0;
                 decimal balanceUnlocked = 0;
 
-                foreach(Account account in ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).WalletAddresses)
+                foreach(Account account in GlobalData.WalletStats.Subaddresses.Values)
                 {
                     if(account.Index == selectedAccountIndex)
                     {
@@ -256,7 +254,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                 decimal balanceTotal = 0;
                 decimal balanceUnlocked = 0;
 
-                foreach (Account account in ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).WalletAddresses)
+                foreach (Account account in GlobalData.WalletStats.Subaddresses.Values)
                 {
                     if (account.Index == fromAccountIndex)
                     {

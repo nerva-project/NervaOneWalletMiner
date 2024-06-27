@@ -76,6 +76,10 @@ namespace NervaOneWalletMiner.Helpers
         public static StatsTransfers TransfersStats = new();        
         public static AddressBook AddressBook = new();
 
+        public static bool IsGetAndSetTransfersDataComplete = true;
+        public static bool IsGetAndSetWalletDataComplete = true;
+        public static bool IsGetAndSetDaemonDataComplete = true;
+
         public static string CliToolsDir = GlobalMethods.GetCliToolsDir();
         public static string WalletDir = GlobalMethods.GetWalletDir();
 

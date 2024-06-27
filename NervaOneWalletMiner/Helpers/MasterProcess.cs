@@ -94,21 +94,30 @@ namespace NervaOneWalletMiner.Helpers
                     UIManager.UpdateDaemonStatus("Client tools not found. Attempting to download...");
                 }
 
-                // Update UI
+
+                // Get Daemon data
                 if (!_killMasterProcess && _cliToolsFound)
                 {
                     if (_masterTimerCount % GlobalData.AppSettings.TimerIntervalMultiplier == 0)
                     {
-                        UIManager.DaemonUiUpdate();
+                        UIManager.GetAndSetDaemonData();
                     }
                 }
 
+                // Actual Daemon UI update
+                if (GlobalData.IsGetAndSetDaemonDataComplete)
+                {
+                    UIManager.UpdateDaemonView();
+                }
+
+
+                // Get Wallets/Transfers data
                 if (!_killMasterProcess && GlobalData.IsInitialDaemonConnectionSuccess && GlobalData.IsWalletOpen)
                 {
                     if (GlobalData.IsWalletJustOpened)
                     {
-                        GlobalMethods.WalletUiUpdate();
-                        UIManager.TransfersUiUpdate();
+                        UIManager.GetAndSetWalletData();
+                        UIManager.GetAndSetTransfersData();
                         if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletHeightSupported)
                         {
                             SetWalletHeight();
@@ -117,8 +126,8 @@ namespace NervaOneWalletMiner.Helpers
                     else if (_masterTimerCount % (GlobalData.AppSettings.TimerIntervalMultiplier * 2) == 0)
                     {
                         // Update wallet every 2nd call because you do not need to do it more often
-                        GlobalMethods.WalletUiUpdate();
-                        UIManager.TransfersUiUpdate();
+                        UIManager.GetAndSetWalletData();
+                        UIManager.GetAndSetTransfersData();
                         if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletHeightSupported)
                         {
                             SetWalletHeight();
@@ -126,9 +135,16 @@ namespace NervaOneWalletMiner.Helpers
                     }
                 }
 
-                // Actual UI update. If walet was closed, it will clear things
-                UIManager.UpdateWalletView();
-                UIManager.UpdateTransfersView();
+                // Actual Wallets/Transfers UI update
+                if(GlobalData.IsGetAndSetWalletDataComplete)
+                {
+                    UIManager.UpdateWalletView();
+                }
+                if (GlobalData.IsGetAndSetTransfersDataComplete)
+                {
+                    UIManager.UpdateTransfersView();
+                }
+
 
                 if (GlobalData.IsWalletJustOpened)
                 {
