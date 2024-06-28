@@ -19,6 +19,7 @@ using Avalonia.Input;
 using Avalonia.Controls;
 using NervaOneWalletMiner.Objects.Stats;
 using NervaOneWalletMiner.Rpc.Daemon.Requests;
+using System.Formats.Tar;
 
 namespace NervaOneWalletMiner.Helpers
 {
@@ -639,7 +640,7 @@ namespace NervaOneWalletMiner.Helpers
             return isSuccess;
         }
 
-        private static void ExtractFile(string destDir, string destFile)
+        private static void ExtractFile(string destDir, string compressedFile)
         {
             try
             {
@@ -659,23 +660,82 @@ namespace NervaOneWalletMiner.Helpers
 
                 Logger.LogDebug("GLM.EXFL", "Extracting CLI tools");
 
-                ZipArchive archive = ZipFile.Open(destFile, ZipArchiveMode.Read);
-                foreach (var entry in archive.Entries)
+                if(compressedFile.EndsWith(".tar.gz"))
                 {
-                    if (!string.IsNullOrEmpty(entry.Name))
+                    // Decompress .gz
+                    FileInfo fileToDecompress = new FileInfo(compressedFile);
+                    using FileStream originalFileStream = fileToDecompress.OpenRead();
+
+                    string currentFileName = fileToDecompress.FullName;
+                    string newCompressedFile = currentFileName.Remove(currentFileName.Length - fileToDecompress.Extension.Length);
+
+                    Logger.LogDebug("GLM.EXFL", "Decompressing: " + currentFileName + " to " + newCompressedFile);
+
+                    // Need new file to be unloced so it can be decopressed below
+                    using (FileStream decompressedFileStream = File.Create(newCompressedFile))
                     {
-                        Logger.LogDebug("GLM.EXFL", "Extracting: " + entry.Name);
-                        string extFile = Path.Combine(destDir, entry.Name);
-                        entry.ExtractToFile(extFile, true);
-#if UNIX
-                        UnixNative.Chmod(extFile, 33261);
-#endif
+                        using GZipStream decompressionStream = new GZipStream(originalFileStream, CompressionMode.Decompress);
+                        decompressionStream.CopyTo(decompressedFileStream);
+                    }
+         
+                    // Now decompress .tar
+                    ExtractTar(destDir, newCompressedFile);
+                }
+                else if(compressedFile.EndsWith(".tar"))
+                {
+                    ExtractTar(destDir, compressedFile);
+                }
+                else
+                {
+                    using ZipArchive archive = ZipFile.Open(compressedFile, ZipArchiveMode.Read);
+
+                    foreach (var entry in archive.Entries)
+                    {
+                        if (!string.IsNullOrEmpty(entry.Name))
+                        {
+                            Logger.LogDebug("GLM.EXFL", "Extracting: " + entry.Name);
+                            string extFile = Path.Combine(destDir, entry.Name);
+                            entry.ExtractToFile(extFile, true);
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
                 Logger.LogException("GLM.EXFL", ex);
+            }
+        }
+
+        public static void ExtractTar(string destDir, string compressedFile)
+        {
+            try
+            {
+                using FileStream stream = File.OpenRead(compressedFile);
+                using var tarReader = new TarReader(stream);
+
+                TarEntry entry;
+                while ((entry = tarReader.GetNextEntry()!) != null)
+                {
+                    if (entry.EntryType is TarEntryType.SymbolicLink or TarEntryType.HardLink or TarEntryType.GlobalExtendedAttributes or TarEntryType.Directory)
+                    {
+                        // Exclude things we do not want
+                        continue;
+                    }
+                    
+                    // Do not want folders but they seem to be part of Name
+                    int startIndex = 0;
+                    if(entry.Name.Contains('/'))
+                    {
+                        startIndex = entry.Name.LastIndexOf('/');
+                    }
+
+                    Logger.LogDebug("GLM.EXTR", "Extracting: " + entry.Name);
+                    entry.ExtractToFile(Path.Join(destDir, entry.Name.Substring(startIndex)), true);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("GLM.EXTR", ex); ;
             }
         }
 
