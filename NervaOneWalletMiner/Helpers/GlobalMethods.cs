@@ -20,6 +20,8 @@ using Avalonia.Controls;
 using NervaOneWalletMiner.Objects.Stats;
 using NervaOneWalletMiner.Rpc.Daemon.Requests;
 using System.Formats.Tar;
+using ICSharpCode.SharpZipLib.BZip2;
+using ICSharpCode.SharpZipLib.GZip;
 
 namespace NervaOneWalletMiner.Helpers
 {
@@ -674,16 +676,30 @@ namespace NervaOneWalletMiner.Helpers
                     // Need new file to be unloced so it can be decopressed below
                     using (FileStream decompressedFileStream = File.Create(newCompressedFile))
                     {
-                        using GZipStream decompressionStream = new GZipStream(originalFileStream, CompressionMode.Decompress);
-                        decompressionStream.CopyTo(decompressedFileStream);
+                        GZip.Decompress(originalFileStream, decompressedFileStream, true);
                     }
          
                     // Now decompress .tar
                     ExtractTar(destDir, newCompressedFile);
                 }
-                else if(compressedFile.EndsWith(".tar"))
+                else if(compressedFile.EndsWith(".tar.bz2"))
                 {
-                    ExtractTar(destDir, compressedFile);
+                    // Decompress .bz2
+                    FileInfo fileToDecompress = new FileInfo(compressedFile);
+                    using FileStream originalFileStream = fileToDecompress.OpenRead();
+
+                    string currentFileName = fileToDecompress.FullName;
+                    string newCompressedFile = currentFileName.Remove(currentFileName.Length - fileToDecompress.Extension.Length);
+
+                    Logger.LogDebug("GLM.EXFL", "Decompressing: " + currentFileName + " to " + newCompressedFile);
+
+                    using (FileStream decompressedFileStream = File.Create(newCompressedFile))
+                    {
+                        BZip2.Decompress(originalFileStream, decompressedFileStream, true);
+                    }
+
+                    // Now decompress .tar
+                    ExtractTar(destDir, newCompressedFile);
                 }
                 else
                 {
