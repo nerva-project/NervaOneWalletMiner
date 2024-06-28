@@ -16,7 +16,7 @@ cp ${dir}/Resources/nerva-logo-color.png ~/.local/bin/nervaone/nerva-logo-color.
 echo "Creating launcher"
 echo "[Desktop Entry]" > ${dd}
 echo "Name=NervaOneDesktop" >> ${dd}
-echo "Exec=${bd}/bin/nervaone/NervaOneWalletMiner.Desktop" >> ${dd}
+echo "Exec=${bd}/bin/nervaone/NervaOneDesktop" >> ${dd}
 echo "Icon=${bd}/bin/nervaone/nerva-logo-color.png" >> ${dd}
 echo "Terminal=false" >> ${dd}
 echo "Type=Application" >> ${dd}

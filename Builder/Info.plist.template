@@ -23,8 +23,8 @@
 	<key>NSPrincipalClass</key>
     <string>NSApplication</string>
     <key>CFBundleName</key>
-    <string>NervaOneWalletMiner</string>
+    <string>NervaOne</string>
     <key>CFBundleExecutable</key>
-    <string>NervaOneWalletMiner.Desktop</string>
+    <string>NervaOneDesktop</string>
 </dict>
 </plist>

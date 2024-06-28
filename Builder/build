@@ -23,7 +23,7 @@ function publish()
     dotnet publish ${ROOT_DIR}/NervaOneWalletMiner.Desktop/NervaOneWalletMiner.Desktop.csproj -c release -r $1 -f ${targetFramework} -p:publishsinglefile=true
 
     if [ "$1" == "osx-x64" ]; then
-        bundle=${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/NervaOneWalletMiner.Desktop.app
+        bundle=${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/NervaOneDesktop.app
         mkdir -p ${bundle}/Contents
         mkdir -p ${bundle}/Contents/MacOS
         mkdir -p ${bundle}/Contents/Resources
@@ -40,9 +40,9 @@ function publish()
         cp -R ${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/release/${targetFramework}/osx-x64/publish/* ${bundle}/Contents/MacOS/
 
         cd ${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin
-        zip -r ${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/nervaone-desk-v${APP_VERSION}_$1.zip ./NervaOneWalletMiner.Desktop.app
+        zip -r ${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/nervaone-desktop-v${APP_VERSION}_$1.zip ./NervaOneDesktop.app
     elif [ "$1" == "linux-x64" ]; then
-        bundle=${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/NervaOneWalletMiner.Desktop
+        bundle=${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/NervaOneDesktop
         mkdir -p ${bundle}/Contents
         mkdir -p ${bundle}/Resources
 
@@ -52,11 +52,11 @@ function publish()
         cp ${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/release/${targetFramework}/linux-x64/publish/* ${bundle}/Contents/
         cp ${BUILDER_DIR}/install ${bundle}/install
 
-        cd ${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/NervaOneWalletMiner.Desktop
-        zip -r ${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/nervaone-desk-v${APP_VERSION}_$1.zip ./*
+        cd ${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin
+        zip -r ${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/nervaone-desktop-v${APP_VERSION}_$1.zip ./NervaOneDesktop
     # else
         # cd ${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin
-        # zip -j ${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/nervaone-desk-v${APP_VERSION}_$1.zip ./release/${targetFramework}/$1/publish/*
+        # zip -j ${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/nervaone-desktop-v${APP_VERSION}_$1.zip ./release/${targetFramework}/$1/publish/*
     fi
 }
 
