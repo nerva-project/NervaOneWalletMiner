@@ -351,6 +351,9 @@ namespace NervaOneWalletMiner.Helpers
                 }
 
                 GlobalData.IsCliToolsFound = true;
+                GlobalData.LastDaemonResponseTime = DateTime.Now;
+                GlobalData.LastDaemonRestartAttempt = DateTime.MinValue;
+
                 GlobalData.CliToolsDir = GetCliToolsDir();
                 GlobalData.WalletDir = GetWalletDir();
 
