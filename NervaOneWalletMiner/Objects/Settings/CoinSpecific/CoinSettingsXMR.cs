@@ -95,7 +95,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
                 daemonCommand += " --start-mining " + miningAddress + " --mining-threads " + daemonSettings.MiningThreads;
             }
 
-            if (GlobalMethods.IsLinux())
+            if (GlobalMethods.IsLinux() || GlobalMethods.IsOsx())
             {
                 daemonCommand += " --detach";
             }
