@@ -1,5 +1,7 @@
 ﻿using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Rpc.Common;
+using System;
+using System.IO;
 
 namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
 {
@@ -30,8 +32,8 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private string _CliUrlMacArm = "https://github.com/nerva-project/nerva/releases/download/v0.1.8.0/nerva-v0.1.8.0_osx_minimal.zip";
 
         private string _DataDirWindows = "C:/ProgramData/nerva";
-        private string _DataDirLinux = "~/.nerva";
-        private string _DataDirMac = "~/.nerva";
+        private string _DataDirLinux = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nerva");
+        private string _DataDirMac = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nerva");
 
         private string _QuickSyncUrl = "https://nerva.one/quicksync/quicksync.raw";        
         #endregion // Private Default Variables

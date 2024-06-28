@@ -1,5 +1,7 @@
 ﻿using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Rpc.Common;
+using System;
+using System.IO;
 
 namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
 {
@@ -30,8 +32,8 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private string _CliUrlMacArm = "https://downloads.getmonero.org/cli/monero-mac-armv8-v0.18.3.3.tar.bz2";
 
         private string _DataDirWindows = "C:/ProgramData/monero";
-        private string _DataDirLinux = "~/.monero";
-        private string _DataDirMac = "~/.monero";
+        private string _DataDirLinux = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".monero");
+        private string _DataDirMac = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".monero");
 
         private string _QuickSyncUrl = string.Empty;
         #endregion // Private Default Variables
