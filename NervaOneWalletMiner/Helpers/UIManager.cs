@@ -22,11 +22,11 @@ namespace NervaOneWalletMiner.Helpers
         public static bool _isTransfersUpdateComplete = true;
         public static bool _askedToQuickSync = false;
 
-        public static readonly Bitmap _walletImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/wallet.png")));
-        public static readonly Bitmap _inImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/transfer_in.png")));
-        public static readonly Bitmap _outImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/transfer_out.png")));
-        public static readonly Bitmap _blockImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/transfer_block.png")));
-        public static readonly Bitmap _pendingImage = new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/transfer_pending.png")));
+        public static readonly Bitmap _walletImage = new Bitmap(AssetLoader.Open(new Uri("avares://" + GlobalData.AppNameMain + "/Assets/wallet.png")));
+        public static readonly Bitmap _inImage = new Bitmap(AssetLoader.Open(new Uri("avares://" + GlobalData.AppNameMain + "/Assets/transfer_in.png")));
+        public static readonly Bitmap _outImage = new Bitmap(AssetLoader.Open(new Uri("avares://" + GlobalData.AppNameMain + "/Assets/transfer_out.png")));
+        public static readonly Bitmap _blockImage = new Bitmap(AssetLoader.Open(new Uri("avares://" + GlobalData.AppNameMain + "/Assets/transfer_block.png")));
+        public static readonly Bitmap _pendingImage = new Bitmap(AssetLoader.Open(new Uri("avares://" + GlobalData.AppNameMain + "/Assets/transfer_pending.png")));
 
         private static ViewModelBase _mainView = new();
 

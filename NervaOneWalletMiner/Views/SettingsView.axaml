@@ -38,7 +38,7 @@
 				<Grid ColumnDefinitions="24,*">
 					<Image Grid.Row="0" Grid.Column="0" 
 						   Height="32"
-						   Source="avares://NervaOneWalletMiner/Assets/xnv/logo.png"/>
+						   Source="avares://NervaOne/Assets/xnv/logo.png"/>
 					<TextBlock Grid.Row="0" Grid.Column="1"
 							Padding="5,7,0,0"
 							Text="Nerva (XNV)"/>
@@ -48,7 +48,7 @@
 			<ComboBoxItem Name="xmr">
 				<Grid ColumnDefinitions="24,*">
 					<Image Grid.Row="0" Grid.Column="0"
-						   Height="32" Source="avares://NervaOneWalletMiner/Assets/xmr/logo.png"/>
+						   Height="32" Source="avares://NervaOne/Assets/xmr/logo.png"/>
 					<TextBlock Grid.Row="0" Grid.Column="1"
 							Padding="5,7,0,0"
 							Text="Monero (XMR)"/>
@@ -58,7 +58,7 @@
 			<ComboBoxItem Name="wow">
 				<Grid ColumnDefinitions="24,*">
 					<Image Grid.Row="0" Grid.Column="0"
-						   Height="32" Source="avares://NervaOneWalletMiner/Assets/wow/logo.png"/>
+						   Height="32" Source="avares://NervaOne/Assets/wow/logo.png"/>
 					<TextBlock Grid.Row="0" Grid.Column="1"
 							Padding="5,7,0,0"
 							Text="Wownero (WOW)"/>
@@ -68,7 +68,7 @@
 			<ComboBoxItem Name="dash">
 				<Grid ColumnDefinitions="24,*">
 					<Image Grid.Row="0" Grid.Column="0"
-						   Height="32" Source="avares://NervaOneWalletMiner/Assets/dash/logo.png"/>
+						   Height="32" Source="avares://NervaOne/Assets/dash/logo.png"/>
 					<TextBlock Grid.Row="0" Grid.Column="1"
 							Padding="5,7,0,0"
 							Text="Dash (DASH)"/>

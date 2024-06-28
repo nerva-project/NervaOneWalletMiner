@@ -14,7 +14,8 @@ namespace NervaOneWalletMiner.Helpers
 {
     public static class GlobalData
     {
-        public const string AppName = "NervaOneWalletMiner";
+        public const string AppNameMain = "NervaOne";
+        public const string AppNameDesktop = "NervaOneDesktop";
         public const string Version = "0.8.1.0";
 
         public const string CliToolsDirName = "cli";
@@ -79,6 +80,7 @@ namespace NervaOneWalletMiner.Helpers
         public static bool IsGetAndSetTransfersDataComplete = true;
         public static bool IsGetAndSetWalletDataComplete = true;
         public static bool IsGetAndSetDaemonDataComplete = true;
+        public static bool IsCliToolsFound = true;
 
         public static string CliToolsDir = GlobalMethods.GetCliToolsDir();
         public static string WalletDir = GlobalMethods.GetWalletDir();

@@ -19,6 +19,6 @@
 			</FluentTheme.Palettes>
 		</FluentTheme>
 		<StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
-		<StyleInclude Source="avares://NervaOneWalletMiner/Assets/Icons.axaml" />		
+		<StyleInclude Source="avares://NervaOne/Assets/Icons.axaml" />		
     </Application.Styles>
 </Application>

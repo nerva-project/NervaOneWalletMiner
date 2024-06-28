@@ -34,7 +34,7 @@
 					<Image Grid.Row="0"
 						   Grid.Column="0"
 						   Height="42"
-						   Source="avares://NervaOneWalletMiner/Assets/xnv/logo.png"/>
+						   Source="avares://NervaOne/Assets/xnv/logo.png"/>
 					<TextBlock Grid.Row="0"
 							   Grid.Column="1"
 							   FontSize="27"
@@ -50,7 +50,7 @@
 					<Image Grid.Row="0"
 						   Grid.Column="0"
 						   Height="42"
-						   Source="avares://NervaOneWalletMiner/Assets/xmr/logo.png"/>
+						   Source="avares://NervaOne/Assets/xmr/logo.png"/>
 					<TextBlock Grid.Row="0"
 							   Grid.Column="1"
 							   FontSize="27"
@@ -66,7 +66,7 @@
 					<Image Grid.Row="0"
 						   Grid.Column="0"
 						   Height="42"
-						   Source="avares://NervaOneWalletMiner/Assets/wow/logo.png"/>
+						   Source="avares://NervaOne/Assets/wow/logo.png"/>
 					<TextBlock Grid.Row="0"
 							   Grid.Column="1"
 							   FontSize="27"
@@ -82,7 +82,7 @@
 					<Image Grid.Row="0"
 						   Grid.Column="0"
 						   Height="42"
-						   Source="avares://NervaOneWalletMiner/Assets/dash/logo.png"/>
+						   Source="avares://NervaOne/Assets/dash/logo.png"/>
 					<TextBlock Grid.Row="0"
 							   Grid.Column="1"
 							   FontSize="27"

@@ -12,7 +12,6 @@ namespace NervaOneWalletMiner.Helpers
         public const int _masterTimerInterval = 1000;        
         public static DateTime _cliToolsRunningLastCheck = DateTime.MinValue;
         public static bool _killMasterProcess = false;
-        public static bool _cliToolsFound = true;
         public static int _masterTimerCount = 0;
         
 
@@ -88,7 +87,7 @@ namespace NervaOneWalletMiner.Helpers
                 }
 
 
-                if (!_cliToolsFound)
+                if (!GlobalData.IsCliToolsFound)
                 {
                     // TODO: For now
                     UIManager.UpdateDaemonStatus("Client tools not found. Attempting to download...");
@@ -96,7 +95,7 @@ namespace NervaOneWalletMiner.Helpers
 
 
                 // Get Daemon data
-                if (!_killMasterProcess && _cliToolsFound)
+                if (!_killMasterProcess && GlobalData.IsCliToolsFound)
                 {
                     if (_masterTimerCount % GlobalData.AppSettings.TimerIntervalMultiplier == 0)
                     {
@@ -207,12 +206,12 @@ namespace NervaOneWalletMiner.Helpers
                         Logger.LogDebug("MSP.KDNR", "Starting daemon process");
                         ProcessManager.StartExternalProcess(GlobalMethods.GetDaemonProcess(), GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].GenerateDaemonOptions(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]));
                         GlobalData.IsInitialDaemonConnectionSuccess = false;
-                        _cliToolsFound = true;
+                        GlobalData.IsCliToolsFound = true;
                     }
                     else
                     {
                         Logger.LogInfo("MSP.KDNR", "CLI tools not found");
-                        _cliToolsFound = false;
+                        GlobalData.IsCliToolsFound = false;
                     }
                 }
             }

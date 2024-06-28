@@ -62,7 +62,7 @@ namespace NervaOneWalletMiner.Helpers
 
             try
             {
-                appDataDir = Path.Combine(GetDataDir(), GlobalData.AppName);
+                appDataDir = Path.Combine(GetDataDir(), GlobalData.AppNameDesktop);
 
                 // Create data directory if it does not exist
                 if (!Directory.Exists(appDataDir))
@@ -346,7 +346,8 @@ namespace NervaOneWalletMiner.Helpers
                         GlobalData.WalletService = new WalletServiceXNV();
                         break;
                 }
-                
+
+                GlobalData.IsCliToolsFound = true;
                 GlobalData.CliToolsDir = GetCliToolsDir();
                 GlobalData.WalletDir = GetWalletDir();
 
@@ -434,22 +435,22 @@ namespace NervaOneWalletMiner.Helpers
             {
                 if (!logoDictionary.ContainsKey(Coin.XNV))
                 {
-                    logoDictionary.Add(Coin.XNV, new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/xnv/logo.png"))));
+                    logoDictionary.Add(Coin.XNV, new Bitmap(AssetLoader.Open(new Uri("avares://" + GlobalData.AppNameMain + "/Assets/xnv/logo.png"))));
                 }
 
                 if (!logoDictionary.ContainsKey(Coin.XMR))
                 {
-                    logoDictionary.Add(Coin.XMR, new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/xmr/logo.png"))));
+                    logoDictionary.Add(Coin.XMR, new Bitmap(AssetLoader.Open(new Uri("avares://" + GlobalData.AppNameMain + "/Assets/xmr/logo.png"))));
                 }
 
                 if (!logoDictionary.ContainsKey(Coin.WOW))
                 {
-                    logoDictionary.Add(Coin.WOW, new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/wow/logo.png"))));
+                    logoDictionary.Add(Coin.WOW, new Bitmap(AssetLoader.Open(new Uri("avares://" + GlobalData.AppNameMain + "/Assets/wow/logo.png"))));
                 }
 
                 if (!logoDictionary.ContainsKey(Coin.DASH))
                 {
-                    logoDictionary.Add(Coin.DASH, new Bitmap(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/dash/logo.png"))));
+                    logoDictionary.Add(Coin.DASH, new Bitmap(AssetLoader.Open(new Uri("avares://" + GlobalData.AppNameMain + "/Assets/dash/logo.png"))));
                 }
             }
             catch (Exception ex)
@@ -468,22 +469,22 @@ namespace NervaOneWalletMiner.Helpers
             {
                 if (!iconDictionary.ContainsKey(Coin.XNV))
                 {
-                    iconDictionary.Add(Coin.XNV, new WindowIcon(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/xnv/logo.png"))));
+                    iconDictionary.Add(Coin.XNV, new WindowIcon(AssetLoader.Open(new Uri("avares://" + GlobalData.AppNameMain + "/Assets/xnv/logo.png"))));
                 }
 
                 if (!iconDictionary.ContainsKey(Coin.XMR))
                 {
-                    iconDictionary.Add(Coin.XMR, new WindowIcon(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/xmr/logo.png"))));
+                    iconDictionary.Add(Coin.XMR, new WindowIcon(AssetLoader.Open(new Uri("avares://" + GlobalData.AppNameMain + "/Assets/xmr/logo.png"))));
                 }
 
                 if (!iconDictionary.ContainsKey(Coin.WOW))
                 {
-                    iconDictionary.Add(Coin.WOW, new WindowIcon(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/wow/logo.png"))));
+                    iconDictionary.Add(Coin.WOW, new WindowIcon(AssetLoader.Open(new Uri("avares://" + GlobalData.AppNameMain + "/Assets/wow/logo.png"))));
                 }
 
                 if (!iconDictionary.ContainsKey(Coin.DASH))
                 {
-                    iconDictionary.Add(Coin.DASH, new WindowIcon(AssetLoader.Open(new Uri("avares://NervaOneWalletMiner/Assets/dash/logo.png"))));
+                    iconDictionary.Add(Coin.DASH, new WindowIcon(AssetLoader.Open(new Uri("avares://" + GlobalData.AppNameMain + "/Assets/dash/logo.png"))));
                 }
             }
             catch (Exception ex)
