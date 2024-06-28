@@ -190,7 +190,7 @@ namespace NervaOneWalletMiner.Helpers
             try
             {
                 bool forceRestart = false;
-                if (GlobalData.LastDaemonResponseTime.AddMinutes(5) < DateTime.Now)
+                if (GlobalData.LastDaemonResponseTime.AddSeconds(420) < DateTime.Now)
                 {
                     // Daemon not responding. Kill and restart
                     forceRestart = true;
@@ -200,18 +200,22 @@ namespace NervaOneWalletMiner.Helpers
 
                 if (!ProcessManager.IsRunning(GlobalData.DaemonProcessName) || forceRestart)
                 {
-                    if (GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
+                    if (GlobalData.LastDaemonRestartAttempt.AddSeconds(420) < DateTime.Now)
                     {
-                        ProcessManager.Kill(GlobalData.DaemonProcessName);
-                        Logger.LogDebug("MSP.KDNR", "Starting daemon process");
-                        ProcessManager.StartExternalProcess(GlobalMethods.GetDaemonProcess(), GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].GenerateDaemonOptions(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]));
-                        GlobalData.IsInitialDaemonConnectionSuccess = false;
-                        GlobalData.IsCliToolsFound = true;
-                    }
-                    else
-                    {
-                        Logger.LogInfo("MSP.KDNR", "CLI tools not found");
-                        GlobalData.IsCliToolsFound = false;
+                        if (GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
+                        {
+                            GlobalData.LastDaemonRestartAttempt = DateTime.Now;
+                            ProcessManager.Kill(GlobalData.DaemonProcessName);
+                            Logger.LogDebug("MSP.KDNR", "Starting daemon process");
+                            ProcessManager.StartExternalProcess(GlobalMethods.GetDaemonProcess(), GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].GenerateDaemonOptions(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]));
+                            GlobalData.IsInitialDaemonConnectionSuccess = false;
+                            GlobalData.IsCliToolsFound = true;
+                        }
+                        else
+                        {
+                            Logger.LogInfo("MSP.KDNR", "CLI tools not found");
+                            GlobalData.IsCliToolsFound = false;
+                        }
                     }
                 }
             }
