@@ -2,22 +2,16 @@
 
 dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-mkdir -p ~/.local/bin/nervaone
-mkdir -p ~/NervaOne
+bd=.
 
-bd=~
+dd=${bd}/NervaOneDesktop
 
-dd=${bd}/NervaOne/NervaOneDesktop
-
-echo "Copying files to ~/.local/bin/nervaone/"
-cp ${dir}/Contents/* ~/.local/bin/nervaone/
-cp ${dir}/Resources/nerva-logo-color.png ~/.local/bin/nervaone/nerva-logo-color.png
 
 echo "Creating launcher"
 echo "[Desktop Entry]" > ${dd}
 echo "Name=NervaOneDesktop" >> ${dd}
-echo "Exec=${bd}/bin/nervaone/NervaOneDesktop" >> ${dd}
-echo "Icon=${bd}/bin/nervaone/nerva-logo-color.png" >> ${dd}
+echo "Exec=${bd}/Contents/NervaOneDesktop" >> ${dd}
+echo "Icon=${bd}/Resources/nerva-logo-color.png" >> ${dd}
 echo "Terminal=false" >> ${dd}
 echo "Type=Application" >> ${dd}
 
