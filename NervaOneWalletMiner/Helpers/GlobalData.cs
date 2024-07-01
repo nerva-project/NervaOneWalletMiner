@@ -68,9 +68,9 @@ namespace NervaOneWalletMiner.Helpers
         public static bool IsWalletJustOpened = true;
         public static string OpenedWalletName = string.Empty;
         public static DateTime WalletPassProvidedTime = DateTime.MinValue;
-        // This will only be used for wallets that once opened, do not lock themselves. Currently this applies to wallets that need password to open
-        // TODO: Hash this and check against hash
-        public static string WalletPassword = string.Empty;
+        
+        // This is used by UI to control if user needs to enter password before they do some sensitive wallet task. It stores password Hash
+        public static string WalletPasswordHash = string.Empty;
 
         // Grid and other UI data
         public static StatsDaemon NetworkStats = new();

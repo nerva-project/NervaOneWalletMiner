@@ -451,7 +451,7 @@ namespace NervaOneWalletMiner.Views
                         if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPassRequiredToOpenWallet)
                         {
                             // Self managed lock
-                            if (passRes.TextBoxValue.Equals(GlobalData.WalletPassword))
+                            if (Hashing.Verify(passRes.TextBoxValue, GlobalData.WalletPasswordHash))
                             {
                                 isAuthorized = true;
                                 GlobalData.WalletPassProvidedTime = DateTime.Now;

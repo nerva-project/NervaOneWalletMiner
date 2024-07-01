@@ -126,7 +126,7 @@ namespace NervaOneWalletMiner.Views
                     if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPassRequiredToOpenWallet)
                     {
                         GlobalData.WalletPassProvidedTime = DateTime.Now;                        
-                        GlobalData.WalletPassword = request.Password;
+                        GlobalData.WalletPasswordHash = Hashing.Hash(request.Password);
                     }
 
                     Logger.LogDebug("WAL.OUWT", "Wallet " + walletName + " opened successfully");
