@@ -81,6 +81,12 @@ namespace NervaOneWalletMiner.Views
                     {
                         Logger.LogDebug("SET.SSCL", "Calling wallet ForceClose");
                         ProcessManager.Kill(GlobalData.WalletProcessName);
+                        
+                        if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopOnExit)
+                        {
+                            Logger.LogDebug("SET.SSCL", "Stopping daemon because switching coin and StopOnExit is set");
+                            GlobalMethods.StopAndCloseDaemon();
+                        }
                     }
 
                     isChanged = true;

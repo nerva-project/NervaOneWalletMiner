@@ -165,9 +165,10 @@ namespace NervaOneWalletMiner.Views
         {
             try
             {
-                Logger.LogDebug("DMS.RWC1", "Restarting CLI");
+                Logger.LogDebug("DMS.RWC1", "Restarting with command");
                 ProcessManager.Kill(GlobalData.WalletProcessName);
-                ProcessManager.Kill(GlobalData.DaemonProcessName);
+
+                GlobalMethods.StopAndCloseDaemon();
 
                 GlobalData.IsDaemonRestarting = true;
                 ProcessManager.StartExternalProcess(GlobalMethods.GetDaemonProcess(), GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].GenerateDaemonOptions(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]) + " " + restartOptions);

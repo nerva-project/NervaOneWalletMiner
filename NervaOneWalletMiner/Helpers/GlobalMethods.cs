@@ -649,18 +649,17 @@ namespace NervaOneWalletMiner.Helpers
         {
             try
             {
-                while (ProcessManager.IsRunning(GlobalData.DaemonProcessName))
-                {
-                    Logger.LogDebug("GLM.EXFL", "Closing Daemon process");
-                    ProcessManager.Kill(GlobalData.DaemonProcessName);
-                    Thread.Sleep(1000);
-                }
-
                 while (ProcessManager.IsRunning(GlobalData.WalletProcessName))
                 {
                     Logger.LogDebug("GLM.EXFL", "Closing Wallet process");
                     ProcessManager.Kill(GlobalData.WalletProcessName);
-                    Thread.Sleep(1000);
+                    Thread.Sleep(500);
+                }
+
+                while (ProcessManager.IsRunning(GlobalData.DaemonProcessName))
+                {
+                    Logger.LogDebug("GLM.EXFL", "Stopping and closing Daemon");
+                    StopAndCloseDaemon();
                 }
 
                 Logger.LogDebug("GLM.EXFL", "Extracting CLI tools");
@@ -1004,7 +1003,8 @@ namespace NervaOneWalletMiner.Helpers
                 {
                     Logger.LogDebug("GLM.RSQS", "Restarting CLI with QuickSync");
                     ProcessManager.Kill(GlobalData.WalletProcessName);
-                    ProcessManager.Kill(GlobalData.DaemonProcessName);
+
+                    StopAndCloseDaemon();
 
                     GlobalData.IsDaemonRestarting = true;
                     string quickSyncFile = Path.Combine(GlobalData.CliToolsDir, Path.GetFileName(GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].QuickSyncUrl));
@@ -1188,10 +1188,9 @@ namespace NervaOneWalletMiner.Helpers
 
                 if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopOnExit)
                 {
-                    ForceDaemonStop();
+                    Logger.LogDebug("GLM.STDN", "Stopping and closing Daemon");
 
-                    Logger.LogDebug("GLM.STDN", "Forcing daemon process close");
-                    ProcessManager.Kill(GlobalData.DaemonProcessName);
+                    StopAndCloseDaemon();
                 }
             }
             catch (Exception ex)
@@ -1201,6 +1200,23 @@ namespace NervaOneWalletMiner.Helpers
 
             Logger.LogInfo("GLM.STDN", "PROGRAM TERMINATED");
             Environment.Exit(0);
+        }
+
+        public static void StopAndCloseDaemon()
+        {
+            try
+            {                
+                // Try to stop Daemon
+                ForceDaemonStop();
+                Thread.Sleep(500);
+
+                // Kill running daemon process
+                ProcessManager.Kill(GlobalData.DaemonProcessName);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("GLM.SACD", ex);
+            }
         }
 
         public static async void ForceWalletClose()

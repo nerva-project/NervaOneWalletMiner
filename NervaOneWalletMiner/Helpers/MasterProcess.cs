@@ -204,9 +204,9 @@ namespace NervaOneWalletMiner.Helpers
                     {
                         if (GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
                         {
+                            Logger.LogDebug("MSP.KDNR", "Restarting daemon process because it's not running");
                             GlobalData.LastDaemonRestartAttempt = DateTime.Now;
-                            ProcessManager.Kill(GlobalData.DaemonProcessName);
-                            Logger.LogDebug("MSP.KDNR", "Starting daemon process");
+                            ProcessManager.Kill(GlobalData.DaemonProcessName);                            
                             ProcessManager.StartExternalProcess(GlobalMethods.GetDaemonProcess(), GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].GenerateDaemonOptions(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]));
                             GlobalData.IsInitialDaemonConnectionSuccess = false;
                             GlobalData.IsCliToolsFound = true;
@@ -229,18 +229,21 @@ namespace NervaOneWalletMiner.Helpers
         {
             try
             {
-                if (!ProcessManager.IsRunning(GlobalData.WalletProcessName))
+                if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsDaemonWalletSeparateApp)
                 {
-                    if (GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
+                    if (!ProcessManager.IsRunning(GlobalData.WalletProcessName))
                     {
-                        Logger.LogDebug("MSP.KWPR", "Calling Wallet ForceClose");
-                        ProcessManager.Kill(GlobalData.WalletProcessName);
-                        Logger.LogDebug("MSP.KWPR", "Starting wallet process");
-                        ProcessManager.StartExternalProcess(GlobalMethods.GetRpcWalletProcess(), GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].GenerateWalletOptions(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin], GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc));
-                    }
-                    else
-                    {
-                        Logger.LogDebug("MSP.KWPR", "CLI tools not found");
+                        if (GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
+                        {
+                            Logger.LogDebug("MSP.KWPR", "Calling Wallet ForceClose");
+                            ProcessManager.Kill(GlobalData.WalletProcessName);
+                            Logger.LogDebug("MSP.KWPR", "Starting wallet process");
+                            ProcessManager.StartExternalProcess(GlobalMethods.GetRpcWalletProcess(), GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].GenerateWalletOptions(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin], GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc));
+                        }
+                        else
+                        {
+                            Logger.LogDebug("MSP.KWPR", "CLI tools not found");
+                        }
                     }
                 }
             }
