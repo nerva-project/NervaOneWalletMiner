@@ -62,12 +62,46 @@ win-x64, win-x86, linux-x64, linux-arm, osx-x64,osx-arm64
 
 Here is full list: [.NET RID Catalog][rid-catalog]
 
-## Running using Visual Studio 2022 Community
-Alternatively, you can download free [Visual Studio 2022 Community Edition][visual-studio-2022], clone this repository and run it through Visual Studio.
+
+## Running using Visual Studio 2022 Community (Windows)
+You can Run/Debug the NervaOne using free [Visual Studio 2022 Community Edition][visual-studio]
+
+Pick below workloads when installing VS:
+.NET multi-platform App UI development
+.NET desktop development
+
+Clone this repository (https://github.com/nerva-project/NervaOneWalletMiner.git)
+Unload .Android, .Browser and .iOS projects
+Set NervaOneWalletMiner.Desktop project as startup project
+Build > Build Solution
+Debug > Start Debugging
+
+
+## Running using Visual Studio Code (Windows/Linux/Mac)
+Install [Visual Studio Code][visual-studio]
+
+Go to Extensions and install: Avalonia for VSCode. More info:
+https://marketplace.visualstudio.com/items?itemName=AvaloniaTeam.vscode-avalonia
+
+In VSCode, go to Explorer and choose Clone this repository:
+https://github.com/nerva-project/NervaOneWalletMiner.git
+
+If you cannot clone because you do not have Git installed, see this:
+https://code.visualstudio.com/docs/sourcecontrol/intro-to-git
+
+Go to TERMINAL and cd into NervaOneWalletMiner.Desktop directory
+
+```
+dotnet build
+```
+
+```
+dotnet run 
+```
 
 
 <!-- Reference links -->
 [dotnet-sdk-8]: https://dotnet.microsoft.com/en-us/download/dotnet/8.0
 [releases-link]: https://github.com/nerva-project/NervaOneWalletMiner/releases
 [rid-catalog]: https://learn.microsoft.com/en-us/dotnet/core/rid-catalog
-[visual-studio-2022]: https://visualstudio.microsoft.com/vs/
+[visual-studio]: https://visualstudio.microsoft.com/
