@@ -10,7 +10,6 @@ using NervaOneWalletMiner.Rpc.Wallet.Responses;
 using NervaOneWalletMiner.ViewModels;
 using NervaOneWalletMiner.ViewsDialogs;
 using System;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace NervaOneWalletMiner.Views
@@ -18,6 +17,9 @@ namespace NervaOneWalletMiner.Views
     public partial class WalletView : UserControl
     {
         Window GetWindow() => TopLevel.GetTopLevel(this) as Window ?? throw new NullReferenceException("Invalid Owner");
+
+        // If calls comes from another View, such as making transfer from Address Book, GetWindow() will throw exception so do it this way
+        private Window? _ownerWindowIfNotCurrent;
 
         public WalletView()
         {
@@ -287,7 +289,9 @@ namespace NervaOneWalletMiner.Views
         {
             try
             {
-                if(GlobalData.IsWalletOpen)
+                _ownerWindowIfNotCurrent = owner;
+
+                if (GlobalData.IsWalletOpen)
                 {
                     var dtgAccounts = this.Get<DataGrid>("dtgAccounts");
                     TransferFundsView window;
@@ -301,12 +305,12 @@ namespace NervaOneWalletMiner.Views
                     }
 
                     window = new TransferFundsView(selectedIndex, toAddress, paymentId);
-                    window.ShowDialog(owner).ContinueWith(TransferDialogClosed);
+                    window.ShowDialog(_ownerWindowIfNotCurrent).ContinueWith(TransferDialogClosed);
                 }
                 else
                 {
                     MessageBoxView window = new("Transfer Funds", "Please open wallet first.", true);
-                    window.ShowDialog(owner);
+                    window.ShowDialog(_ownerWindowIfNotCurrent);
                 }
             }
             catch (Exception ex)
@@ -355,7 +359,7 @@ namespace NervaOneWalletMiner.Views
                     await Dispatcher.UIThread.Invoke(async () =>
                     {
                         MessageBoxView window = new("Transfer Funds", "Transfer error\r\n\r\n" + response.Error.Message, true);
-                        await window.ShowDialog(GetWindow());
+                        await window.ShowDialog(_ownerWindowIfNotCurrent == null ? GetWindow() : _ownerWindowIfNotCurrent);
                     });
                 }
                 else
@@ -364,7 +368,7 @@ namespace NervaOneWalletMiner.Views
                     await Dispatcher.UIThread.InvokeAsync(async () =>
                     {
                         MessageBoxView window = new("Transfer Funds", "Transfer successful!", true);
-                        await window.ShowDialog(GetWindow());
+                        await window.ShowDialog(_ownerWindowIfNotCurrent == null ? GetWindow() : _ownerWindowIfNotCurrent);
                     });
                 }
             }
@@ -394,7 +398,7 @@ namespace NervaOneWalletMiner.Views
                     await Dispatcher.UIThread.Invoke(async () =>
                     {
                         MessageBoxView window = new("Transfer Split", "Transfer error\r\n\r\n" + response.Error.Message, true);
-                        await window.ShowDialog(GetWindow());
+                        await window.ShowDialog(_ownerWindowIfNotCurrent == null ? GetWindow() : _ownerWindowIfNotCurrent);
                     });
                 }
                 else
@@ -403,7 +407,7 @@ namespace NervaOneWalletMiner.Views
                     await Dispatcher.UIThread.InvokeAsync(async () =>
                     {
                         MessageBoxView window = new("Transfer Split", "Transfer successful!", true);
-                        await window.ShowDialog(GetWindow());
+                        await window.ShowDialog(_ownerWindowIfNotCurrent == null ? GetWindow() : _ownerWindowIfNotCurrent);
                     });
                 }
             }
