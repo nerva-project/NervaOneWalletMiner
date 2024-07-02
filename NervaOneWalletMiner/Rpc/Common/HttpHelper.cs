@@ -17,7 +17,7 @@ namespace NervaOneWalletMiner.Rpc.Common
             {
                 using (HttpClient client = new HttpClient())
                 {
-                    client.Timeout = TimeSpan.FromSeconds(30);
+                    client.Timeout = TimeSpan.FromSeconds(50);
 
                     HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, serviceUrl);
 
@@ -47,7 +47,7 @@ namespace NervaOneWalletMiner.Rpc.Common
             {
                 using (HttpClient client = new HttpClient())
                 {
-                    client.Timeout = TimeSpan.FromSeconds(30);
+                    client.Timeout = TimeSpan.FromSeconds(50);
 
                     HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, serviceUrl);
 

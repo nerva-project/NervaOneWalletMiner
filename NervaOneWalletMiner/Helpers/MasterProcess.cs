@@ -190,7 +190,7 @@ namespace NervaOneWalletMiner.Helpers
             try
             {
                 bool forceRestart = false;
-                if (GlobalData.LastDaemonResponseTime.AddSeconds(420) < DateTime.Now)
+                if (GlobalData.LastDaemonResponseTime.AddSeconds(300) < DateTime.Now)
                 {
                     // Daemon not responding. Kill and restart
                     forceRestart = true;
@@ -200,7 +200,7 @@ namespace NervaOneWalletMiner.Helpers
 
                 if (!ProcessManager.IsRunning(GlobalData.DaemonProcessName) || forceRestart)
                 {
-                    if (GlobalData.LastDaemonRestartAttempt.AddSeconds(420) < DateTime.Now)
+                    if (GlobalData.LastDaemonRestartAttempt.AddSeconds(300) < DateTime.Now)
                     {
                         if (GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
                         {
