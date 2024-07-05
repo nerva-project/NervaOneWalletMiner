@@ -2,18 +2,19 @@
 
 dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-bd=.
+bd=~/Downloads/NervaOneDesktop
 
-dd=${bd}/NervaOneDesktop
+dd=~/.local/share/applications/nerva-one.desktop
 
 
 echo "Creating launcher"
 echo "[Desktop Entry]" > ${dd}
+echo "Type=Application" >> ${dd}
 echo "Name=NervaOneDesktop" >> ${dd}
+echo "Comment=Nerva One Desktop" >> ${dd}
 echo "Exec=${bd}/Contents/NervaOneDesktop" >> ${dd}
 echo "Icon=${bd}/Resources/nerva-logo-color.png" >> ${dd}
 echo "Terminal=false" >> ${dd}
-echo "Type=Application" >> ${dd}
 
 chmod +x ${dd}
 
