@@ -649,19 +649,6 @@ namespace NervaOneWalletMiner.Helpers
         {
             try
             {
-                while (ProcessManager.IsRunning(GlobalData.WalletProcessName))
-                {
-                    Logger.LogDebug("GLM.EXFL", "Closing Wallet process");
-                    ProcessManager.Kill(GlobalData.WalletProcessName);
-                    Thread.Sleep(500);
-                }
-
-                while (ProcessManager.IsRunning(GlobalData.DaemonProcessName))
-                {
-                    Logger.LogDebug("GLM.EXFL", "Stopping and closing Daemon");
-                    StopAndCloseDaemon();
-                }
-
                 Logger.LogDebug("GLM.EXFL", "Extracting CLI tools");
 
                 if(compressedFile.EndsWith(".tar.gz"))
