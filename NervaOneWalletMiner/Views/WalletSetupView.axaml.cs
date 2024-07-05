@@ -50,6 +50,23 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
+        public void OpenWalletExportsFolder_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    FileName = GlobalData.ExportsDir,
+                    UseShellExecute = true
+                };
+                Process.Start(psi);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("WAS.OWEC", ex);
+            }
+        }
+
         public void SaveSettings_Clicked(object sender, RoutedEventArgs args)
         {
             try

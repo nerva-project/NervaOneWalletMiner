@@ -246,7 +246,8 @@ namespace NervaOneWalletMiner.Helpers
 
         public static string GetExportFileNameWithPath()
         {
-            return Path.Combine(GlobalData.ExportsDir, "export_" + DateTime.Now.ToString("yyyMMdd_HHmmss") + ".csv");
+            string walletName = string.IsNullOrEmpty(GlobalData.OpenedWalletName) ? "" : GlobalData.OpenedWalletName.Replace(" ", "-") + "-";
+            return Path.Combine(GlobalData.ExportsDir, "export-" + walletName + DateTime.Now.ToString("yyyMMdd-HHmmss") + ".csv");
         }
 
         public static string CycleLogFile(string path)

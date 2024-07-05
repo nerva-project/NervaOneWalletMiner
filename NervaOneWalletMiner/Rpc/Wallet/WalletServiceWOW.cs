@@ -1468,7 +1468,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                 destinations += destination.address;
                             }
 
-                            newTransfer.Destination = "\"" + destinations + "\"";
+                            newTransfer.Destination = destinations;
                             exportList.Add(newTransfer);
                         }
 
