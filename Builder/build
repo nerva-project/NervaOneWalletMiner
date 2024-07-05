@@ -51,6 +51,7 @@ function publish()
 
         cp ${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/release/${targetFramework}/$1/publish/* ${bundle}/Contents/
         cp ${BUILDER_DIR}/install ${bundle}/install
+        chmod +x ${bundle}/install
 
         cd ${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin
         zip -r ${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/nervaone-desktop-v${APP_VERSION}_$1.zip ./NervaOneDesktop
