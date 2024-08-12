@@ -244,10 +244,34 @@ namespace NervaOneWalletMiner.Helpers
             return Path.Combine(dataDir, GlobalData.AppConfigFileName);
         }
 
-        public static string GetExportFileNameWithPath()
+        public static string GetExportFileNameWithPath(string label = "")
         {
             string walletName = string.IsNullOrEmpty(GlobalData.OpenedWalletName) ? "" : GlobalData.OpenedWalletName.Replace(" ", "-") + "-";
-            return Path.Combine(GlobalData.ExportsDir, "export-" + walletName + DateTime.Now.ToString("yyyMMdd-HHmmss") + ".csv");
+            string walletLabel = string.Empty;
+
+            if(label != string.Empty)
+            {
+                // Label can have invalid file name characters so need to remove those
+                char[] invalidChars = Path.GetInvalidFileNameChars();
+                walletLabel = label.Replace(" ", "-") + "-";
+                
+                for(int i = 0; i < invalidChars.Length; i++)
+                {
+                    if (walletLabel.Contains(invalidChars[i]))
+                    {
+                        walletLabel = walletLabel.Replace(invalidChars[i].ToString(), "");
+                    }                    
+                }
+            }
+
+            if(walletLabel == string.Empty)
+            {
+                return Path.Combine(GlobalData.ExportsDir, "export-" + walletName + DateTime.Now.ToString("yyyMMdd-HHmmss") + ".csv");
+            }
+            else
+            {
+                return Path.Combine(GlobalData.ExportsDir, "export-" + walletName + walletLabel + DateTime.Now.ToString("yyyMMdd-HHmmss") + ".csv");
+            }            
         }
 
         public static string CycleLogFile(string path)

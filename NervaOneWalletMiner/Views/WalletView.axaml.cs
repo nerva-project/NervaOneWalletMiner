@@ -562,7 +562,7 @@ namespace NervaOneWalletMiner.Views
                 if (dtgAccounts.SelectedItem != null)
                 {
                     Account selectedItem = (Account)dtgAccounts.SelectedItem;
-                    string exportFile = GlobalMethods.GetExportFileNameWithPath();
+                    string exportFile = GlobalMethods.GetExportFileNameWithPath(selectedItem.Label);
 
                     GetTransfersExportRequest request = new()
                     {
