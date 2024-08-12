@@ -22,6 +22,13 @@ namespace NervaOneWalletMiner.ViewModels
             StartMiningNonUiEvent!.Invoke(miningThreads);
         }
 
+        public delegate void StopMiningNonUiAction();
+        public event StopMiningNonUiAction? StopMiningNonUiEvent;
+        public void StopMiningNonUi()
+        {
+            StopMiningNonUiEvent!.Invoke();
+        }
+
 
         private string _StartStopMining = StatusMiner.StartMining;
         public string StartStopMining

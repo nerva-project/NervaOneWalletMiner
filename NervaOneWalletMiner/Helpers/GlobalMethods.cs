@@ -1179,6 +1179,8 @@ namespace NervaOneWalletMiner.Helpers
         public static void CoinChanged()
         {
             GlobalData.NetworkStats = new();
+            GlobalData.IsManualStopMining = false;
+            GlobalData.IsAutoStoppedMining = false;
         }
         #endregion // Misc Methods
 

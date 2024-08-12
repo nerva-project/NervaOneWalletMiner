@@ -67,14 +67,36 @@ namespace NervaOneWalletMiner.Helpers
                     {
                         KeepDaemonRunning();
 
-                        // TODO: Maybe do it another way. Might be good enough though
+                        // Auto start mining if setting enabled
                         if (GlobalData.NetworkStats.YourHeight > 0
                             && GlobalData.NetworkStats.YourHeight == GlobalData.NetworkStats.NetHeight
                             && GlobalData.NetworkStats.MinerStatus == StatusMiner.Inactive
                             && GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AutoStartMining
-                            && !GlobalData.IsManualStopMining)
+                            && !GlobalData.IsManualStopMining
+                            && !GlobalData.IsAutoStoppedMining)
                         {
                             Logger.LogDebug("MSP.MUPS", "Auto starting mining");
+                            ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).StartMiningNonUi(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
+                        }
+
+                        // If 0 connections, stop mining so we're not using CPU resources when no connections to the network
+                        if (GlobalData.NetworkStats.MinerStatus == StatusMiner.Mining
+                            && GlobalData.NetworkStats.ConnectionsOut + GlobalData.NetworkStats.ConnectionsIn < 1
+                            && !GlobalData.IsAutoStoppedMining)
+                        {
+                            GlobalData.IsAutoStoppedMining = true;
+
+                            Logger.LogDebug("MSP.MUPS", "Auto stopping mining. No connections");
+                            ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).StopMiningNonUi();
+                        }
+
+                        // When connections come back, start mining again
+                        if (GlobalData.NetworkStats.ConnectionsOut + GlobalData.NetworkStats.ConnectionsIn > 0
+                            && GlobalData.IsAutoStoppedMining)
+                        {
+                            GlobalData.IsAutoStoppedMining = false;
+
+                            Logger.LogDebug("MSP.MUPS", "Auto restarting mining. Total connections: " + (GlobalData.NetworkStats.ConnectionsOut + GlobalData.NetworkStats.ConnectionsIn));
                             ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).StartMiningNonUi(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
                         }
                     }

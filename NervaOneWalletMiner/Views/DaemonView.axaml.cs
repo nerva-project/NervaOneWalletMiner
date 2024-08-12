@@ -49,6 +49,7 @@ namespace NervaOneWalletMiner.Views
                     DaemonViewModel vm = (DaemonViewModel)DataContext!;
                     vm.StartMiningUiEvent += (owner, threads) => StartMiningAsync(owner, threads);
                     vm.StartMiningNonUiEvent += StartMiningNonUi;
+                    vm.StopMiningNonUiEvent += StopMiningNonUi;
                     GlobalData.AreDaemonEventsRegistered = true;
                 }
             }
@@ -70,7 +71,7 @@ namespace NervaOneWalletMiner.Views
                     // Stop mining
                     Logger.LogDebug("DMN.SSMC", "Stopping mining");
                     GlobalData.IsManualStopMining = true;
-                    StopMiningAsync();
+                    StopMiningAsync(GetWindow());
                     btnStartStopMining.Content = StatusMiner.StartMining;
                     nupThreads.IsEnabled = true;
                 }
@@ -191,7 +192,12 @@ namespace NervaOneWalletMiner.Views
         }
 
 
-        public async void StopMiningAsync()
+        public void StopMiningNonUi()
+        {
+            // Master Process does not have owner so do not attempt to show messages
+            StopMiningAsync(null, false);
+        }
+        public async void StopMiningAsync(Window? owner, bool isUiThread = true)
         {
             try
             {
@@ -201,11 +207,14 @@ namespace NervaOneWalletMiner.Views
                 StopMiningResponse response = await GlobalData.DaemonService.StopMining(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, request);
                 if (response.Error.IsError)
                 {
-                    await Dispatcher.UIThread.Invoke(async () =>
+                    if (isUiThread)
                     {
-                        MessageBoxView window = new("Stop Mining", "Error when stopping mining\r\n\r\n" + response.Error.Message, true);
-                        await window.ShowDialog(GetWindow());
-                    });
+                        await Dispatcher.UIThread.Invoke(async () =>
+                        {
+                            MessageBoxView window = new("Stop Mining", "Error when stopping mining\r\n\r\n" + response.Error.Message, true);
+                            await window.ShowDialog(owner!);
+                        });
+                    }
                 }
             }
             catch (Exception ex)
