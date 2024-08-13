@@ -83,7 +83,6 @@ namespace NervaOneWalletMiner.Helpers
 
         public static void SelectionChanged(object? sender, SelectionModelSelectionChangedEventArgs e)
         {
-            // TODO: Figoure out better way of doing this
             switch (((ListBoxItem)e.SelectedItems[0]!).Name)
             {
                 case SplitViewPages.Wallet:

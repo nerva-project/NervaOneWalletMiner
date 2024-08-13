@@ -9,6 +9,8 @@ namespace NervaOneWalletMiner.ViewsDialogs
 {
     public partial class RestoreFromSeedView : Window
     {
+        Window GetWindow() => TopLevel.GetTopLevel(this) as Window ?? throw new NullReferenceException("Invalid Owner");
+
         public RestoreFromSeedView()
         {
             try
@@ -41,8 +43,8 @@ namespace NervaOneWalletMiner.ViewsDialogs
 
                 if (string.IsNullOrEmpty(tbxSeedPhrase.Text) || string.IsNullOrEmpty(tbxWalletName.Text) || string.IsNullOrEmpty(tbxPassword.Text))
                 {
-                    // TODO:  Let user know that required componets are missing
-
+                    MessageBoxView window = new("Restore From Seed", "Seed Phrase, Wallet Name and Password are all required.", true);
+                    window.ShowDialog(GetWindow());
                 }
                 else
                 {

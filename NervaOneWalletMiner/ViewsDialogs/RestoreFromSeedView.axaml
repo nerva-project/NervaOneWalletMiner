@@ -53,6 +53,7 @@
 
 			<Button Name="btnCancel"
 					Content="Cancel"
+					Click="CancelButton_Clicked"
 					Margin="10,0,0,0"/>
 		</DockPanel>
 	</StackPanel>

@@ -9,6 +9,8 @@ namespace NervaOneWalletMiner.ViewsDialogs
 {
     public partial class CreateWalletView : Window
     {
+        Window GetWindow() => TopLevel.GetTopLevel(this) as Window ?? throw new NullReferenceException("Invalid Owner");
+
         public CreateWalletView()
         {
             try
@@ -37,8 +39,8 @@ namespace NervaOneWalletMiner.ViewsDialogs
 
                 if (string.IsNullOrEmpty(tbxWalletName.Text) || string.IsNullOrEmpty(tbxPassword.Text))
                 {
-                    // TODO:  Let user know that both Wallet Name and Password are required
-
+                    MessageBoxView window = new("Create Wallet", "Wallet Name and Password are required.", true);
+                    window.ShowDialog(GetWindow());
                 }
                 else
                 {

@@ -9,6 +9,8 @@ namespace NervaOneWalletMiner.ViewsDialogs
 {
     public partial class RestoreFromKeysView : Window
     {
+        Window GetWindow() => TopLevel.GetTopLevel(this) as Window ?? throw new NullReferenceException("Invalid Owner");
+
         public RestoreFromKeysView()
         {
             try
@@ -40,11 +42,14 @@ namespace NervaOneWalletMiner.ViewsDialogs
 
                 var cbxLanguage = this.Get<ComboBox>("cbxLanguage");
 
-                if (string.IsNullOrEmpty(tbxWalletAddress.Text) || string.IsNullOrEmpty(tbxViewKey.Text) || string.IsNullOrEmpty(tbxSpendKey.Text)
-                    || string.IsNullOrEmpty(tbxWalletName.Text) || string.IsNullOrEmpty(tbxPassword.Text))
+                if (string.IsNullOrEmpty(tbxWalletAddress.Text)
+                    || string.IsNullOrEmpty(tbxViewKey.Text)
+                    || string.IsNullOrEmpty(tbxSpendKey.Text)
+                    || string.IsNullOrEmpty(tbxWalletName.Text)
+                    || string.IsNullOrEmpty(tbxPassword.Text))
                 {
-                    // TODO:  Let user know that required componets are missing
-
+                    MessageBoxView window = new("Restore From Keys", "Wallet Address, View Key, Spend Key, Wallet Name and Password are all required.", true);
+                    window.ShowDialog(GetWindow());
                 }
                 else
                 {
