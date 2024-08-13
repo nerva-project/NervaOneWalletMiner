@@ -105,17 +105,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                 }
                 else
                 {
-                    uint fromAccountIndex = 0;
-                    string fromAddress = cbxSendFrom.SelectedValue.ToString()!;
-
-                    // TODO: Since addresses are shortened, you could potentally have 2 of the same ones
-                    foreach (uint index in _accounts.Keys)
-                    {
-                        if (_accounts[index].Equals(fromAddress))
-                        {
-                            fromAccountIndex = index;
-                        }
-                    }
+                    uint fromAccountIndex = (uint)cbxSendFrom.SelectedIndex;
 
                     MessageBoxView confirmWindow = new MessageBoxView("Confirm Transfer", "You're about to send " + tbxAmount.Text
                         + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits
@@ -181,7 +171,6 @@ namespace NervaOneWalletMiner.ViewsDialogs
                             DialogResult result = new()
                             {
                                 IsOk = true,
-                                SendFromAddress = fromAddress,
                                 SendFromAddressIndex = fromAccountIndex,
                                 SendToAddress = tbxSendTo.Text,
                                 SendAmount = Convert.ToDecimal(tbxAmount.Text),
@@ -239,17 +228,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
         {
             try
             {
-                // TODO: Change this to something easier
-                uint fromAccountIndex = 0;
-                string fromAddress = cbxSendFrom.SelectedValue!.ToString()!;
-
-                foreach (uint index in _accounts.Keys)
-                {
-                    if (_accounts[index].Equals(fromAddress))
-                    {
-                        fromAccountIndex = index;
-                    }
-                }
+                uint fromAccountIndex = (uint)cbxSendFrom.SelectedIndex;
 
                 decimal balanceTotal = 0;
                 decimal balanceUnlocked = 0;
