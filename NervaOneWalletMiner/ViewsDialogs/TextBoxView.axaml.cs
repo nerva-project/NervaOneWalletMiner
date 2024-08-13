@@ -8,6 +8,8 @@ namespace NervaOneWalletMiner.ViewsDialogs
 {
     public partial class TextBoxView : Window
     {
+        Window GetWindow() => TopLevel.GetTopLevel(this) as Window ?? throw new NullReferenceException("Invalid Owner");
+
         bool _isTextRequired = false;
 
         // Not used but designer will complain without it
@@ -49,7 +51,8 @@ namespace NervaOneWalletMiner.ViewsDialogs
 
                 if(_isTextRequired && string.IsNullOrEmpty(tbxValue.Text))
                 {
-                    // TODO: Inform user that text is required
+                    MessageBoxView window = new(Title!, "Value is required.", true);
+                    window.ShowDialog(GetWindow());
                 }
                 else
                 {

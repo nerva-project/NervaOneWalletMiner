@@ -79,7 +79,8 @@ public partial class MainWindow : Window
     {
         if (GlobalData.IsConfigFound && !GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
         {
-            // CLI tools missing. Need to download
+            // CLI tools missing. Need to download            
+            GlobalData.IsCliToolsFound = false;
             string cliToolsLink = GlobalMethods.GetCliToolsDownloadLink(GlobalData.AppSettings.ActiveCoin);
             Logger.LogDebug("MAW.CDCN", "CLI tools not found. Asking user to confirm download link: " + cliToolsLink);
 

@@ -375,7 +375,6 @@ namespace NervaOneWalletMiner.Helpers
                         break;
                 }
 
-                GlobalData.IsCliToolsFound = true;
                 GlobalData.LastDaemonResponseTime = DateTime.Now;
                 GlobalData.LastDaemonRestartAttempt = DateTime.MinValue;
 

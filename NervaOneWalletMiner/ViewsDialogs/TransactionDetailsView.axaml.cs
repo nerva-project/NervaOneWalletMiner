@@ -43,7 +43,6 @@ namespace NervaOneWalletMiner.ViewsDialogs
         {
             try
             {
-                // TODO: For multi-coin support, need to make generic KeyType values and handle them in interface implementation
                 GetTranserByTxIdRequest request = new GetTranserByTxIdRequest();
                 request.TransactionId = _transactionId;
                 request.AccountIndex = _accountIndex;

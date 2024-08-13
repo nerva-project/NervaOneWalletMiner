@@ -519,23 +519,31 @@ namespace NervaOneWalletMiner.Helpers
         {
             try
             {
-                if (!GlobalData.IsInitialDaemonConnectionSuccess)
+                if (!GlobalData.IsCliToolsFound)
                 {
                     GlobalData.NetworkStats = new()
                     {
-                        StatusSync = " | Trying to establish connection with daemon..."
+                        StatusSync = " | Client tools not found. Attempting to download...",
+                        Connections = []
                     };
-                    GlobalData.NetworkStats.Connections = [];                    
+                }
+                else if (GlobalData.IsDaemonRestarting)
+                {
+                    GlobalData.NetworkStats = new()
+                    {
+                        StatusSync = " | Restarting daemon...",
+                        Connections = []
+                    };
+                }
+                else if (!GlobalData.IsInitialDaemonConnectionSuccess)
+                {
+                    GlobalData.NetworkStats = new()
+                    {
+                        StatusSync = " | Trying to establish connection with daemon...",
+                        Connections = []
+                    };
                 }
 
-                if (GlobalData.IsDaemonRestarting)
-                {
-                    GlobalData.NetworkStats = new()
-                    {
-                        StatusSync = " | Restarting daemon..."
-                    };
-                    GlobalData.NetworkStats.Connections = [];                    
-                }
 
                 if (GlobalData.IsGetAndSetDaemonDataComplete)
                 {

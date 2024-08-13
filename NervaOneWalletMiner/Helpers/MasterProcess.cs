@@ -109,21 +109,12 @@ namespace NervaOneWalletMiner.Helpers
                 }
 
 
-                if (!GlobalData.IsCliToolsFound)
-                {
-                    // TODO: For now
-                    UIManager.UpdateDaemonStatus("Client tools not found. Attempting to download...");
-                }
-
-
                 // Get Daemon data
-                if (!_killMasterProcess && GlobalData.IsCliToolsFound)
+                if (!_killMasterProcess && _masterTimerCount % GlobalData.AppSettings.TimerIntervalMultiplier == 0)
                 {
-                    if (_masterTimerCount % GlobalData.AppSettings.TimerIntervalMultiplier == 0)
-                    {
-                        UIManager.GetAndSetDaemonData();
-                    }
+                    UIManager.GetAndSetDaemonData();
                 }
+
 
                 // Actual Daemon UI update
                 if (GlobalData.IsGetAndSetDaemonDataComplete)
@@ -236,7 +227,6 @@ namespace NervaOneWalletMiner.Helpers
                         else
                         {
                             Logger.LogInfo("MSP.KDNR", "CLI tools not found");
-                            GlobalData.IsCliToolsFound = false;
                         }
                     }
                 }

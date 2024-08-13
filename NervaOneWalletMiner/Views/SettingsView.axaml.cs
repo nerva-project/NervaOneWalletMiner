@@ -94,7 +94,8 @@ namespace NervaOneWalletMiner.Views
 
                     if (!GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
                     {
-                        // CLI tools missing. Need to download
+                        // CLI tools missing. Need to download                        
+                        GlobalData.IsCliToolsFound = false;
                         string cliToolsLink = GlobalMethods.GetCliToolsDownloadLink(GlobalData.AppSettings.ActiveCoin);
                         Logger.LogDebug("SET.SSCL", "CLI tools not found. Asking user to confirm download link: " + cliToolsLink);
                         

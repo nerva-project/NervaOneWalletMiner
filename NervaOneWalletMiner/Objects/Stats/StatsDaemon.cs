@@ -24,6 +24,6 @@ namespace NervaOneWalletMiner.Objects.Stats
         public string Version { get; set; } = "0";
         public ulong ConnectionsIn { get; set; } = 0;
         public ulong ConnectionsOut { get; set; } = 0;
-        public string StatusSync { get; set; } = "None";
+        public string StatusSync { get; set; } = string.Empty;
     }
 }
