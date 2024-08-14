@@ -905,7 +905,6 @@ namespace NervaOneWalletMiner.Rpc.Wallet
          *  bool strict_balances;
          */
 
-        // TODO: Allow params to be passed
         public async Task<GetAccountsResponse> GetAccounts(RpcBase rpc, GetAccountsRequest requestObj)
         {
             GetAccountsResponse responseObj = new();

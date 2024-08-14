@@ -458,8 +458,6 @@ namespace NervaOneWalletMiner.Rpc.Wallet
          */
         public async Task<RestoreFromKeysResponse> RestoreFromKeys(RpcBase rpc, RestoreFromKeysRequest requestObj)
         {
-            // TODO: Test Restore from Keys!
-
             RestoreFromKeysResponse responseObj = new();
 
             try
@@ -914,7 +912,6 @@ namespace NervaOneWalletMiner.Rpc.Wallet
          *  bool regexp; // allow regular expression filters if set to true
          */
 
-        // TODO: Allow params to be passed
         public async Task<GetAccountsResponse> GetAccounts(RpcBase rpc, GetAccountsRequest requestObj)
         {
             GetAccountsResponse responseObj = new();
