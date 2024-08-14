@@ -118,8 +118,7 @@ namespace NervaOneWalletMiner.Views
                                 GlobalMethods.SaveConfig();
                             }
 
-                            Logger.LogDebug("DMN.SSMC", "Starting mining");
-                            GlobalData.IsManualStopMining = false;
+                            Logger.LogDebug("DMN.SSMC", "Starting mining");                            
                             StartMiningAsync(GetWindow(), GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
                             btnStartStopMining.Content = StatusMiner.StopMining;
                             nupThreads.IsEnabled = false;
@@ -170,11 +169,14 @@ namespace NervaOneWalletMiner.Views
                         }
                     }
                     else
-                    {
+                    {                       
                         // Some errors are not reported as errors, such as not being able to mine to subaddress
                         Logger.LogDebug("GLM.STMA", "Start mining response status: " + response.Status);
 
-                        if(isUiThread)
+                        // Without this, "Auto start mining" might try to start mining again before update happens
+                        GlobalData.NetworkStats.MinerStatus = StatusMiner.Mining;
+
+                        if (isUiThread)
                         {
                             await Dispatcher.UIThread.Invoke(async () =>
                             {
@@ -183,6 +185,8 @@ namespace NervaOneWalletMiner.Views
                             });
                         }
                     }
+
+                    GlobalData.IsManualStopMining = false;
                 }
             }
             catch (Exception ex)
