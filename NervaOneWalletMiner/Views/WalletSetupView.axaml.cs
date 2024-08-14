@@ -201,30 +201,49 @@ namespace NervaOneWalletMiner.Views
 
         private void RestoreFromSeedDialogClosed(Task task)
         {
-            DialogResult result = ((DialogResult)((Task<object>)task).Result);
-            if (result != null && result.IsOk)
+            DialogResult result;
+
+            try
             {
-                // TODO: Change this so you're not storing sensitive date in many places
-                if (!string.IsNullOrEmpty(result.SeedPhrase) && !string.IsNullOrEmpty(result.WalletName) && !string.IsNullOrEmpty(result.WalletPassword))
+                result = ((DialogResult)((Task<object>)task).Result);
+                if (result != null && result.IsOk)
                 {
-                    RestoreFromSeed(result.SeedPhrase, result.SeedOffset, result.WalletName, result.WalletPassword, result.WalletLanguage);
+                    // Close wallet first, if one is opened
+                    if (GlobalData.IsWalletOpen)
+                    {
+                        GlobalMethods.ForceWalletClose();
+                        GlobalMethods.WalletClosedOrErrored();
+                    }
+
+                    if (!string.IsNullOrEmpty(result.SeedPhrase) && !string.IsNullOrEmpty(result.WalletName) && !string.IsNullOrEmpty(result.WalletPassword))
+                    {
+                        RestoreFromSeed(result.SeedPhrase, result.SeedOffset, result.WalletName, result.WalletPassword, result.WalletLanguage);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("WAS.RSDC", ex);
+            }
+            finally
+            {
+                result = new DialogResult();
             }
         }
 
         private async void RestoreFromSeed(string seed, string seedOffset, string walletName, string walletPassword, string walletLanguage)
         {
+            RestoreFromSeedRequest request = new()
+            {
+                Seed = seed,
+                SeedOffset = seedOffset,
+                WalletName = walletName,
+                Password = walletPassword,
+                Language = walletLanguage
+            };
+
             try
             {
-                RestoreFromSeedRequest request = new()
-                {
-                    Seed = seed,
-                    SeedOffset = seedOffset,
-                    WalletName = walletName,
-                    Password = walletPassword,
-                    Language = walletLanguage
-                };
-
                 RestoreFromSeedResponse response = await GlobalData.WalletService.RestoreFromSeed(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
 
                 if (response.Error.IsError)
@@ -254,7 +273,11 @@ namespace NervaOneWalletMiner.Views
             {
                 Logger.LogException("WAS.RFS1", ex);
             }
-            
+            finally
+            {
+                seed = walletPassword = string.Empty;
+                request = new();
+            }
         }
         #endregion // Restore from Seed
 
@@ -274,32 +297,51 @@ namespace NervaOneWalletMiner.Views
 
         private void RestoreFromKeysDialogClosed(Task task)
         {
-            DialogResult result = ((DialogResult)((Task<object>)task).Result);
-            if (result != null && result.IsOk)
+            DialogResult result;
+
+            try
             {
-                // TODO: Change this so you're not storing sensitive date in many places
-                if (!string.IsNullOrEmpty(result.WalletAddress) && !string.IsNullOrEmpty(result.ViewKey)  && !string.IsNullOrEmpty(result.SpendKey)
-                    && !string.IsNullOrEmpty(result.WalletName) && !string.IsNullOrEmpty(result.WalletPassword))
+                result = ((DialogResult)((Task<object>)task).Result);
+                if (result != null && result.IsOk)
                 {
-                    RestoreFromKeys(result.WalletAddress, result.ViewKey, result.SpendKey, result.WalletName, result.WalletPassword, result.WalletLanguage);
+                    // Close wallet first, if one is opened
+                    if (GlobalData.IsWalletOpen)
+                    {
+                        GlobalMethods.ForceWalletClose();
+                        GlobalMethods.WalletClosedOrErrored();
+                    }
+
+                    if (!string.IsNullOrEmpty(result.WalletAddress) && !string.IsNullOrEmpty(result.ViewKey) && !string.IsNullOrEmpty(result.SpendKey)
+                        && !string.IsNullOrEmpty(result.WalletName) && !string.IsNullOrEmpty(result.WalletPassword))
+                    {
+                        RestoreFromKeys(result.WalletAddress, result.ViewKey, result.SpendKey, result.WalletName, result.WalletPassword, result.WalletLanguage);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("WAS.RKDC", ex);
+            }
+            finally
+            {
+                result = new DialogResult();
             }
         }
 
         private async void RestoreFromKeys(string walletAddress, string viewKey, string spendKey, string walletName, string walletPassword, string walletLanguage)
         {
+            RestoreFromKeysRequest request = new()
+            {
+                WalletAddress = walletAddress,
+                ViewKey = viewKey,
+                SpendKey = spendKey,
+                WalletName = walletName,
+                Password = walletPassword,
+                Language = walletLanguage
+            };
+
             try
             {
-                RestoreFromKeysRequest request = new()
-                {
-                    WalletAddress = walletAddress,
-                    ViewKey = viewKey,
-                    SpendKey = spendKey,
-                    WalletName = walletName,
-                    Password = walletPassword,
-                    Language = walletLanguage
-                };
-
                 RestoreFromKeysResponse response = await GlobalData.WalletService.RestoreFromKeys(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
 
                 if (response.Error.IsError)
@@ -329,7 +371,11 @@ namespace NervaOneWalletMiner.Views
             {
                 Logger.LogException("WAS.RFKS", ex);
             }
-
+            finally
+            {
+                viewKey = spendKey = walletPassword = string.Empty;
+                request = new();
+            }
         }
         #endregion // Restore from Keys
 
@@ -455,7 +501,7 @@ namespace NervaOneWalletMiner.Views
                 bool isAuthorized = false;
                 if(!GlobalData.IsWalletOpen)
                 {
-                    MessageBoxView window = new("View Private Keys", "Please open wallet first.", true);
+                    MessageBoxView window = new("View Keys and Seed", "Please open wallet first.", true);
                     await window.ShowDialog(GetWindow());
                 }
                 else if (DateTime.Now > GlobalData.WalletPassProvidedTime.AddMinutes(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].UnlockMinutes))

@@ -16,9 +16,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             try
             {
                 InitializeComponent();
-                Icon = GlobalMethods.GetWindowIcon();
-
-                // TODO: Check if wallet open and show error if not
+                Icon = GlobalMethods.GetWindowIcon();               
 
                 GetAndShowKeys();
             }
@@ -32,8 +30,6 @@ namespace NervaOneWalletMiner.ViewsDialogs
         {
             try
             {
-                // TODO: For multi-coin support, need to make generic KeyType values and handle them in interface implementation
-
                 GetPrivateKeysResponse response = await GlobalData.WalletService.GetPrivateKeys(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new GetPrivateKeysRequest() { KeyType = KeyType.AllViewSpend });
 
                 if (response.Error.IsError)
@@ -42,12 +38,11 @@ namespace NervaOneWalletMiner.ViewsDialogs
                 }
                 else
                 {
-                    this.Get<TextBox>("tbxPublicViewKey").Text = response.PublicViewKey;
-                    this.Get<TextBox>("tbxPrivateViewKey").Text = response.PrivateViewKey;
-                    this.Get<TextBox>("tbxPublicSpendKey").Text = response.PublicSpendKey;
-                    this.Get<TextBox>("tbxPrivateSpendKey").Text = response.PrivateSpendKey;
+                    tbxPublicViewKey.Text = response.PublicViewKey;
+                    tbxPrivateViewKey.Text = response.PrivateViewKey;
+                    tbxPublicSpendKey.Text = response.PublicSpendKey;
+                    tbxPrivateSpendKey.Text = response.PrivateSpendKey;
                     response = new GetPrivateKeysResponse();
-
 
                     // Once you got keys, query mnemonic seed
                     response = await GlobalData.WalletService.GetPrivateKeys(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new GetPrivateKeysRequest() { KeyType = KeyType.Mnemonic });
@@ -57,7 +52,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     }
                     else
                     {
-                        this.Get<TextBox>("tbxMnemonicSeed").Text = response.Mnemonic;
+                        tbxMnemonicSeed.Text = response.Mnemonic;
                         response = new GetPrivateKeysResponse();
                     }                        
                 }
@@ -77,19 +72,23 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     IsCancel = true
                 };
 
-                // TODO: Clear those even if user closes window without clicking close
-                this.Get<TextBox>("tbxPublicViewKey").Text = "";
-                this.Get<TextBox>("tbxPrivateViewKey").Text = "";
-                this.Get<TextBox>("tbxPublicSpendKey").Text = "";
-                this.Get<TextBox>("tbxPrivateSpendKey").Text = "";
-                this.Get<TextBox>("tbxMnemonicSeed").Text = "";
-
                 Close(result);
             }
             catch (Exception ex)
             {
                 Logger.LogException("DKD.CLBC", ex);
             }
+        }
+
+        protected override void OnClosing(WindowClosingEventArgs e)
+        {
+            tbxPublicViewKey.Text = "";
+            tbxPrivateViewKey.Text = "";
+            tbxPublicSpendKey.Text = "";
+            tbxPrivateSpendKey.Text = "";
+            tbxMnemonicSeed.Text = "";
+
+            base.OnClosing(e);
         }
     }
 }
