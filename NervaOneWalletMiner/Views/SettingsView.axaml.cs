@@ -35,7 +35,7 @@ namespace NervaOneWalletMiner.Views
                     }
                 };
 
-                // TODO: Should probably come up with a simpler way to do this
+                // Name of coin as define in Settings axaml needs to equal to ActiveCoin
                 ComboBoxItem selectedCoin = (ComboBoxItem)cbxCoin.Items[0]!;
                 foreach (ComboBoxItem? coin in cbxCoin.Items)
                 {

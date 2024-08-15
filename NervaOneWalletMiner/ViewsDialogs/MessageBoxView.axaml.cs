@@ -33,8 +33,9 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     btnCancel.IsVisible = true;
                 }
 
-                // TODO: Change view Height based on number of Message text lines
-
+                // Change height based on number of lines. Assume 70 characters per line
+                double numberOfLines = Math.Ceiling(textMessage.Length / 70.0);
+                Height = 100 + (numberOfLines * 18);
             }
             catch (Exception ex)
             {
