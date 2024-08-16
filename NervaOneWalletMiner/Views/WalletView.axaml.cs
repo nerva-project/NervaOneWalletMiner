@@ -68,10 +68,27 @@ namespace NervaOneWalletMiner.Views
 
                 if (btnOpenCloseWallet.Content!.ToString()!.Equals(StatusWallet.OpenWallet))
                 {
-                    // Open wallet dialog
-                    Logger.LogDebug("WAL.OCWC", "Opening wallet dialog");
-                    var window = new OpenWalletView();
-                    await window.ShowDialog(GetWindow()).ContinueWith(OpenWalletDialogClosed);
+                    if (!GlobalData.IsCliToolsFound)
+                    {
+                        Logger.LogDebug("WAL.OCWC", "Trying to open wallet but CLI tools not found");
+
+                        MessageBoxView window = new("Open Wallet", "Client tools missing. Cannot open wallet until client tools are downloaded and running", true);
+                        await window.ShowDialog(GetWindow());
+                    }
+                    else if (!GlobalData.IsInitialDaemonConnectionSuccess)
+                    {
+                        Logger.LogDebug("WAL.OCWC", "Trying to open wallet but daemon not running");
+
+                        MessageBoxView window = new("Open Wallet", "Daemon not running. Cannot open wallet until connection is established", true);
+                        await window.ShowDialog(GetWindow());
+                    }
+                    else
+                    {
+                        // Open wallet dialog
+                        Logger.LogDebug("WAL.OCWC", "Opening wallet dialog");
+                        var window = new OpenWalletView();
+                        await window.ShowDialog(GetWindow()).ContinueWith(OpenWalletDialogClosed);
+                    }
                 }
                 else
                 {
