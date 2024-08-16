@@ -521,11 +521,22 @@ namespace NervaOneWalletMiner.Helpers
             {
                 if (!GlobalData.IsCliToolsFound)
                 {
-                    GlobalData.NetworkStats = new()
+                    if(GlobalData.IsCliToolsDownloadConfirmed)
                     {
-                        StatusSync = " | Client tools not found. Attempting to download...",
-                        Connections = []
-                    };
+                        GlobalData.NetworkStats = new()
+                        {
+                            StatusSync = " | Trying to download client tools...",
+                            Connections = []
+                        };
+                    }
+                    else
+                    {
+                        GlobalData.NetworkStats = new()
+                        {
+                            StatusSync = " | Client tools missing.",
+                            Connections = []
+                        };
+                    }
                 }
                 else if (GlobalData.IsDaemonRestarting)
                 {

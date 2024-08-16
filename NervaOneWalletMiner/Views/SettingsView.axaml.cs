@@ -125,6 +125,8 @@ namespace NervaOneWalletMiner.Views
                 if (result != null && result.IsOk)
                 {
                     Logger.LogDebug("SET.CTLC", "Attempting to download CLI tools from: " + result.TextBoxValue);
+                    GlobalData.IsCliToolsDownloadConfirmed = true;
+
                     if (!string.IsNullOrEmpty(result.TextBoxValue))
                     {
                         // Download and extract CLI tools
@@ -134,13 +136,14 @@ namespace NervaOneWalletMiner.Views
                 else
                 {
                     Logger.LogDebug("SET.CTLC", "CLI tools download cancelled");
+                    GlobalData.IsCliToolsDownloadConfirmed = false;
+
                     await Dispatcher.UIThread.Invoke(async () =>
                     {
                         MessageBoxView window = new("Client Tools Missing", "NervaOne cannot run without client tools. Switch coin or restart to download client tools. "
                             + "Alternatively you can put your own client tools in Daemon Setup > Open Client Tools Folder", true);
                         await window.ShowDialog(GetWindow());
                     });
-
                 }
             }
             catch (Exception ex)

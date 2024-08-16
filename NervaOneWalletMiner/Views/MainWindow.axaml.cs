@@ -97,6 +97,8 @@ public partial class MainWindow : Window
             if (result != null && result.IsOk)
             {
                 Logger.LogDebug("MAW.CTLC", "CLI tools not found. Attempting to download from: " + result.TextBoxValue);
+                GlobalData.IsCliToolsDownloadConfirmed = true;
+
                 if (!string.IsNullOrEmpty(result.TextBoxValue))
                 {
                     // Download and extract CLI tools
@@ -106,6 +108,8 @@ public partial class MainWindow : Window
             else
             {
                 Logger.LogDebug("MAW.CTLC", "CLI tools download cancelled.");
+                GlobalData.IsCliToolsDownloadConfirmed = false;
+
                 await Dispatcher.UIThread.Invoke(async () =>
                 {
                     MessageBoxView window = new("Client Tools Missing", "NervaOne cannot run without client tools. Switch coin or restart to download client tools. "

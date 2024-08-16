@@ -1180,6 +1180,9 @@ namespace NervaOneWalletMiner.Helpers
             GlobalData.NetworkStats = new();
             GlobalData.IsManualStopMining = false;
             GlobalData.IsAutoStoppedMining = false;
+
+            GlobalData.IsCliToolsFound = true;
+            GlobalData.IsCliToolsDownloadConfirmed = false;
         }
         #endregion // Misc Methods
 

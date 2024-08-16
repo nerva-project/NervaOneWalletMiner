@@ -83,6 +83,7 @@ namespace NervaOneWalletMiner.Helpers
         public static bool IsGetAndSetWalletDataComplete = true;
         public static bool IsGetAndSetDaemonDataComplete = true;
         public static bool IsCliToolsFound = true;
+        public static bool IsCliToolsDownloadConfirmed = false;
 
         public static string CliToolsDir = GlobalMethods.GetCliToolsDir();
         public static string WalletDir = GlobalMethods.GetWalletDir();
