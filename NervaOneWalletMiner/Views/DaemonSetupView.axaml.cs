@@ -3,7 +3,6 @@ using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects;
-using NervaOneWalletMiner.Rpc;
 using NervaOneWalletMiner.ViewsDialogs;
 using System;
 using System.Diagnostics;
@@ -46,9 +45,9 @@ namespace NervaOneWalletMiner.Views
             {
                 bool isChanged = false;
                          
-                if (!string.IsNullOrEmpty(tbxMiningAddress.Text) && GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress != tbxMiningAddress.Text)
+                if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress != tbxMiningAddress.Text)
                 {
-                    GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress = tbxMiningAddress.Text;
+                    GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress = tbxMiningAddress.Text!;
                     isChanged = true;
                 }
 
@@ -58,9 +57,9 @@ namespace NervaOneWalletMiner.Views
                     isChanged = true;
                 }
 
-                if (!string.IsNullOrEmpty(tbxAdditionalArguments.Text) && GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AdditionalArguments != tbxAdditionalArguments.Text)
+                if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AdditionalArguments != tbxAdditionalArguments.Text)
                 {
-                    GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AdditionalArguments = tbxAdditionalArguments.Text;
+                    GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AdditionalArguments = tbxAdditionalArguments.Text!;
                     isChanged = true;
                 }
 
