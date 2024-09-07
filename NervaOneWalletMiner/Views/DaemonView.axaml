@@ -36,7 +36,8 @@
 							   Minimum="1"
 							   Value="1"
 							   FormatString="0"
-							   MaxWidth="110"
+							   MaxWidth="110"							   
+							   ValueChanged="nupThreads_ValueChanged"
 							   IsEnabled="{Binding IsNumThreadsEnabled}"/>
 			</DockPanel>
 			<Button Name="btnStartStopMining"

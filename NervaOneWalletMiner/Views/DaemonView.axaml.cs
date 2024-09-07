@@ -59,6 +59,16 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
+        private void nupThreads_ValueChanged(object sender, NumericUpDownValueChangedEventArgs args)
+        {
+            if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads != nupThreads.Value)
+            {
+                GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads = Convert.ToInt32(nupThreads.Value);
+                Logger.LogDebug("DMN.NTVC", "Setting mining threads: " + GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
+                GlobalMethods.SaveConfig();
+            }
+        }
+
         public async void StartStopMining_Clicked(object sender, RoutedEventArgs args)
         {
             try
