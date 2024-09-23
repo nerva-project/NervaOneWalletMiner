@@ -76,7 +76,7 @@ namespace NervaOneWalletMiner.Helpers
         // Grid and other UI data
         public static StatsDaemon NetworkStats = new();
         public static StatsWallet WalletStats = new();
-        public static StatsTransfers TransfersStats = new();        
+        public static StatsTransfers TransfersStats = new();
         public static AddressBook AddressBook = new();
 
         public static bool IsGetAndSetTransfersDataComplete = true;
@@ -85,12 +85,19 @@ namespace NervaOneWalletMiner.Helpers
         public static bool IsCliToolsFound = true;
         public static bool IsCliToolsDownloadConfirmed = false;
 
+        // Connections Guard
+        public static DateTime ConnectGuardLastGoodTime = DateTime.Now;
+        public static int ConnectGuardRestartCount = 1;
+        public static ulong ConnectGuardMinimumGoodCount = 3;
+        public static int ConnectGuardMinutes = 10;
+        public static int ConnectGuardBlocksToPop = 1000;        
+
         public static string CliToolsDir = GlobalMethods.GetCliToolsDir();
         public static string WalletDir = GlobalMethods.GetWalletDir();
 
         public static ulong NewestTransactionHeight = 0;
         public static string NewestTransactionBlockHash = string.Empty;
-        public static ulong WalletHeight = 0;        
+        public static ulong WalletHeight = 0;
        
         public static string WalletProcessName = GlobalMethods.GetWalletProcessName(AppSettings.ActiveCoin);
         public static string DaemonProcessName = GlobalMethods.GetDaemonProcessName(AppSettings.ActiveCoin);

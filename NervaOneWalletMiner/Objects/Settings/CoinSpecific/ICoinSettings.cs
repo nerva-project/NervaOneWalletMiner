@@ -15,6 +15,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         bool IsPassRequiredToOpenWallet { get; set; }
         bool AreIntegratedAddressesSupported { get; set; }
         bool AreKeysDumpedToFile {  get; set; }
+        bool IsPoppingBlocksSupported { get; set; }
 
         int LogLevelDaemon { get; set; }
         int LogLevelWallet { get; set; }
@@ -36,5 +37,6 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
 
         string GenerateWalletOptions(SettingsWallet walletSettings, RpcBase daemonRpc);
         string GenerateDaemonOptions(SettingsDaemon daemonSettings);
+        string GeneratePopBlocksOption(int numberOfBlocks);
     }
 }

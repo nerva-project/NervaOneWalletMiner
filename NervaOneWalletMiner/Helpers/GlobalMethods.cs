@@ -1183,6 +1183,8 @@ namespace NervaOneWalletMiner.Helpers
 
             GlobalData.IsCliToolsFound = true;
             GlobalData.IsCliToolsDownloadConfirmed = false;
+            GlobalData.ConnectGuardLastGoodTime = DateTime.Now;
+            GlobalData.ConnectGuardRestartCount = 1;
         }
         #endregion // Misc Methods
 

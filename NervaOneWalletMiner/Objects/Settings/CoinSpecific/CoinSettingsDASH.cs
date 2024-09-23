@@ -19,6 +19,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private bool _IsPassRequiredToOpenWallet = false;
         private bool _AreIntegratedAddressesSupported = false;
         private bool _AreKeysDumpedToFile = true;
+        private bool _IsPoppingBlocksSupported = false;
 
         private int _LogLevelDaemon = 0;
         private int _LogLevelWallet = 0;
@@ -51,6 +52,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public bool IsPassRequiredToOpenWallet { get => _IsPassRequiredToOpenWallet; set => _IsPassRequiredToOpenWallet = value; }
         public bool AreIntegratedAddressesSupported { get => _AreIntegratedAddressesSupported; set => _AreIntegratedAddressesSupported = value; }
         public bool AreKeysDumpedToFile { get => _AreKeysDumpedToFile; set => _AreKeysDumpedToFile = value; }
+        public bool IsPoppingBlocksSupported { get => _IsPoppingBlocksSupported; set => _IsPoppingBlocksSupported = value; }
 
         public int LogLevelDaemon { get => _LogLevelDaemon; set => _LogLevelDaemon = value; }
         public int LogLevelWallet { get => _LogLevelWallet; set => _LogLevelWallet = value; }
@@ -102,6 +104,12 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public string GenerateWalletOptions(SettingsWallet walletSettings, RpcBase daemonRpc)
         {
             // Should not call this because daemon and wallet are the same process
+            throw new NotImplementedException();
+        }
+
+        public string GeneratePopBlocksOption(int numberOfBlocks)
+        {
+            // Popping blocks is not supported
             throw new NotImplementedException();
         }
         #endregion // Interface Methods

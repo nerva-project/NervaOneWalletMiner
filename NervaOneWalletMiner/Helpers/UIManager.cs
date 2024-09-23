@@ -610,6 +610,12 @@ namespace NervaOneWalletMiner.Helpers
                         GlobalData.NetworkStats.ConnectionsIn = infoRes.ConnectionCountIn;
                         GlobalData.NetworkStats.ConnectionsOut = infoRes.ConnectionCountOut;
 
+                        // Used for Connections Guard
+                        if(GlobalData.NetworkStats.ConnectionsIn + GlobalData.NetworkStats.ConnectionsOut > GlobalData.ConnectGuardMinimumGoodCount)
+                        {
+                            GlobalData.ConnectGuardLastGoodTime = DateTime.Now;
+                        }
+
                         GlobalData.NetworkStats.Version = infoRes.Version;
                         GlobalData.NetworkStats.StatusSync = "";
                         if (infoRes.TargetHeight != 0 && infoRes.Height < infoRes.TargetHeight)

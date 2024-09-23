@@ -174,6 +174,18 @@ namespace NervaOneWalletMiner.Helpers
                         GlobalMethods.SaveWallet();
                     }
                 }
+
+                if(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].EnableConnectionsGuard)
+                {
+                    if (GlobalData.ConnectGuardLastGoodTime.AddMinutes(GlobalData.ConnectGuardMinutes * GlobalData.ConnectGuardRestartCount) < DateTime.Now)
+                    {                        
+                        Logger.LogDebug("MSP.MUPS", "Connections guard forcing restart. Last good time: " + GlobalData.ConnectGuardLastGoodTime.ToLongTimeString() + " | Restart Ct: " + GlobalData.ConnectGuardRestartCount);
+                        
+                        // Pop blocks every 3rd restart
+                        ConnectionsGuardRestart(GlobalData.ConnectGuardRestartCount % 3 == 0);
+                        GlobalData.ConnectGuardRestartCount++;
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -262,6 +274,33 @@ namespace NervaOneWalletMiner.Helpers
             catch (Exception ex)
             {
                 Logger.LogException("MSP.KWPR", ex);
+            }
+        }
+
+        private static void ConnectionsGuardRestart(bool popBlocks)
+        {
+            try
+            {
+                if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].EnableConnectionsGuard)
+                {
+                    string restartOptions = string.Empty;
+
+                    if (popBlocks)
+                    {
+                        restartOptions = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPoppingBlocksSupported ? GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].GeneratePopBlocksOption(GlobalData.ConnectGuardBlocksToPop) : string.Empty;
+                    }
+                    
+                    ProcessManager.Kill(GlobalData.WalletProcessName);
+                    GlobalMethods.StopAndCloseDaemon();
+                    GlobalData.IsDaemonRestarting = true;
+
+                    Logger.LogDebug("MSP.CSGR", "Connections guard restaring using options: " + restartOptions);
+                    ProcessManager.StartExternalProcess(GlobalMethods.GetDaemonProcess(), GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].GenerateDaemonOptions(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]) + " " + restartOptions);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("MSP.CSGR", ex);
             }
         }
 
