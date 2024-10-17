@@ -88,7 +88,7 @@ namespace NervaOneWalletMiner.Helpers
         // Connections Guard
         public static DateTime ConnectGuardLastGoodTime = DateTime.Now;
         public static int ConnectGuardRestartCount = 1;
-        public static ulong ConnectGuardMinimumGoodCount = 3;
+        public static ulong ConnectGuardMinimumGoodCount = 2;
         public static int ConnectGuardMinutes = 10;
         public static int ConnectGuardBlocksToPop = 1000;        
 
