@@ -3,6 +3,7 @@ using Avalonia.Interactivity;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects;
 using System;
+using System.Linq;
 
 namespace NervaOneWalletMiner.ViewsDialogs
 {
@@ -35,7 +36,8 @@ namespace NervaOneWalletMiner.ViewsDialogs
 
                 // Change height based on number of lines. Assume 70 characters per line
                 double numberOfLines = Math.Ceiling(textMessage.Length / 70.0);
-                Height = 100 + (numberOfLines * 18);
+                int numberOfNewLines = textMessage.Where(x => (x == '\n')).Count();
+                Height = 80 + (numberOfLines * 18) + (numberOfNewLines * 18);
             }
             catch (Exception ex)
             {

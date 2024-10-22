@@ -40,7 +40,7 @@ namespace NervaOneWalletMiner.Views
         }
 
         #region Save Settings
-        public void SaveSettings_Clicked(object sender, RoutedEventArgs args)
+        public async void SaveSettings_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
@@ -106,6 +106,15 @@ namespace NervaOneWalletMiner.Views
                 if (isChanged)
                 {                    
                     GlobalMethods.SaveConfig();
+
+                    // Ask user if they want to restart daemon
+                    MessageBoxView confirmDaemonRestart = new MessageBoxView("Restart Daemon?", "You've made changes to daemon setup. For those changes to take effect, restart is required.\r\n\r\nWould you like to restart daemon now?", false);
+                    DialogResult confirmRestart = await confirmDaemonRestart.ShowDialog<DialogResult>(GetWindow());
+
+                    if (confirmRestart != null && confirmRestart.IsOk)
+                    {
+                        RestartWithCommand(string.Empty);
+                    }
                 }
             }
             catch (Exception ex)
