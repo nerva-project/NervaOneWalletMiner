@@ -24,13 +24,13 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private int _LogLevelDaemon = 0;
         private int _LogLevelWallet = 0;
 
-        private string _CliUrlWindows64 = "https://github.com/wownero-project/wownero/releases/download/v0.11.0.0/wownero-x86_64-w64-mingw32-v0.11.zip";
-        private string _CliUrlWindows32 = "https://github.com/wownero-project/wownero/releases/download/v0.11.0.0/wownero-i686-w64-mingw32-v0.11.zip";
-        private string _CliUrlLinux64 = "https://github.com/wownero-project/wownero/releases/download/v0.11.0.0/wownero-aarch64-linux-gnu-v0.11.tar.bz2";
-        private string _CliUrlLinux32 = "https://github.com/wownero-project/wownero/releases/download/v0.11.0.0/wownero-aarch64-linux-gnu-v0.11.tar.bz2";
-        private string _CliUrlLinuxArm = "https://github.com/wownero-project/wownero/releases/download/v0.11.0.0/wownero-arm-linux-android-v0.11.tar.bz2";
-        private string _CliUrlMacIntel = "https://github.com/wownero-project/wownero/releases/download/v0.11.0.0/wownero-x86_64-apple-darwin11-v0.11.tar.bz2";
-        private string _CliUrlMacArm = "https://github.com/wownero-project/wownero/releases/download/v0.11.0.0/wownero-x86_64-apple-darwin11-v0.11.tar.bz2";
+        private string _CliUrlWindows64 = "https://codeberg.org/wownero/wownero/releases/download/v0.11.2.0/wownero-x86_64-w64-mingw32-59db3fe8d.zip";
+        private string _CliUrlWindows32 = "https://codeberg.org/wownero/wownero/releases/download/v0.11.2.0/wownero-i686-w64-mingw32-59db3fe8d.zip";
+        private string _CliUrlLinux64 = "https://codeberg.org/wownero/wownero/releases/download/v0.11.2.0/wownero-x86_64-linux-gnu-59db3fe8d.tar.bz2";
+        private string _CliUrlLinux32 = "https://codeberg.org/wownero/wownero/releases/download/v0.11.2.0/wownero-i686-linux-gnu-59db3fe8d.tar.bz2";
+        private string _CliUrlLinuxArm = "https://codeberg.org/wownero/wownero/releases/download/v0.11.2.0/wownero-aarch64-linux-gnu-59db3fe8d.tar.bz2";
+        private string _CliUrlMacIntel = "https://codeberg.org/wownero/wownero/releases/download/v0.11.2.0/wownero-x86_64-apple-darwin11-59db3fe8d.tar.bz2";
+        private string _CliUrlMacArm = "https://codeberg.org/wownero/wownero/releases/download/v0.11.2.0/wownero-aarch64-apple-darwin11-59db3fe8d.tar.bz2";
 
         private string _DataDirWindows = "C:/ProgramData/wownero";
         private string _DataDirLinux = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".wownero");

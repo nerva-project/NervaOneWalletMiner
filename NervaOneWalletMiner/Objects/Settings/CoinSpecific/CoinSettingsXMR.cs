@@ -24,13 +24,13 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private int _LogLevelDaemon = 0;
         private int _LogLevelWallet = 0;
 
-        private string _CliUrlWindows64 = "https://downloads.getmonero.org/cli/monero-win-x64-v0.18.3.3.zip";
-        private string _CliUrlWindows32 = "https://downloads.getmonero.org/cli/monero-win-x86-v0.18.3.3.zip";
-        private string _CliUrlLinux64 = "https://downloads.getmonero.org/cli/monero-linux-x64-v0.18.3.3.tar.bz2";
-        private string _CliUrlLinux32 = "https://downloads.getmonero.org/cli/monero-linux-x86-v0.18.3.3.tar.bz2";
-        private string _CliUrlLinuxArm = "https://downloads.getmonero.org/cli/monero-linux-armv7-v0.18.3.3.tar.bz2";
-        private string _CliUrlMacIntel = "https://downloads.getmonero.org/cli/monero-mac-x64-v0.18.3.3.tar.bz2";
-        private string _CliUrlMacArm = "https://downloads.getmonero.org/cli/monero-mac-armv8-v0.18.3.3.tar.bz2";
+        private string _CliUrlWindows64 = "https://downloads.getmonero.org/cli/monero-win-x64-v0.18.3.4.zip";
+        private string _CliUrlWindows32 = "https://downloads.getmonero.org/cli/monero-win-x86-v0.18.3.4.zip";
+        private string _CliUrlLinux64 = "https://downloads.getmonero.org/cli/monero-linux-x64-v0.18.3.4.tar.bz2";
+        private string _CliUrlLinux32 = "https://downloads.getmonero.org/cli/monero-linux-x86-v0.18.3.4.tar.bz2";
+        private string _CliUrlLinuxArm = "https://downloads.getmonero.org/cli/monero-linux-armv7-v0.18.3.4.tar.bz2";
+        private string _CliUrlMacIntel = "https://downloads.getmonero.org/cli/monero-mac-x64-v0.18.3.4.tar.bz2";
+        private string _CliUrlMacArm = "https://downloads.getmonero.org/cli/monero-mac-armv8-v0.18.3.4.tar.bz2";
 
         private string _DataDirWindows = "C:/ProgramData/monero";
         private string _DataDirLinux = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".monero");
