@@ -295,7 +295,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                                     {
                                         Address = connection.addr,
                                         Height = connection.startingheight,
-                                        LiveTime = (DateTime.Now - DateTime.UnixEpoch.AddSeconds(connection.conntime).ToLocalTime()).ToString(@"hh\:mm\:ss"),
+                                        LiveTime = (DateTime.Now - DateTime.UnixEpoch.AddSeconds(connection.conntime).ToLocalTime()).ToString(@"%d\.hh\:mm"),
                                         State = connection.connection_type,
                                         IsIncoming = connection.inbound
                                     });

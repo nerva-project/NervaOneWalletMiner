@@ -331,7 +331,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                                     {
                                         Address = connection.address,
                                         Height = Convert.ToInt64(connection.height),
-                                        LiveTime = TimeSpan.FromSeconds(connection.live_time).ToString(@"hh\:mm\:ss"),
+                                        LiveTime = TimeSpan.FromSeconds(connection.live_time).ToString(@"%d\.hh\:mm"),
                                         State = connection.state,
                                         IsIncoming = connection.incoming
                                     });
