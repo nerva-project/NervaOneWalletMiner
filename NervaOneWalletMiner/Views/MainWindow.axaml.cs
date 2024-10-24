@@ -97,7 +97,7 @@ public partial class MainWindow : Window
             if (result != null && result.IsOk)
             {
                 Logger.LogDebug("MAW.CTLC", "CLI tools not found. Attempting to download from: " + result.TextBoxValue);
-                GlobalData.IsCliToolsDownloadConfirmed = true;
+                GlobalData.IsCliToolsDownloading = true;
 
                 if (!string.IsNullOrEmpty(result.TextBoxValue))
                 {
@@ -108,7 +108,7 @@ public partial class MainWindow : Window
             else
             {
                 Logger.LogDebug("MAW.CTLC", "CLI tools download cancelled.");
-                GlobalData.IsCliToolsDownloadConfirmed = false;
+                GlobalData.IsCliToolsDownloading = false;
 
                 await Dispatcher.UIThread.Invoke(async () =>
                 {

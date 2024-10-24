@@ -83,7 +83,7 @@ namespace NervaOneWalletMiner.Helpers
         public static bool IsGetAndSetWalletDataComplete = true;
         public static bool IsGetAndSetDaemonDataComplete = true;
         public static bool IsCliToolsFound = true;
-        public static bool IsCliToolsDownloadConfirmed = false;
+        public static bool IsCliToolsDownloading = false;
 
         // Connections Guard
         public static DateTime ConnectGuardLastGoodTime = DateTime.Now;

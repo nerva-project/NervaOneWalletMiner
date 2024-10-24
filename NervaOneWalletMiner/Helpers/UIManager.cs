@@ -519,24 +519,21 @@ namespace NervaOneWalletMiner.Helpers
         {
             try
             {
-                if (!GlobalData.IsCliToolsFound)
+                if (GlobalData.IsCliToolsDownloading)
                 {
-                    if(GlobalData.IsCliToolsDownloadConfirmed)
+                    GlobalData.NetworkStats = new()
                     {
-                        GlobalData.NetworkStats = new()
-                        {
-                            StatusSync = " | Trying to download client tools...",
-                            Connections = []
-                        };
-                    }
-                    else
+                        StatusSync = " | Downloading client tools. Please wait...",
+                        Connections = []
+                    };
+                }
+                else if (!GlobalData.IsCliToolsFound)
+                {
+                    GlobalData.NetworkStats = new()
                     {
-                        GlobalData.NetworkStats = new()
-                        {
-                            StatusSync = " | Client tools missing.",
-                            Connections = []
-                        };
-                    }
+                        StatusSync = " | Client tools missing.",
+                        Connections = []
+                    };
                 }
                 else if (GlobalData.IsDaemonRestarting)
                 {
@@ -550,7 +547,7 @@ namespace NervaOneWalletMiner.Helpers
                 {
                     GlobalData.NetworkStats = new()
                     {
-                        StatusSync = " | Trying to establish connection with daemon...",
+                        StatusSync = " | Establishing connection with daemon...",
                         Connections = []
                     };
                 }

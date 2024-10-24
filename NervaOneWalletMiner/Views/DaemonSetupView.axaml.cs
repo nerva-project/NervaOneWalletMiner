@@ -3,6 +3,8 @@ using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects;
+using NervaOneWalletMiner.Objects.Constants;
+using NervaOneWalletMiner.ViewModels;
 using NervaOneWalletMiner.ViewsDialogs;
 using System;
 using System.Diagnostics;
@@ -145,6 +147,62 @@ namespace NervaOneWalletMiner.Views
             }
         }
         #endregion // Restart With QuickSync
+
+        #region Update Client Tools
+        public void UpdateClientTools_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                string cliToolsLink = GlobalMethods.GetCliToolsDownloadLink(GlobalData.AppSettings.ActiveCoin);
+                Logger.LogDebug("DMS.UCTC", "Updating client tools");
+
+                var window = new TextBoxView("Update Client Tools", "Client Tools Download Link", cliToolsLink, string.Empty);
+                window.ShowDialog(GetWindow()).ContinueWith(CliToolsLinkDialogClosed);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DMS.UCTC", ex);
+            }
+        }
+
+        private async void CliToolsLinkDialogClosed(Task task)
+        {
+            try
+            {
+                DialogResult result = ((DialogResult)((Task<object>)task).Result);
+                if (result != null && result.IsOk)
+                {                                      
+                    if (!string.IsNullOrEmpty(result.TextBoxValue))
+                    {
+                        // We'll be downloading new client tools so clean up
+                        GlobalData.IsCliToolsDownloading = true;
+
+                        if (GlobalData.IsWalletOpen)
+                        {
+                            Logger.LogDebug("DMS.CTLC", "Closing wallet: " + GlobalData.OpenedWalletName);
+                            await((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).CloseWalletNonUi();
+                        }
+
+                        if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsDaemonWalletSeparateApp)
+                        {
+                            Logger.LogDebug("DMS.CTLC", "Calling wallet ForceClose...");
+                            ProcessManager.Kill(GlobalData.WalletProcessName);
+                        }
+
+                        Logger.LogDebug("DMS.CTLC", "Stopping daemon...");
+                        GlobalMethods.StopAndCloseDaemon();
+
+                        // Download and extract CLI tools
+                        GlobalMethods.SetUpCliTools(result.TextBoxValue, GlobalData.CliToolsDir);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DMS.CTLC", ex);
+            }
+        }
+        #endregion // Update Client Tools
 
         #region Restart with Command
         public void RestartWithCommand_Clicked(object sender, RoutedEventArgs args)

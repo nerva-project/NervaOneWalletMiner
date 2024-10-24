@@ -606,31 +606,25 @@ namespace NervaOneWalletMiner.Helpers
         {
             try
             {
-                // Check if we already downloaded the CLI package
+                // It used to check if already downloaded and try extracting existing file but if we're here again it means the process got interapted so re-download
                 string destFileWithPath = Path.Combine(cliToolsPath, Path.GetFileName(downloadUrl));
 
-                if (File.Exists(destFileWithPath))
-                {
-                    Logger.LogDebug("GLM.SUCT", "Extracting existing CLI tools: " + destFileWithPath);
+                Logger.LogDebug("GLM.SUCT", "Downloading CLI tools. URL: " + downloadUrl);
+                bool isSuccess = await DownloadFileToFolder(downloadUrl, cliToolsPath);
 
+                if (isSuccess)
+                {
+                    Logger.LogDebug("GLM.SUCT", "Extracting CLI tools after download: " + destFileWithPath);
                     ExtractFile(cliToolsPath, destFileWithPath);
-                }
-                else
-                {
-                    Logger.LogDebug("GLM.SUCT", "Downloading CLI tools. URL: " + downloadUrl);
-
-                    bool isSuccess = await DownloadFileToFolder(downloadUrl, cliToolsPath);
-
-                    if (isSuccess)
-                    {
-                        Logger.LogDebug("GLM.SUCT", "Extracting CLI tools after download: " + destFileWithPath);
-                        ExtractFile(cliToolsPath, destFileWithPath);
-                    }
                 }
             }
             catch (Exception ex)
             {
                 Logger.LogException("GLM.SUCT", ex);
+            }
+            finally
+            {
+                GlobalData.IsCliToolsDownloading = false;
             }
         }
 
@@ -1182,7 +1176,7 @@ namespace NervaOneWalletMiner.Helpers
             GlobalData.IsAutoStoppedMining = false;
 
             GlobalData.IsCliToolsFound = true;
-            GlobalData.IsCliToolsDownloadConfirmed = false;
+            GlobalData.IsCliToolsDownloading = false;
             GlobalData.ConnectGuardLastGoodTime = DateTime.Now;
             GlobalData.ConnectGuardRestartCount = 1;
         }
@@ -1226,10 +1220,11 @@ namespace NervaOneWalletMiner.Helpers
             {                
                 // Try to stop Daemon
                 ForceDaemonStop();
-                Thread.Sleep(500);
+                Thread.Sleep(2000);
 
                 // Kill running daemon process
                 ProcessManager.Kill(GlobalData.DaemonProcessName);
+                Thread.Sleep(500);
             }
             catch (Exception ex)
             {

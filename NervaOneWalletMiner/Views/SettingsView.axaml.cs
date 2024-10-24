@@ -125,7 +125,7 @@ namespace NervaOneWalletMiner.Views
                 if (result != null && result.IsOk)
                 {
                     Logger.LogDebug("SET.CTLC", "Attempting to download CLI tools from: " + result.TextBoxValue);
-                    GlobalData.IsCliToolsDownloadConfirmed = true;
+                    GlobalData.IsCliToolsDownloading = true;
 
                     if (!string.IsNullOrEmpty(result.TextBoxValue))
                     {
@@ -136,7 +136,7 @@ namespace NervaOneWalletMiner.Views
                 else
                 {
                     Logger.LogDebug("SET.CTLC", "CLI tools download cancelled");
-                    GlobalData.IsCliToolsDownloadConfirmed = false;
+                    GlobalData.IsCliToolsDownloading = false;
 
                     await Dispatcher.UIThread.Invoke(async () =>
                     {

@@ -227,7 +227,7 @@ namespace NervaOneWalletMiner.Helpers
                 {
                     if (GlobalData.LastDaemonRestartAttempt.AddSeconds(300) < DateTime.Now)
                     {
-                        if (GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
+                        if (!GlobalData.IsCliToolsDownloading && GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
                         {
                             Logger.LogDebug("MSP.KDNR", "Restarting daemon process because it's not running");
                             GlobalData.LastDaemonRestartAttempt = DateTime.Now;
@@ -255,7 +255,7 @@ namespace NervaOneWalletMiner.Helpers
             {
                 if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsDaemonWalletSeparateApp)
                 {
-                    if (!ProcessManager.IsRunning(GlobalData.WalletProcessName))
+                    if (!GlobalData.IsCliToolsDownloading && !ProcessManager.IsRunning(GlobalData.WalletProcessName))
                     {
                         if (GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
                         {
