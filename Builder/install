@@ -18,4 +18,4 @@ echo "Terminal=false" >> ${dd}
 
 chmod +x ${dd}
 
-echo "Finished"
+echo "Installer finished successfully. You can now open NervaOne from your Applications."

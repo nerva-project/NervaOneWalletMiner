@@ -18,4 +18,10 @@
   <ItemGroup>
     <ProjectReference Include="..\NervaOneWalletMiner\NervaOneWalletMiner.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Update="readme.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
