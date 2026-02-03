@@ -64,20 +64,20 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
         }
 
-        public void CancelButtonClicked(object sender, RoutedEventArgs args)
+        public void OKButtonClicked(object sender, RoutedEventArgs args)
         {
             try
             {
                 DialogResult result = new()
                 {
-                    IsCancel = true
+                    IsOk = true
                 };
 
                 Close(result);
             }
             catch (Exception ex)
             {
-                Logger.LogException("DKD.CLBC", ex);
+                Logger.LogException("MBD.OKBC", ex);
             }
         }
 
