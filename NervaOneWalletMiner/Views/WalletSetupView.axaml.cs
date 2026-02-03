@@ -177,7 +177,7 @@ namespace NervaOneWalletMiner.Views
                     Logger.LogDebug("WAS.CNW1", "Wallet " + walletName + " created successfully");
                     await Dispatcher.UIThread.InvokeAsync(async () =>
                     {
-                        MessageBoxView window = new("Create Wallet", walletName + " wallet created successfully!\r\n\r\nYour new wallet is now open. Make sure to save your seed phrase and keys!", true);
+						WalletCreatedView window = new();
                         await window.ShowDialog(GetWindow());
                     });
                 }
