@@ -22,7 +22,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("DKD.CONS", ex);
+                Logger.LogException("DWC.CONS", ex);
             }
         }
 
@@ -34,7 +34,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
 
                 if (response.Error.IsError)
                 {
-                    Logger.LogError("DKD.GASK", "Failed to query keys for " + GlobalData.OpenedWalletName + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
+                    Logger.LogError("DWC.GASK", "Failed to query keys for " + GlobalData.OpenedWalletName + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
                 }
                 else
                 {
@@ -42,14 +42,14 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     tbxPrivateViewKey.Text = response.PrivateViewKey;
                     tbxPublicSpendKey.Text = response.PublicSpendKey;
                     tbxPrivateSpendKey.Text = response.PrivateSpendKey;
-					tbkMessage.Text = "Wallet created successfully!\r\n\r\nYour new wallet is now open. Please make sure to write down your seed phrase and keys!";
+					tbkMessage.Text = "Wallet created successfully! Your new wallet is now open.\r\n\r\nPlease make sure to write down your seed phrase and keys!";
                     response = new GetPrivateKeysResponse();
 
                     // Once you got keys, query mnemonic seed
                     response = await GlobalData.WalletService.GetPrivateKeys(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new GetPrivateKeysRequest() { KeyType = KeyType.Mnemonic });
                     if (response.Error.IsError)
                     {
-                        Logger.LogError("DKD.GASK", "Failed to query mnemonic seed for " + GlobalData.OpenedWalletName + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
+                        Logger.LogError("DWC.GASK", "Failed to query mnemonic seed for " + GlobalData.OpenedWalletName + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
                     }
                     else
                     {
@@ -60,7 +60,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("DKD.GASK", ex);
+                Logger.LogException("DWC.GASK", ex);
             }
         }
 
@@ -77,7 +77,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("MBD.OKBC", ex);
+                Logger.LogException("DWC.OKBC", ex);
             }
         }
 

@@ -5,7 +5,7 @@
         mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="550"
         x:Class="NervaOneWalletMiner.ViewsDialogs.WalletCreatedView"
 		Width="600"
-		Height="550"
+		Height="600"
 		Topmost="True"
 		WindowStartupLocation="CenterOwner"
         Title="Wallet Created Success">
