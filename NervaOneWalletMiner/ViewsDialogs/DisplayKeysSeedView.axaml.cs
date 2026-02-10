@@ -11,14 +11,21 @@ namespace NervaOneWalletMiner.ViewsDialogs
 {
     public partial class DisplayKeysSeedView : Window
     {
+        #region Constructors and Loading
+        // Not used but designer will complain without it
         public DisplayKeysSeedView()
+        {
+            InitializeComponent();
+        }
+
+        public DisplayKeysSeedView(string message)
         {
             try
             {
                 InitializeComponent();
                 Icon = GlobalMethods.GetWindowIcon();               
 
-                GetAndShowKeys();
+                GetAndShowKeys(message);
             }
             catch (Exception ex)
             {
@@ -26,7 +33,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
         }
 
-        private async void GetAndShowKeys()
+        private async void GetAndShowKeys(string message)
         {
             try
             {
@@ -42,6 +49,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     tbxPrivateViewKey.Text = response.PrivateViewKey;
                     tbxPublicSpendKey.Text = response.PublicSpendKey;
                     tbxPrivateSpendKey.Text = response.PrivateSpendKey;
+                    tbkMessage.Text = message;
                     response = new GetPrivateKeysResponse();
 
                     // Once you got keys, query mnemonic seed
@@ -62,8 +70,139 @@ namespace NervaOneWalletMiner.ViewsDialogs
                 Logger.LogException("DKD.GASK", ex);
             }
         }
+        #endregion // Constructors and Loading
 
-        public void CancelButtonClicked(object sender, RoutedEventArgs args)
+        #region Events        
+        public void CopyPublicViewKeyToClipboardButton_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                GlobalMethods.CopyToClipboard(this, tbxPublicViewKey.Text!);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DKD.CPUV", ex);
+            }
+        }
+
+        public void CopyPrivateViewKeyToClipboardButton_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                GlobalMethods.CopyToClipboard(this, tbxPrivateViewKey.Text!);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DKD.CPRV", ex);
+            }
+        }
+
+        public void ShowHidePrivateViewKeyButton_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                if (tbxPrivateViewKey.RevealPassword)
+                {
+                    // Reveal was true, so hide
+                    tbxPrivateViewKey.RevealPassword = false;
+                    btnShowHidePrivateViewKey.Content = "Show";
+                }
+                else
+                {
+                    // Reveal was false, so show
+                    tbxPrivateViewKey.RevealPassword = true;
+                    btnShowHidePrivateViewKey.Content = "Hide";
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DKD.SHPV", ex);
+            }
+        }
+
+        public void CopyPublicSpendKeyToClipboardButton_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                GlobalMethods.CopyToClipboard(this, tbxPublicSpendKey.Text!);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DKD.CPUS", ex);
+            }
+        }
+
+        public void CopyPrivateSpendKeyToClipboardButton_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                GlobalMethods.CopyToClipboard(this, tbxPrivateSpendKey.Text!);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DKD.CPRS", ex);
+            }
+        }
+
+        public void ShowHidePrivateSpendKeyButton_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                if (tbxPrivateSpendKey.RevealPassword)
+                {
+                    // Reveal was true, so hide
+                    tbxPrivateSpendKey.RevealPassword = false;
+                    btnShowHidePrivateSpendKey.Content = "Show";
+                }
+                else
+                {
+                    // Reveal was false, so show
+                    tbxPrivateSpendKey.RevealPassword = true;
+                    btnShowHidePrivateSpendKey.Content = "Hide";
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DKD.SHPS", ex);
+            }
+        }
+
+        public void CopySeedToClipboardButton_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                GlobalMethods.CopyToClipboard(this, tbxMnemonicSeed.Text!);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DKD.CPRS", ex);
+            }
+        }
+
+        public void ShowHideSeedButton_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                if (tbxMnemonicSeed.RevealPassword)
+                {
+                    // Reveal was true, so hide
+                    tbxMnemonicSeed.RevealPassword = false;
+                    btnShowHideSeed.Content = "Show";
+                }
+                else
+                {
+                    // Reveal was false, so show
+                    tbxMnemonicSeed.RevealPassword = true;
+                    btnShowHideSeed.Content = "Hide";
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DKD.SHPS", ex);
+            }
+        }
+
+        public void CancelButton_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
@@ -90,5 +229,6 @@ namespace NervaOneWalletMiner.ViewsDialogs
 
             base.OnClosing(e);
         }
+        #endregion // Events
     }
 }
