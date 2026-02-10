@@ -24,7 +24,7 @@ jobs:
 
     - name: Restore dependencies
       run: |
-        cd ./NervaOneWalletMiner.Desktop
+        cd ./NervaOneWalletMiner
         dotnet restore
 
     - name: Build
