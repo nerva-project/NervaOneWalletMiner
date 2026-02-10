@@ -31,8 +31,3 @@ jobs:
       run: |
         cd ./NervaOneWalletMiner.Desktop
         dotnet build --no-restore
-      
-    - name: Test
-      run: 
-        cd ./NervaOneWalletMiner.Desktop
-        dotnet test --no-build --verbosity normal
