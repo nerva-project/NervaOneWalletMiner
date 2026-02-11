@@ -9,6 +9,7 @@ using NervaOneWalletMiner.Rpc.Daemon.Responses;
 using NervaOneWalletMiner.ViewModels;
 using NervaOneWalletMiner.ViewsDialogs;
 using System;
+using System.Threading.Tasks;
 
 namespace NervaOneWalletMiner.Views
 {
@@ -59,6 +60,16 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
+        private void hashThreshold_ValueChanged(object sender, NumericUpDownValueChangedEventArgs args)
+        {
+            if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopMiningThreshold != hashThreshold.Value)
+            {
+                GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopMiningThreshold = Convert.ToInt32(hashThreshold.Value);
+                Logger.LogDebug("DMN.NTVC", "Setting stop mining threshold: " + GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopMiningThreshold);
+                GlobalMethods.SaveConfig();
+            }
+        }
+        
         private void nupThreads_ValueChanged(object sender, NumericUpDownValueChangedEventArgs args)
         {
             if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads != nupThreads.Value)
@@ -169,13 +180,19 @@ namespace NervaOneWalletMiner.Views
                     {
                         Logger.LogDebug("GLM.STMA", "Error starting mining | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
 
-                        if (isUiThread)
+                        if (isUiThread && !response.Error.Code.Equals("Network hash too high"))
                         {
                             await Dispatcher.UIThread.Invoke(async () =>
                             {
                                 MessageBoxView window = new("Start Mining", "Error when starting mining\r\n\r\n" + response.Error.Message, true);
                                 await window.ShowDialog(owner!);
                             });
+                        }
+
+                        if (response.Error.Code.Equals("Network hash too high"))
+                        {
+                            await Task.Delay(1000 * 60); // Wait 1 minute before trying again
+                            StartMiningAsync(owner, threads, isUiThread);
                         }
                     }
                     else
