@@ -1,7 +1,7 @@
 # This workflow will build a .NET project
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
 
-name: .NET
+name: ci-build-artifacts
 
 on:
   push:
@@ -10,24 +10,147 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+    setup:
+        runs-on: ubuntu-latest
+        outputs:
+            version: ${{ steps.get_version.outputs.version }}
+        env:
+            currVer: ${{ github.ref_name }}
+        steps:
+          - name: Extract Version Number
+            id: get_version
+            shell: bash
+            run: |
+              version="${currVer#v}"
+              echo "version=$version" >> $GITHUB_OUTPUT
+              echo "Extracted version: $version"
 
-    runs-on: ubuntu-latest
+# ================================
+#              Windows
+# ================================
+    build-windows:
+        needs: setup
+        runs-on: windows-latest
+        strategy:
+            matrix:
+                rid: ["win-x64", "win-arm64"]
 
-    steps:
-    - uses: actions/checkout@v4
+        steps:
+          - name: Checkout Repository
+            uses: actions/checkout@v4
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.x
+          - name: Setup .NET
+            uses: actions/setup-dotnet@v4
+            with:
+                dotnet-version: 8.0.x
 
-    - name: Restore dependencies
-      run: |
-        cd ./NervaOneWalletMiner.Desktop
-        dotnet restore
+          - name: Install Netloy
+            run: dotnet tool install -g Netloy
 
-    - name: Build
-      run: |
-        cd ./NervaOneWalletMiner.Desktop
-        dotnet build --no-restore
+          - name: Restore Dependencies
+            run: |
+                cd ./NervaOneWalletMiner.Desktop
+                dotnet restore
+
+          - name: Build Windows ZIP
+            run: |
+                cd ./Builder
+                netloy -t portable -r ${{ matrix.rid }} -y -o "Output/nervaone-desktop-${{ needs.setup.outputs.version }}-${{ matrix.rid }}.zip"
+
+          - name: Remove PDB Files
+            run: Remove-Item -Path "./Builder/Output/*.pdb" -Force -ErrorAction SilentlyContinue
+            shell: pwsh
+
+          - name: Upload Windows Artifacts
+            uses: actions/upload-artifact@v4
+            with:
+                name: ${{ matrix.rid }}-packages
+                path: |
+                    ./Builder/Output/*
+                    !./Builder/Output/*.pdb
+                    !./Builder/Output/*.wixpdb
+
+# ================================
+#              Linux
+# ================================
+    build-linux:
+        needs: setup
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                rid: ["linux-x64", "linux-arm64"]
+
+        steps:
+          - name: Checkout Repository
+            uses: actions/checkout@v4
+
+          - name: Setup .NET
+            uses: actions/setup-dotnet@v4
+            with:
+                dotnet-version: 8.0.x
+
+          - name: Install Dependencies
+            env:
+                DEBIAN_FRONTEND: noninteractive
+                NEEDRESTART_MODE: l
+            run: |
+                sudo apt update
+                sudo apt-get install -y zip libfuse2t64
+
+          - name: Install Netloy
+            run: dotnet tool install -g Netloy
+
+          - name: Restore Dependencies
+            run: |
+                cd ./NervaOneWalletMiner.Desktop
+                dotnet restore
+
+          - name: Build Linux TAR.GZ
+            run: |
+                cd ./Builder
+                netloy -t portable -r ${{ matrix.rid }} -y -o "Output/nervaone-desktop-${{ needs.setup.outputs.version }}-${{ matrix.rid }}.tar.gz"
+
+          - name: Upload Linux Artifacts
+            uses: actions/upload-artifact@v4
+            with:
+                name: ${{ matrix.rid }}-packages
+                path: ./Builder/Output/*
+
+
+# ================================
+#              macOS
+# ================================
+    build-macos:
+        needs: setup
+        runs-on: macos-latest
+        strategy:
+            matrix:
+                rid: ["osx-x64", "osx-arm64"]
+
+        steps:
+          - name: Checkout Repository
+            uses: actions/checkout@v4
+
+          - name: Setup .NET
+            uses: actions/setup-dotnet@v4
+            with:
+                dotnet-version: 8.0.x
+
+          - name: Install Netloy
+            run: dotnet tool install -g Netloy
+
+          - name: Restore Dependencies
+            run: |
+                cd ./NervaOneWalletMiner.Desktop
+                dotnet restore
+
+          - name: Build macOS TAR.GZ
+            run: |
+                cd ./Builder
+                netloy -t portable -r ${{ matrix.rid }} -y -o "Output/nervaone-desktop-${{ needs.setup.outputs.version }}-${{ matrix.rid }}.tar.gz"
+
+          - name: Upload macOS  Artifacts
+            uses: actions/upload-artifact@v4
+            with:
+                name: ${{ matrix.rid }}-packages
+                path: ./Builder/Output/*
