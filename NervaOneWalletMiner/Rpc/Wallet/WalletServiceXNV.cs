@@ -1515,6 +1515,13 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         }
         #endregion // Get Transfers Export
 
+        #region Sweep Below
+        public Task<SweepBelowResponse> SweepBelow(RpcBase rpc, SweepBelowRequest requestObj)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion // Sweep Below
+
         #region Common Internal Helper Objects
         private class TransferEntry
         {

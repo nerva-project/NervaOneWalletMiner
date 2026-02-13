@@ -1596,6 +1596,11 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         {
             throw new NotImplementedException();
         }
+
+        public Task<SweepBelowResponse> SweepBelow(RpcBase rpc, SweepBelowRequest requestObj)
+        {
+            throw new NotImplementedException();
+        }
         #endregion // Unsupported Methods
     }
 }

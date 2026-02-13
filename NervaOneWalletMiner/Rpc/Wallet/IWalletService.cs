@@ -48,5 +48,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
 
 
         Task<GetTransfersExportResponse> GetTransfersExport(RpcBase rpc, GetTransfersExportRequest requestObj);
+
+        Task<SweepBelowResponse> SweepBelow(RpcBase rpc, SweepBelowRequest requestObj);
     }
 }

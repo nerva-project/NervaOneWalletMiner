@@ -50,6 +50,18 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
+        public void SweepBelow_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                // TODO: Not implemented yet
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("WAS.SWBC", ex);
+            }
+        }        
+
         public void OpenWalletExportsFolder_Clicked(object sender, RoutedEventArgs args)
         {
             try
