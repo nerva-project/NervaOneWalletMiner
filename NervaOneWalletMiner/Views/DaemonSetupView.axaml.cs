@@ -308,6 +308,29 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
+        private void NoDns_IsCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is CheckBox checkBox)
+                {
+                    if (checkBox.IsChecked!.Value)
+                    {
+                        cbxUseNoAnalyticsFlag.IsChecked = true;
+                        cbxUseNoAnalyticsFlag.IsEnabled = false;
+                    }
+                    else
+                    {
+                        cbxUseNoAnalyticsFlag.IsEnabled = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DMS.NDCC", ex);
+            }
+        }
+
         public IStorageProvider GetStorageProvider()
         {
             return GetTopLevel().StorageProvider;
