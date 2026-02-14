@@ -124,24 +124,39 @@ namespace NervaOneWalletMiner.Rpc.Daemon
         }
         #endregion // Stop Mining
 
-         
+        #region Stop Mining Auto
         public async Task<StopMiningResponse> StopMiningAuto(RpcBase rpc, StopMiningRequest requestObj)
         {
+            MiningStatusResponse status = await GetMiningStatus(rpc, new MiningStatusRequest());
             StopMiningResponse responseObj = new();
             
-            GetInfoResponse infoRes = await GlobalData.DaemonService.GetInfo(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new GetInfoRequest());
-            if ((infoRes.NetworkHashRate / 1000.0d) < requestObj.StopMiningThreshold)
+            if (!status.IsActive)
             {
-                responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, "Network hash too high");
                 return responseObj;
             }
+            
+            GetInfoResponse infoRes = await GlobalData.DaemonService.GetInfo(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new GetInfoRequest());
+            if ((infoRes.NetworkHashRate / 1000.0d) <= requestObj.StopMiningThreshold)
+            {
+                responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, "Network hash below threshold");
+                return responseObj;
+            }
+            Console.WriteLine("Stopping mining");
 
             return await StopMining(rpc, requestObj);
         }
-        
+        #endregion
+
+        #region Start Mining Auto
         public async Task<StartMiningResponse> StartMiningAuto(RpcBase rpc, StartMiningRequest requestObj)
         {
+            MiningStatusResponse status = await GetMiningStatus(rpc, new MiningStatusRequest());
             StartMiningResponse responseObj = new();
+            
+            if (status.IsActive)
+            {
+                return responseObj;
+            }
             
             GetInfoResponse infoRes = await GlobalData.DaemonService.GetInfo(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new GetInfoRequest());
             if ((infoRes.NetworkHashRate / 1000.0d) > requestObj.StopMiningThreshold)
@@ -149,9 +164,11 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, "Network hash too high");
                 return responseObj;
             }
+            Console.WriteLine("Starting mining");
 
             return await StartMining(rpc, requestObj);
         }
+        #endregion
         
         #region Stop Daemon
         public async Task<StopDaemonResponse> StopDaemon(RpcBase rpc, StopDaemonRequest requestObj)

@@ -76,6 +76,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
         }
         #endregion // Start Mining
 
+        #region Stop Mining Auto
         public async Task<StopMiningResponse> StopMiningAuto(RpcBase rpc, StopMiningRequest requestObj)
         {
             MiningStatusResponse status = await GetMiningStatus(rpc, new MiningStatusRequest());
@@ -96,7 +97,9 @@ namespace NervaOneWalletMiner.Rpc.Daemon
 
             return await StopMining(rpc, requestObj);
         }
+        #endregion
 
+        #region Start Mining Auto
         public async Task<StartMiningResponse> StartMiningAuto(RpcBase rpc, StartMiningRequest requestObj)
         {
             MiningStatusResponse status = await GetMiningStatus(rpc, new MiningStatusRequest());
@@ -117,6 +120,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
 
             return await StartMining(rpc, requestObj);
         }
+        #endregion
 
         #region Stop Mining
         public async Task<StopMiningResponse> StopMining(RpcBase rpc, StopMiningRequest requestObj)
