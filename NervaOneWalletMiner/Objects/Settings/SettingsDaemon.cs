@@ -25,5 +25,9 @@ namespace NervaOneWalletMiner.Objects.Settings
         public int LogLevel { get; set; } = -1;
 
         public bool IsTestnet { get; set; } = false;
+
+        public bool UseNoAnalyticsFlag { get; set; } = false;
+        
+        public bool UseNoDnsFlag { get; set; } = false;
     }
 }

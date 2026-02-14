@@ -5,38 +5,94 @@
         mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="550"
         x:Class="NervaOneWalletMiner.ViewsDialogs.DisplayKeysSeedView"
 		Width="600"
-		Height="550"
+		Height="605"
 		Topmost="True"
 		WindowStartupLocation="CenterOwner"
-        Title="Wallet Restore Info">
+        Title="Keys and Seed Phrase">
 	
 	<StackPanel Spacing="5" Margin="10">
+		<TextBlock Name="tbkMessage"
+				   TextWrapping="WrapWithOverflow"
+				   Text="Message"
+				   Margin="0 5" />
+
 		<Label Content="Public View Key"/>
-		<TextBox Name="tbxPublicViewKey"/>
+		<DockPanel>
+			<TextBox Name="tbxPublicViewKey" Width="515"/>
+			<Button Name="btnCopyPublicViewKeyToClipboard"
+					Content="Copy"
+					Margin="10,0,0,0"
+					Click="CopyPublicViewKeyToClipboardButton_Clicked"/>
+		</DockPanel>
 
 		<Label Content="Private View Key"/>
-		<TextBox Name="tbxPrivateViewKey"/>
+		<DockPanel>
+			<TextBox Name="tbxPrivateViewKey"
+					PasswordChar="*"
+					Width="450"/>
+			<Button Name="btnShowHidePrivateViewKey"
+					Content="Show"
+					Margin="10,0,0,0"
+					Click="ShowHidePrivateViewKeyButton_Clicked"/>
+			<Button Name="btnCopyPrivateViewKeyToClipboard"
+					Content="Copy"
+					Margin="10,0,0,0"
+					Click="CopyPrivateViewKeyToClipboardButton_Clicked"/>
+		</DockPanel>
 
 		<Separator Margin="0,20,0,10"/>
 
 		<Label Content="Public Spend Key"/>
-		<TextBox Name="tbxPublicSpendKey"/>
+		<DockPanel>
+			<TextBox Name="tbxPublicSpendKey" Width="515"/>
+			<Button Name="btnCopyPublicSpendKeyToClipboard"
+					Content="Copy"
+					Margin="10,0,0,0"
+					Click="CopyPublicSpendKeyToClipboardButton_Clicked"/>
+		</DockPanel>
 
 		<Label Content="Private Spend Key"/>
-		<TextBox Name="tbxPrivateSpendKey"/>
+		<DockPanel>
+			<TextBox Name="tbxPrivateSpendKey"
+					PasswordChar="*"
+					Width="450"/>
+			<Button Name="btnShowHidePrivateSpendKey"
+					Content="Show"
+					Margin="10,0,0,0"
+					Click="ShowHidePrivateSpendKeyButton_Clicked"/>
+			<Button Name="btnCopyPrivateSpendKeyToClipboard"
+					Content="Copy"
+					Margin="10,0,0,0"
+					Click="CopyPrivateSpendKeyToClipboardButton_Clicked"/>
+		</DockPanel>
+		
 
 		<Separator Margin="0,20,0,10"/>
 
 		<Label Content="Mnemonic Seed"/>
-		<TextBox Name="tbxMnemonicSeed"				 
-				 AcceptsReturn="True"
-				 TextWrapping="Wrap"
-				 Height="100"/>
+		<DockPanel>				
+			<TextBox Name="tbxMnemonicSeed"
+					PasswordChar="*"
+					AcceptsReturn="True"
+					TextWrapping="Wrap"
+					Height="80"
+					Width="515"/>
 
+			<StackPanel>
+				<Button Name="btnShowHideSeed"
+						Content="Show"
+						Margin="10,0,0,10"
+						Click="ShowHideSeedButton_Clicked"/>
+				<Button Name="btnCopySeedToClipboard"
+						Content="Copy"
+						Margin="10,0,0,0"
+						Click="CopySeedToClipboardButton_Clicked"/>
+			</StackPanel>
+		</DockPanel>
 		<DockPanel Margin="0,15,0,0">
 			<Button Name="btnClancel"
 					Content="Cancel"
-					Click="CancelButtonClicked"
+					Click="CancelButton_Clicked"
 					Margin="10,0,0,0"/>
 		</DockPanel>
 	</StackPanel>

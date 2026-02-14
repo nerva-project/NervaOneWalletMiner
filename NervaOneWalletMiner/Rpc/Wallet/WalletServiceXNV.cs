@@ -1318,7 +1318,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     {
                         ResQueryKey getHeightResponse = JsonConvert.DeserializeObject<ResQueryKey>(jsonObject.SelectToken("result").ToString());
                         responseObj.PublicViewKey = getHeightResponse.public_view_key;
-                        responseObj.PrivateViewKey = getHeightResponse.public_view_key;
+                        responseObj.PrivateViewKey = getHeightResponse.private_view_key;
                         responseObj.PublicSpendKey = getHeightResponse.public_spend_key;
                         responseObj.PrivateSpendKey = getHeightResponse.private_spend_key;
                         responseObj.Mnemonic = getHeightResponse.mnemonic;

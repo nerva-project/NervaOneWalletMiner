@@ -102,6 +102,16 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
                 daemonCommand += " --detach";
             }
 
+            if(daemonSettings.UseNoAnalyticsFlag)
+            {
+                daemonCommand += " --no-analytics";
+            }
+
+            if (daemonSettings.UseNoDnsFlag)
+            {
+                daemonCommand += " --no-dns";
+            }
+
             if (!string.IsNullOrEmpty(daemonSettings.AdditionalArguments))
             {
                 daemonCommand += " " + daemonSettings.AdditionalArguments;

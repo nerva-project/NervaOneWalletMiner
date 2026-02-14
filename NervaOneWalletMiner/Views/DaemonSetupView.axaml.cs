@@ -34,6 +34,8 @@ namespace NervaOneWalletMiner.Views
                 cbxAutoStartMining.IsChecked = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AutoStartMining;
                 cbxStopOnExit.IsChecked = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopOnExit;
                 cbxEnableConnectionsGuard.IsChecked = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].EnableConnectionsGuard;
+                cbxUseNoAnalyticsFlag.IsChecked = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].UseNoAnalyticsFlag;
+                cbxUseNoDnsFlag.IsChecked = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].UseNoDnsFlag;
             }
             catch (Exception ex)
             {
@@ -103,6 +105,19 @@ namespace NervaOneWalletMiner.Views
                     GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].EnableConnectionsGuard = ((bool)(cbxEnableConnectionsGuard.IsChecked == null ? false : cbxEnableConnectionsGuard.IsChecked));
                     isChanged = true;
                 }
+
+                if (cbxUseNoAnalyticsFlag.IsChecked != GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].UseNoAnalyticsFlag)
+                {
+                    GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].UseNoAnalyticsFlag = ((bool)(cbxUseNoAnalyticsFlag.IsChecked == null ? false : cbxUseNoAnalyticsFlag.IsChecked));
+                    isChanged = true;
+                }
+
+                if (cbxUseNoDnsFlag.IsChecked != GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].UseNoDnsFlag)
+                {
+                    GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].UseNoDnsFlag = ((bool)(cbxUseNoDnsFlag.IsChecked == null ? false : cbxUseNoDnsFlag.IsChecked));
+                    isChanged = true;
+                }
+
 
                 // Save setting only if something changed
                 if (isChanged)
@@ -290,6 +305,29 @@ namespace NervaOneWalletMiner.Views
             catch (Exception ex)
             {
                 Logger.LogException("DMS.CDDC", ex);
+            }
+        }
+
+        private void NoDns_IsCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is CheckBox checkBox)
+                {
+                    if (checkBox.IsChecked!.Value)
+                    {
+                        cbxUseNoAnalyticsFlag.IsChecked = true;
+                        cbxUseNoAnalyticsFlag.IsEnabled = false;
+                    }
+                    else
+                    {
+                        cbxUseNoAnalyticsFlag.IsEnabled = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DMS.NDCC", ex);
             }
         }
 

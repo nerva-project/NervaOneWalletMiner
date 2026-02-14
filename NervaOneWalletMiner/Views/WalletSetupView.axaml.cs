@@ -177,7 +177,7 @@ namespace NervaOneWalletMiner.Views
                     Logger.LogDebug("WAS.CNW1", "Wallet " + walletName + " created successfully");
                     await Dispatcher.UIThread.InvokeAsync(async () =>
                     {
-						WalletCreatedView window = new();
+						DisplayKeysSeedView window = new("Wallet created successfully! Your new wallet is now open.\r\n\r\nPlease make sure to save your seed phrase and keys to a safe place. You'll need them if you ever need to restore your wallet. If somebody gets a hold of those, they can steal your funds!");
                         await window.ShowDialog(GetWindow());
                     });
                 }
@@ -653,7 +653,7 @@ namespace NervaOneWalletMiner.Views
                     }
                     else
                     {
-                        var window = new DisplayKeysSeedView();
+                        var window = new DisplayKeysSeedView("Please make sure to save your seed phrase and keys to a safe place. You'll need them if you ever need to restore your wallet. If somebody gets a hold of those, they can steal your funds!");
                         await window.ShowDialog(GetWindow());
                     }
                 }

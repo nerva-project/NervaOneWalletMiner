@@ -10,134 +10,142 @@
 		<vm:WalletViewModel/>
 	</Design.DataContext>
 
-	<StackPanel HorizontalAlignment="Stretch"
-				Spacing="5"
-				Margin="10"
-				MaxWidth="650">
-		<Grid ColumnDefinitions="200,*,120">			
-			<Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="32,*">
-				<Image Grid.Row="0"
-					   Grid.Column="0"
-					   Name="imgCoinIcon"/>
-				<Label Grid.Row="0"
-					   Grid.Column="1"
-					   Content="Wallet"
-					   Height="24"
-					   Margin="5,0,0,0"/>
-			</Grid>
+	<Grid RowDefinitions="140, *">
+		<Grid Grid.Row="0">
+			<StackPanel HorizontalAlignment="Stretch"
+						Spacing="5"
+						Margin="10"
+						MaxWidth="650">
+				<Grid ColumnDefinitions="200,*,120">			
+					<Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="32,*">
+						<Image Grid.Row="0"
+							   Grid.Column="0"
+							   Name="imgCoinIcon"/>
+						<Label Grid.Row="0"
+							   Grid.Column="1"
+							   Content="Wallet"
+							   Height="24"
+							   Margin="5,0,0,0"/>
+					</Grid>
 
-			<Button Name="btnOpenCloseWallet"
-					Grid.Row="0" Grid.Column="2"					
-					Content="{Binding OpenCloseWallet}"
-					DockPanel.Dock="Right"
-					Width="120"
-					Click="OpenCloseWallet_Clicked"/>
-		</Grid>
+					<Button Name="btnOpenCloseWallet"
+							Grid.Row="0" Grid.Column="2"					
+							Content="{Binding OpenCloseWallet}"
+							DockPanel.Dock="Right"
+							Width="120"
+							Click="OpenCloseWallet_Clicked"/>
+				</Grid>
 
-		<Grid ColumnDefinitions="200,*,200" Margin="0,20,0,0">
-			<Grid ColumnDefinitions="120,100" Grid.Row="0" Grid.Column="0">
-				<Grid.RowDefinitions>
-					<RowDefinition Height="35"/>
-					<RowDefinition Height="35"/>
-				</Grid.RowDefinitions>
+				<Grid ColumnDefinitions="200,*,200" Margin="0,20,0,0">
+					<Grid ColumnDefinitions="120,100" Grid.Row="0" Grid.Column="0">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="35"/>
+							<RowDefinition Height="35"/>
+						</Grid.RowDefinitions>
 
-				<Label Grid.Row="0" 
-					   Grid.Column="0"
-					   Content="{Binding TotalLockedLabel}"/>
-				<Label Grid.Row="0"
-					   Grid.Column="1"
-					   Content="{Binding TotalCoins}"
-					   Width="160"
-					   HorizontalAlignment="Left"/>
-				<Label Grid.Row="1"
-					   Grid.Column="0"
-					   Content="{Binding TotalUnlockedLabel}"/>
-				<Label Grid.Row="1"
-					   Grid.Column="1"
-					   Content="{Binding UnlockedCoins}"
-					   Width="160"
-					   HorizontalAlignment="Left"/>
-			</Grid>
+						<Label Grid.Row="0" 
+							   Grid.Column="0"
+							   Content="{Binding TotalLockedLabel}"/>
+						<Label Grid.Row="0"
+							   Grid.Column="1"
+							   Content="{Binding TotalCoins}"
+							   Width="160"
+							   HorizontalAlignment="Left"/>
+						<Label Grid.Row="1"
+							   Grid.Column="0"
+							   Content="{Binding TotalUnlockedLabel}"/>
+						<Label Grid.Row="1"
+							   Grid.Column="1"
+							   Content="{Binding UnlockedCoins}"
+							   Width="160"
+							   HorizontalAlignment="Left"/>
+					</Grid>
 
-			<Grid ColumnDefinitions="120"
-				  Grid.Row="0"
-				  Grid.Column="2"
-				  HorizontalAlignment="Right">
-				<Grid.RowDefinitions>
-					<RowDefinition Height="30"/>
-					<RowDefinition Height="30"/>
-				</Grid.RowDefinitions>
+					<Grid ColumnDefinitions="120"
+						  Grid.Row="0"
+						  Grid.Column="2"
+						  HorizontalAlignment="Right">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="30"/>
+							<RowDefinition Height="30"/>
+						</Grid.RowDefinitions>
 
-				<Button Name="btnTransferFunds"
-						Content="Transfer Funds"
-						Grid.Row="0" Grid.Column="0"						
-						HorizontalAlignment="Stretch"
-						Click="TransferFunds_Clicked"/>
+						<Button Name="btnTransferFunds"
+								Content="Transfer Funds"
+								Grid.Row="0" Grid.Column="0"						
+								HorizontalAlignment="Stretch"
+								Click="TransferFunds_Clicked"/>
 				
-				<Button Name="btnAddressInfo"
-						Grid.Row="1" Grid.Column="0"
-						Content="Address Info"
-						HorizontalAlignment="Stretch"
-						Click="AddressInfo_Clicked"/>
-			</Grid>
-		</Grid>
-		<DataGrid Name="dtgAccounts"
-				  ItemsSource="{Binding WalletAddresses, Mode=OneWay}"
-				  AutoGenerateColumns="False"
-				  GridLinesVisibility="Horizontal"
-				  IsReadOnly="True"
-				  Height="395"
-				  Margin="0,20,0,0"
-				  DoubleTapped="DtgAccounts_DoubleTapped">
-			<DataGrid.Styles>
-				<Style Selector="DataGridCell:current /template/ Grid#FocusVisual">
-					<Setter Property="IsVisible" Value="false" />
-				</Style>
-			</DataGrid.Styles>
-			<DataGrid.Columns>
-				<DataGridTemplateColumn Header="">
-					<DataTemplate DataType="Bitmap">
-						<Image Source="{Binding WalletIcon}" Height="15"/>
-					</DataTemplate>
-				</DataGridTemplateColumn>
-				<DataGridTextColumn Header="Id"
-									Binding="{Binding Index}"/>
-				<DataGridTextColumn Header="Label"
-									MinWidth="120"
-									Width="*"
-									Binding="{Binding Label}"/>
-				<DataGridTextColumn Header="Address"
-									MinWidth="120"
-									Width="*"
-									Binding="{Binding AddressShort}"/>
-				<DataGridTextColumn Header="Balance"
-									Binding="{Binding BalanceTotal}"/>
-				<DataGridTextColumn Header="Unlocked"
-									Binding="{Binding BalanceUnlocked}"/>
-			</DataGrid.Columns>
-			<DataGrid.ContextMenu>
-				<ContextMenu>
-					<MenuItem Header="Address Info"
-							  Click="AddressInfo_Clicked"/>
-					<MenuItem Header="Transfer Funds"
-							  Click="TransferFunds_Clicked"/>
-					<Separator/>
-					<MenuItem Header="Create New Account"
-							  Click="CreateAccount_Clicked"/>
-					<MenuItem Header="Rename Label"
-							  Click="RenameLabel_Clicked"/>	
-					<MenuItem Name="miStartMining"
-							  Header="Start Mining"
-							  Click="StartMining_Clicked"/>
-					<Separator/>
-					<MenuItem Header="Export Selected"
-							  Click="ExportSelected_Clicked"/>
-					<MenuItem Header="Export All"
-							  Click="ExportAll_Clicked"/>
-				</ContextMenu>
-			</DataGrid.ContextMenu>
-		</DataGrid>
+						<Button Name="btnAddressInfo"
+								Grid.Row="1" Grid.Column="0"
+								Content="Address Info"
+								HorizontalAlignment="Stretch"
+								Click="AddressInfo_Clicked"/>
+					</Grid>
+				</Grid>
+				
 
-	</StackPanel>
+			</StackPanel>
+		</Grid>
+
+		<Grid Grid.Row="1">
+			<DataGrid Name="dtgAccounts"
+						  ItemsSource="{Binding WalletAddresses, Mode=OneWay}"
+						  AutoGenerateColumns="False"
+						  GridLinesVisibility="Horizontal"
+						  IsReadOnly="True"
+						  Margin="0,20,0,0"
+						  MaxWidth="650"
+						  DoubleTapped="DtgAccounts_DoubleTapped">
+					<DataGrid.Styles>
+						<Style Selector="DataGridCell:current /template/ Grid#FocusVisual">
+							<Setter Property="IsVisible" Value="false" />
+						</Style>
+					</DataGrid.Styles>
+					<DataGrid.Columns>
+						<DataGridTemplateColumn Header="">
+							<DataTemplate DataType="Bitmap">
+								<Image Source="{Binding WalletIcon}" Height="15"/>
+							</DataTemplate>
+						</DataGridTemplateColumn>
+						<DataGridTextColumn Header="Id"
+											Binding="{Binding Index}"/>
+						<DataGridTextColumn Header="Label"
+											MinWidth="120"
+											Width="*"
+											Binding="{Binding Label}"/>
+						<DataGridTextColumn Header="Address"
+											MinWidth="120"
+											Width="*"
+											Binding="{Binding AddressShort}"/>
+						<DataGridTextColumn Header="Balance"
+											Binding="{Binding BalanceTotal}"/>
+						<DataGridTextColumn Header="Unlocked"
+											Binding="{Binding BalanceUnlocked}"/>
+					</DataGrid.Columns>
+					<DataGrid.ContextMenu>
+						<ContextMenu>
+							<MenuItem Header="Address Info"
+									  Click="AddressInfo_Clicked"/>
+							<MenuItem Header="Transfer Funds"
+									  Click="TransferFunds_Clicked"/>
+							<Separator/>
+							<MenuItem Header="Create New Account"
+									  Click="CreateAccount_Clicked"/>
+							<MenuItem Header="Rename Label"
+									  Click="RenameLabel_Clicked"/>	
+							<MenuItem Name="miStartMining"
+									  Header="Start Mining"
+									  Click="StartMining_Clicked"/>
+							<Separator/>
+							<MenuItem Header="Export Selected"
+									  Click="ExportSelected_Clicked"/>
+							<MenuItem Header="Export All"
+									  Click="ExportAll_Clicked"/>
+						</ContextMenu>
+					</DataGrid.ContextMenu>
+			</DataGrid>
+		</Grid>
+	</Grid>
 	
 </UserControl>
