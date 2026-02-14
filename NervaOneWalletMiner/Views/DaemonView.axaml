@@ -14,7 +14,7 @@
 				Spacing="5"
 				Margin="10"
 				MaxWidth="650">
-		<Grid ColumnDefinitions="100,*,100">
+		<Grid ColumnDefinitions="100,*,*,100">
 			<Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="32,*">
 				<Image Grid.Row="0"
 					   Grid.Column="0"
@@ -31,10 +31,10 @@
 			           Margin="0,0,5,0"
 			           MinWidth="200"
 			           MaxWidth="250">
-				<Label Content="Maximum net hash threshold KH/s:" Height="24"/>
+				<Label Content="Net KH/s:" Height="24"/>
 				<NumericUpDown Name="hashThreshold"
-				               Minimum="1"
-				               Value="0"
+				               Minimum="-1"
+				               Value="-1"
 				               FormatString="0"
 				               MaxWidth="110"							   
 				               ValueChanged="hashThreshold_ValueChanged"
@@ -42,7 +42,7 @@
 			</DockPanel>
 			
 			<DockPanel Grid.Row="0"
-			           Grid.Column="1"
+			           Grid.Column="2"
 			           Margin="0,0,5,0"
 			           MinWidth="200"
 			           MaxWidth="250">
@@ -57,7 +57,7 @@
 			</DockPanel>
 			<Button Name="btnStartStopMining"
 					Grid.Row="0"
-					Grid.Column="2"
+					Grid.Column="3"
 					Content="{Binding StartStopMining}"
 					DockPanel.Dock="Right"
 					Click="StartStopMining_Clicked"/>

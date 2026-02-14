@@ -9,6 +9,7 @@ using NervaOneWalletMiner.Rpc.Daemon.Responses;
 using NervaOneWalletMiner.ViewModels;
 using NervaOneWalletMiner.ViewsDialogs;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NervaOneWalletMiner.Views
@@ -16,6 +17,8 @@ namespace NervaOneWalletMiner.Views
     public partial class DaemonView : UserControl
     {
         Window GetWindow() => TopLevel.GetTopLevel(this) as Window ?? throw new NullReferenceException("Invalid Owner");
+
+        private CancellationTokenSource? _monitoringCts;
 
         public DaemonView()
         {
@@ -34,6 +37,12 @@ namespace NervaOneWalletMiner.Views
                 var nupThreads = this.Get<NumericUpDown>("nupThreads");
                 nupThreads.Maximum = GlobalData.CpuThreadCount;
                 nupThreads.Value = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads;
+
+                var savedThreshold = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopMiningThreshold;
+                if (savedThreshold > 0)
+                {
+                    hashThreshold.Value = savedThreshold;
+                }
             }
             catch (Exception ex)
             {
@@ -171,28 +180,28 @@ namespace NervaOneWalletMiner.Views
                     StartMiningRequest request = new()
                     {
                         MiningAddress = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress,
-                        ThreadCount = threads
+                        ThreadCount = threads,
+                        StopMiningThreshold = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopMiningThreshold,
                     };
 
-                    Logger.LogDebug("GLM.STMA", "Calling StartMining. Address: " + GlobalMethods.GetShorterString(request.MiningAddress, 12) + " | Threads: " + request.ThreadCount);
-                    StartMiningResponse response = await GlobalData.DaemonService.StartMining(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, request);
+                    Logger.LogDebug("GLM.STMA", "Calling StartMining. Address: " + GlobalMethods.GetShorterString(request.MiningAddress, 12) + " | Threads: " + request.ThreadCount + " | Threshold: " + request.StopMiningThreshold);
+                    StartMiningResponse response = request.StopMiningThreshold > 0
+                        ? await GlobalData.DaemonService.StartMiningAuto(
+                            GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, request)
+                        : await GlobalData.DaemonService.StartMining(
+                            GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, request);
+                    
                     if (response.Error.IsError)
                     {
                         Logger.LogDebug("GLM.STMA", "Error starting mining | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
 
-                        if (isUiThread && !response.Error.Code.Equals("Network hash too high"))
+                        if (isUiThread && !response.Error.Content.Equals("Network hash too high"))
                         {
                             await Dispatcher.UIThread.Invoke(async () =>
                             {
                                 MessageBoxView window = new("Start Mining", "Error when starting mining\r\n\r\n" + response.Error.Message, true);
                                 await window.ShowDialog(owner!);
                             });
-                        }
-
-                        if (response.Error.Code.Equals("Network hash too high"))
-                        {
-                            await Task.Delay(1000 * 60); // Wait 1 minute before trying again
-                            StartMiningAsync(owner, threads, isUiThread);
                         }
                     }
                     else
@@ -211,6 +220,12 @@ namespace NervaOneWalletMiner.Views
                                 await window.ShowDialog(owner!);
                             });
                         }
+                    }
+
+                    // Start continuous monitoring when threshold is enabled
+                    if (request.StopMiningThreshold > 0)
+                    {
+                        StartHashRateMonitoring(threads);
                     }
 
                     GlobalData.IsManualStopMining = false;
@@ -232,10 +247,21 @@ namespace NervaOneWalletMiner.Views
         {
             try
             {
-                StopMiningRequest request = new();
+                // Stop the monitoring loop first so it doesn't restart mining
+                StopHashRateMonitoring();
+
+                StopMiningRequest request = new()
+                {
+                    StopMiningThreshold = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]
+                        .StopMiningThreshold,
+                };
 
                 Logger.LogDebug("GLM.SPMA", "Calling StopMining");
-                StopMiningResponse response = await GlobalData.DaemonService.StopMining(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, request);
+                // Always call StopMining directly - user explicitly wants to stop
+                StopMiningResponse response =
+                    await GlobalData.DaemonService.StopMining(
+                        GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, request);
+                    
                 if (response.Error.IsError)
                 {
                     if (isUiThread)
@@ -253,5 +279,104 @@ namespace NervaOneWalletMiner.Views
                 Logger.LogException("GLM.SPMA", ex);
             }
         }
+
+        #region Hash Rate Monitoring
+        private void StartHashRateMonitoring(int threads)
+        {
+            StopHashRateMonitoring();
+            _monitoringCts = new CancellationTokenSource();
+            var token = _monitoringCts.Token;
+
+            _ = Task.Run(async () =>
+            {
+                Logger.LogDebug("DMN.HMON", "Hash rate monitoring started");
+
+                while (!token.IsCancellationRequested)
+                {
+                    try
+                    {
+                        await Task.Delay(60_000, token);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        break;
+                    }
+
+                    try
+                    {
+                        if (GlobalData.IsManualStopMining)
+                        {
+                            Logger.LogDebug("DMN.HMON", "Manual stop detected, ending monitoring");
+                            break;
+                        }
+
+                        var rpc = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc;
+                        var threshold = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopMiningThreshold;
+
+                        if (threshold <= 0)
+                        {
+                            Logger.LogDebug("DMN.HMON", "Threshold disabled, ending monitoring");
+                            break;
+                        }
+
+                        var infoRes = await GlobalData.DaemonService.GetInfo(rpc, new GetInfoRequest());
+                        if (infoRes.Error.IsError)
+                        {
+                            Logger.LogDebug("DMN.HMON", "Failed to get network info, skipping check");
+                            continue;
+                        }
+
+                        var hashRateKH = infoRes.NetworkHashRate / 1000.0d;
+
+                        var statusRes = await GlobalData.DaemonService.GetMiningStatus(rpc, new MiningStatusRequest());
+                        if (statusRes.Error.IsError)
+                        {
+                            Logger.LogDebug("DMN.HMON", "Failed to get mining status, skipping check");
+                            continue;
+                        }
+
+                        if (statusRes.IsActive && hashRateKH > threshold)
+                        {
+                            // Hash rate rose above threshold - pause mining
+                            Logger.LogDebug("DMN.HMON", "Hash rate " + hashRateKH.ToString("F1") + " KH/s above threshold " + threshold + ", pausing mining");
+                            await GlobalData.DaemonService.StopMining(rpc, new StopMiningRequest());
+                        }
+                        else if (!statusRes.IsActive && hashRateKH <= threshold)
+                        {
+                            // Hash rate dropped to or below threshold - resume mining
+                            Logger.LogDebug("DMN.HMON", "Hash rate " + hashRateKH.ToString("F1") + " KH/s at or below threshold " + threshold + ", resuming mining");
+                            var startRequest = new StartMiningRequest
+                            {
+                                MiningAddress = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress,
+                                ThreadCount = threads,
+                            };
+                            await GlobalData.DaemonService.StartMining(rpc, startRequest);
+                            GlobalData.NetworkStats.MinerStatus = StatusMiner.Mining;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogException("DMN.HMON", ex);
+                    }
+                }
+
+                Logger.LogDebug("DMN.HMON", "Hash rate monitoring stopped");
+            }, token);
+        }
+
+        private void StopHashRateMonitoring()
+        {
+            try
+            {
+                _monitoringCts?.Cancel();
+                _monitoringCts?.Dispose();
+                _monitoringCts = null;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DMN.SHRM", ex);
+            }
+        }
+        #endregion // Hash Rate Monitoring
     }
 }
