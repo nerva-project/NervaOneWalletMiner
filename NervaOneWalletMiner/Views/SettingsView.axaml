@@ -77,6 +77,21 @@
 			</ComboBoxItem>
 			<!-- Define coins ends -->			
 		</ComboBox>
+		
+		<Label Content="Net hash threshold (KH/s)" Margin="0, 10, 0, 0"/>
+		<CheckBox Name="cbxThresholdEnabled"
+				  Content="Enabled"
+				  Margin="0, 0, 0, 10"
+				  IsCheckedChanged="ThresholdEnabled_IsCheckedChanged"/>
+				  
+		<NumericUpDown Name="hashThreshold"
+					   Minimum="0"
+					   Value="0"
+					   FormatString="N0"
+					   MaxWidth="160"							   
+					   HorizontalAlignment="Left"
+					   ValueChanged="hashThreshold_ValueChanged"
+					   IsEnabled="false"/>
 
 		<Label Content="Applicaiton Theme" Margin="0,10,0,0"/>
 		<ComboBox Name="cbxThemeVariants"

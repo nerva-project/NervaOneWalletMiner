@@ -37,12 +37,6 @@ namespace NervaOneWalletMiner.Views
                 var nupThreads = this.Get<NumericUpDown>("nupThreads");
                 nupThreads.Maximum = GlobalData.CpuThreadCount;
                 nupThreads.Value = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads;
-
-                var savedThreshold = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopMiningThreshold;
-                if (savedThreshold > 0)
-                {
-                    hashThreshold.Value = savedThreshold;
-                }
             }
             catch (Exception ex)
             {
@@ -69,16 +63,6 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
-        private void hashThreshold_ValueChanged(object sender, NumericUpDownValueChangedEventArgs args)
-        {
-            if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopMiningThreshold != hashThreshold.Value)
-            {
-                GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopMiningThreshold = Convert.ToInt32(hashThreshold.Value);
-                Logger.LogDebug("DMN.NTVC", "Setting stop mining threshold: " + GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopMiningThreshold);
-                GlobalMethods.SaveConfig();
-            }
-        }
-        
         private void nupThreads_ValueChanged(object sender, NumericUpDownValueChangedEventArgs args)
         {
             if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads != nupThreads.Value)
