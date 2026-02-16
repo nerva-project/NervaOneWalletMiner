@@ -9,6 +9,7 @@ using NervaOneWalletMiner.Rpc.Daemon.Responses;
 using NervaOneWalletMiner.ViewModels;
 using NervaOneWalletMiner.ViewsDialogs;
 using System;
+using System.Drawing.Printing;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -179,7 +180,9 @@ namespace NervaOneWalletMiner.Views
                     {
                         Logger.LogDebug("GLM.STMA", "Error starting mining | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
 
-                        if (isUiThread && !response.Error.Content.Equals("Network hash too high"))
+                        Console.WriteLine(response.Error.Content);
+                        Console.WriteLine(response.Error.Message);
+                        if (isUiThread && !string.Equals(response.Error.Message, "Network hash too high"))
                         {
                             await Dispatcher.UIThread.Invoke(async () =>
                             {

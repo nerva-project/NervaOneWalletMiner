@@ -141,6 +141,7 @@ namespace NervaOneWalletMiner.Views
                     if (checkBox.IsChecked!.Value)
                     {
                         hashThreshold.IsEnabled = true;
+                        GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopMiningThreshold = Convert.ToInt32(hashThreshold.Value);
                     }
                     else
                     {
