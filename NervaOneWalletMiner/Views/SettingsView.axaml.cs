@@ -44,6 +44,20 @@ namespace NervaOneWalletMiner.Views
                         selectedCoin = coin;
                     }
                 }
+                
+                var savedThreshold = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopMiningThreshold;
+                if (savedThreshold > 0)
+                {
+                    cbxThresholdEnabled.IsChecked = true;
+                    hashThreshold.IsEnabled = true;
+                    hashThreshold.Value = savedThreshold;
+                }
+                else
+                {
+                    cbxThresholdEnabled.IsChecked = false;
+                    hashThreshold.IsEnabled = false;
+                }
+
                 cbxCoin.SelectedValue = selectedCoin;
             }
             catch (Exception ex)
@@ -114,6 +128,41 @@ namespace NervaOneWalletMiner.Views
             catch (Exception ex)
             {
                 Logger.LogException("SET.SSCL", ex);
+            }
+        }
+        
+        
+        private void ThresholdEnabled_IsCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is CheckBox checkBox)
+                {
+                    if (checkBox.IsChecked!.Value)
+                    {
+                        hashThreshold.IsEnabled = true;
+                        GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopMiningThreshold = Convert.ToInt32(hashThreshold.Value);
+                    }
+                    else
+                    {
+                        hashThreshold.IsEnabled = false;
+                        GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopMiningThreshold = 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DMS.NHMT", ex); // Net Hash Mining Threshold
+            }
+        }
+        
+        private void hashThreshold_ValueChanged(object sender, NumericUpDownValueChangedEventArgs args)
+        {
+            if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopMiningThreshold != hashThreshold.Value)
+            {
+                GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopMiningThreshold = Convert.ToInt32(hashThreshold.Value);
+                Logger.LogDebug("DMN.NHMT", "Setting net hash mining threshold: " + GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopMiningThreshold);
+                GlobalMethods.SaveConfig();
             }
         }
 

@@ -15,6 +15,8 @@ namespace NervaOneWalletMiner.Objects.Settings
         public string MiningAddress { get; set; } = string.Empty;
 
         public int MiningThreads { get; set; } = 0;
+        
+        public int StopMiningThreshold { get; set; } = -1;
 
         public string AdditionalArguments { get; set; } = string.Empty;
 

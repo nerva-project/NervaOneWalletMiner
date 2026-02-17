@@ -37,6 +37,13 @@ namespace NervaOneWalletMiner.ViewModels
             set => this.RaiseAndSetIfChanged(ref _StartStopMining, value);
         }
 
+        private bool _IsMiningThresholdEnabled = true;
+        public bool IsMiningThresholdEnabled
+        {
+            get => _IsMiningThresholdEnabled;
+            set => this.RaiseAndSetIfChanged(ref _IsMiningThresholdEnabled, value);
+        }
+        
         private bool _IsNumThreadsEnabled = true;
         public bool IsNumThreadsEnabled
         {
