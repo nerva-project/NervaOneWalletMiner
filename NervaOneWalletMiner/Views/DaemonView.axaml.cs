@@ -158,7 +158,7 @@ namespace NervaOneWalletMiner.Views
             {
                 if(string.IsNullOrEmpty(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress))
                 {
-                    Logger.LogError("GLM.STMA", "Mining address missing. Cannot start mining");
+                    Logger.LogError("DMN.STMA", "Mining address missing. Cannot start mining");
                 }
                 else
                 {
@@ -166,11 +166,12 @@ namespace NervaOneWalletMiner.Views
                     {
                         MiningAddress = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress,
                         ThreadCount = threads,
-                        StopMiningThreshold = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopMiningThreshold,
+                        EnableMiningThreshold = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].EnableMiningThreshold,
+                        StopMiningThreshold = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopMiningThreshold
                     };
 
-                    Logger.LogDebug("GLM.STMA", "Calling StartMining. Address: " + GlobalMethods.GetShorterString(request.MiningAddress, 12) + " | Threads: " + request.ThreadCount + " | Threshold: " + request.StopMiningThreshold);
-                    StartMiningResponse response = request.StopMiningThreshold > 0
+                    Logger.LogDebug("DMN.STMA", "Calling StartMining. Address: " + GlobalMethods.GetShorterString(request.MiningAddress, 12) + " | Threads: " + request.ThreadCount + " | Enable Mining Threshold: " + request.EnableMiningThreshold + " | Threshold: " + request.StopMiningThreshold);
+                    StartMiningResponse response = request.EnableMiningThreshold
                         ? await GlobalData.DaemonService.StartMiningAuto(
                             GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, request)
                         : await GlobalData.DaemonService.StartMining(
@@ -178,7 +179,7 @@ namespace NervaOneWalletMiner.Views
                     
                     if (response.Error.IsError)
                     {
-                        Logger.LogDebug("GLM.STMA", "Error starting mining | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
+                        Logger.LogDebug("DMN.STMA", "Error starting mining | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
 
                         Console.WriteLine(response.Error.Content);
                         Console.WriteLine(response.Error.Message);
@@ -194,7 +195,7 @@ namespace NervaOneWalletMiner.Views
                     else
                     {                       
                         // Some errors are not reported as errors, such as not being able to mine to subaddress
-                        Logger.LogDebug("GLM.STMA", "Start mining response status: " + response.Status);
+                        Logger.LogDebug("DMN.STMA", "Start mining response status: " + response.Status);
 
                         // Without this, "Auto start mining" might try to start mining again before update happens
                         GlobalData.NetworkStats.MinerStatus = StatusMiner.Mining;
@@ -210,7 +211,7 @@ namespace NervaOneWalletMiner.Views
                     }
 
                     // Start continuous monitoring when threshold is enabled
-                    if (request.StopMiningThreshold > 0)
+                    if (request.EnableMiningThreshold)
                     {
                         StartHashRateMonitoring(threads);
                     }
@@ -220,7 +221,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("GLM.STMA", ex);
+                Logger.LogException("DMN.STMA", ex);
             }
         }
 
@@ -239,11 +240,11 @@ namespace NervaOneWalletMiner.Views
 
                 StopMiningRequest request = new()
                 {
-                    StopMiningThreshold = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]
-                        .StopMiningThreshold,
+                    EnableMiningThreshold = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].EnableMiningThreshold,
+                    StopMiningThreshold = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopMiningThreshold
                 };
 
-                Logger.LogDebug("GLM.SPMA", "Calling StopMining");
+                Logger.LogDebug("DMN.SPMA", "Calling StopMining");
                 // Always call StopMining directly - user explicitly wants to stop
                 StopMiningResponse response =
                     await GlobalData.DaemonService.StopMining(
@@ -263,7 +264,7 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("GLM.SPMA", ex);
+                Logger.LogException("DMN.SPMA", ex);
             }
         }
 
@@ -298,9 +299,10 @@ namespace NervaOneWalletMiner.Views
                         }
 
                         var rpc = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc;
+                        var enableThreshold = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].EnableMiningThreshold;
                         var threshold = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopMiningThreshold;
 
-                        if (threshold <= 0)
+                        if (!enableThreshold)
                         {
                             Logger.LogDebug("DMN.HMON", "Threshold disabled, ending monitoring");
                             break;
