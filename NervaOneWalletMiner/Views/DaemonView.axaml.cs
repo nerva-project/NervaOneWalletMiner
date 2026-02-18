@@ -190,19 +190,7 @@ namespace NervaOneWalletMiner.Views
                         Console.WriteLine(response.Error.Content);
                         Console.WriteLine(response.Error.Message);
                         
-                        if (request.EnableMiningThreshold)
-                        {
-                            // Change button to "Stop mining"
-                            Dispatcher.UIThread.Post(() =>
-                            {
-                                if (DataContext is DaemonViewModel vm)
-                                {
-                                    vm.StartStopMining = StatusMiner.StopMining;
-                                    vm.IsNumThreadsEnabled = false;
-                                }
-                            });
-                        }
-                        else if (isUiThread && !string.Equals(response.Error.Message, "Network hash too high"))
+                        if (isUiThread && !string.Equals(response.Error.Message, "Network hash too high"))
                         {
                             await Dispatcher.UIThread.Invoke(async () =>
                             {
@@ -285,14 +273,17 @@ namespace NervaOneWalletMiner.Views
                     }
                 }
                 // Change the button to "Start mining"
-                Dispatcher.UIThread.Post(() =>
+                if (!request.EnableMiningThreshold)
                 {
-                    if (DataContext is DaemonViewModel vm)
+                    Dispatcher.UIThread.Post(() =>
                     {
-                        vm.StartStopMining = StatusMiner.StartMining;
-                        vm.IsNumThreadsEnabled = true;
-                    }
-                });
+                        if (DataContext is DaemonViewModel vm)
+                        {
+                            vm.StartStopMining = StatusMiner.StartMining;
+                            vm.IsNumThreadsEnabled = true;
+                        }
+                    });
+                }
             }
             catch (Exception ex)
             {
