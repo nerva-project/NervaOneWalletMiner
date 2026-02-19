@@ -15,7 +15,9 @@ namespace NervaOneWalletMiner.ViewsDialogs
             InitializeComponent();         
         }
 
-        public MessageBoxView(string title, string textMessage, bool hideCancelButton)
+        public MessageBoxView(string title, string textMessage, bool hideCancelButton) : this(title, textMessage, hideCancelButton, false) { }        
+
+        public MessageBoxView(string title, string textMessage, bool hideCancelButton, bool isYesNoButtons)
         {
             try
             {
@@ -24,6 +26,12 @@ namespace NervaOneWalletMiner.ViewsDialogs
 
                 Title = title;
                 tbkMessage.Text = textMessage;
+
+                if(isYesNoButtons)
+                {
+                    btnOk.Content = "Yes";
+                    btnCancel.Content = "No";
+                }
 
                 if (hideCancelButton)
                 {
