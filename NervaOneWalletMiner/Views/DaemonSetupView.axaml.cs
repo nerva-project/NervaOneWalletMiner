@@ -151,7 +151,7 @@ namespace NervaOneWalletMiner.Views
                     if (isRestartRequired)
                     {
                         // Ask user if they want to restart daemon
-                        MessageBoxView confirmDaemonRestart = new MessageBoxView("Restart Daemon?", "You've made changes to daemon setup. For those changes to take effect, restart is required.\r\n\r\nWould you like to restart daemon now?", false);
+                        MessageBoxView confirmDaemonRestart = new MessageBoxView("Restart Daemon?", "You've made changes to daemon setup. For those changes to take effect, restart is required.\r\n\r\nWould you like to restart daemon now?", false, true);
                         DialogResult confirmRestart = await confirmDaemonRestart.ShowDialog<DialogResult>(GetWindow());
 
                         if (confirmRestart != null && confirmRestart.IsOk)

@@ -110,7 +110,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     MessageBoxView confirmWindow = new MessageBoxView("Confirm Transfer", "You're about to send " + tbxAmount.Text
                         + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits
                         + ". Once transfer is started, it cannot be stopped. Do you want to continue?",
-                        false);
+                        false, true);
                     DialogResult confirmRes = await confirmWindow.ShowDialog<DialogResult>(this);
 
                     if (confirmRes != null && confirmRes.IsOk)
