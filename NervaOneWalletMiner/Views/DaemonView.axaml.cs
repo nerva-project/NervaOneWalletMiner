@@ -171,6 +171,12 @@ namespace NervaOneWalletMiner.Views
                     };
 
                     Logger.LogDebug("DMN.STMA", "Calling StartMining. Address: " + GlobalMethods.GetShorterString(request.MiningAddress, 12) + " | Threads: " + request.ThreadCount + " | Enable Mining Threshold: " + request.EnableMiningThreshold + " | Threshold: " + request.StopMiningThreshold);
+                    
+                    if (request.EnableMiningThreshold)
+                    {
+                        StartHashRateMonitoring(threads);  // Always start monitoring
+                    }
+                    
                     StartMiningResponse response = request.EnableMiningThreshold
                         ? await GlobalData.DaemonService.StartMiningAuto(
                             GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, request)
@@ -183,6 +189,7 @@ namespace NervaOneWalletMiner.Views
 
                         Console.WriteLine(response.Error.Content);
                         Console.WriteLine(response.Error.Message);
+                        
                         if (isUiThread && !string.Equals(response.Error.Message, "Network hash too high"))
                         {
                             await Dispatcher.UIThread.Invoke(async () =>
@@ -199,6 +206,16 @@ namespace NervaOneWalletMiner.Views
 
                         // Without this, "Auto start mining" might try to start mining again before update happens
                         GlobalData.NetworkStats.MinerStatus = StatusMiner.Mining;
+                        
+                        // Change the button to "Stop mining"
+                        Dispatcher.UIThread.Post(() =>
+                        {
+                            if (DataContext is DaemonViewModel vm)
+                            {
+                                vm.StartStopMining = StatusMiner.StopMining;
+                                vm.IsNumThreadsEnabled = false;
+                            }
+                        });
 
                         if (isUiThread)
                         {
@@ -208,12 +225,6 @@ namespace NervaOneWalletMiner.Views
                                 await window.ShowDialog(owner!);
                             });
                         }
-                    }
-
-                    // Start continuous monitoring when threshold is enabled
-                    if (request.EnableMiningThreshold)
-                    {
-                        StartHashRateMonitoring(threads);
                     }
 
                     GlobalData.IsManualStopMining = false;
@@ -260,6 +271,18 @@ namespace NervaOneWalletMiner.Views
                             await window.ShowDialog(owner!);
                         });
                     }
+                }
+                // Change the button to "Start mining"
+                if (!request.EnableMiningThreshold)
+                {
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        if (DataContext is DaemonViewModel vm)
+                        {
+                            vm.StartStopMining = StatusMiner.StartMining;
+                            vm.IsNumThreadsEnabled = true;
+                        }
+                    });
                 }
             }
             catch (Exception ex)
