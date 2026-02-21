@@ -1,5 +1,4 @@
-﻿using NervaOneWalletMiner.Helpers;
-using NervaOneWalletMiner.Objects.Constants;
+﻿using NervaOneWalletMiner.Objects.Constants;
 using System.Collections.Generic;
 
 namespace NervaOneWalletMiner.Objects.Settings

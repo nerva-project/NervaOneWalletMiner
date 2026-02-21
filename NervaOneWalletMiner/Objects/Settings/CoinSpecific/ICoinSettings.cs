@@ -28,6 +28,8 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         string CliUrlMacIntel { get; set; }
         string CliUrlMacArm { get; set; }
 
+        string PublicNodeUrlDefault { get; set; }
+
         string DataDirWindows { get; set; }
         string DataDirLinux { get; set; }
         string DataDirMac { get; set; }
@@ -35,7 +37,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         string QuickSyncUrl { get; set; }
 
 
-        string GenerateWalletOptions(SettingsWallet walletSettings, RpcBase daemonRpc);
+        string GenerateWalletOptions(SettingsWallet walletSettings, SettingsDaemon daemonSettings);
         string GenerateDaemonOptions(SettingsDaemon daemonSettings);
         string GeneratePopBlocksOption(int numberOfBlocks);
     }

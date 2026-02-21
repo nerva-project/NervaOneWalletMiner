@@ -58,46 +58,49 @@ namespace NervaOneWalletMiner.Helpers
                     UIManager.UpdateCoinIcon(GlobalMethods.GetLogo());
                 }
 
-                // If kill master process is issued at any point, skip everything else and do not restrt master timer            
+                // If kill master process is issued at any point, skip everything else and do not restart master timer            
                 if (_cliToolsRunningLastCheck.AddSeconds(10) < DateTime.Now)
                 {
                     _cliToolsRunningLastCheck = DateTime.Now;
 
-                    if (!_killMasterProcess)
+                    if (!GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
                     {
-                        KeepDaemonRunning();
-
-                        // Auto start mining if setting enabled
-                        if (GlobalData.NetworkStats.YourHeight > 0
-                            && GlobalData.NetworkStats.YourHeight == GlobalData.NetworkStats.NetHeight
-                            && GlobalData.NetworkStats.MinerStatus == StatusMiner.Inactive
-                            && GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AutoStartMining
-                            && !GlobalData.IsManualStopMining
-                            && !GlobalData.IsAutoStoppedMining)
+                        if (!_killMasterProcess)
                         {
-                            Logger.LogDebug("MSP.MUPS", "Auto starting mining");
-                            ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).StartMiningNonUi(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
-                        }
+                            KeepDaemonRunning();
 
-                        // If 0 connections, stop mining so we're not using CPU resources when no connections to the network
-                        if (GlobalData.NetworkStats.MinerStatus == StatusMiner.Mining
-                            && GlobalData.NetworkStats.ConnectionsOut + GlobalData.NetworkStats.ConnectionsIn < 1
-                            && !GlobalData.IsAutoStoppedMining)
-                        {
-                            GlobalData.IsAutoStoppedMining = true;
+                            // Auto start mining if setting enabled
+                            if (GlobalData.NetworkStats.YourHeight > 0
+                                && GlobalData.NetworkStats.YourHeight == GlobalData.NetworkStats.NetHeight
+                                && GlobalData.NetworkStats.MinerStatus == StatusMiner.Inactive
+                                && GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AutoStartMining
+                                && !GlobalData.IsManualStopMining
+                                && !GlobalData.IsAutoStoppedMining)
+                            {
+                                Logger.LogDebug("MSP.MUPS", "Auto starting mining");
+                                ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).StartMiningNonUi(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
+                            }
 
-                            Logger.LogDebug("MSP.MUPS", "Auto stopping mining. No connections");
-                            ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).StopMiningNonUi();
-                        }
+                            // If 0 connections, stop mining so we're not using CPU resources when no connections to the network
+                            if (GlobalData.NetworkStats.MinerStatus == StatusMiner.Mining
+                                && GlobalData.NetworkStats.ConnectionsOut + GlobalData.NetworkStats.ConnectionsIn < 1
+                                && !GlobalData.IsAutoStoppedMining)
+                            {
+                                GlobalData.IsAutoStoppedMining = true;
 
-                        // When connections come back, start mining again
-                        if (GlobalData.NetworkStats.ConnectionsOut + GlobalData.NetworkStats.ConnectionsIn > 0
-                            && GlobalData.IsAutoStoppedMining)
-                        {
-                            GlobalData.IsAutoStoppedMining = false;
+                                Logger.LogDebug("MSP.MUPS", "Auto stopping mining. No connections");
+                                ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).StopMiningNonUi();
+                            }
 
-                            Logger.LogDebug("MSP.MUPS", "Auto restarting mining. Total connections: " + (GlobalData.NetworkStats.ConnectionsOut + GlobalData.NetworkStats.ConnectionsIn));
-                            ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).StartMiningNonUi(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
+                            // When connections come back, start mining again
+                            if (GlobalData.NetworkStats.ConnectionsOut + GlobalData.NetworkStats.ConnectionsIn > 0
+                                && GlobalData.IsAutoStoppedMining)
+                            {
+                                GlobalData.IsAutoStoppedMining = false;
+
+                                Logger.LogDebug("MSP.MUPS", "Auto restarting mining. Total connections: " + (GlobalData.NetworkStats.ConnectionsOut + GlobalData.NetworkStats.ConnectionsIn));
+                                ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).StartMiningNonUi(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
+                            }
                         }
                     }
 
@@ -110,21 +113,24 @@ namespace NervaOneWalletMiner.Helpers
 
 
                 // Get Daemon data
-                if (!_killMasterProcess && _masterTimerCount % GlobalData.AppSettings.TimerIntervalMultiplier == 0)
+                if(!GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
                 {
-                    UIManager.GetAndSetDaemonData();
+                    if (!_killMasterProcess && _masterTimerCount % GlobalData.AppSettings.TimerIntervalMultiplier == 0)
+                    {
+                        UIManager.GetAndSetDaemonData();
+                    }
+
+                    // Actual Daemon UI update
+                    if (GlobalData.IsGetAndSetDaemonDataComplete)
+                    {
+                        UIManager.UpdateDaemonView();
+                    }
                 }
-
-
-                // Actual Daemon UI update
-                if (GlobalData.IsGetAndSetDaemonDataComplete)
-                {
-                    UIManager.UpdateDaemonView();
-                }
-
 
                 // Get Wallets/Transfers data
-                if (!_killMasterProcess && GlobalData.IsInitialDaemonConnectionSuccess && GlobalData.IsWalletOpen)
+                if (!_killMasterProcess
+                    && (GlobalData.IsInitialDaemonConnectionSuccess || GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
+                    && GlobalData.IsWalletOpen)
                 {
                     if (GlobalData.IsWalletJustOpened)
                     {
@@ -175,15 +181,18 @@ namespace NervaOneWalletMiner.Helpers
                     }
                 }
 
-                if(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].EnableConnectionsGuard)
+                if (!GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
                 {
-                    if (GlobalData.ConnectGuardLastGoodTime.AddMinutes(GlobalData.ConnectGuardMinutes * GlobalData.ConnectGuardRestartCount) < DateTime.Now)
-                    {                        
-                        Logger.LogDebug("MSP.MUPS", "Connections guard forcing restart. Last good time: " + GlobalData.ConnectGuardLastGoodTime.ToLongTimeString() + " | Restart Ct: " + GlobalData.ConnectGuardRestartCount);
-                        
-                        // Pop blocks every 3rd restart
-                        ConnectionsGuardRestart(GlobalData.ConnectGuardRestartCount % 3 == 0);
-                        GlobalData.ConnectGuardRestartCount++;
+                    if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].EnableConnectionsGuard)
+                    {
+                        if (GlobalData.ConnectGuardLastGoodTime.AddMinutes(GlobalData.ConnectGuardMinutes * GlobalData.ConnectGuardRestartCount) < DateTime.Now)
+                        {
+                            Logger.LogDebug("MSP.MUPS", "Connections guard forcing restart. Last good time: " + GlobalData.ConnectGuardLastGoodTime.ToLongTimeString() + " | Restart Ct: " + GlobalData.ConnectGuardRestartCount);
+
+                            // Pop blocks every 3rd restart
+                            ConnectionsGuardRestart(GlobalData.ConnectGuardRestartCount % 3 == 0);
+                            GlobalData.ConnectGuardRestartCount++;
+                        }
                     }
                 }
             }
@@ -262,7 +271,7 @@ namespace NervaOneWalletMiner.Helpers
                             Logger.LogDebug("MSP.KWPR", "Calling Wallet ForceClose");
                             ProcessManager.Kill(GlobalData.WalletProcessName);
                             Logger.LogDebug("MSP.KWPR", "Starting wallet process");
-                            ProcessManager.StartExternalProcess(GlobalMethods.GetRpcWalletProcess(), GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].GenerateWalletOptions(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin], GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc));
+                            ProcessManager.StartExternalProcess(GlobalMethods.GetRpcWalletProcess(), GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].GenerateWalletOptions(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin], GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]));
                         }
                         else
                         {

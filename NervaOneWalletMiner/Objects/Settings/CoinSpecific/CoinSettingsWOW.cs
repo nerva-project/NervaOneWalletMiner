@@ -30,7 +30,9 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private string _CliUrlLinux32 = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-i686-linux-gnu-v0.11.3.0.tar.bz2";
         private string _CliUrlLinuxArm = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-aarch64-linux-gnu-v0.11.3.0.tar.bz2";
         private string _CliUrlMacIntel = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-x86_64-apple-darwin11-v0.11.3.0.tar.bz2";
-        private string _CliUrlMacArm = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-aarch64-apple-darwin11-v0.11.3.0.tar.bz2";        
+        private string _CliUrlMacArm = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-aarch64-apple-darwin11-v0.11.3.0.tar.bz2";
+
+        private string _PublicNodeUrlDefault = "N/A";
 
         private string _DataDirWindows = "C:/ProgramData/wownero";
         private string _DataDirLinux = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".wownero");
@@ -64,6 +66,8 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public string CliUrlLinuxArm { get => _CliUrlLinuxArm; set => _CliUrlLinuxArm = value; }
         public string CliUrlMacIntel { get => _CliUrlMacIntel; set => _CliUrlMacIntel = value; }
         public string CliUrlMacArm { get => _CliUrlMacArm; set => _CliUrlMacArm = value; }
+
+        public string PublicNodeUrlDefault { get => _PublicNodeUrlDefault; set => _PublicNodeUrlDefault = value; }
 
         public string DataDirWindows { get => _DataDirWindows; set => _DataDirWindows = value; }
         public string DataDirLinux { get => _DataDirLinux; set => _DataDirLinux = value; }
@@ -110,9 +114,19 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
             return daemonCommand;
         }
 
-        public string GenerateWalletOptions(SettingsWallet walletSettings, RpcBase daemonRpc)
+        public string GenerateWalletOptions(SettingsWallet walletSettings, SettingsDaemon daemonSettings)
         {
-            string appCommand = "--daemon-address " + daemonRpc.Host + ":" + daemonRpc.Port;
+            string appCommand = string.Empty;
+
+            if (daemonSettings.IsWalletOnly)
+            {
+                appCommand = "--daemon-address " + walletSettings.PublicNodeAddress;
+            }
+            else
+            {
+                appCommand = "--daemon-address " + daemonSettings.Rpc.Host + ":" + daemonSettings.Rpc.Port;
+            }
+                
             appCommand += " --rpc-bind-port " + walletSettings.Rpc.Port;
             appCommand += " --disable-rpc-login";
             appCommand += " --wallet-dir \"" + GlobalData.WalletDir + "\"";

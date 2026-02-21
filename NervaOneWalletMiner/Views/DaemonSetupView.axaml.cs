@@ -46,7 +46,25 @@ namespace NervaOneWalletMiner.Views
                 else
                 {
                     hashThreshold.IsEnabled = false;
-                }                
+                }
+
+                // Set saved address if there, or default if not
+                tbxRemoteNode.Text = string.IsNullOrEmpty(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].PublicNodeAddress)
+                    ? GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].PublicNodeUrlDefault
+                    : GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].PublicNodeAddress;
+
+                if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
+                {
+                    RemoteNode.IsChecked = true;
+                    spFullNode.IsVisible = false;
+                    spWalletOnly.IsVisible = true;
+                }
+                else
+                {
+                    FullNode.IsChecked = true;
+                    spFullNode.IsVisible = true;
+                    spWalletOnly.IsVisible = false;
+                }
             }
             catch (Exception ex)
             {
@@ -61,7 +79,36 @@ namespace NervaOneWalletMiner.Views
             {
                 bool isChanged = false;
                 bool isRestartRequired = false;
-                         
+
+                if(RemoteNode.IsChecked!.Value)
+                {
+                    if(string.IsNullOrEmpty(tbxRemoteNode.Text))
+                    {
+                        MessageBoxView errorMessage = new MessageBoxView("Remote Node Required", "Remote Node Address or IP is required.", true);
+                        await errorMessage.ShowDialog<DialogResult>(GetWindow());
+                        return;
+                    }
+
+                    if (!GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
+                    {
+                        GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly = true;
+                        isChanged = isRestartRequired = true;
+                    }
+                    if (GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].PublicNodeAddress != tbxRemoteNode.Text)
+                    {
+                        GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].PublicNodeAddress = tbxRemoteNode.Text;
+                        isChanged = isRestartRequired = true;
+                    }
+                }
+                else
+                {
+                    if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
+                    {
+                        GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly = false;
+                        isChanged = isRestartRequired = true;
+                    }
+                }
+
                 if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress != tbxMiningAddress.Text)
                 {
                     GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress = tbxMiningAddress.Text!;
@@ -284,9 +331,17 @@ namespace NervaOneWalletMiner.Views
                 ProcessManager.Kill(GlobalData.WalletProcessName);
 
                 GlobalMethods.StopAndCloseDaemon();
-
-                GlobalData.IsDaemonRestarting = true;
-                ProcessManager.StartExternalProcess(GlobalMethods.GetDaemonProcess(), GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].GenerateDaemonOptions(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]) + " " + restartOptions);
+               
+                if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
+                {
+                    Logger.LogDebug("DMS.RWC1", "Running as Wallet Only");
+                }
+                else
+                {
+                    Logger.LogDebug("DMS.RWC1", "Running as Full Node");
+                    GlobalData.IsDaemonRestarting = true;
+                    ProcessManager.StartExternalProcess(GlobalMethods.GetDaemonProcess(), GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].GenerateDaemonOptions(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]) + " " + restartOptions);
+                }
             }
             catch (Exception ex)
             {
@@ -377,6 +432,37 @@ namespace NervaOneWalletMiner.Views
             catch (Exception ex)
             {
                 Logger.LogException("DMS.NHMT", ex); // Net Hash Mining Threshold
+            }
+        }
+
+        private void NodeType_IsCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is RadioButton radioButton)
+                {
+                    switch (radioButton.Name)
+                    {
+                        case "FullNode":
+                            if (radioButton.IsChecked!.Value)
+                            {
+                                spFullNode.IsVisible = true;
+                                spWalletOnly.IsVisible = false;                                
+                            }
+                            break;
+                        case "RemoteNode":
+                            if (radioButton.IsChecked!.Value)
+                            {
+                                spWalletOnly.IsVisible = true;
+                                spFullNode.IsVisible = false;
+                            }
+                            break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DMS.NTCC", ex);
             }
         }
 

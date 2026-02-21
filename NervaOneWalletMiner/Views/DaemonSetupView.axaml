@@ -33,20 +33,6 @@
 					Margin="0,10,0,0"
 					Click="OpenCliToolsFolder_Clicked"/>
 
-			<Separator Margin="0,20,0,0"/>
-
-			<Button Name="btnRestartWithCommand"
-					Content="Restart with optional Command"
-					DockPanel.Dock="Right"
-					Margin="0,10,0,0"
-					Click="RestartWithCommand_Clicked"/>
-		
-			<Button Name="btnRestartWithQuickSync"
-					Content="Restart with QuickSync"
-					DockPanel.Dock="Right"
-					Margin="0,10,0,0"
-					Click="RestartWithQuickSync_Clicked"/>
-
 			<Button Name="btnUpdateClientTools"
 					Content="Update Client Tools"
 					DockPanel.Dock="Right"
@@ -55,77 +41,115 @@
 
 			<Separator Margin="0,20,0,0"/>
 
-			<Label Content="Mining Address" Margin="0,10,0,0"/>
-			<TextBox Name="tbxMiningAddress"
-					 Watermark="Address that will receive mining rewards"/>
+			<RadioButton GroupName="NodeType"
+					Name="FullNode"
+					Margin="0,20,0,0"
+					IsChecked="True"
+					IsCheckedChanged="NodeType_IsCheckedChanged"
+					Content="Full Node: Blockchain runs on your device">			
+			</RadioButton>
 
-			<Label Content="Data Directory" Margin="0,10,0,0"/>
-			<Grid ColumnDefinitions="*,80">
-				<TextBox Grid.Row="0"
-						 Grid.Column="0"
-						 Name="tbxDaemonDataDir"
-						 Watermark="Blockchain database directory"/>
+			<RadioButton GroupName="NodeType"
+					Name="RemoteNode"
+					Margin="0,0,0,0"
+					IsCheckedChanged="NodeType_IsCheckedChanged"
+					Content="Wallet Only: Connect to remote node and get wallet functionality only">			
+			</RadioButton>
 
-				<Button Grid.Row="0"
-						Grid.Column="1"
-						Name="btnChangeDataDir"
-						Content="Change"
-						Margin="10,0,0,0"
-						Click="ChangeDataDir_Clicked"/>
-			</Grid>			
+			<StackPanel Name="spWalletOnly">
+				<Label Name="lblRemoteNode"
+					   Content="Remote Node Address or IP (Include port if not default)"/>
+				<TextBox Name="tbxRemoteNode" />
+			</StackPanel>
 
-			<Label Content="Additional Startup Arguments" Margin="0,10,0,0"/>
-			<TextBox Name="tbxAdditionalArguments"
-					 Watermark="Additional arguments that will be sent to daemon when it starts"/>
+			<StackPanel Name="spFullNode">							
+				<Separator Margin="0,20,0,0"/>
 
-			<Label Content="Port Number" Margin="0,10,0,0"/>
-			<TextBox Name="tbxPortNumber"
-					 Watermark="Number - port that daemon will use to listen on"/>
+				<Button Name="btnRestartWithCommand"
+						Content="Restart with optional Command"
+						DockPanel.Dock="Right"
+						Margin="0,10,0,0"
+						Click="RestartWithCommand_Clicked"/>
+		
+				<Button Name="btnRestartWithQuickSync"
+						Content="Restart with QuickSync"
+						DockPanel.Dock="Right"
+						Margin="0,10,0,0"
+						Click="RestartWithQuickSync_Clicked"/>
 
-			<Label Content="Log Level" Margin="0,10,0,0"/>
-			<TextBox Name="tbxLogLevel"
-					 Watermark="Number - level at which daemon will write to log files"/>
+				<Separator Margin="0,20,0,0"/>
+
+				<Label Content="Mining Address" Margin="0,10,0,0"/>
+				<TextBox Name="tbxMiningAddress"
+						 Watermark="Address that will receive mining rewards"/>
+
+				<Label Content="Data Directory" Margin="0,10,0,0"/>
+				<Grid ColumnDefinitions="*,80">
+					<TextBox Grid.Row="0"
+							 Grid.Column="0"
+							 Name="tbxDaemonDataDir"
+							 Watermark="Blockchain database directory"/>
+
+					<Button Grid.Row="0"
+							Grid.Column="1"
+							Name="btnChangeDataDir"
+							Content="Change"
+							Margin="10,0,0,0"
+							Click="ChangeDataDir_Clicked"/>
+				</Grid>			
+
+				<Label Content="Additional Startup Arguments" Margin="0,10,0,0"/>
+				<TextBox Name="tbxAdditionalArguments"
+						 Watermark="Additional arguments that will be sent to daemon when it starts"/>
+
+				<Label Content="Port Number" Margin="0,10,0,0"/>
+				<TextBox Name="tbxPortNumber"
+						 Watermark="Number - port that daemon will use to listen on"/>
+
+				<Label Content="Log Level" Margin="0,10,0,0"/>
+				<TextBox Name="tbxLogLevel"
+						 Watermark="Number - level at which daemon will write to log files"/>
 			
-			<CheckBox Name="cbxAutoStartMining"
-					  Content="Auto start mining"
-					  Margin="0,10,0,0"/>
+				<CheckBox Name="cbxAutoStartMining"
+						  Content="Auto start mining"
+						  Margin="0,10,0,0"/>
 			
-			<CheckBox Name="cbxStopOnExit"
-					  Content="Stop daemon on exit and coin switch"
-					  Margin="0,10,0,0"/>
+				<CheckBox Name="cbxStopOnExit"
+						  Content="Stop daemon on exit and coin switch"
+						  Margin="0,10,0,0"/>
 
-			<CheckBox Name="cbxEnableConnectionsGuard"
-					  Content="Enable connections guard"
-					  IsChecked="True"
-					  Margin="0,10,0,0"/>
+				<CheckBox Name="cbxEnableConnectionsGuard"
+						  Content="Enable connections guard"
+						  IsChecked="True"
+						  Margin="0,10,0,0"/>
 
-			<CheckBox Name="cbxUseNoAnalyticsFlag"
-					  Content="Disable Analytics: Don't report node info to node map"
-					  IsChecked="False"
-					  Margin="0,10,0,0"/>
+				<CheckBox Name="cbxUseNoAnalyticsFlag"
+						  Content="Disable Analytics: Don't report node info to node map"
+						  IsChecked="False"
+						  Margin="0,10,0,0"/>
 
-			<CheckBox Name="cbxUseNoDnsFlag"
-					  Content="Disable DNS: Don't use DNS seed nodes for peer discovery"
-					  IsChecked="False"
-					  Margin="30,10,0,0"
-					  IsCheckedChanged="NoDns_IsCheckedChanged"/>
+				<CheckBox Name="cbxUseNoDnsFlag"
+						  Content="Disable DNS: Don't use DNS seed nodes for peer discovery"
+						  IsChecked="False"
+						  Margin="30,10,0,0"
+						  IsCheckedChanged="NoDns_IsCheckedChanged"/>
 
-			<Separator Margin="0,20,0,0"/>
+				<Separator Margin="0,20,0,0"/>
 			
-			<CheckBox Name="cbxThresholdEnabled"
-					  Content="Enable Net Hash Threshold: Only mine if below (KH/s)"
-					  Margin="0,10,0,0"
-					  IsCheckedChanged="ThresholdEnabled_IsCheckedChanged"/>
+				<CheckBox Name="cbxThresholdEnabled"
+						  Content="Enable Net Hash Threshold: Only mine if below (KH/s)"
+						  Margin="0,10,0,0"
+						  IsCheckedChanged="ThresholdEnabled_IsCheckedChanged"/>
 				  
-			<NumericUpDown Name="hashThreshold"
-						   Minimum="0"
-						   Value="100"
-						   FormatString="N0"
-						   Width="160"
-						   HorizontalAlignment="Left"
-						   Margin="30,10,0,0"
-						   IsEnabled="false"/>
-
+				<NumericUpDown Name="hashThreshold"
+							   Minimum="0"
+							   Value="100"
+							   FormatString="N0"
+							   Width="160"
+							   HorizontalAlignment="Left"
+							   Margin="30,10,0,0"
+							   IsEnabled="false"/>
+			</StackPanel>
 			<Separator Margin="0,20,0,0"/>
 
 			<Button Name="btnSaveSettings"
