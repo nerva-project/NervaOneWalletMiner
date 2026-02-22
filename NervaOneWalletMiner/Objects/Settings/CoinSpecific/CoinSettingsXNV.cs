@@ -1,5 +1,4 @@
 ﻿using NervaOneWalletMiner.Helpers;
-using NervaOneWalletMiner.Rpc.Common;
 using System;
 using System.IO;
 
@@ -32,7 +31,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private string _CliUrlMacIntel = "https://github.com/nerva-project/nerva/releases/download/v0.2.0.0/nerva-macos-x64-v0.2.0.0.tar.bz2";
         private string _CliUrlMacArm = "https://github.com/nerva-project/nerva/releases/download/v0.2.0.0/nerva-macos-armv8-v0.2.0.0.tar.bz2";
 
-        private string _PublicNodeUrlDefault = "node.nerva.one";
+        private string _PublicNodeUrlDefault = "node.nerva.one:17566";
 
         private string _DataDirWindows = "C:/ProgramData/nerva";
         private string _DataDirLinux = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nerva");
@@ -132,7 +131,6 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
             if (daemonSettings.IsWalletOnly)
             {
                 appCommand = "--daemon-address " + walletSettings.PublicNodeAddress;
-                //74.208.52.101:17566
             }
             else
             {

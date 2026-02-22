@@ -124,7 +124,12 @@ namespace NervaOneWalletMiner.Helpers
                     if (GlobalData.IsGetAndSetDaemonDataComplete)
                     {
                         UIManager.UpdateDaemonView();
+                        UIManager.UpdateStatusBar();
                     }
+                }
+                else
+                {
+                    UIManager.UpdateStatusBar();
                 }
 
                 // Get Wallets/Transfers data

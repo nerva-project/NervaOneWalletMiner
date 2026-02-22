@@ -1,27 +1,28 @@
-﻿using Avalonia.Media.Imaging;
+﻿using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using ICSharpCode.SharpZipLib.BZip2;
+using ICSharpCode.SharpZipLib.GZip;
 using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Objects.Settings;
 using NervaOneWalletMiner.Objects.Settings.CoinSpecific;
+using NervaOneWalletMiner.Objects.Stats;
 using NervaOneWalletMiner.Rpc.Daemon;
+using NervaOneWalletMiner.Rpc.Daemon.Requests;
 using NervaOneWalletMiner.Rpc.Wallet;
+using NervaOneWalletMiner.Rpc.Wallet.Requests;
+using NervaOneWalletMiner.Rpc.Wallet.Responses;
+using NervaOneWalletMiner.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Formats.Tar;
 using System.IO;
 using System.IO.Compression;
+using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Net.Http;
-using NervaOneWalletMiner.Rpc.Wallet.Requests;
-using NervaOneWalletMiner.Rpc.Wallet.Responses;
-using Avalonia.Input;
-using Avalonia.Controls;
-using NervaOneWalletMiner.Objects.Stats;
-using NervaOneWalletMiner.Rpc.Daemon.Requests;
-using System.Formats.Tar;
-using ICSharpCode.SharpZipLib.BZip2;
-using ICSharpCode.SharpZipLib.GZip;
 
 namespace NervaOneWalletMiner.Helpers
 {
@@ -1104,6 +1105,25 @@ namespace NervaOneWalletMiner.Helpers
         #endregion // Data Manipulation
 
         #region Misc Methods
+        public static void ShowHideDaemonTab()
+        {
+            try
+            {
+                if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
+                {
+                    ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).ShowDaemonTab(false);
+                }
+                else
+                {
+                    ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).ShowDaemonTab(true);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("GLM.SHDT", ex);
+            }
+        }
+
         public static void CopyToClipboard(Avalonia.Visual visual, string text)
         {
             try

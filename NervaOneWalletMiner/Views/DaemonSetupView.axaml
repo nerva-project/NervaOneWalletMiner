@@ -58,7 +58,7 @@
 
 			<StackPanel Name="spWalletOnly">
 				<Label Name="lblRemoteNode"
-					   Content="Remote Node Address or IP (Include port if not default)"/>
+					   Content="Remote Node Address or IP (Including port number)"/>
 				<TextBox Name="tbxRemoteNode" />
 			</StackPanel>
 

@@ -75,12 +75,17 @@ public partial class CoinSetupView : Window
             }
             else
             {
-                if((bool)RemoteNode.IsChecked!)
+                GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].PublicNodeAddress = tbxRemoteNode.Text!.Trim();
+
+                if ((bool)RemoteNode.IsChecked!)
                 {
                     GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly = true;
-                    GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].PublicNodeAddress = tbxRemoteNode.Text!.Trim();
-                    GlobalMethods.SaveConfig();
                 }
+                else
+                {
+                    GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly = false;                    
+                }
+                GlobalMethods.SaveConfig();
 
                 DialogResult result = new()
                 {

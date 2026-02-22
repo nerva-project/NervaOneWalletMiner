@@ -1,5 +1,4 @@
 ﻿using NervaOneWalletMiner.Helpers;
-using NervaOneWalletMiner.Rpc.Common;
 using System;
 using System.IO;
 
@@ -32,7 +31,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private string _CliUrlMacIntel = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-x86_64-apple-darwin11-v0.11.3.0.tar.bz2";
         private string _CliUrlMacArm = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-aarch64-apple-darwin11-v0.11.3.0.tar.bz2";
 
-        private string _PublicNodeUrlDefault = "N/A";
+        private string _PublicNodeUrlDefault = "node.monerodevs.org:34568";
 
         private string _DataDirWindows = "C:/ProgramData/wownero";
         private string _DataDirLinux = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".wownero");
