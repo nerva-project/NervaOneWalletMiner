@@ -95,11 +95,10 @@ namespace NervaOneWalletMiner.Views
                     if (!GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
                     {
                         // CLI tools missing. Need to download                        
-                        GlobalData.IsCliToolsFound = false;
-                        string cliToolsLink = GlobalMethods.GetCliToolsDownloadLink(GlobalData.AppSettings.ActiveCoin);
-                        Logger.LogDebug("SET.SSCL", "CLI tools not found. Asking user to confirm download link: " + cliToolsLink);
-                        
-                        var window = new TextBoxView("Get Client Tools", "Client Tools Download Link", cliToolsLink, string.Empty);
+                        GlobalData.IsCliToolsFound = false;                       
+                        Logger.LogDebug("SET.SSCL", "CLI tools not found. Opening Coin Setup View.");
+
+                        var window = new CoinSetupView();
                         await window.ShowDialog(GetWindow()).ContinueWith(CliToolsLinkDialogClosed);
                     }
                 }
@@ -109,6 +108,8 @@ namespace NervaOneWalletMiner.Views
                     imgCoinIcon.Source = GlobalMethods.GetLogo();
                     GlobalData.NetworkStats = new();
                     GlobalMethods.SaveConfig();
+
+                    GlobalMethods.ShowHideDaemonTab();
                 }
             }
             catch (Exception ex)

@@ -32,8 +32,11 @@ public partial class MainWindow : Window
             MainViewModel vm = (MainViewModel)DataContext!;
             vm.CheckAndGetCliEvent += CheckAndDownloadCliIfNeeded;
             vm.SyncWithQuickSyncEvent += QuickSyncIfWanted;
+            vm.ShowDaemonTabEvent += ShowDaemonTab;
 
             CheckAndDownloadCliIfNeeded();
+
+            GlobalMethods.ShowHideDaemonTab();
         }
         catch (Exception ex)
         {
@@ -81,10 +84,9 @@ public partial class MainWindow : Window
         {
             // CLI tools missing. Need to download            
             GlobalData.IsCliToolsFound = false;
-            string cliToolsLink = GlobalMethods.GetCliToolsDownloadLink(GlobalData.AppSettings.ActiveCoin);
-            Logger.LogDebug("MAW.CDCN", "CLI tools not found. Asking user to confirm download link: " + cliToolsLink);
+            Logger.LogDebug("MAW.CDCN", "CLI tools not found. Opening Coin Setup View.");
 
-            var window = new TextBoxView("Get Client Tools", "Client Tools Download Link", cliToolsLink, string.Empty);
+            var window = new CoinSetupView();
             window.ShowDialog(this).ContinueWith(CliToolsLinkDialogClosed);
         }
     }
@@ -121,6 +123,31 @@ public partial class MainWindow : Window
         catch (Exception ex)
         {
             Logger.LogException("MAW.CTLC", ex);
+        }
+    }
+
+    public void ShowDaemonTab(bool isVisible)
+    {
+        try
+        {
+            if (!isVisible)
+            {
+                if (MainViewControl.daemon.IsVisible)
+                {
+                    MainViewControl.daemon.IsVisible = false;
+                }
+            }
+            else
+            {
+                if (!MainViewControl.daemon.IsVisible)
+                {
+                    MainViewControl.daemon.IsVisible = true;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException("MAV.DVIS", ex);
         }
     }
 }

@@ -75,7 +75,7 @@ namespace NervaOneWalletMiner.Views
                         MessageBoxView window = new("Open Wallet", "Client tools missing. Cannot open wallet until client tools are downloaded and running", true);
                         await window.ShowDialog(GetWindow());
                     }
-                    else if (!GlobalData.IsInitialDaemonConnectionSuccess)
+                    else if (!GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly && !GlobalData.IsInitialDaemonConnectionSuccess)
                     {
                         Logger.LogDebug("WAL.OCWC", "Trying to open wallet but daemon not running");
 

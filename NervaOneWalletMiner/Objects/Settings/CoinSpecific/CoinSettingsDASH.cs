@@ -1,5 +1,4 @@
 ﻿using NervaOneWalletMiner.Helpers;
-using NervaOneWalletMiner.Rpc.Common;
 using System;
 using System.IO;
 
@@ -31,6 +30,8 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private string _CliUrlLinuxArm = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-arm-linux-gnueabihf.tar.gz";
         private string _CliUrlMacIntel = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-x86_64-apple-darwin.tar.gz";
         private string _CliUrlMacArm = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-arm64-apple-darwin.tar.gz";
+
+        private string _PublicNodeUrlDefault = "N/A";
 
         private string _DataDirWindows = Path.Combine(GlobalMethods.GetDataDir(), "DashCore");
         private string _DataDirLinux = Path.Combine(GlobalMethods.GetDataDir(), "DashCore");
@@ -64,6 +65,8 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public string CliUrlLinuxArm { get => _CliUrlLinuxArm; set => _CliUrlLinuxArm = value; }
         public string CliUrlMacIntel { get => _CliUrlMacIntel; set => _CliUrlMacIntel = value; }
         public string CliUrlMacArm { get => _CliUrlMacArm; set => _CliUrlMacArm = value; }
+
+        public string PublicNodeUrlDefault { get => _PublicNodeUrlDefault; set => _PublicNodeUrlDefault = value; }
 
         public string DataDirWindows { get => _DataDirWindows; set => _DataDirWindows = value; }
         public string DataDirLinux { get => _DataDirLinux; set => _DataDirLinux = value; }
@@ -101,7 +104,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
             return daemonCommand;
         }
 
-        public string GenerateWalletOptions(SettingsWallet walletSettings, RpcBase daemonRpc)
+        public string GenerateWalletOptions(SettingsWallet walletSettings, SettingsDaemon daemonSettings)
         {
             // Should not call this because daemon and wallet are the same process
             throw new NotImplementedException();

@@ -30,7 +30,7 @@
 					</Button>
 				
 					<ListBox Selection="{Binding Selection}">
-						<ListBoxItem Name="daemon" IsSelected="True">
+						<ListBoxItem Name="daemon">
 							<StackPanel Spacing="12" Orientation="Horizontal">
 								<PathIcon Height="20" Data="{StaticResource DaemonIcon}"/>
 								<TextBlock Text="Daemon"/>

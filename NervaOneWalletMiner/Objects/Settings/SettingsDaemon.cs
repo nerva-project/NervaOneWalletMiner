@@ -4,6 +4,8 @@ namespace NervaOneWalletMiner.Objects.Settings
 {
     public class SettingsDaemon
     {
+        public bool IsWalletOnly { get; set; } = false;
+
         public RpcBase Rpc { get; set; } = new RpcBase();
 
         public bool StopOnExit { get; set; } = false;

@@ -17,6 +17,13 @@ public class MainViewModel : ViewModelBase
         CheckAndGetCliEvent!.Invoke();
     }
 
+    public delegate void ShowDaemonTabAction(bool isVisible);
+    public event ShowDaemonTabAction? ShowDaemonTabEvent;
+    public void ShowDaemonTab(bool isVisible)
+    {
+        ShowDaemonTabEvent!.Invoke(isVisible);
+    }
+
     public delegate void SyncWithQuickSyncAction(double percentSynced);
     public event SyncWithQuickSyncAction? SyncWithQuickSyncEvent;
     public void AskIfSyncWithQuickSync(double percentSynced)
@@ -92,7 +99,14 @@ public class MainViewModel : ViewModelBase
             UIManager.SetUpFirstRun();            
         }
 
-        _CurrentPage = GlobalData.ViewModelPages[SplitViewPages.Daemon];
+        if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
+        {
+            _CurrentPage = GlobalData.ViewModelPages[SplitViewPages.Wallet];
+        }
+        else
+        {
+            _CurrentPage = GlobalData.ViewModelPages[SplitViewPages.Daemon];
+        }
 
         TriggerPaneCommand = ReactiveCommand.Create(TriggerPane);        
         Selection = new SelectionModel<ListBoxItem>();

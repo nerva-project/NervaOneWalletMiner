@@ -11,11 +11,19 @@ public partial class MainView : UserControl
 		try
 		{
             InitializeComponent();
+
+            if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
+            {
+                wallet.IsSelected = true;                
+            }
+            else
+            {
+                daemon.IsSelected = true;
+            }
         }
 		catch (Exception ex)
 		{
             Logger.LogException("MAV.CONS", ex);
-        }
-        
+        }        
     }
 }

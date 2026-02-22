@@ -1,5 +1,4 @@
 ﻿using NervaOneWalletMiner.Helpers;
-using NervaOneWalletMiner.Rpc.Common;
 using System;
 using System.IO;
 
@@ -31,6 +30,8 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private string _CliUrlLinuxArm = "https://github.com/nerva-project/nerva/releases/download/v0.2.0.0/nerva-linux-armv7-v0.2.0.0.tar.bz2";
         private string _CliUrlMacIntel = "https://github.com/nerva-project/nerva/releases/download/v0.2.0.0/nerva-macos-x64-v0.2.0.0.tar.bz2";
         private string _CliUrlMacArm = "https://github.com/nerva-project/nerva/releases/download/v0.2.0.0/nerva-macos-armv8-v0.2.0.0.tar.bz2";
+
+        private string _PublicNodeUrlDefault = "node.nerva.one:17566";
 
         private string _DataDirWindows = "C:/ProgramData/nerva";
         private string _DataDirLinux = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nerva");
@@ -64,6 +65,8 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public string CliUrlLinuxArm { get => _CliUrlLinuxArm; set => _CliUrlLinuxArm = value; }
         public string CliUrlMacIntel { get => _CliUrlMacIntel; set => _CliUrlMacIntel = value; }
         public string CliUrlMacArm { get => _CliUrlMacArm; set => _CliUrlMacArm = value; }
+
+        public string PublicNodeUrlDefault { get => _PublicNodeUrlDefault; set => _PublicNodeUrlDefault = value; }
 
         public string DataDirWindows { get => _DataDirWindows; set => _DataDirWindows = value; }
         public string DataDirLinux { get => _DataDirLinux; set => _DataDirLinux = value; }
@@ -120,9 +123,20 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
             return daemonCommand;
         }
 
-        public string GenerateWalletOptions(SettingsWallet walletSettings, RpcBase daemonRpc)
+        public string GenerateWalletOptions(SettingsWallet walletSettings, SettingsDaemon daemonSettings)
         {
-            string appCommand = "--daemon-address " + daemonRpc.Host + ":" + daemonRpc.Port;
+            string appCommand = string.Empty;
+
+            // TODO: Might want to change this to just set host and port in daemonSettings
+            if (daemonSettings.IsWalletOnly)
+            {
+                appCommand = "--daemon-address " + walletSettings.PublicNodeAddress;
+            }
+            else
+            {
+                appCommand = "--daemon-address " + daemonSettings.Rpc.Host + ":" + daemonSettings.Rpc.Port;
+            }                
+            
             appCommand += " --rpc-bind-port " + walletSettings.Rpc.Port;
             appCommand += " --disable-rpc-login";
             appCommand += " --wallet-dir \"" + GlobalData.WalletDir + "\"";

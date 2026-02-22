@@ -74,11 +74,19 @@ namespace NervaOneWalletMiner.Helpers
                 { SplitViewPages.MainView, _mainView }
             };
 
-            ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.Daemon];
+            if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
+            {
+                ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.Wallet];
+            }
+            else
+            {
+                ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.Daemon];
+            }            
 
             MasterProcess.StartMasterUpdateProcess();
 
-            UpdateDaemonView();            
+            UpdateDaemonView();
+            UpdateStatusBar();
         }
 
         public static void SelectionChanged(object? sender, SelectionModelSelectionChangedEventArgs e)
@@ -257,15 +265,32 @@ namespace NervaOneWalletMiner.Helpers
                         ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).IsNumThreadsEnabled = true;
                     }
                 }
-
-                // Status Bar
-                UpdateDaemonStatus("Connections: " + GlobalData.NetworkStats.ConnectionsOut + "(out) + " + GlobalData.NetworkStats.ConnectionsIn + "(in)" + GlobalData.NetworkStats.StatusSync);
-                UpdateDaemonVersion(GlobalData.NetworkStats.Version.ToLower().StartsWith("v") ? GlobalData.NetworkStats.Version : "v: " + GlobalData.NetworkStats.Version);
             }
             catch (Exception ex)
             {
                 Logger.LogException("UIM.UPDV", ex);
             }          
+        }
+
+        public static void UpdateStatusBar()
+        {
+            try
+            {
+                if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
+                {
+                    UpdateDaemonStatus("Connected to: " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].PublicNodeAddress);
+                    UpdateDaemonVersion("Public Node");
+                }
+                else
+                {
+                    UpdateDaemonStatus("Connections: " + GlobalData.NetworkStats.ConnectionsOut + "(out) + " + GlobalData.NetworkStats.ConnectionsIn + "(in)" + GlobalData.NetworkStats.StatusSync);
+                    UpdateDaemonVersion(GlobalData.NetworkStats.Version.ToLower().StartsWith("v") ? GlobalData.NetworkStats.Version : "v: " + GlobalData.NetworkStats.Version);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("UIM.UPSB", ex);
+            }
         }
         
         public static void UpdateWalletView()

@@ -12,7 +12,7 @@
         Title="NervaOne Wallet and Miner">
 
 	<Grid>
-        <views:MainView/>
+        <views:MainView Name="MainViewControl"/>
 	</Grid>
 	
 </Window>

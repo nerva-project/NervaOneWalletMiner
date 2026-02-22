@@ -126,7 +126,7 @@ namespace NervaOneWalletMiner.Views
                     MessageBoxView window = new("Create New Wallet", "Client tools missing. Cannot create wallet until client tools are downloaded and running", true);
                     await window.ShowDialog(GetWindow());
                 }
-                else if (!GlobalData.IsInitialDaemonConnectionSuccess)
+                else if (!GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly && !GlobalData.IsInitialDaemonConnectionSuccess)
                 {
                     Logger.LogDebug("WAS.CWC1", "Trying to create wallet but daemon not running");
 
@@ -214,7 +214,7 @@ namespace NervaOneWalletMiner.Views
                     MessageBoxView window = new("Restore Wallet from Seed", "Client tools missing. Cannot restore wallet until client tools are downloaded and running", true);
                     await window.ShowDialog(GetWindow());
                 }
-                else if (!GlobalData.IsInitialDaemonConnectionSuccess)
+                else if (!GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly && !GlobalData.IsInitialDaemonConnectionSuccess)
                 {
                     Logger.LogDebug("WAS.RFSC", "Trying to restore wallet but daemon not running");
 
@@ -327,7 +327,7 @@ namespace NervaOneWalletMiner.Views
                     MessageBoxView window = new("Restore Wallet from Keys", "Client tools missing. Cannot restore wallet until client tools are downloaded and running", true);
                     await window.ShowDialog(GetWindow());
                 }
-                else if (!GlobalData.IsInitialDaemonConnectionSuccess)
+                else if (!GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly && !GlobalData.IsInitialDaemonConnectionSuccess)
                 {
                     Logger.LogDebug("WAS.RFKC", "Trying to restore wallet but daemon not running");
 
@@ -442,7 +442,7 @@ namespace NervaOneWalletMiner.Views
                     MessageBoxView window = new("Rescan Spent", "Client tools missing. Cannot rescan wallet until client tools are downloaded and running", true);
                     await window.ShowDialog(GetWindow());
                 }
-                else if (!GlobalData.IsInitialDaemonConnectionSuccess)
+                else if (!GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly && !GlobalData.IsInitialDaemonConnectionSuccess)
                 {
                     Logger.LogDebug("WAS.RSTC", "Trying to rescan spent but daemon not running");
 
@@ -511,7 +511,7 @@ namespace NervaOneWalletMiner.Views
                     MessageBoxView window = new("Rescan Blockchain", "Client tools missing. Cannot rescan wallet until client tools are downloaded and running", true);
                     await window.ShowDialog(GetWindow());
                 }
-                else if (!GlobalData.IsInitialDaemonConnectionSuccess)
+                else if (!GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly && !GlobalData.IsInitialDaemonConnectionSuccess)
                 {
                     Logger.LogDebug("WAS.RBCC", "Trying to rescan blockchain but daemon not running");
 
@@ -582,7 +582,7 @@ namespace NervaOneWalletMiner.Views
                     MessageBoxView window = new("View Keys and Seed", "Client tools missing. Cannot view keys and seed until client tools are downloaded and running", true);
                     await window.ShowDialog(GetWindow());
                 }
-                else if (!GlobalData.IsInitialDaemonConnectionSuccess)
+                else if (!GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly && !GlobalData.IsInitialDaemonConnectionSuccess)
                 {
                     Logger.LogDebug("WAS.VKSC", "Trying to view keys and seed but daemon not running");
 
