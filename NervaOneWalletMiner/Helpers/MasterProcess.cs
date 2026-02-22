@@ -117,6 +117,7 @@ namespace NervaOneWalletMiner.Helpers
                 {
                     if (!_killMasterProcess && _masterTimerCount % GlobalData.AppSettings.TimerIntervalMultiplier == 0)
                     {
+                        UIManager.HandleNetworkStats();
                         UIManager.GetAndSetDaemonData();
                     }
 
@@ -129,6 +130,7 @@ namespace NervaOneWalletMiner.Helpers
                 }
                 else
                 {
+                    UIManager.HandleNetworkStats();
                     UIManager.UpdateStatusBar();
                 }
 
@@ -267,6 +269,13 @@ namespace NervaOneWalletMiner.Helpers
         {
             try
             {
+                if (!GlobalData.IsCliToolsDownloading && GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
+                {
+                    Logger.LogDebug("MSP.KWPR", "Client tools found.");
+                    GlobalData.IsCliToolsFound = true;
+
+                }
+
                 if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsDaemonWalletSeparateApp)
                 {
                     if (!GlobalData.IsCliToolsDownloading && !ProcessManager.IsRunning(GlobalData.WalletProcessName))
