@@ -86,7 +86,7 @@ public partial class MainWindow : Window
             GlobalData.IsCliToolsFound = false;
             Logger.LogDebug("MAW.CDCN", "CLI tools not found. Opening Coin Setup View.");
 
-            var window = new CoinSetupView();
+            var window = new CoinSetupView();            
             window.ShowDialog(this).ContinueWith(CliToolsLinkDialogClosed);
         }
     }
@@ -135,6 +135,10 @@ public partial class MainWindow : Window
                 if (MainViewControl.daemon.IsVisible)
                 {
                     MainViewControl.daemon.IsVisible = false;
+                    if (MainViewControl.daemon.IsSelected)
+                    {
+                        MainViewControl.wallet.IsSelected = true;
+                    }
                 }
             }
             else

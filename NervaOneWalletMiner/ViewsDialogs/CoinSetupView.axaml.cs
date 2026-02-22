@@ -93,6 +93,8 @@ public partial class CoinSetupView : Window
                     TextBoxValue = tbxCliDownloadUrl.Text!,
                 };
 
+                GlobalMethods.ShowHideDaemonTab();
+
                 Close(result);
             }
         }
