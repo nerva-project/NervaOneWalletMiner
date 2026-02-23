@@ -269,11 +269,10 @@ namespace NervaOneWalletMiner.Helpers
         {
             try
             {
-                if (!GlobalData.IsCliToolsDownloading && GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
+                if (!GlobalData.IsCliToolsDownloading && GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir) && !GlobalData.IsCliToolsFound)
                 {
                     Logger.LogDebug("MSP.KWPR", "Client tools found.");
                     GlobalData.IsCliToolsFound = true;
-
                 }
 
                 if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsDaemonWalletSeparateApp)

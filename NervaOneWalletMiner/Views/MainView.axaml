@@ -15,14 +15,18 @@
 	</Design.DataContext>
 	
 	<Grid RowDefinitions="*,50">
-		<SplitView IsPaneOpen="{Binding IsPaneOpen}"
-					DisplayMode="CompactInline"
-					OpenPaneLength="160"
-					CompactPaneLength="46"
-					Grid.Row="0">
+		<SplitView Name="spvMain"
+				   IsPaneOpen="{Binding IsPaneOpen}"
+				   PaneOpened="spvMain_PaneOpenedClosed"
+				   PaneClosed="spvMain_PaneOpenedClosed"
+				   DisplayMode="CompactInline"
+				   OpenPaneLength="160"
+				   CompactPaneLength="46"
+				   Grid.Row="0">
 			<SplitView.Pane>
 				<StackPanel Spacing="3" Margin="2">
-					<Button Width="32"
+					<Button Name="btnLines"
+							Width="32"
 							Height="32"
 							Margin="4 7"
 							Command="{Binding TriggerPaneCommand}">
