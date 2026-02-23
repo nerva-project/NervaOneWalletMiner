@@ -14,16 +14,15 @@ jobs:
         runs-on: ubuntu-latest
         outputs:
             version: ${{ steps.get_version.outputs.version }}
-        env:
-            currVer: ${{ github.ref_name }}
         steps:
-          - name: Extract Version Number
+          - uses: actions/checkout@v4
+          - name: Extract NervaOne Version
             id: get_version
             shell: bash
             run: |
-              version="${currVer#v}"
-              echo "version=$version" >> $GITHUB_OUTPUT
-              echo "Extracted version: $version"
+                version=$(awk '/public const string Version = /{ print $6 }' < ./NervaOneWalletMiner/Helpers/GlobalData.cs)
+                export version=$(echo ${version} | tr -d '";')
+                echo "version=$version" >> $GITHUB_OUTPUT
 
 # ================================
 #              Windows
@@ -44,31 +43,27 @@ jobs:
             with:
                 dotnet-version: 8.0.x
 
-          - name: Install Netloy
-            run: dotnet tool install -g Netloy
-
           - name: Restore Dependencies
             run: |
                 cd ./NervaOneWalletMiner.Desktop
                 dotnet restore
 
-          - name: Build Windows ZIP
+          - name: Build for Windows
             run: |
-                cd ./Builder
-                netloy -t portable -r ${{ matrix.rid }} -y -o "Output/nervaone-desktop-${{ needs.setup.outputs.version }}-${{ matrix.rid }}.zip"
+                cd ./NervaOneWalletMiner.Desktop
+                dotnet publish NervaOneWalletMiner.Desktop.csproj -c release -r ${{ matrix.rid }} -p:publishsinglefile=true
 
           - name: Remove PDB Files
-            run: Remove-Item -Path "./Builder/Output/*.pdb" -Force -ErrorAction SilentlyContinue
+            run: Remove-Item -Path "./NervaOneWalletMiner.Desktop/bin/release/net8.0/${{ matrix.rid }}/publish/*.pdb" -Force -ErrorAction SilentlyContinue
             shell: pwsh
 
           - name: Upload Windows Artifacts
             uses: actions/upload-artifact@v4
             with:
-                name: ${{ matrix.rid }}-packages
+                name: nervaone-desktop-v${{ needs.setup.outputs.version }}-${{ matrix.rid }}
                 path: |
-                    ./Builder/Output/*
-                    !./Builder/Output/*.pdb
-                    !./Builder/Output/*.wixpdb
+                    ./NervaOneWalletMiner.Desktop/bin/release/net8.0/${{ matrix.rid }}/publish/*
+                    !./NervaOneWalletMiner.Desktop/bin/release/net8.0/${{ matrix.rid }}/publish/*.pdb
 
 # ================================
 #              Linux
@@ -97,25 +92,35 @@ jobs:
                 sudo apt update
                 sudo apt-get install -y zip libfuse2t64
 
-          - name: Install Netloy
-            run: dotnet tool install -g Netloy
-
           - name: Restore Dependencies
             run: |
                 cd ./NervaOneWalletMiner.Desktop
                 dotnet restore
 
-          - name: Build Linux TAR.GZ
+          - name: Build for Linux
             run: |
-                cd ./Builder
-                netloy -t portable -r ${{ matrix.rid }} -y -o "Output/nervaone-desktop-${{ needs.setup.outputs.version }}-${{ matrix.rid }}.tar.gz"
+                cd ./NervaOneWalletMiner.Desktop
+                dotnet publish NervaOneWalletMiner.Desktop.csproj -c release -r ${{ matrix.rid }} -p:publishsinglefile=true
 
-          - name: Upload Linux Artifacts
+          - name: Create Artifact Directories
+            shell: bash
+            run: |
+              mkdir -p ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop/Contents
+              mkdir -p ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop/Resources
+
+          - name: Copy Icons and Files
+            run: |              
+              cp ./Builder/logos/nerva-logo-color.png ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop/Resources/nerva-logo-color.png
+              cp ./Builder/logos/nerva-logo-color-2.png ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop/Resources/nerva-logo-color-2.png
+              cp ./NervaOneWalletMiner.Desktop/bin/release/net8.0/${{ matrix.rid }}/publish/* ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop/Contents/
+              cp ./Builder/install ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop/install
+              chmod +x ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop/install
+
+          - name: Upload Artifacts
             uses: actions/upload-artifact@v4
             with:
-                name: ${{ matrix.rid }}-packages
-                path: ./Builder/Output/*
-
+                name: nervaone-desktop-v${{ needs.setup.outputs.version }}-${{ matrix.rid }}
+                path: ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop/*
 
 # ================================
 #              macOS
@@ -136,21 +141,37 @@ jobs:
             with:
                 dotnet-version: 8.0.x
 
-          - name: Install Netloy
-            run: dotnet tool install -g Netloy
-
           - name: Restore Dependencies
             run: |
                 cd ./NervaOneWalletMiner.Desktop
                 dotnet restore
 
-          - name: Build macOS TAR.GZ
+          - name: Build for MacOS
             run: |
-                cd ./Builder
-                netloy -t portable -r ${{ matrix.rid }} -y -o "Output/nervaone-desktop-${{ needs.setup.outputs.version }}-${{ matrix.rid }}.tar.gz"
+                cd ./NervaOneWalletMiner.Desktop
+                dotnet publish NervaOneWalletMiner.Desktop.csproj -c release -r ${{ matrix.rid }} -p:publishsinglefile=true                
 
-          - name: Upload macOS  Artifacts
+          - name: Create Artifact Directories
+            run: |
+              mkdir -p ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop.app/Contents
+              mkdir -p ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop.app/Contents/MacOS
+              mkdir -p ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop.app/Contents/Resources
+
+          - name: Generate Plist
+            run: |
+              plist=$(sed -e "s/{APP_VERSION}/0.8.4.0/" -e "s/{DISPLAY_NAME}/NervaOne/" ./Builder/Info.plist.template)
+              echo "$plist" > ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop.app/Contents/Info.plist
+
+          - name: Copy Icons and Launcher
+            run: |
+              cp ./Builder/logos/nerva-logo-color.icns ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop.app/Contents/Resources/nerva-logo-color.icns
+              cp ./Builder/logos/nerva-logo-color-2.icns ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop.app/Contents/Resources/nerva-logo-color-2.icns
+              cp -R ./NervaOneWalletMiner.Desktop/bin/release/net8.0/${{ matrix.rid }}/publish/* ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop.app/Contents/MacOS/
+
+          - name: Upload Artifacts
             uses: actions/upload-artifact@v4
             with:
-                name: ${{ matrix.rid }}-packages
-                path: ./Builder/Output/*
+                name: nervaone-desktop-v${{ needs.setup.outputs.version }}-${{ matrix.rid }}
+                path: |
+                  ./NervaOneWalletMiner.Desktop/bin/*
+                  !./NervaOneWalletMiner.Desktop/bin/release/
