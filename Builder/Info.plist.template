@@ -5,7 +5,7 @@
 	<key>CFBundleIdentifier</key>
 	<string>one.nerva.desktop</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2024 The Nerva Project</string>
+	<string>Copyright © 2026 The Nerva Project</string>
 	<key>CFBundleShortVersionString</key>
 	<string>{APP_VERSION}</string>
 	<key>CFBundleVersion</key>
