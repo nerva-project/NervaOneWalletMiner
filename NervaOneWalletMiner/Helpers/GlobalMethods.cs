@@ -1129,12 +1129,12 @@ namespace NervaOneWalletMiner.Helpers
             try
             {
                 var clipboard = TopLevel.GetTopLevel(visual)?.Clipboard;
-                var dataObject = new DataObject();
-                dataObject.Set(DataFormats.Text, text);
+                var dataObject = new DataTransfer();
+                dataObject.Add(DataTransferItem.CreateText(text));
 
                 if (clipboard != null)
                 {
-                    clipboard.SetDataObjectAsync(dataObject);
+                    clipboard.SetDataAsync(dataObject);
                 }
             }
             catch (Exception ex)
