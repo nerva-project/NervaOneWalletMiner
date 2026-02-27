@@ -285,7 +285,7 @@ namespace NervaOneWalletMiner.Helpers
                 if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
                 {
                     UpdateDaemonStatus(GlobalData.NetworkStats.StatusSync);
-                    UpdateDaemonVersion("Public Node");
+                    UpdateDaemonVersion("Remote Node");
                 }
                 else
                 {
