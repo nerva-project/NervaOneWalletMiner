@@ -1213,8 +1213,9 @@ namespace NervaOneWalletMiner.Helpers
         public static void CoinChanged()
         {
             GlobalData.NetworkStats = new();
-            GlobalData.IsManualStopMining = false;
-            GlobalData.IsAutoStoppedMining = false;
+            GlobalData.IsManualStoppedMining = false;
+            GlobalData.IsNoConnectionsStoppedMining = false;
+            GlobalData.IsHashRateMonitoringStoppedMining = false;
 
             GlobalData.IsCliToolsFound = true;
             GlobalData.IsCliToolsDownloading = false;

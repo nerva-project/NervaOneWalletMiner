@@ -75,65 +75,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
             return responseObj;
         }
         #endregion // Start Mining
-
-        #region Stop Mining Auto
-        public async Task<StopMiningResponse> StopMiningAuto(RpcBase rpc, StopMiningRequest requestObj)
-        {
-            MiningStatusResponse status = await GetMiningStatus(rpc, new MiningStatusRequest());
-            StopMiningResponse responseObj = new();
-            
-            if (!status.IsActive)
-            {
-                responseObj.Error.IsError = false;
-                return responseObj;
-            }
-
-            if (requestObj.EnableMiningThreshold)
-            {
-                GetInfoResponse infoRes = await GlobalData.DaemonService.GetInfo(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new GetInfoRequest());
-                if ((infoRes.NetworkHashRate / 1000.0d) <= requestObj.StopMiningThreshold)
-                {
-                    responseObj.Error.IsError = true;
-                    responseObj.Error.Message = "Network hash below threshold";
-                    return responseObj;
-                }
-            }
-
-            Console.WriteLine("Stopping mining");
-
-            return await StopMining(rpc, requestObj);
-        }
-        #endregion
-
-        #region Start Mining Auto
-        public async Task<StartMiningResponse> StartMiningAuto(RpcBase rpc, StartMiningRequest requestObj)
-        {
-            MiningStatusResponse status = await GetMiningStatus(rpc, new MiningStatusRequest());
-            StartMiningResponse responseObj = new();
-            
-            if (status.IsActive)
-            {
-                responseObj.Error.IsError = false;
-                return responseObj;
-            }
-            
-            if(requestObj.EnableMiningThreshold)
-            {
-                GetInfoResponse infoRes = await GlobalData.DaemonService.GetInfo(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new GetInfoRequest());
-                if ((infoRes.NetworkHashRate / 1000.0d) > requestObj.StopMiningThreshold)
-                {
-                    responseObj.Error.IsError = true;
-                    responseObj.Error.Message = "Network hash too high";
-                    return responseObj;
-                }
-            }
-            
-            Console.WriteLine("Starting mining");
-
-            return await StartMining(rpc, requestObj);
-        }
-        #endregion
-
+       
         #region Stop Mining
         public async Task<StopMiningResponse> StopMining(RpcBase rpc, StopMiningRequest requestObj)
         {

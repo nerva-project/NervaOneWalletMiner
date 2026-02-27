@@ -1,8 +1,11 @@
 ﻿using NervaOneWalletMiner.Objects.Constants;
+using NervaOneWalletMiner.Rpc.Daemon.Requests;
 using NervaOneWalletMiner.Rpc.Wallet.Requests;
 using NervaOneWalletMiner.Rpc.Wallet.Responses;
 using NervaOneWalletMiner.ViewModels;
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NervaOneWalletMiner.Helpers
 {
@@ -74,8 +77,9 @@ namespace NervaOneWalletMiner.Helpers
                                 && GlobalData.NetworkStats.YourHeight == GlobalData.NetworkStats.NetHeight
                                 && GlobalData.NetworkStats.MinerStatus == StatusMiner.Inactive
                                 && GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AutoStartMining
-                                && !GlobalData.IsManualStopMining
-                                && !GlobalData.IsAutoStoppedMining)
+                                && !GlobalData.IsManualStoppedMining
+                                && !GlobalData.IsNoConnectionsStoppedMining
+                                && !GlobalData.IsHashRateMonitoringStoppedMining)
                             {
                                 Logger.LogDebug("MSP.MUPS", "Auto starting mining");
                                 ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).StartMiningNonUi(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
@@ -84,9 +88,9 @@ namespace NervaOneWalletMiner.Helpers
                             // If 0 connections, stop mining so we're not using CPU resources when no connections to the network
                             if (GlobalData.NetworkStats.MinerStatus == StatusMiner.Mining
                                 && GlobalData.NetworkStats.ConnectionsOut + GlobalData.NetworkStats.ConnectionsIn < 1
-                                && !GlobalData.IsAutoStoppedMining)
+                                && !GlobalData.IsNoConnectionsStoppedMining)
                             {
-                                GlobalData.IsAutoStoppedMining = true;
+                                GlobalData.IsNoConnectionsStoppedMining = true;
 
                                 Logger.LogDebug("MSP.MUPS", "Auto stopping mining. No connections");
                                 ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).StopMiningNonUi();
@@ -94,12 +98,31 @@ namespace NervaOneWalletMiner.Helpers
 
                             // When connections come back, start mining again
                             if (GlobalData.NetworkStats.ConnectionsOut + GlobalData.NetworkStats.ConnectionsIn > 0
-                                && GlobalData.IsAutoStoppedMining)
+                                && GlobalData.IsNoConnectionsStoppedMining)
                             {
-                                GlobalData.IsAutoStoppedMining = false;
+                                GlobalData.IsNoConnectionsStoppedMining = false;
 
                                 Logger.LogDebug("MSP.MUPS", "Auto restarting mining. Total connections: " + (GlobalData.NetworkStats.ConnectionsOut + GlobalData.NetworkStats.ConnectionsIn));
                                 ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).StartMiningNonUi(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
+                            }
+
+                            // Hashrate monitoring
+                            if (GlobalData.NetworkStats.YourHeight > 0
+                                && GlobalData.NetworkStats.YourHeight == GlobalData.NetworkStats.NetHeight
+                                && !GlobalData.IsManualStoppedMining
+                                && !GlobalData.IsNoConnectionsStoppedMining)
+                            {
+                                if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].EnableMiningThreshold)
+                                {
+                                    // Mining threshold is enabled. Run through logic to pause/unpause mining
+                                    HashRateMonitoringStartStopMining();
+                                }
+                                else if (GlobalData.IsHashRateMonitoringStoppedMining)
+                                {
+                                    Logger.LogDebug("MSP.MUPS", "Hash rate monitoring stopped mining but mining threshold is now disabled. Restarting mining.");
+                                    GlobalData.IsHashRateMonitoringStoppedMining = false;
+                                    ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).StartMiningNonUi(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
+                                }
                             }
                         }
                     }
@@ -323,6 +346,38 @@ namespace NervaOneWalletMiner.Helpers
             catch (Exception ex)
             {
                 Logger.LogException("MSP.CSGR", ex);
+            }
+        }
+
+        private static void HashRateMonitoringStartStopMining()
+        {
+            try
+            {
+                if(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].EnableMiningThreshold)
+                {
+                    int hashRateKH = (int)(GlobalData.NetworkStats.NetHashRate / 1000.0d);
+                    int stopThreshold = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopMiningThreshold;
+                      
+                    if(GlobalData.NetworkStats.MinerStatus == StatusMiner.Mining && hashRateKH > stopThreshold)
+                    {
+                        Logger.LogDebug("MSP.HMSS", "Hash rate " + hashRateKH.ToString("F1") + " KH/s above threshold " + stopThreshold + " KH/s, pausing mining");
+
+                        ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).StopMiningNonUi();
+                        GlobalData.IsHashRateMonitoringStoppedMining = true;
+                    }
+
+                    if(GlobalData.IsHashRateMonitoringStoppedMining && hashRateKH < stopThreshold)
+                    {
+                        Logger.LogDebug("MSP.HMSS", "Hash rate " + hashRateKH.ToString("F1") + " KH/s below threshold " + stopThreshold + " KH/s, restarting mining");
+
+                        ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).StartMiningNonUi(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
+                        GlobalData.IsHashRateMonitoringStoppedMining = false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("MSP.HMSS", ex);
             }
         }
 

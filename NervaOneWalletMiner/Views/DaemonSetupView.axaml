@@ -143,7 +143,6 @@
 				  
 				<NumericUpDown Name="hashThreshold"
 							   Minimum="0"
-							   Value="100"
 							   FormatString="N0"
 							   Width="160"
 							   HorizontalAlignment="Left"

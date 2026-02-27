@@ -9,17 +9,12 @@ using NervaOneWalletMiner.Rpc.Daemon.Responses;
 using NervaOneWalletMiner.ViewModels;
 using NervaOneWalletMiner.ViewsDialogs;
 using System;
-using System.Drawing.Printing;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace NervaOneWalletMiner.Views
 {
     public partial class DaemonView : UserControl
     {
         Window GetWindow() => TopLevel.GetTopLevel(this) as Window ?? throw new NullReferenceException("Invalid Owner");
-
-        private CancellationTokenSource? _monitoringCts;
 
         public DaemonView()
         {
@@ -85,7 +80,7 @@ namespace NervaOneWalletMiner.Views
                 {
                     // Stop mining
                     Logger.LogDebug("DMN.SSMC", "Stopping mining");
-                    GlobalData.IsManualStopMining = true;
+                    GlobalData.IsManualStoppedMining = true;
                     StopMiningAsync(GetWindow());
                     btnStartStopMining.Content = StatusMiner.StartMining;
                     nupThreads.IsEnabled = true;
@@ -165,16 +160,11 @@ namespace NervaOneWalletMiner.Views
                     StartMiningRequest request = new()
                     {
                         MiningAddress = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress,
-                        ThreadCount = threads,
-                        EnableMiningThreshold = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].EnableMiningThreshold,
-                        StopMiningThreshold = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopMiningThreshold
+                        ThreadCount = threads
                     };
 
-                    Logger.LogDebug("DMN.STMA", "Calling StartMining. Address: " + GlobalMethods.GetShorterString(request.MiningAddress, 12) + " | Threads: " + request.ThreadCount + " | Enable Mining Threshold: " + request.EnableMiningThreshold + " | Threshold: " + request.StopMiningThreshold);
-                    StartMiningResponse response = request.EnableMiningThreshold
-                        ? await GlobalData.DaemonService.StartMiningAuto(
-                            GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, request)
-                        : await GlobalData.DaemonService.StartMining(
+                    Logger.LogDebug("DMN.STMA", "Calling StartMining. Address: " + GlobalMethods.GetShorterString(request.MiningAddress, 12) + " | Threads: " + request.ThreadCount);
+                    StartMiningResponse response = await GlobalData.DaemonService.StartMining(
                             GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, request);
                     
                     if (response.Error.IsError)
@@ -210,13 +200,7 @@ namespace NervaOneWalletMiner.Views
                         }
                     }
 
-                    // Start continuous monitoring when threshold is enabled
-                    if (request.EnableMiningThreshold)
-                    {
-                        StartHashRateMonitoring(threads);
-                    }
-
-                    GlobalData.IsManualStopMining = false;
+                    GlobalData.IsManualStoppedMining = false;
                 }
             }
             catch (Exception ex)
@@ -224,7 +208,6 @@ namespace NervaOneWalletMiner.Views
                 Logger.LogException("DMN.STMA", ex);
             }
         }
-
 
         public void StopMiningNonUi()
         {
@@ -235,17 +218,9 @@ namespace NervaOneWalletMiner.Views
         {
             try
             {
-                // Stop the monitoring loop first so it doesn't restart mining
-                StopHashRateMonitoring();
-
-                StopMiningRequest request = new()
-                {
-                    EnableMiningThreshold = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].EnableMiningThreshold,
-                    StopMiningThreshold = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopMiningThreshold
-                };
+                StopMiningRequest request = new();
 
                 Logger.LogDebug("DMN.SPMA", "Calling StopMining");
-                // Always call StopMining directly - user explicitly wants to stop
                 StopMiningResponse response =
                     await GlobalData.DaemonService.StopMining(
                         GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, request);
@@ -267,105 +242,5 @@ namespace NervaOneWalletMiner.Views
                 Logger.LogException("DMN.SPMA", ex);
             }
         }
-
-        #region Hash Rate Monitoring
-        private void StartHashRateMonitoring(int threads)
-        {
-            StopHashRateMonitoring();
-            _monitoringCts = new CancellationTokenSource();
-            var token = _monitoringCts.Token;
-
-            _ = Task.Run(async () =>
-            {
-                Logger.LogDebug("DMN.HMON", "Hash rate monitoring started");
-
-                while (!token.IsCancellationRequested)
-                {
-                    try
-                    {
-                        await Task.Delay(60_000, token);
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        break;
-                    }
-
-                    try
-                    {
-                        if (GlobalData.IsManualStopMining)
-                        {
-                            Logger.LogDebug("DMN.HMON", "Manual stop detected, ending monitoring");
-                            break;
-                        }
-
-                        var rpc = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc;
-                        var enableThreshold = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].EnableMiningThreshold;
-                        var threshold = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopMiningThreshold;
-
-                        if (!enableThreshold)
-                        {
-                            Logger.LogDebug("DMN.HMON", "Threshold disabled, ending monitoring");
-                            break;
-                        }
-
-                        var infoRes = await GlobalData.DaemonService.GetInfo(rpc, new GetInfoRequest());
-                        if (infoRes.Error.IsError)
-                        {
-                            Logger.LogDebug("DMN.HMON", "Failed to get network info, skipping check");
-                            continue;
-                        }
-
-                        var hashRateKH = infoRes.NetworkHashRate / 1000.0d;
-
-                        var statusRes = await GlobalData.DaemonService.GetMiningStatus(rpc, new MiningStatusRequest());
-                        if (statusRes.Error.IsError)
-                        {
-                            Logger.LogDebug("DMN.HMON", "Failed to get mining status, skipping check");
-                            continue;
-                        }
-
-                        if (statusRes.IsActive && hashRateKH > threshold)
-                        {
-                            // Hash rate rose above threshold - pause mining
-                            Logger.LogDebug("DMN.HMON", "Hash rate " + hashRateKH.ToString("F1") + " KH/s above threshold " + threshold + ", pausing mining");
-                            await GlobalData.DaemonService.StopMining(rpc, new StopMiningRequest());
-                        }
-                        else if (!statusRes.IsActive && hashRateKH <= threshold)
-                        {
-                            // Hash rate dropped to or below threshold - resume mining
-                            Logger.LogDebug("DMN.HMON", "Hash rate " + hashRateKH.ToString("F1") + " KH/s at or below threshold " + threshold + ", resuming mining");
-                            var startRequest = new StartMiningRequest
-                            {
-                                MiningAddress = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress,
-                                ThreadCount = threads,
-                            };
-                            await GlobalData.DaemonService.StartMining(rpc, startRequest);
-                            GlobalData.NetworkStats.MinerStatus = StatusMiner.Mining;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.LogException("DMN.HMON", ex);
-                    }
-                }
-
-                Logger.LogDebug("DMN.HMON", "Hash rate monitoring stopped");
-            }, token);
-        }
-
-        private void StopHashRateMonitoring()
-        {
-            try
-            {
-                _monitoringCts?.Cancel();
-                _monitoringCts?.Dispose();
-                _monitoringCts = null;
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException("DMN.SHRM", ex);
-            }
-        }
-        #endregion // Hash Rate Monitoring
     }
 }

@@ -170,7 +170,7 @@ namespace NervaOneWalletMiner.Helpers
                 // Daemon View
                 ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).NetHeight = GlobalData.NetworkStats.NetHeight.ToString();
                 ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).YourHeight = GlobalData.NetworkStats.YourHeight.ToString();
-                ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).NetHash = GlobalData.NetworkStats.NetHash;
+                ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).NetHash = GlobalData.NetworkStats.NetHashString;
                 ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).RunTime = GlobalData.NetworkStats.RunTime;
 
                 ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).MinerMessage = GlobalData.NetworkStats.MinerStatus;
@@ -623,30 +623,31 @@ namespace NervaOneWalletMiner.Helpers
 
                         GlobalData.NetworkStats.NetHeight = (infoRes.TargetHeight > infoRes.Height ? infoRes.TargetHeight : infoRes.Height);
                         GlobalData.NetworkStats.YourHeight = infoRes.Height;
+                        GlobalData.NetworkStats.NetHashRate = infoRes.NetworkHashRate;
 
                         if ((infoRes.NetworkHashRate / 1000000000000000.0d) > 1)
                         {
-                            GlobalData.NetworkStats.NetHash = Math.Round((infoRes.NetworkHashRate / 1000000000000000.0d), 2) + " PH/s";
+                            GlobalData.NetworkStats.NetHashString = Math.Round((infoRes.NetworkHashRate / 1000000000000000.0d), 2) + " PH/s";
                         }
                         else if ((infoRes.NetworkHashRate / 1000000000000.0d) > 1)
                         {
-                            GlobalData.NetworkStats.NetHash = Math.Round((infoRes.NetworkHashRate / 1000000000000.0d), 2) + " TH/s";
+                            GlobalData.NetworkStats.NetHashString = Math.Round((infoRes.NetworkHashRate / 1000000000000.0d), 2) + " TH/s";
                         }
                         else if ((infoRes.NetworkHashRate / 1000000000.0d) > 1)
                         {
-                            GlobalData.NetworkStats.NetHash = Math.Round((infoRes.NetworkHashRate / 1000000000.0d), 2) + " GH/s";
+                            GlobalData.NetworkStats.NetHashString = Math.Round((infoRes.NetworkHashRate / 1000000000.0d), 2) + " GH/s";
                         }
                         else if ((infoRes.NetworkHashRate / 1000000.0d) > 1)
                         {
-                            GlobalData.NetworkStats.NetHash = Math.Round((infoRes.NetworkHashRate / 1000000.0d), 2) + " MH/s";
+                            GlobalData.NetworkStats.NetHashString = Math.Round((infoRes.NetworkHashRate / 1000000.0d), 2) + " MH/s";
                         }
                         else if ((infoRes.NetworkHashRate / 1000.0d) > 1)
                         {
-                            GlobalData.NetworkStats.NetHash = Math.Round((infoRes.NetworkHashRate / 1000.0d), 2) + " KH/s";
+                            GlobalData.NetworkStats.NetHashString = Math.Round((infoRes.NetworkHashRate / 1000.0d), 2) + " KH/s";
                         }
                         else
                         {
-                            GlobalData.NetworkStats.NetHash = infoRes.NetworkHashRate + " H/s";
+                            GlobalData.NetworkStats.NetHashString = infoRes.NetworkHashRate + " H/s";
                         }
 
                         DateTime miningStartTime = infoRes.StartTime;
