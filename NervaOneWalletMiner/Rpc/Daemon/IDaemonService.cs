@@ -8,12 +8,8 @@ namespace NervaOneWalletMiner.Rpc.Daemon
     public interface IDaemonService
     {
         Task<StartMiningResponse> StartMining(RpcBase rpc, StartMiningRequest requestObj);
-        
-        Task<StartMiningResponse> StartMiningAuto(RpcBase rpc, StartMiningRequest requestObj);
 
         Task<StopMiningResponse> StopMining(RpcBase rpc, StopMiningRequest requestObj);
-        
-        Task<StopMiningResponse> StopMiningAuto(RpcBase rpc, StopMiningRequest requestObj);
         
         Task<StopDaemonResponse> StopDaemon(RpcBase rpc, StopDaemonRequest requestObj);
 

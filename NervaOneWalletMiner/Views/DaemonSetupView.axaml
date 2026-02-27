@@ -129,7 +129,7 @@
 						  Margin="0,10,0,0"/>
 
 				<CheckBox Name="cbxUseNoDnsFlag"
-						  Content="Disable DNS: Don't use DNS seed nodes for peer discovery"
+						  Content="Disable DNS: Don't use Domain Name System"
 						  IsChecked="False"
 						  Margin="30,10,0,0"
 						  IsCheckedChanged="NoDns_IsCheckedChanged"/>
@@ -143,7 +143,6 @@
 				  
 				<NumericUpDown Name="hashThreshold"
 							   Minimum="0"
-							   Value="100"
 							   FormatString="N0"
 							   Width="160"
 							   HorizontalAlignment="Left"

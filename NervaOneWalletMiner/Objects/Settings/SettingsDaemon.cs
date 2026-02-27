@@ -20,7 +20,7 @@ namespace NervaOneWalletMiner.Objects.Settings
         
         public bool EnableMiningThreshold { get; set; } = false;
 
-        public int StopMiningThreshold { get; set; } = 0;
+        public int StopMiningThreshold { get; set; } = 500;
 
         public string AdditionalArguments { get; set; } = string.Empty;
 

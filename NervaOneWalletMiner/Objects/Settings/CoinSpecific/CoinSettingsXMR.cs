@@ -93,11 +93,10 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
                 daemonCommand += " --testnet";
             }
 
-            if (daemonSettings.AutoStartMining)
+            if (daemonSettings.AutoStartMining && !string.IsNullOrEmpty(daemonSettings.MiningAddress))
             {
-                string miningAddress = daemonSettings.MiningAddress;
-                Logger.LogDebug("XMR.CGDO", "Enabling startup mining @ " + miningAddress);
-                daemonCommand += " --start-mining " + miningAddress + " --mining-threads " + daemonSettings.MiningThreads;
+                Logger.LogDebug("XMR.CGDO", "Enabling startup mining @ " + daemonSettings.MiningAddress);
+                daemonCommand += " --start-mining " + daemonSettings.MiningAddress + " --mining-threads " + daemonSettings.MiningThreads;
             }
 
             if (GlobalMethods.IsLinux() || GlobalMethods.IsOsx())

@@ -30,6 +30,8 @@ public partial class App : Application
 
             GlobalMethods.SetCoin(GlobalData.AppSettings.ActiveCoin);
 
+            GlobalMethods.DeleteOldLogFiles();
+
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 desktop.Exit += OnExit;

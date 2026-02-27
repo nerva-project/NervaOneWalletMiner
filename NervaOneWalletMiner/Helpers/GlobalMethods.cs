@@ -229,6 +229,27 @@ namespace NervaOneWalletMiner.Helpers
             }
         }
 
+        public static void DeleteOldLogFiles()
+        {
+            try
+            {
+                DirectoryInfo logsDir = new(GetLogsDir());
+                FileInfo[] logFiles = logsDir.GetFiles("log_*.log");
+
+                foreach (FileInfo file in logFiles)
+                {
+                    if(file.CreationTime < DateTime.Now.AddDays(-30))
+                    {
+                        file.Delete();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("GLM.DOLF", ex);
+            }
+        }
+
         public static string GetDaemonProcess()
         {
             return Path.Combine(GlobalData.CliToolsDir, GlobalData.DaemonProcessName);
@@ -1192,8 +1213,9 @@ namespace NervaOneWalletMiner.Helpers
         public static void CoinChanged()
         {
             GlobalData.NetworkStats = new();
-            GlobalData.IsManualStopMining = false;
-            GlobalData.IsAutoStoppedMining = false;
+            GlobalData.IsManualStoppedMining = false;
+            GlobalData.IsNoConnectionsStoppedMining = false;
+            GlobalData.IsHashRateMonitoringStoppedMining = false;
 
             GlobalData.IsCliToolsFound = true;
             GlobalData.IsCliToolsDownloading = false;
