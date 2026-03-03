@@ -1,16 +1,31 @@
-# NervaOne Wallet and Miner
-Copyright (c) 2024 The Nerva Project
+# 🌐 NervaOne Wallet and Miner
 
-NervaOne is a multi-coin, non-custodial GUI Wallet and CPU Miner. It runs on your desktop device and allows you to control daemon/wallet using modern graphical user interface.
+---
 
-NervaOne Desktop currently supports below cryptos:
+[![GitHub release](https://img.shields.io/github/v/release/nerva-project/NervaOneWalletMiner?style=flat)][releases-link]
+[![GitHub contributors](https://img.shields.io/github/contributors/nerva-project/NervaOneWalletMiner?style=flat)][contributors]
+[![GitHub license](https://img.shields.io/github/license/nerva-project/NervaOneWalletMiner?style=flat)][license]
+[![GitHub issues](https://img.shields.io/github/issues/nerva-project/NervaOneWalletMiner?style=flat)][issues]
+[![GitHub downloads](https://img.shields.io/github/downloads/nerva-project/NervaOneWalletMiner/total?style=flat)][releases-link]
+
+---
+
+## About NervaOne
+
+**NervaOne** is a multi-coin, non-custodial GUI Wallet and CPU Miner. It runs on your desktop device and allows you to control daemon/wallet using modern graphical user interface.
+
+Now it can also run as Wallet Only by connectingt to remote node.
+
+NervaOne Desktop currently supports below crypto projects:
 
 - Nerva (XNV)
 - Monero (XMR)
 - Wownero (WOW)
-- Dash (DASH)
+- Dash (DASH) - unfinished
 
-## Build instructions
+---
+
+## 📦 Build instructions
 We encourage you to build the project yourself but if you do not feel comfortable doing that, see [Releases][releases-link]
 
 
@@ -110,9 +125,26 @@ dotnet build
 dotnet run 
 ```
 
+---
+
+## 📊 Future Plans
+
+Make it work on mobile devices
+
+---
+
+## 📜 License
+
+Copyright (c) 2026 The Nerva Project
+
+This project is licensed under the terms of the [MIT License](https://github.com/nerva-project/NervaOneWalletMiner?tab=MIT-1-ov-file). Feel free to use, modify, and distribute the software as per the license agreement.
+
 
 <!-- Reference links -->
 [dotnet-sdk-8]: https://dotnet.microsoft.com/en-us/download/dotnet/8.0
 [releases-link]: https://github.com/nerva-project/NervaOneWalletMiner/releases
 [rid-catalog]: https://learn.microsoft.com/en-us/dotnet/core/rid-catalog
 [visual-studio]: https://visualstudio.microsoft.com/
+[contributors]: https://github.com/nerva-project/NervaOneWalletMiner/graphs/contributors
+[license]: https://github.com/nerva-project/NervaOneWalletMiner?tab=MIT-1-ov-file
+[issues]: https://github.com/nerva-project/NervaOneWalletMiner/issues
