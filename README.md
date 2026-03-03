@@ -1,4 +1,6 @@
-# 🌐 NervaOne Wallet and Miner
+# 🏛️ NervaOne Wallet and Miner
+
+![NervaOne Banner](./Assets/Screenshots/nervaone_banner.png)
 
 ---
 
@@ -10,13 +12,13 @@
 
 ---
 
-## About NervaOne
+## ⓘ About NervaOne
 
-**NervaOne** is a multi-coin, non-custodial GUI Wallet and CPU Miner. It runs on your desktop device and allows you to control daemon/wallet using modern graphical user interface.
+**NervaOne** is an open-source, non-custodial Wallet and CPU Miner. It runs on your desktop device and allows you to control daemon/wallet using modern graphical user interface.
 
-Now it can also run as Wallet Only by connectingt to remote node.
+Now it can also be used as Wallet Only by connecting to remote node.
 
-NervaOne Desktop currently supports below crypto projects:
+NervaOne Desktop currently supports below cryptocurrencies:
 
 - Nerva (XNV)
 - Monero (XMR)
@@ -25,7 +27,7 @@ NervaOne Desktop currently supports below crypto projects:
 
 ---
 
-## 📦 Build instructions
+## 🛠️ Build Instructions
 We encourage you to build the project yourself but if you do not feel comfortable doing that, see [Releases][releases-link]
 
 
@@ -39,7 +41,9 @@ or by issuing command such as this:
  sudo apt-get install dotnet-sdk-8.0
 ```
  
-## Building Using Command line
+ ---
+
+## 📦 Building Using Command Line
 Go to directory where you want to create NervaOneWalletMiner folder and run these commands:
 
 ```
@@ -77,8 +81,9 @@ win-x64, win-x86, linux-x64, linux-arm, osx-x64,osx-arm64
 
 Here is full list: [.NET RID Catalog][rid-catalog]
 
+---
 
-## Running using Visual Studio 2022 Community (Windows)
+## 🏃 Running Using Visual Studio 2022 Community (Windows)
 You can Run/Debug the NervaOne using free [Visual Studio 2022 Community Edition][visual-studio]
 
 
@@ -99,8 +104,9 @@ Build > Build Solution
 
 Debug > Start Debugging
 
+---
 
-## Running using Visual Studio Code (Windows/Linux/Mac)
+## 🏃‍♂️‍➡️ Running Using Visual Studio Code (Windows/Linux/Mac)
 Install [Visual Studio Code][visual-studio]
 
 Go to Extensions and install: Avalonia for VSCode. More info:
@@ -127,7 +133,7 @@ dotnet run
 
 ---
 
-## 📊 Future Plans
+## 📆 Future Plans
 
 Make it work on mobile devices
 
