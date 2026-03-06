@@ -4,11 +4,12 @@
 
 ---
 
-[![GitHub release](https://img.shields.io/github/v/release/nerva-project/NervaOneWalletMiner?style=flat)][releases-link]
-[![GitHub contributors](https://img.shields.io/github/contributors/nerva-project/NervaOneWalletMiner?style=flat)][contributors]
-[![GitHub license](https://img.shields.io/github/license/nerva-project/NervaOneWalletMiner?style=flat)][license]
-[![GitHub issues](https://img.shields.io/github/issues/nerva-project/NervaOneWalletMiner?style=flat)][issues]
-[![GitHub downloads](https://img.shields.io/github/downloads/nerva-project/NervaOneWalletMiner/total?style=flat)][releases-link]
+[![GitHub Build](https://github.com/nerva-project/NervaOneWalletMiner/actions/workflows/dotnet.yml/badge.svg)][actions]
+[![Latest Version](https://img.shields.io/github/v/release/nerva-project/NervaOneWalletMiner?style=flat)][releases-link]
+[![License](https://img.shields.io/github/license/nerva-project/NervaOneWalletMiner?style=flat)][license]
+[![GitHub Issues](https://img.shields.io/github/issues/nerva-project/NervaOneWalletMiner?style=flat)][issues]
+[![GitHub Downloads](https://img.shields.io/github/downloads/nerva-project/NervaOneWalletMiner/total?style=flat)][releases-link]
+[![Deep Wiki](https://deepwiki.com/badge.svg)][deep-wiki]
 
 ---
 
@@ -154,3 +155,5 @@ This project is licensed under the terms of the [MIT License](https://github.com
 [contributors]: https://github.com/nerva-project/NervaOneWalletMiner/graphs/contributors
 [license]: https://github.com/nerva-project/NervaOneWalletMiner?tab=MIT-1-ov-file
 [issues]: https://github.com/nerva-project/NervaOneWalletMiner/issues
+[actions]: https://github.com/nerva-project/NervaOneWalletMiner/actions
+[deep-wiki]: https://deepwiki.com/nerva-project/NervaOneWalletMiner
