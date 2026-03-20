@@ -15,7 +15,7 @@ jobs:
         outputs:
             version: ${{ steps.get_version.outputs.version }}
         steps:
-          - uses: actions/checkout@v4
+          - uses: actions/checkout@v5
           - name: Extract NervaOne Version
             id: get_version
             shell: bash
@@ -36,10 +36,10 @@ jobs:
 
         steps:
           - name: Checkout Repository
-            uses: actions/checkout@v4
+            uses: actions/checkout@v5
 
           - name: Setup .NET
-            uses: actions/setup-dotnet@v4
+            uses: actions/setup-dotnet@v5
             with:
                 dotnet-version: 8.0.x
 
@@ -58,7 +58,7 @@ jobs:
             shell: pwsh
 
           - name: Upload Windows Artifacts
-            uses: actions/upload-artifact@v4
+            uses: actions/upload-artifact@v6
             with:
                 name: nervaone-desktop-v${{ needs.setup.outputs.version }}-${{ matrix.rid }}
                 path: |
@@ -77,10 +77,10 @@ jobs:
 
         steps:
           - name: Checkout Repository
-            uses: actions/checkout@v4
+            uses: actions/checkout@v5
 
           - name: Setup .NET
-            uses: actions/setup-dotnet@v4
+            uses: actions/setup-dotnet@v5
             with:
                 dotnet-version: 8.0.x
 
@@ -117,7 +117,7 @@ jobs:
               chmod +x ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop/install
 
           - name: Upload Artifacts
-            uses: actions/upload-artifact@v4
+            uses: actions/upload-artifact@v6
             with:
                 name: nervaone-desktop-v${{ needs.setup.outputs.version }}-${{ matrix.rid }}
                 path: ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop/*
@@ -134,10 +134,10 @@ jobs:
 
         steps:
           - name: Checkout Repository
-            uses: actions/checkout@v4
+            uses: actions/checkout@v5
 
           - name: Setup .NET
-            uses: actions/setup-dotnet@v4
+            uses: actions/setup-dotnet@v5
             with:
                 dotnet-version: 8.0.x
 
@@ -169,7 +169,7 @@ jobs:
               cp -R ./NervaOneWalletMiner.Desktop/bin/release/net8.0/${{ matrix.rid }}/publish/* ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop.app/Contents/MacOS/
 
           - name: Upload Artifacts
-            uses: actions/upload-artifact@v4
+            uses: actions/upload-artifact@v6
             with:
                 name: nervaone-desktop-v${{ needs.setup.outputs.version }}-${{ matrix.rid }}
                 path: |
