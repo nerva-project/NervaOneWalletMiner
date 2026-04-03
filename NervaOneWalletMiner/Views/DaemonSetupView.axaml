@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:vm="clr-namespace:NervaOneWalletMiner.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="550"			 
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="550"
              x:Class="NervaOneWalletMiner.Views.DaemonSetupView">
 
 	<Design.DataContext>
@@ -15,7 +15,7 @@
 					ScrollViewer.AllowAutoHide="True"
 					Spacing="5"
 					Margin="10"
-					MaxWidth="650">		
+					MaxWidth="650">
 			<Grid ColumnDefinitions="32,*">
 				<Image Grid.Row="0"
 					   Grid.Column="0"
@@ -44,25 +44,27 @@
 			<RadioButton GroupName="NodeType"
 					Name="FullNode"
 					Margin="0,20,0,0"
-					IsChecked="True"
+					IsChecked="{Binding !IsWalletOnly}"
 					IsCheckedChanged="NodeType_IsCheckedChanged"
-					Content="Full Node: Blockchain runs on your device">			
+					Content="Full Node: Blockchain runs on your device">
 			</RadioButton>
 
 			<RadioButton GroupName="NodeType"
 					Name="RemoteNode"
 					Margin="0,0,0,0"
+					IsChecked="{Binding IsWalletOnly}"
 					IsCheckedChanged="NodeType_IsCheckedChanged"
-					Content="Wallet Only: Connect to remote node and get wallet functionality only">			
+					Content="Wallet Only: Connect to remote node and get wallet functionality only">
 			</RadioButton>
 
-			<StackPanel Name="spWalletOnly">
+			<StackPanel Name="spWalletOnly" IsVisible="{Binding IsWalletOnly}">
 				<Label Name="lblRemoteNode"
 					   Content="Remote Node Address or IP (Including port number)"/>
-				<TextBox Name="tbxRemoteNode" />
+				<TextBox Name="tbxRemoteNode"
+						 Text="{Binding RemoteNodeAddress, Mode=TwoWay}"/>
 			</StackPanel>
 
-			<StackPanel Name="spFullNode">							
+			<StackPanel Name="spFullNode" IsVisible="{Binding !IsWalletOnly}">
 				<Separator Margin="0,20,0,0"/>
 
 				<Button Name="btnRestartWithCommand"
@@ -70,7 +72,7 @@
 						DockPanel.Dock="Right"
 						Margin="0,10,0,0"
 						Click="RestartWithCommand_Clicked"/>
-		
+
 				<Button Name="btnRestartWithQuickSync"
 						Content="Restart with QuickSync"
 						DockPanel.Dock="Right"
@@ -81,6 +83,7 @@
 
 				<Label Content="Mining Address" Margin="0,10,0,0"/>
 				<TextBox Name="tbxMiningAddress"
+						 Text="{Binding MiningAddress, Mode=TwoWay}"
 						 Watermark="Address that will receive mining rewards"/>
 
 				<Label Content="Data Directory" Margin="0,10,0,0"/>
@@ -88,6 +91,7 @@
 					<TextBox Grid.Row="0"
 							 Grid.Column="0"
 							 Name="tbxDaemonDataDir"
+							 Text="{Binding DataDir, Mode=TwoWay}"
 							 Watermark="Blockchain database directory"/>
 
 					<Button Grid.Row="0"
@@ -96,58 +100,65 @@
 							Content="Change"
 							Margin="10,0,0,0"
 							Click="ChangeDataDir_Clicked"/>
-				</Grid>			
+				</Grid>
 
 				<Label Content="Additional Startup Arguments" Margin="0,10,0,0"/>
 				<TextBox Name="tbxAdditionalArguments"
+						 Text="{Binding AdditionalArguments, Mode=TwoWay}"
 						 Watermark="Additional arguments that will be sent to daemon when it starts"/>
 
 				<Label Content="Port Number" Margin="0,10,0,0"/>
 				<TextBox Name="tbxPortNumber"
+						 Text="{Binding PortNumber, Mode=TwoWay}"
 						 Watermark="Number - port that daemon will use to listen on"/>
 
 				<Label Content="Log Level" Margin="0,10,0,0"/>
 				<TextBox Name="tbxLogLevel"
+						 Text="{Binding LogLevel, Mode=TwoWay}"
 						 Watermark="Number - level at which daemon will write to log files"/>
-			
+
 				<CheckBox Name="cbxAutoStartMining"
 						  Content="Auto start mining"
+						  IsChecked="{Binding AutoStartMining, Mode=TwoWay}"
 						  Margin="0,10,0,0"/>
-			
+
 				<CheckBox Name="cbxStopOnExit"
 						  Content="Stop daemon on exit and coin switch"
+						  IsChecked="{Binding StopOnExit, Mode=TwoWay}"
 						  Margin="0,10,0,0"/>
 
 				<CheckBox Name="cbxEnableConnectionsGuard"
 						  Content="Enable connections guard"
-						  IsChecked="True"
+						  IsChecked="{Binding EnableConnectionsGuard, Mode=TwoWay}"
 						  Margin="0,10,0,0"/>
 
 				<CheckBox Name="cbxUseNoAnalyticsFlag"
 						  Content="Disable Analytics: Don't report node info to node map"
-						  IsChecked="False"
+						  IsChecked="{Binding UseNoAnalyticsFlag, Mode=TwoWay}"
 						  Margin="0,10,0,0"/>
 
 				<CheckBox Name="cbxUseNoDnsFlag"
 						  Content="Disable DNS: Don't use Domain Name System"
-						  IsChecked="False"
+						  IsChecked="{Binding UseNoDnsFlag, Mode=TwoWay}"
 						  Margin="30,10,0,0"
 						  IsCheckedChanged="NoDns_IsCheckedChanged"/>
 
 				<Separator Margin="0,20,0,0"/>
-			
+
 				<CheckBox Name="cbxThresholdEnabled"
 						  Content="Enable Net Hash Threshold: Only mine if below (KH/s)"
+						  IsChecked="{Binding ThresholdEnabled, Mode=TwoWay}"
 						  Margin="0,10,0,0"
 						  IsCheckedChanged="ThresholdEnabled_IsCheckedChanged"/>
-				  
+
 				<NumericUpDown Name="hashThreshold"
+							   Value="{Binding HashThreshold, Mode=TwoWay}"
 							   Minimum="0"
 							   FormatString="N0"
 							   Width="160"
 							   HorizontalAlignment="Left"
 							   Margin="30,10,0,0"
-							   IsEnabled="false"/>
+							   IsEnabled="{Binding ThresholdEnabled}"/>
 			</StackPanel>
 			<Separator Margin="0,20,0,0"/>
 
@@ -155,8 +166,8 @@
 					Content="Save Settings"
 					Click="SaveSettings_Clicked"
 					Margin="0,10,0,0"/>
-			
+
 		</StackPanel>
 	</ScrollViewer>
-	
+
 </UserControl>

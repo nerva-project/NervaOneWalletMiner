@@ -3,7 +3,6 @@ using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects;
-using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.ViewModels;
 using NervaOneWalletMiner.ViewsDialogs;
 using System;
@@ -17,6 +16,7 @@ namespace NervaOneWalletMiner.Views
     {
         Window GetWindow() => TopLevel.GetTopLevel(this) as Window ?? throw new NullReferenceException("Invalid Owner");
         TopLevel GetTopLevel() => TopLevel.GetTopLevel(this) ?? throw new NullReferenceException("Invalid Owner");
+        DaemonSetupViewModel GetVm() => (DaemonSetupViewModel)DataContext!;
 
         public DaemonSetupView()
         {
@@ -24,47 +24,6 @@ namespace NervaOneWalletMiner.Views
             {
                 InitializeComponent();
                 imgCoinIcon.Source = GlobalMethods.GetLogo();
-
-                tbxMiningAddress.Text = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress;
-                tbxDaemonDataDir.Text = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].DataDir;
-                tbxAdditionalArguments.Text = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AdditionalArguments;
-                tbxPortNumber.Text = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc.Port.ToString();
-                tbxLogLevel.Text = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].LogLevel.ToString();
-
-                cbxAutoStartMining.IsChecked = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AutoStartMining;
-                cbxStopOnExit.IsChecked = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopOnExit;
-                cbxEnableConnectionsGuard.IsChecked = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].EnableConnectionsGuard;
-                cbxUseNoAnalyticsFlag.IsChecked = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].UseNoAnalyticsFlag;
-                cbxUseNoDnsFlag.IsChecked = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].UseNoDnsFlag;
-                cbxThresholdEnabled.IsChecked = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].EnableMiningThreshold;
-                hashThreshold.Value = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopMiningThreshold;
-
-                if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].EnableMiningThreshold)
-                {
-                    hashThreshold.IsEnabled = true;
-                }
-                else
-                {
-                    hashThreshold.IsEnabled = false;
-                }
-
-                // Set saved address if there, or default if not
-                tbxRemoteNode.Text = string.IsNullOrEmpty(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].PublicNodeAddress)
-                    ? GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].PublicNodeUrlDefault
-                    : GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].PublicNodeAddress;
-
-                if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
-                {
-                    RemoteNode.IsChecked = true;
-                    spFullNode.IsVisible = false;
-                    spWalletOnly.IsVisible = true;                    
-                }
-                else
-                {
-                    FullNode.IsChecked = true;
-                    spFullNode.IsVisible = true;
-                    spWalletOnly.IsVisible = false;
-                }
             }
             catch (Exception ex)
             {
@@ -77,167 +36,42 @@ namespace NervaOneWalletMiner.Views
         {
             try
             {
-                bool isSaveSettingsNeeded = false;
-                bool isRestartRequired = false;
-                bool isLocalRemoteNodeChange = false;
+                var vm = GetVm();
 
-                // Settings that apply to running Full Node or Remote Node
-                if(RemoteNode.IsChecked!.Value)
+                if (vm.IsWalletOnly && string.IsNullOrEmpty(vm.RemoteNodeAddress))
                 {
-                    if(string.IsNullOrEmpty(tbxRemoteNode.Text))
-                    {
-                        MessageBoxView errorMessage = new MessageBoxView("Remote Node Required", "Remote Node Address or IP is required.", true);
-                        await errorMessage.ShowDialog<DialogResult>(GetWindow());
-                        return;
-                    }
-                    
-                    if (!GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
-                    {
-                        GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly = true;
-                        Logger.LogDebug("DMS.SSC1", "Switching to Wallet Only");
-                        isSaveSettingsNeeded = isLocalRemoteNodeChange = true;
-                    }
+                    await new MessageBoxView("Remote Node Required", "Remote Node Address or IP is required.", true).ShowDialog<DialogResult>(GetWindow());
+                    return;
+                }
 
-                    if (GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].PublicNodeAddress != tbxRemoteNode.Text.Trim())
+                var result = vm.ApplySettings();
+
+                if (!result.IsSaved)
+                {
+                    return;
+                }
+
+                if (result.LocalRemoteChanged)
+                {
+                    Logger.LogDebug("DMS.SSC1", "Local/Remote settings changed. Restarting");
+                    GlobalMethods.ShowHideDaemonTab();
+                    DaemonSetupViewModel.RestartWithCommand(string.Empty);
+                }
+                else if (result.RestartRequired)
+                {
+                    Logger.LogDebug("DMS.SSC1", "Restart required. Asking user");
+                    MessageBoxView confirmDaemonRestart = new("Restart Daemon?", "You've made changes to daemon setup. For those changes to take effect, restart is required.\r\n\r\nWould you like to restart daemon now?", false, true);
+                    DialogResult confirmRestart = await confirmDaemonRestart.ShowDialog<DialogResult>(GetWindow());
+
+                    if (confirmRestart != null && confirmRestart.IsOk)
                     {
-                        GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].PublicNodeAddress = tbxRemoteNode.Text.Trim();
-                        Logger.LogDebug("DMS.SSC1", "New Public Node: " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].PublicNodeAddress);
-                        isSaveSettingsNeeded = isLocalRemoteNodeChange = true;
+                        Logger.LogDebug("DMS.SSC1", "User confirmed restart. Restarting");
+                        DaemonSetupViewModel.RestartWithCommand(string.Empty);
                     }
                 }
                 else
                 {
-                    if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
-                    {
-                        GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly = false;
-                        Logger.LogDebug("DMS.SSC1", "Switching to Full Node");
-                        isSaveSettingsNeeded = isLocalRemoteNodeChange = true;
-                    }
-                }
-
-                // Settings that apply to Daemon
-                if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress != tbxMiningAddress.Text)
-                {
-                    GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress = tbxMiningAddress.Text!;
-                    Logger.LogDebug("DMS.SSC1", "New Mining Address: " + GlobalMethods.GetShorterString(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress, 12));
-                    isSaveSettingsNeeded = isRestartRequired = true;
-                }
-
-                if (!string.IsNullOrEmpty(tbxDaemonDataDir.Text) && GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].DataDir != tbxDaemonDataDir.Text)
-                {
-                    GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].DataDir = tbxDaemonDataDir.Text;
-                    Logger.LogDebug("DMS.SSC1", "New Data Directory: " + GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].DataDir);
-                    isSaveSettingsNeeded = isRestartRequired = true;
-                }
-
-                if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AdditionalArguments != tbxAdditionalArguments.Text)
-                {
-                    GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AdditionalArguments = tbxAdditionalArguments.Text!;
-                    Logger.LogDebug("DMS.SSC1", "New Additional Arguments: " + GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AdditionalArguments);
-                    isSaveSettingsNeeded = isRestartRequired = true;
-                }
-
-                if (!string.IsNullOrEmpty(tbxPortNumber.Text))
-                {
-                    int portNumber = Convert.ToInt32(tbxPortNumber.Text);
-                    if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc.Port != portNumber)
-                    {
-                        GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc.Port = portNumber;
-                        Logger.LogDebug("DMS.SSC1", "New RCP Port: " + GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc.Port);
-                        isSaveSettingsNeeded = isRestartRequired = true;
-                    }
-                }
-
-                if (!string.IsNullOrEmpty(tbxLogLevel.Text))
-                {
-                    int logLevel = Convert.ToInt32(tbxLogLevel.Text);
-                    if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].LogLevel != logLevel)
-                    {
-                        GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].LogLevel = logLevel;
-                        Logger.LogDebug("DMS.SSC1", "New Log Level: " + GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].LogLevel);
-                        isSaveSettingsNeeded = isRestartRequired = true;
-                    }
-                }
-                
-                if (cbxAutoStartMining.IsChecked != GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AutoStartMining)
-                {
-                    GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AutoStartMining = ((bool)(cbxAutoStartMining.IsChecked == null ? false : cbxAutoStartMining.IsChecked));
-                    Logger.LogDebug("DMS.SSC1", "New Auto Start Mining: " + GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].AutoStartMining);
-                    isSaveSettingsNeeded = true;
-                }
-
-                if (cbxStopOnExit.IsChecked != GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopOnExit)
-                {
-                    GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopOnExit = ((bool)(cbxStopOnExit.IsChecked == null ? false : cbxStopOnExit.IsChecked));
-                    Logger.LogDebug("DMS.SSC1", "New Stop on Exit: " + GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopOnExit);
-                    isSaveSettingsNeeded = true;
-                }
-
-                if (cbxEnableConnectionsGuard.IsChecked != GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].EnableConnectionsGuard)
-                {
-                    GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].EnableConnectionsGuard = ((bool)(cbxEnableConnectionsGuard.IsChecked == null ? false : cbxEnableConnectionsGuard.IsChecked));
-                    Logger.LogDebug("DMS.SSC1", "New Enable Connections Guard: " + GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].EnableConnectionsGuard);
-                    isSaveSettingsNeeded = true;
-                }
-
-                if (cbxUseNoAnalyticsFlag.IsChecked != GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].UseNoAnalyticsFlag)
-                {
-                    GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].UseNoAnalyticsFlag = ((bool)(cbxUseNoAnalyticsFlag.IsChecked == null ? false : cbxUseNoAnalyticsFlag.IsChecked));
-                    Logger.LogDebug("DMS.SSC1", "New No Analytics Flag: " + GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].UseNoAnalyticsFlag);
-                    isSaveSettingsNeeded = isRestartRequired = true;
-                }
-
-                if (cbxUseNoDnsFlag.IsChecked != GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].UseNoDnsFlag)
-                {
-                    GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].UseNoDnsFlag = ((bool)(cbxUseNoDnsFlag.IsChecked == null ? false : cbxUseNoDnsFlag.IsChecked));
-                    Logger.LogDebug("DMS.SSC1", "New No DNS Flag: " + GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].UseNoDnsFlag);
-                    isSaveSettingsNeeded = isRestartRequired = true;
-                }
-
-                if (cbxThresholdEnabled.IsChecked != GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].EnableMiningThreshold)
-                {
-                    GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].EnableMiningThreshold = ((bool)(cbxThresholdEnabled.IsChecked == null ? false : cbxThresholdEnabled.IsChecked));
-                    Logger.LogDebug("DMS.SSC1", "New Enable Mining Threshold: " + GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].EnableMiningThreshold);
-                    isSaveSettingsNeeded = true;
-                }
-
-                if (hashThreshold.Value != GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopMiningThreshold)
-                {
-                    GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopMiningThreshold = Convert.ToInt32(hashThreshold.Value);
-                    isSaveSettingsNeeded = true;
-                    Logger.LogDebug("DMS.SSC1", "New Stop Mining Threshold: " + GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopMiningThreshold);                    
-                }
-
-                // Save setting only if something changed
-                if (isSaveSettingsNeeded)
-                {
-                    GlobalMethods.SaveConfig();
-                    Logger.LogDebug("DMS.SSC1", "Settings saved");
-
-                    if (isLocalRemoteNodeChange)
-                    {
-                        Logger.LogDebug("DMS.SSC1", "Local/Remote settings changed. Restarting");
-                        GlobalMethods.ShowHideDaemonTab();
-                        RestartWithCommand(string.Empty);
-                    }
-                    else if (isRestartRequired)
-                    {
-                        // Ask user if they want to restart daemon
-                        Logger.LogDebug("DMS.SSC1", "Restart required. Asking user");
-                        MessageBoxView confirmDaemonRestart = new MessageBoxView("Restart Daemon?", "You've made changes to daemon setup. For those changes to take effect, restart is required.\r\n\r\nWould you like to restart daemon now?", false, true);
-                        DialogResult confirmRestart = await confirmDaemonRestart.ShowDialog<DialogResult>(GetWindow());
-
-                        if (confirmRestart != null && confirmRestart.IsOk)
-                        {
-                            Logger.LogDebug("DMS.SSC1", "User confirmed restart. Restarting");
-                            RestartWithCommand(string.Empty);
-                        }
-                    }
-                    else
-                    {
-                        MessageBoxView window = new("Daemon Setting", "Changes saved successfully.", true);
-                        await window.ShowDialog(GetWindow());
-                    }
+                    await new MessageBoxView("Daemon Setting", "Changes saved successfully.", true).ShowDialog(GetWindow());
                 }
             }
             catch (Exception ex)
@@ -252,10 +86,9 @@ namespace NervaOneWalletMiner.Views
         {
             try
             {
-                if (string.IsNullOrEmpty(GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].QuickSyncUrl))
+                if (!GetVm().IsQuickSyncSupported())
                 {
-                    MessageBoxView window = new("Restart with QuickSync", "Error, " + GlobalData.AppSettings.ActiveCoin.ToUpper() + " does not support QuickSync.", true);
-                    window.ShowDialog(GetWindow());
+                    new MessageBoxView("Restart with QuickSync", "Error, " + GlobalData.AppSettings.ActiveCoin.ToUpper() + " does not support QuickSync.", true).ShowDialog(GetWindow());
                 }
                 else
                 {
@@ -274,7 +107,7 @@ namespace NervaOneWalletMiner.Views
         {
             try
             {
-                string cliToolsLink = GlobalMethods.GetCliToolsDownloadLink(GlobalData.AppSettings.ActiveCoin);
+                string cliToolsLink = GetVm().GetCliToolsDownloadLink();
                 Logger.LogDebug("DMS.UCTC", "Updating client tools");
 
                 var window = new TextBoxView("Update Client Tools", "Client Tools Download Link", cliToolsLink, string.Empty);
@@ -291,31 +124,9 @@ namespace NervaOneWalletMiner.Views
             try
             {
                 DialogResult result = ((DialogResult)((Task<object>)task).Result);
-                if (result != null && result.IsOk)
-                {                                      
-                    if (!string.IsNullOrEmpty(result.TextBoxValue))
-                    {
-                        // We'll be downloading new client tools so clean up
-                        GlobalData.IsCliToolsDownloading = true;
-
-                        if (GlobalData.IsWalletOpen)
-                        {
-                            Logger.LogDebug("DMS.CTLC", "Closing wallet: " + GlobalData.OpenedWalletName);
-                            await((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).CloseWalletNonUi();
-                        }
-
-                        if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsDaemonWalletSeparateApp)
-                        {
-                            Logger.LogDebug("DMS.CTLC", "Calling wallet ForceClose...");
-                            ProcessManager.Kill(GlobalData.WalletProcessName);
-                        }
-
-                        Logger.LogDebug("DMS.CTLC", "Stopping daemon...");
-                        GlobalMethods.StopAndCloseDaemon();
-
-                        // Download and extract CLI tools
-                        GlobalMethods.SetUpCliTools(result.TextBoxValue, GlobalData.CliToolsDir);
-                    }
+                if (result != null && result.IsOk && !string.IsNullOrEmpty(result.TextBoxValue))
+                {
+                    await GetVm().PerformCliToolsUpdate(result.TextBoxValue);
                 }
             }
             catch (Exception ex)
@@ -346,38 +157,12 @@ namespace NervaOneWalletMiner.Views
                 DialogResult result = ((DialogResult)((Task<object>)task).Result);
                 if (result != null && result.IsOk)
                 {
-                    RestartWithCommand(result.RestartOptions);
+                    DaemonSetupViewModel.RestartWithCommand(result.RestartOptions);
                 }
             }
             catch (Exception ex)
             {
                 Logger.LogException("DMS.RCDC", ex);
-            }
-        }
-
-        public static void RestartWithCommand(string restartOptions)
-        {
-            try
-            {
-                Logger.LogDebug("DMS.RWC1", "Restarting with command");
-                ProcessManager.Kill(GlobalData.WalletProcessName);
-
-                GlobalMethods.StopAndCloseDaemon();
-               
-                if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
-                {
-                    Logger.LogDebug("DMS.RWC1", "Running as Wallet Only");
-                }
-                else
-                {
-                    Logger.LogDebug("DMS.RWC1", "Running as Full Node");
-                    GlobalData.IsDaemonRestarting = true;
-                    ProcessManager.StartExternalProcess(GlobalMethods.GetDaemonProcess(), GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].GenerateDaemonOptions(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]) + " " + restartOptions);
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException("DMS.RWC1", ex);
             }
         }
         #endregion // Restart with Command
@@ -387,12 +172,7 @@ namespace NervaOneWalletMiner.Views
         {
             try
             {
-                ProcessStartInfo psi = new ProcessStartInfo
-                {
-                    FileName = GlobalData.CliToolsDir,
-                    UseShellExecute = true
-                };
-                Process.Start(psi);
+                Process.Start(new ProcessStartInfo { FileName = GlobalData.CliToolsDir, UseShellExecute = true });
             }
             catch (Exception ex)
             {
@@ -404,16 +184,16 @@ namespace NervaOneWalletMiner.Views
         {
             try
             {
-                var result = await GetStorageProvider().OpenFolderPickerAsync(new FolderPickerOpenOptions()
+                var result = await GetTopLevel().StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions()
                 {
                     Title = "Select Data Directory Folder",
-                    SuggestedStartLocation = await GetStorageProvider().TryGetFolderFromPathAsync(tbxDaemonDataDir.Text!),
+                    SuggestedStartLocation = await GetTopLevel().StorageProvider.TryGetFolderFromPathAsync(GetVm().DataDir),
                     AllowMultiple = false
                 });
 
-                if(result.FirstOrDefault() is IStorageFolder item)
+                if (result.FirstOrDefault() is IStorageFolder item)
                 {
-                    tbxDaemonDataDir.Text = item.Path.AbsolutePath;
+                    GetVm().DataDir = item.Path.AbsolutePath;
                 }
             }
             catch (Exception ex)
@@ -451,19 +231,12 @@ namespace NervaOneWalletMiner.Views
             {
                 if (sender is CheckBox checkBox)
                 {
-                    if (checkBox.IsChecked!.Value)
-                    {
-                        hashThreshold.IsEnabled = true;
-                    }
-                    else
-                    {
-                        hashThreshold.IsEnabled = false;
-                    }
+                    hashThreshold.IsEnabled = checkBox.IsChecked!.Value;
                 }
             }
             catch (Exception ex)
             {
-                Logger.LogException("DMS.NHMT", ex); // Net Hash Mining Threshold
+                Logger.LogException("DMS.NHMT", ex);
             }
         }
 
@@ -479,7 +252,7 @@ namespace NervaOneWalletMiner.Views
                             if (radioButton.IsChecked!.Value)
                             {
                                 spFullNode.IsVisible = true;
-                                spWalletOnly.IsVisible = false;                                
+                                spWalletOnly.IsVisible = false;
                             }
                             break;
                         case "RemoteNode":
@@ -496,11 +269,6 @@ namespace NervaOneWalletMiner.Views
             {
                 Logger.LogException("DMS.NTCC", ex);
             }
-        }
-
-        public IStorageProvider GetStorageProvider()
-        {
-            return GetTopLevel().StorageProvider;
         }
         #endregion // Other Event Methods
     }
