@@ -8,7 +8,6 @@ using NervaOneWalletMiner.ViewsDialogs;
 using System;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace NervaOneWalletMiner.Views
 {
@@ -55,7 +54,7 @@ namespace NervaOneWalletMiner.Views
                 {
                     Logger.LogDebug("DMS.SSC1", "Local/Remote settings changed. Restarting");
                     GlobalMethods.ShowHideDaemonTab();
-                    DaemonSetupViewModel.RestartWithCommand(string.Empty);
+                    GetVm().RestartWithCommand(string.Empty);
                 }
                 else if (result.RestartRequired)
                 {
@@ -66,7 +65,7 @@ namespace NervaOneWalletMiner.Views
                     if (confirmRestart != null && confirmRestart.IsOk)
                     {
                         Logger.LogDebug("DMS.SSC1", "User confirmed restart. Restarting");
-                        DaemonSetupViewModel.RestartWithCommand(string.Empty);
+                        GetVm().RestartWithCommand(string.Empty);
                     }
                 }
                 else
@@ -103,7 +102,7 @@ namespace NervaOneWalletMiner.Views
         #endregion // Restart With QuickSync
 
         #region Update Client Tools
-        public void UpdateClientTools_Clicked(object sender, RoutedEventArgs args)
+        public async void UpdateClientTools_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
@@ -111,19 +110,7 @@ namespace NervaOneWalletMiner.Views
                 Logger.LogDebug("DMS.UCTC", "Updating client tools");
 
                 var window = new TextBoxView("Update Client Tools", "Client Tools Download Link", cliToolsLink, string.Empty);
-                window.ShowDialog(GetWindow()).ContinueWith(CliToolsLinkDialogClosed);
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException("DMS.UCTC", ex);
-            }
-        }
-
-        private async void CliToolsLinkDialogClosed(Task task)
-        {
-            try
-            {
-                DialogResult result = ((DialogResult)((Task<object>)task).Result);
+                DialogResult result = await window.ShowDialog<DialogResult>(GetWindow());
                 if (result != null && result.IsOk && !string.IsNullOrEmpty(result.TextBoxValue))
                 {
                     await GetVm().PerformCliToolsUpdate(result.TextBoxValue);
@@ -131,38 +118,26 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("DMS.CTLC", ex);
+                Logger.LogException("DMS.UCTC", ex);
             }
         }
         #endregion // Update Client Tools
 
         #region Restart with Command
-        public void RestartWithCommand_Clicked(object sender, RoutedEventArgs args)
+        public async void RestartWithCommand_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
                 var window = new RestartWithCommandView();
-                window.ShowDialog(GetWindow()).ContinueWith(RestartWithCommandDialogClosed);
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException("DMS.RWCC", ex);
-            }
-        }
-
-        private void RestartWithCommandDialogClosed(Task task)
-        {
-            try
-            {
-                DialogResult result = ((DialogResult)((Task<object>)task).Result);
+                DialogResult result = await window.ShowDialog<DialogResult>(GetWindow());
                 if (result != null && result.IsOk)
                 {
-                    DaemonSetupViewModel.RestartWithCommand(result.RestartOptions);
+                    GetVm().RestartWithCommand(result.RestartOptions);
                 }
             }
             catch (Exception ex)
             {
-                Logger.LogException("DMS.RCDC", ex);
+                Logger.LogException("DMS.RWCC", ex);
             }
         }
         #endregion // Restart with Command

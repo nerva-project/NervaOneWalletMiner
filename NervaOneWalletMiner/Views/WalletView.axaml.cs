@@ -87,7 +87,11 @@ namespace NervaOneWalletMiner.Views
                         // Open wallet dialog
                         Logger.LogDebug("WAL.OCWC", "Opening wallet dialog");
                         var window = new OpenWalletView();
-                        await window.ShowDialog(GetWindow()).ContinueWith(OpenWalletDialogClosed);
+                        DialogResult result = await window.ShowDialog<DialogResult>(GetWindow());
+                        if (result != null && result.IsOk)
+                        {
+                            OpenUserWallet(result.WalletName, result.WalletPassword);
+                        }
                     }
                 }
                 else
@@ -100,16 +104,6 @@ namespace NervaOneWalletMiner.Views
             catch (Exception ex)
             {
                 Logger.LogException("WAL.OCWC", ex);
-            }
-        }
-
-        private void OpenWalletDialogClosed(Task task)
-        {
-            DialogResult result = ((DialogResult)((Task<object>)task).Result);
-            if (result != null && result.IsOk)
-            {
-                // Open wallet
-                OpenUserWallet(result.WalletName, result.WalletPassword);
             }
         }
 
@@ -162,24 +156,12 @@ namespace NervaOneWalletMiner.Views
             ShowCreateAccount();
         }
 
-        private void ShowCreateAccount()
+        private async void ShowCreateAccount()
         {
             try
             {
                 var window = new TextBoxView("Create Account", "Account Label", string.Empty, "Enter new account label", false);
-                window.ShowDialog(GetWindow()).ContinueWith(CreateAccounDialogClosed);
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException("WAL.SRCA", ex);
-            }
-        }
-
-        private async void CreateAccounDialogClosed(Task task)
-        {
-            try
-            {
-                DialogResult result = ((DialogResult)((Task<object>)task).Result);
+                DialogResult result = await window.ShowDialog<DialogResult>(GetWindow());
                 if (result != null && result.IsOk)
                 {
                     CreateAccountRequest request = new()
@@ -191,33 +173,27 @@ namespace NervaOneWalletMiner.Views
 
                     if (response.Error.IsError)
                     {
-                        Logger.LogError("WAL.CADC", "Failed to create account " + request.Label + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
-                        await Dispatcher.UIThread.Invoke(async () =>
-                        {
-                            MessageBoxView window = new("Create Account", "Error creating account\r\n" + response.Error.Message, true);
-                            await window.ShowDialog(GetWindow());
-                        });
+                        Logger.LogError("WAL.SRCA", "Failed to create account " + request.Label + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
+                        MessageBoxView msgWindow = new("Create Account", "Error creating account\r\n" + response.Error.Message, true);
+                        await msgWindow.ShowDialog(GetWindow());
                     }
                     else
                     {
                         if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsSavingWalletSupported)
                         {
-                            Logger.LogDebug("WAL.CADC", "New account created successfully");
+                            Logger.LogDebug("WAL.SRCA", "New account created successfully");
                             GlobalMethods.SaveWallet();
                         }
 
-                        await Dispatcher.UIThread.InvokeAsync(async () =>
-                        {
-                            MessageBoxView window = new("Create Account", "Account created successfully!", true);
-                            await window.ShowDialog(GetWindow());
-                        });
+                        MessageBoxView msgWindow = new("Create Account", "Account created successfully!", true);
+                        await msgWindow.ShowDialog(GetWindow());
                     }
                 }
             }
             catch (Exception ex)
             {
-                Logger.LogException("WAL.CADC", ex);
-            }            
+                Logger.LogException("WAL.SRCA", ex);
+            }
         }
         #endregion Create Account
 
@@ -227,7 +203,7 @@ namespace NervaOneWalletMiner.Views
             ShowRenameLabel();
         }
 
-        private void ShowRenameLabel()
+        private async void ShowRenameLabel()
         {
             try
             {
@@ -235,64 +211,43 @@ namespace NervaOneWalletMiner.Views
                 {
                     Account selectedItem = (Account)dtgAccounts.SelectedItem;
                     var window = new TextBoxView("Change Account Label", "Account Label", selectedItem.Label, string.Empty, false);
-                    window.ShowDialog(GetWindow()).ContinueWith(RenameLabelDialogClosed);
+                    DialogResult result = await window.ShowDialog<DialogResult>(GetWindow());
+                    if (result != null && result.IsOk)
+                    {
+                        LabelAccountRequest request = new()
+                        {
+                            AccountIndex = selectedItem.Index,
+                            Label = result.TextBoxValue
+                        };
+
+                        LabelAccountResponse response = await GlobalData.WalletService.LabelAccount(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
+
+                        if (response.Error.IsError)
+                        {
+                            Logger.LogError("WAL.SHRL", "Failed to rename account " + request.Label + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
+                            MessageBoxView msgWindow = new("Rename Account", "Error renaming account\r\n" + response.Error.Message, true);
+                            await msgWindow.ShowDialog(GetWindow());
+                        }
+                        else
+                        {
+                            Logger.LogDebug("WAL.SHRL", "Account label changed successfully to " + request.Label);
+                            UIManager.GetAndSetWalletData();
+
+                            if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsSavingWalletSupported)
+                            {
+                                GlobalMethods.SaveWallet();
+                            }
+
+                            MessageBoxView msgWindow = new("Rename Account", "Account label changed successfully!", true);
+                            await msgWindow.ShowDialog(GetWindow());
+                        }
+                    }
                 }
             }
             catch (Exception ex)
             {
                 Logger.LogException("WAL.SHRL", ex);
             }
-        }
-
-        private async void RenameLabelDialogClosed(Task task)
-        {
-            try
-            {
-                DialogResult result = ((DialogResult)((Task<object>)task).Result);
-                if (result != null && result.IsOk)
-                {
-                    Account selectedItem = (Account)dtgAccounts.SelectedItem;
-
-                    LabelAccountRequest request = new()
-                    {
-                        AccountIndex = selectedItem.Index,
-                        Label = result.TextBoxValue
-                    };
-
-                    LabelAccountResponse response = await GlobalData.WalletService.LabelAccount(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
-
-                    if (response.Error.IsError)
-                    {
-                        Logger.LogError("WAL.RLDC", "Failed to rename account " + request.Label + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
-
-                        await Dispatcher.UIThread.InvokeAsync(async () =>
-                        {
-                            MessageBoxView window = new("Rename Account", "Error renaming account\\r\\n\" + response.Error.Message", true);
-                            await window.ShowDialog(GetWindow());
-                        });
-                    }
-                    else
-                    {
-                        Logger.LogDebug("WAL.RLDC", "Account label changed successfully to " + request.Label);
-                        UIManager.GetAndSetWalletData();
-
-                        if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsSavingWalletSupported)
-                        {
-                            GlobalMethods.SaveWallet();
-                        }
-
-                        await Dispatcher.UIThread.InvokeAsync(async () =>
-                        {
-                            MessageBoxView window = new("Rename Account", "Account label changed successfully!", true);
-                            await window.ShowDialog(GetWindow());
-                        });
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException("WAL.RLDC", ex);
-            }            
         }
         #endregion Rename Label
 
@@ -302,7 +257,7 @@ namespace NervaOneWalletMiner.Views
             ShowTransferDialog(GetWindow(), string.Empty, string.Empty);
         }
 
-        public void ShowTransferDialog(Window owner, string toAddress, string paymentId)
+        public async void ShowTransferDialog(Window owner, string toAddress, string paymentId)
         {
             try
             {
@@ -311,7 +266,6 @@ namespace NervaOneWalletMiner.Views
                 if (GlobalData.IsWalletOpen)
                 {
                     var dtgAccounts = this.Get<DataGrid>("dtgAccounts");
-                    TransferFundsView window;
 
                     uint selectedIndex = 0;
 
@@ -321,39 +275,33 @@ namespace NervaOneWalletMiner.Views
                         selectedIndex = selectedItem.Index;
                     }
 
-                    window = new TransferFundsView(selectedIndex, toAddress, paymentId);
-                    window.ShowDialog(_ownerWindowIfNotCurrent).ContinueWith(TransferDialogClosed);
+                    var window = new TransferFundsView(selectedIndex, toAddress, paymentId);
+                    DialogResult result = await window.ShowDialog<DialogResult>(_ownerWindowIfNotCurrent);
+                    if (result != null && result.IsOk)
+                    {
+                        if (!string.IsNullOrEmpty(result.SendToAddress) && result.SendAmount > 0)
+                        {
+                            if (result.IsSplitTranfer)
+                            {
+                                MakeTransferSplit(result.SendFromAddressIndex, result.SendToAddress, result.SendAmount, result.SendPaymentId, result.Priority);
+                            }
+                            else
+                            {
+                                MakeTransfer(result.SendFromAddressIndex, result.SendToAddress, result.SendAmount, result.SendPaymentId, result.Priority);
+                            }
+                        }
+                    }
                 }
                 else
                 {
                     MessageBoxView window = new("Transfer Funds", "Please open wallet first.", true);
-                    window.ShowDialog(_ownerWindowIfNotCurrent);
+                    await window.ShowDialog(_ownerWindowIfNotCurrent);
                 }
             }
             catch (Exception ex)
             {
                 Logger.LogException("WAL.STRD", ex);
             }
-        }
-
-        private void TransferDialogClosed(Task task)
-        {
-            DialogResult result = ((DialogResult)((Task<object>)task).Result);
-            if (result != null && result.IsOk)
-            {
-                // Submit transfer
-                if (!string.IsNullOrEmpty(result.SendToAddress) && result.SendAmount > 0)
-                {
-                    if (result.IsSplitTranfer)
-                    {
-                        MakeTransferSplit(result.SendFromAddressIndex, result.SendToAddress, result.SendAmount, result.SendPaymentId, result.Priority);
-                    }
-                    else
-                    {
-                        MakeTransfer(result.SendFromAddressIndex, result.SendToAddress, result.SendAmount, result.SendPaymentId, result.Priority);
-                    }
-                }
-            }         
         }
 
         private async void MakeTransfer(uint sendFromAccountIndex, string sendToAddress, decimal amount, string paymentId, string priority)
@@ -572,6 +520,7 @@ namespace NervaOneWalletMiner.Views
         }
         #endregion // Start Mining
 
+        #region Export Transactions       
         public async void ExportSelected_Clicked(object sender, RoutedEventArgs args)
         {
             try
@@ -650,5 +599,6 @@ namespace NervaOneWalletMiner.Views
                 Logger.LogException("WAL.EXAC", ex);
             }
         }
+        #endregion // Export Transactions
     }
 }

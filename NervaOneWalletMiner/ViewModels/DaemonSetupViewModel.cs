@@ -279,7 +279,7 @@ namespace NervaOneWalletMiner.ViewModels
             }
         }
 
-        public static void RestartWithCommand(string restartOptions)
+        public void RestartWithCommand(string restartOptions)
         {
             try
             {

@@ -5,7 +5,6 @@ using NervaOneWalletMiner.Objects;
 using NervaOneWalletMiner.ViewModels;
 using NervaOneWalletMiner.ViewsDialogs;
 using System;
-using System.Threading.Tasks;
 
 namespace NervaOneWalletMiner.Views;
 
@@ -53,7 +52,11 @@ public partial class MainWindow : Window
             {
                 MessageBoxView window = new("QuickSync", "You're currently only " + percentSynced.ToString("P1") + " synchronized "
                     + "\n\r\n\rWould you like to use QuickSync to synchronize faster?", false);
-                await window.ShowDialog(this).ContinueWith(QuickSyncConfirmDialogClosed);
+                DialogResult result = await window.ShowDialog<DialogResult>(this);
+                if (result != null && result.IsOk)
+                {
+                    GlobalMethods.RestartWithQuickSync();
+                }
             });
         }
         catch (Exception ex)
@@ -62,62 +65,37 @@ public partial class MainWindow : Window
         }
     }
 
-    private void QuickSyncConfirmDialogClosed(Task task)
+    public async void CheckAndDownloadCliIfNeeded()
     {
         try
         {
-            DialogResult result = ((DialogResult)((Task<object>)task).Result);
-            if (result != null && result.IsOk)
+            if (GlobalData.IsConfigFound && !GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
             {
-                GlobalMethods.RestartWithQuickSync();
-            }
-        }
-        catch (Exception ex)
-        {
-            Logger.LogException("MAW.QSDC", ex);
-        }
-    }
+                // CLI tools missing. Need to download
+                GlobalData.IsCliToolsFound = false;
+                Logger.LogDebug("MAW.CDCN", "CLI tools not found. Opening Coin Setup View.");
 
-    public void CheckAndDownloadCliIfNeeded()
-    {
-        if (GlobalData.IsConfigFound && !GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
-        {
-            // CLI tools missing. Need to download            
-            GlobalData.IsCliToolsFound = false;
-            Logger.LogDebug("MAW.CDCN", "CLI tools not found. Opening Coin Setup View.");
-
-            var window = new CoinSetupView();            
-            window.ShowDialog(this).ContinueWith(CliToolsLinkDialogClosed);
-        }
-    }
-
-    private async void CliToolsLinkDialogClosed(Task task)
-    {
-        try
-        {
-            DialogResult result = ((DialogResult)((Task<object>)task).Result);
-            if (result != null && result.IsOk)
-            {
-                Logger.LogDebug("MAW.CTLC", "CLI tools not found. Attempting to download from: " + result.TextBoxValue);
-                GlobalData.IsCliToolsDownloading = true;
-
-                if (!string.IsNullOrEmpty(result.TextBoxValue))
+                var window = new CoinSetupView();
+                DialogResult result = await window.ShowDialog<DialogResult>(this);
+                if (result != null && result.IsOk)
                 {
-                    // Download and extract CLI tools
-                    GlobalMethods.SetUpCliTools(result.TextBoxValue, GlobalData.CliToolsDir);
+                    Logger.LogDebug("MAW.CTLC", "CLI tools not found. Attempting to download from: " + result.TextBoxValue);
+                    GlobalData.IsCliToolsDownloading = true;
+
+                    if (!string.IsNullOrEmpty(result.TextBoxValue))
+                    {
+                        GlobalMethods.SetUpCliTools(result.TextBoxValue, GlobalData.CliToolsDir);
+                    }
                 }
-            }
-            else
-            {
-                Logger.LogDebug("MAW.CTLC", "CLI tools download cancelled.");
-                GlobalData.IsCliToolsDownloading = false;
-
-                await Dispatcher.UIThread.Invoke(async () =>
+                else
                 {
-                    MessageBoxView window = new("Client Tools Missing", "NervaOne cannot run without client tools. Switch coin or restart to download client tools. "
+                    Logger.LogDebug("MAW.CTLC", "CLI tools download cancelled.");
+                    GlobalData.IsCliToolsDownloading = false;
+
+                    MessageBoxView msgWindow = new("Client Tools Missing", "NervaOne cannot run without client tools. Switch coin or restart to download client tools. "
                         + "Alternatively you can put your own client tools in Daemon Setup > Open Client Tools Folder", true);
-                    await window.ShowDialog(this);
-                });               
+                    await msgWindow.ShowDialog(this);
+                }
             }
         }
         catch (Exception ex)

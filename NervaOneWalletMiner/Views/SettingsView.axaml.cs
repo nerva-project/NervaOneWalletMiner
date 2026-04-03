@@ -9,7 +9,6 @@ using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.ViewModels;
 using NervaOneWalletMiner.ViewsDialogs;
 using System;
-using System.Threading.Tasks;
 
 namespace NervaOneWalletMiner.Views
 {
@@ -99,7 +98,27 @@ namespace NervaOneWalletMiner.Views
                         Logger.LogDebug("SET.SSCL", "CLI tools not found. Opening Coin Setup View.");
 
                         var window = new CoinSetupView();
-                        await window.ShowDialog(GetWindow()).ContinueWith(CliToolsLinkDialogClosed);
+                        DialogResult cliResult = await window.ShowDialog<DialogResult>(GetWindow());
+                        if (cliResult != null && cliResult.IsOk)
+                        {
+                            Logger.LogDebug("SET.CTLC", "Attempting to download CLI tools from: " + cliResult.TextBoxValue);
+                            GlobalData.IsCliToolsDownloading = true;
+
+                            if (!string.IsNullOrEmpty(cliResult.TextBoxValue))
+                            {
+                                // Download and extract CLI tools
+                                GlobalMethods.SetUpCliTools(cliResult.TextBoxValue, GlobalData.CliToolsDir);
+                            }
+                        }
+                        else
+                        {
+                            Logger.LogDebug("SET.CTLC", "CLI tools download cancelled");
+                            GlobalData.IsCliToolsDownloading = false;
+
+                            MessageBoxView msgWindow = new("Client Tools Missing", "NervaOne cannot run without client tools. Switch coin or restart to download client tools. "
+                                + "Alternatively you can put your own client tools in Daemon Setup > Open Client Tools Folder", true);
+                            await msgWindow.ShowDialog(GetWindow());
+                        }
                     }
                 }
 
@@ -115,41 +134,6 @@ namespace NervaOneWalletMiner.Views
             catch (Exception ex)
             {
                 Logger.LogException("SET.SSCL", ex);
-            }
-        }       
-
-        private async void CliToolsLinkDialogClosed(Task task)
-        {
-            try
-            {
-                DialogResult result = ((DialogResult)((Task<object>)task).Result);
-                if (result != null && result.IsOk)
-                {
-                    Logger.LogDebug("SET.CTLC", "Attempting to download CLI tools from: " + result.TextBoxValue);
-                    GlobalData.IsCliToolsDownloading = true;
-
-                    if (!string.IsNullOrEmpty(result.TextBoxValue))
-                    {
-                        // Download and extract CLI tools
-                        GlobalMethods.SetUpCliTools(result.TextBoxValue, GlobalData.CliToolsDir);
-                    }
-                }
-                else
-                {
-                    Logger.LogDebug("SET.CTLC", "CLI tools download cancelled");
-                    GlobalData.IsCliToolsDownloading = false;
-
-                    await Dispatcher.UIThread.Invoke(async () =>
-                    {
-                        MessageBoxView window = new("Client Tools Missing", "NervaOne cannot run without client tools. Switch coin or restart to download client tools. "
-                            + "Alternatively you can put your own client tools in Daemon Setup > Open Client Tools Folder", true);
-                        await window.ShowDialog(GetWindow());
-                    });
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException("SET.CTLC", ex);
             }
         }
     }
