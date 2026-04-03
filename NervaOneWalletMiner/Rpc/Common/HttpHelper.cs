@@ -9,33 +9,32 @@ namespace NervaOneWalletMiner.Rpc.Common
 {
     public static class HttpHelper
     {
+        private static readonly HttpClient _client = new HttpClient()
+        {
+            Timeout = TimeSpan.FromSeconds(50)
+        };
+
         public static async Task<HttpResponseMessage> GetPostFromService(string serviceUrl, string postContent)
         {
             HttpResponseMessage response = new HttpResponseMessage();
 
             try
             {
-                using (HttpClient client = new HttpClient())
-                {
-                    client.Timeout = TimeSpan.FromSeconds(50);
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, serviceUrl);
+                request.Content = new StringContent(postContent);
+                request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, serviceUrl);
+                //Logger.LogDebug("HTTP.GPFS", "Calling POST: " + serviceUrl);
 
-                    request.Content = new StringContent(postContent);
-                    request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                response = await _client.SendAsync(request);
 
-                    //Logger.LogDebug("HTTP.GPFS", "Calling POST: " + serviceUrl);
-
-                    response = await client.SendAsync(request);
-
-                    //Logger.LogDebug("HTTP.GPFS", "Call returned: " + serviceUrl);                    
-                }
+                //Logger.LogDebug("HTTP.GPFS", "Call returned: " + serviceUrl);
             }
             catch (Exception ex)
             {
                 Logger.LogError("HTTP.GPFS", "Exception message: " + ex.Message);
             }
-            
+
             return response;
         }
 
@@ -45,25 +44,20 @@ namespace NervaOneWalletMiner.Rpc.Common
 
             try
             {
-                using (HttpClient client = new HttpClient())
-                {
-                    client.Timeout = TimeSpan.FromSeconds(50);
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, serviceUrl);
 
-                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, serviceUrl);
+                var authentication = userName + ":" + password;
+                var base64EncodedAuthentication = Convert.ToBase64String(Encoding.ASCII.GetBytes(authentication));
+                request.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthentication);
 
-                    var authentication = userName + ":" + password;
-                    var base64EncodedAuthentication = Convert.ToBase64String(Encoding.ASCII.GetBytes(authentication));
-                    request.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthentication);
+                request.Content = new StringContent(postContent);
+                request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-                    request.Content = new StringContent(postContent);
-                    request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                //Logger.LogDebug("HTTP.GPSA", "Calling POST: " + serviceUrl);
 
-                    //Logger.LogDebug("HTTP.GPSA", "Calling POST: " + serviceUrl);
+                response = await _client.SendAsync(request);
 
-                    response = await client.SendAsync(request);
-
-                    //Logger.LogDebug("HTTP.GPSA", "Call returned: " + serviceUrl);                    
-                }
+                //Logger.LogDebug("HTTP.GPSA", "Call returned: " + serviceUrl);
             }
             catch (Exception ex)
             {
