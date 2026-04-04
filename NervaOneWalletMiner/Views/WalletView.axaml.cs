@@ -91,6 +91,9 @@ namespace NervaOneWalletMiner.Views
                         if (result != null && result.IsOk)
                         {
                             OpenUserWallet(result.WalletName, result.WalletPassword);
+
+                            // WalletPassword is zeroed inside OpenUserWallet's finally block but do it here again anyways
+                            Array.Clear(result.WalletPassword, 0, result.WalletPassword.Length);
                         }
                     }
                 }
@@ -107,15 +110,20 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
-        private async void OpenUserWallet(string walletName, string walletPassword)
+        private async void OpenUserWallet(string walletName, char[] walletPassword)
         {
+            OpenWalletRequest request;
+
             try
             {
-                OpenWalletRequest request = new()
+                request = new()
                 {
                     WalletName = walletName,
                     Password = walletPassword
                 };
+
+                // Need this before OpenWallet as password will be cleared there
+                string walletPasswordHash = Hashing.Hash(walletPassword);
 
                 OpenWalletResponse response = await GlobalData.WalletService.OpenWallet(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
 
@@ -136,8 +144,8 @@ namespace NervaOneWalletMiner.Views
 
                     if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPassRequiredToOpenWallet)
                     {
-                        GlobalData.WalletPassProvidedTime = DateTime.Now;                        
-                        GlobalData.WalletPasswordHash = Hashing.Hash(request.Password);
+                        GlobalData.WalletPassProvidedTime = DateTime.Now;
+                        GlobalData.WalletPasswordHash = walletPasswordHash;
                     }
 
                     Logger.LogDebug("WAL.OUWT", "Wallet " + walletName + " opened successfully");
@@ -146,7 +154,12 @@ namespace NervaOneWalletMiner.Views
             catch (Exception ex)
             {
                 Logger.LogException("WAL.OUWT", ex);
-            }            
+            }
+            finally
+            {
+                Array.Clear(walletPassword, 0, walletPassword.Length);
+                request = new();
+            }
         }
         #endregion // Open Wallet
 

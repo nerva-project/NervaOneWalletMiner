@@ -3,10 +3,10 @@
     public class RestoreFromSeedRequest
     {
         public ulong RestoreHeight { get; set; } = 0;
-        public string Seed { get; set; } = string.Empty;
+        public char[] Seed { get; set; } = [];
         public string SeedOffset { get; set; } = string.Empty;
         public string WalletName { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
+        public char[] Password { get; set; } = [];
         public string Language { get; set; } = string.Empty;
         public bool AutoSave { get; set; } = true;
     }

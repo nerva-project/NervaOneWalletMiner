@@ -83,7 +83,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 var requestParams = new JObject
                 {
                     ["filename"] = requestObj.WalletName,
-                    ["password"] = requestObj.Password
+                    ["password"] = new string(requestObj.Password)
                 };
 
                 var requestJson = new JObject
@@ -121,6 +121,10 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             catch (Exception ex)
             {
                 Logger.LogException(CoinPrefix + ".WOPW", ex);
+            }
+            finally
+            {
+                Array.Clear(requestObj.Password, 0, requestObj.Password.Length);
             }
 
             return responseObj;
@@ -194,7 +198,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 var requestParams = new JObject
                 {
                     ["filename"] = requestObj.WalletName,
-                    ["password"] = requestObj.Password,
+                    ["password"] = new string(requestObj.Password),
                     ["language"] = requestObj.Language
                 };
 
@@ -233,6 +237,10 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             catch (Exception ex)
             {
                 Logger.LogException(CoinPrefix + ".WCRW", ex);
+            }
+            finally
+            {
+                Array.Clear(requestObj.Password, 0, requestObj.Password.Length);
             }
 
             return responseObj;
@@ -424,9 +432,9 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 {
                     ["restore_height"] = requestObj.RestoreHeight,
                     ["filename"] = requestObj.WalletName,
-                    ["seed"] = requestObj.Seed,
+                    ["seed"] = new string(requestObj.Seed),
                     ["seed_offset"] = requestObj.SeedOffset,
-                    ["password"] = requestObj.Password,
+                    ["password"] = new string(requestObj.Password),
                     ["language"] = requestObj.Language,
                     ["autosave_current"] = requestObj.AutoSave
                 };
@@ -472,6 +480,11 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             {
                 Logger.LogException(CoinPrefix + ".WRFS", ex);
             }
+            finally
+            {
+                Array.Clear(requestObj.Seed, 0, requestObj.Seed.Length);
+                Array.Clear(requestObj.Password, 0, requestObj.Password.Length);
+            }
 
             return responseObj;
         }
@@ -508,9 +521,9 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     ["restore_height"] = requestObj.RestoreHeight,
                     ["filename"] = requestObj.WalletName,
                     ["address"] = requestObj.WalletAddress,
-                    ["spendkey"] = requestObj.SpendKey,
-                    ["viewkey"] = requestObj.ViewKey,
-                    ["password"] = requestObj.Password,
+                    ["spendkey"] = new string(requestObj.SpendKey),
+                    ["viewkey"] = new string(requestObj.ViewKey),
+                    ["password"] = new string(requestObj.Password),
                     ["language"] = requestObj.Language,
                     ["autosave_current"] = requestObj.AutoSave
                 };
@@ -553,6 +566,12 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             catch (Exception ex)
             {
                 Logger.LogException(CoinPrefix + ".WRFK", ex);
+            }
+            finally
+            {
+                Array.Clear(requestObj.ViewKey, 0, requestObj.ViewKey.Length);
+                Array.Clear(requestObj.SpendKey, 0, requestObj.SpendKey.Length);
+                Array.Clear(requestObj.Password, 0, requestObj.Password.Length);
             }
 
             return responseObj;
@@ -1367,13 +1386,13 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                         ResQueryKey queryKeyResponse = JsonConvert.DeserializeObject<ResQueryKey>(jsonObject.SelectToken("result").ToString());
                         if (requestObj.KeyType == KeyType.Mnemonic)
                         {
-                            responseObj.Mnemonic = queryKeyResponse.key;
+                            responseObj.Mnemonic = queryKeyResponse.key.ToCharArray();
 
                             responseObj.Error.IsError = false;
                         }
                         else if (requestObj.KeyType == KeyType.AllViewSpend)
                         {
-                            responseObj.PrivateViewKey = queryKeyResponse.key;
+                            responseObj.PrivateViewKey = queryKeyResponse.key.ToCharArray();
 
                             // Call again to get spend key
                             requestJson = new JObject
@@ -1398,7 +1417,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                 else
                                 {
                                     queryKeyResponse = JsonConvert.DeserializeObject<ResQueryKey>(jsonObject.SelectToken("result").ToString());
-                                    responseObj.PrivateSpendKey = queryKeyResponse.key;
+                                    responseObj.PrivateSpendKey = queryKeyResponse.key.ToCharArray();
 
                                     responseObj.Error.IsError = false;
                                 }

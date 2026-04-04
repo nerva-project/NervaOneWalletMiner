@@ -127,10 +127,11 @@ namespace NervaOneWalletMiner.ViewsDialogs
                                 if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPassRequiredToOpenWallet)
                                 {
                                     // Self managed lock
-                                    if (Hashing.Verify(passRes.TextBoxValue, GlobalData.WalletPasswordHash))
+                                    if (Hashing.Verify(passRes.TextBoxValue.ToCharArray(), GlobalData.WalletPasswordHash))
                                     {
                                         isAuthorized = true;
                                         GlobalData.WalletPassProvidedTime = DateTime.Now;
+                                        passRes.TextBoxValue = "";
                                     }                                    
                                 }
                                 else
@@ -138,7 +139,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                                     // Lock managed by wallet
                                     UnlockWithPassRequest request = new()
                                     {
-                                        Password = passRes.TextBoxValue,
+                                        Password = passRes.TextBoxValue.ToCharArray(),
                                         TimeoutInSeconds = GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].UnlockMinutes * 60
                                     };
 

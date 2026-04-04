@@ -3,6 +3,6 @@
     public class OpenWalletRequest
     {
         public string WalletName { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
+        public char[] Password { get; set; } = [];
     }
 }

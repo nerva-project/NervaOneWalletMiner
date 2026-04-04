@@ -37,9 +37,9 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 {
                     ["restore_height"] = requestObj.RestoreHeight,
                     ["filename"] = requestObj.WalletName,
-                    ["seed"] = requestObj.Seed,
+                    ["seed"] = new string(requestObj.Seed),
                     ["seed_offset"] = requestObj.SeedOffset,
-                    ["password"] = requestObj.Password,
+                    ["password"] = new string(requestObj.Password),
                     ["language"] = requestObj.Language,
                     ["autosave_current"] = requestObj.AutoSave
                 };
@@ -121,9 +121,9 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     ["restore_height"] = requestObj.RestoreHeight,
                     ["filename"] = requestObj.WalletName,
                     ["address"] = requestObj.WalletAddress,
-                    ["spendkey"] = requestObj.SpendKey,
-                    ["viewkey"] = requestObj.ViewKey,
-                    ["password"] = requestObj.Password,
+                    ["spendkey"] = new string(requestObj.SpendKey),
+                    ["viewkey"] = new string(requestObj.ViewKey),
+                    ["password"] = new string(requestObj.Password),
                     ["language"] = requestObj.Language,
                     ["autosave_current"] = requestObj.AutoSave
                 };
@@ -230,10 +230,10 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     {
                         ResQueryKey queryKeyResponse = JsonConvert.DeserializeObject<ResQueryKey>(jsonObject.SelectToken("result").ToString());
                         responseObj.PublicViewKey = queryKeyResponse.public_view_key;
-                        responseObj.PrivateViewKey = queryKeyResponse.private_view_key;
+                        responseObj.PrivateViewKey = queryKeyResponse.private_view_key.ToCharArray();
                         responseObj.PublicSpendKey = queryKeyResponse.public_spend_key;
-                        responseObj.PrivateSpendKey = queryKeyResponse.private_spend_key;
-                        responseObj.Mnemonic = queryKeyResponse.mnemonic;
+                        responseObj.PrivateSpendKey = queryKeyResponse.private_spend_key.ToCharArray();
+                        responseObj.Mnemonic = queryKeyResponse.mnemonic.ToCharArray();
 
                         responseObj.Error.IsError = false;
                     }

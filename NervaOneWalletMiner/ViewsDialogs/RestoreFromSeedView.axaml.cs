@@ -51,13 +51,15 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     DialogResult result = new()
                     {
                         IsOk = true,
-                        SeedPhrase = tbxSeedPhrase.Text,
+                        SeedPhrase = tbxSeedPhrase.Text.ToCharArray(),
                         SeedOffset = tbxSeedOffset.Text!,
                         WalletName = tbxWalletName.Text,
-                        WalletPassword = tbxPassword.Text,
+                        WalletPassword = tbxPassword.Text.ToCharArray(),
                         WalletLanguage = cbxLanguage.SelectedValue == null ? Language.English : cbxLanguage.SelectedValue.ToString()!
                     };
 
+                    tbxSeedPhrase.Text = string.Empty;
+                    tbxPassword.Text = string.Empty;
                     Close(result);
                 }
             }

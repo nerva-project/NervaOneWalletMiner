@@ -14,7 +14,7 @@ namespace NervaOneWalletMiner.Helpers
 
         private const char segmentDelimiter = ':';
 
-        public static string Hash(string input)
+        public static string Hash(char[] input)
         {
             byte[] salt = RandomNumberGenerator.GetBytes(_saltSize);
             byte[] hash = Rfc2898DeriveBytes.Pbkdf2(input, salt, _iterations, _algorithm, _keySize);
@@ -22,7 +22,7 @@ namespace NervaOneWalletMiner.Helpers
             return string.Join(segmentDelimiter, Convert.ToHexString(hash), Convert.ToHexString(salt), _iterations, _algorithm);
         }
 
-        public static bool Verify(string input, string hashString)
+        public static bool Verify(char[] input, string hashString)
         {
             string[] segments = hashString.Split(segmentDelimiter);
             byte[] hash = Convert.FromHexString(segments[0]);
