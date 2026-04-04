@@ -1,7 +1,7 @@
 ﻿using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Objects.DataGrid;
 using NervaOneWalletMiner.Rpc.Common;
-using NervaOneWalletMiner.Rpc.Wallet.Objects;
 using NervaOneWalletMiner.Rpc.Wallet.Requests;
 using NervaOneWalletMiner.Rpc.Wallet.Responses;
 using Newtonsoft.Json;
@@ -18,6 +18,53 @@ namespace NervaOneWalletMiner.Rpc.Wallet
     internal class WalletServiceDASH : IWalletService
     {
         private static int _id = 0;
+
+        protected ServiceError GetServiceError(string source, dynamic error)
+        {
+            ServiceError serviceError = new();
+
+            try
+            {
+                serviceError.IsError = true;
+                serviceError.Code = error["code"].ToString();
+                serviceError.Message = error["message"].ToString();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DAS.CGSE", ex);
+            }
+
+            return serviceError;
+        }
+
+        protected string GetTransactionType(string type)
+        {
+            string returnType = TransferType.Unknown;
+
+            switch (type.ToLower())
+            {
+                case "receive":
+                    returnType = TransferType.In;
+                    break;
+                case "send":
+                    returnType = TransferType.Out;
+                    break;
+                case "coinjoin":
+                    returnType = TransferType.Out;
+                    break;
+                case "generate":
+                    returnType = TransferType.Block;
+                    break;
+                case "immature":
+                    returnType = TransferType.Block;
+                    break;
+                default:
+                    returnType = TransferType.Unknown;
+                    break;
+            }
+
+            return returnType;
+        }
 
         #region Open Wallet
         public async Task<OpenWalletResponse> OpenWallet(RpcBase rpc, OpenWalletRequest requestObj)
@@ -51,7 +98,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonDASH.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -106,7 +153,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonDASH.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -162,7 +209,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonDASH.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -217,7 +264,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonDASH.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -270,7 +317,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonDASH.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -346,7 +393,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonDASH.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -422,7 +469,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonDASH.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {                        
@@ -471,7 +518,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                         if (error != null)
                         {
                             // Set Service error
-                            responseObj.Error = CommonDASH.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                            responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                         }
                         else
                         {
@@ -569,7 +616,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonDASH.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -585,7 +632,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                 Height = string.IsNullOrEmpty(entry.blockheight) ? 0 : Convert.ToUInt32(entry.blockheight),
                                 Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timereceived).ToLocalTime(),
                                 Amount = Convert.ToDecimal(entry.amount),
-                                Type = CommonDASH.GetTransactionType(entry.category)
+                                Type = GetTransactionType(entry.category)
                             };
 
                             responseObj.Transfers.Add(newTransfer);
@@ -642,7 +689,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonDASH.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -725,7 +772,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonDASH.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {

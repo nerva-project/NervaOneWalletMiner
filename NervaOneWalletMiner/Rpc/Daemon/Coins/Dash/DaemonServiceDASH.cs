@@ -1,14 +1,14 @@
-﻿using NervaOneWalletMiner.Objects.DataGrid;
+﻿using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Objects.DataGrid;
 using NervaOneWalletMiner.Rpc.Common;
 using NervaOneWalletMiner.Rpc.Daemon.Requests;
 using NervaOneWalletMiner.Rpc.Daemon.Responses;
-using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
-using NervaOneWalletMiner.Helpers;
 
 namespace NervaOneWalletMiner.Rpc.Daemon
 {
@@ -17,6 +17,24 @@ namespace NervaOneWalletMiner.Rpc.Daemon
     internal class DaemonServiceDASH : IDaemonService
     {
         private const double _blockSeconds = 150.0;
+
+        protected ServiceError GetServiceError(string source, dynamic error)
+        {
+            ServiceError serviceError = new();
+
+            try
+            {
+                serviceError.IsError = true;
+                serviceError.Code = error["code"].ToString();
+                serviceError.Message = error["message"].ToString();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DAS.CGSE", ex);
+            }
+
+            return serviceError;
+        }
 
         #region Stop Daemon
         public async Task<StopDaemonResponse> StopDaemon(RpcBase rpc, StopDaemonRequest requestObj)
@@ -49,7 +67,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                         if (error != null)
                         {
                             // Set Service error
-                            responseObj.Error = CommonDASH.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                            responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                         }
                         else
                         {
@@ -106,7 +124,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                         if (error != null)
                         {
                             // Set Service error
-                            responseObj.Error = CommonDASH.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                            responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                             responseObj.Status = "ERROR";
                         }
                         else
@@ -157,7 +175,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                             if (error != null)
                             {
                                 // Set Service error
-                                responseObj.Error = CommonDASH.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                                responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                             }
                             else
                             {
@@ -210,7 +228,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                             if (error != null)
                             {
                                 // Set Service error
-                                responseObj.Error = CommonDASH.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                                responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                             }
                             else
                             {
@@ -280,7 +298,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                         if (error != null)
                         {
                             // Set Service error
-                            responseObj.Error = CommonDASH.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                            responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                         }
                         else
                         {

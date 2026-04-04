@@ -1,4 +1,4 @@
-﻿using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Objects.DataGrid;
 using NervaOneWalletMiner.Rpc.Common;
@@ -16,10 +16,57 @@ using System.Threading.Tasks;
 
 namespace NervaOneWalletMiner.Rpc.Wallet
 {
-    // Monero implementation as of 5/13/24: https://github.com/monero-project/monero
-
-    public class WalletServiceXMR : IWalletService
+    public abstract class WalletServiceBaseXMR : IWalletService
     {
+        protected abstract string CoinPrefix { get; }
+
+        protected virtual decimal AmountFromAtomicUnits(ulong value, int decimalPlaces) =>
+            Math.Round(Convert.ToDecimal(value / 1000000000000.0), decimalPlaces);
+
+        protected virtual ulong AtomicUnitsFromAmount(decimal amount) =>
+            (ulong)(amount * Convert.ToDecimal(1000000000000.0));
+
+        protected ServiceError GetServiceError(string source, dynamic error)
+        {
+            ServiceError serviceError = new();
+
+            try
+            {
+                serviceError.IsError = true;
+                serviceError.Code = error["code"].ToString();
+                serviceError.Message = error["message"].ToString();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(CoinPrefix + ".CGSE", ex);
+            }
+
+            return serviceError;
+        }
+
+        protected static uint GetPriority(string stringPriority)
+        {
+            uint priority = 0;
+
+            switch (stringPriority)
+            {
+                case SendPriority.Low:
+                    priority = 1;
+                    break;
+                case SendPriority.Medium:
+                    priority = 2;
+                    break;
+                case SendPriority.High:
+                    priority = 3;
+                    break;
+                default:
+                    priority = 0;
+                    break;
+            }
+
+            return priority;
+        }
+
         #region Open Wallet
         /* RPC request params:
          *  std::string filename;
@@ -57,7 +104,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -73,7 +120,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WOPW", ex);
+                Logger.LogException(CoinPrefix + ".WOPW", ex);
             }
 
             return responseObj;
@@ -108,7 +155,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -124,7 +171,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WCLW", ex);
+                Logger.LogException(CoinPrefix + ".WCLW", ex);
             }
 
             return responseObj;
@@ -169,7 +216,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -185,7 +232,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WCRW", ex);
+                Logger.LogException(CoinPrefix + ".WCRW", ex);
             }
 
             return responseObj;
@@ -226,12 +273,11 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
-                        // Monero returns account_index and address but don't really need it
-
+                        // Returns account_index and address but don't really need it
                         responseObj.Error.IsError = false;
                     }
                 }
@@ -243,16 +289,10 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WCRA", ex);
+                Logger.LogException(CoinPrefix + ".WCRA", ex);
             }
 
             return responseObj;
-        }
-
-        private class ResCreateAccount
-        {
-            public uint account_index { get; set; } = 0;
-            public string address { get; set; } = string.Empty;
         }
         #endregion // Create Account
 
@@ -292,7 +332,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -307,7 +347,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WLAT", ex);
+                Logger.LogException(CoinPrefix + ".WLAT", ex);
             }
 
             return responseObj;
@@ -339,7 +379,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -355,7 +395,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WSWT", ex);
+                Logger.LogException(CoinPrefix + ".WSWT", ex);
             }
 
             return responseObj;
@@ -373,7 +413,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
          *  bool autosave_current;                  OPT
          *  bool enable_multisig_experimental;      OPT
          */
-        public async Task<RestoreFromSeedResponse> RestoreFromSeed(RpcBase rpc, RestoreFromSeedRequest requestObj)
+        public virtual async Task<RestoreFromSeedResponse> RestoreFromSeed(RpcBase rpc, RestoreFromSeedRequest requestObj)
         {
             RestoreFromSeedResponse responseObj = new();
 
@@ -409,7 +449,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -430,7 +470,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WRFS", ex);
+                Logger.LogException(CoinPrefix + ".WRFS", ex);
             }
 
             return responseObj;
@@ -454,9 +494,9 @@ namespace NervaOneWalletMiner.Rpc.Wallet
          *  std::string viewkey;
          *  std::string password;
          *  bool autosave_current;                  OPT
-         *  std::string language;         
+         *  std::string language;
          */
-        public async Task<RestoreFromKeysResponse> RestoreFromKeys(RpcBase rpc, RestoreFromKeysRequest requestObj)
+        public virtual async Task<RestoreFromKeysResponse> RestoreFromKeys(RpcBase rpc, RestoreFromKeysRequest requestObj)
         {
             RestoreFromKeysResponse responseObj = new();
 
@@ -493,7 +533,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -512,7 +552,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WRFK", ex);
+                Logger.LogException(CoinPrefix + ".WRFK", ex);
             }
 
             return responseObj;
@@ -552,7 +592,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 foreach (Common.TransferDestination destination in requestObj.Destinations)
                 {
                     dynamic newDest = new JObject();
-                    newDest.amount = CommonXMR.AtomicUnitsFromDoubleAmount(destination.Amount);
+                    newDest.amount = AtomicUnitsFromAmount(destination.Amount);
                     newDest.address = destination.Address;
                     destinationsJson.Add(newDest);
                 }
@@ -560,7 +600,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
 
                 paramsJson.account_index = requestObj.AccountIndex;
                 paramsJson.subaddr_indices = new JArray(requestObj.SubAddressIndices);
-                paramsJson.priority = CommonXMR.GetPriority(requestObj.Priority);
+                paramsJson.priority = GetPriority(requestObj.Priority);
                 paramsJson.unlock_time = requestObj.UnlockTime;
                 paramsJson.payment_id = requestObj.PaymentId is null ? "" : requestObj.PaymentId;
                 paramsJson.get_tx_key = requestObj.GetTxKey;
@@ -586,7 +626,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -604,7 +644,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WTRA", ex);
+                Logger.LogException(CoinPrefix + ".WTRA", ex);
             }
 
             return responseObj;
@@ -634,7 +674,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         {
             public List<string> key_images { get; set; } = [];
         }
-        #endregion // Transfer        
+        #endregion // Transfer
 
         #region Transfer Split
         /* RPC request params:
@@ -662,7 +702,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 foreach (Common.TransferDestination destination in requestObj.Destinations)
                 {
                     dynamic newDest = new JObject();
-                    newDest.amount = CommonXMR.AtomicUnitsFromDoubleAmount(destination.Amount);
+                    newDest.amount = AtomicUnitsFromAmount(destination.Amount);
                     newDest.address = destination.Address;
                     destinationsJson.Add(newDest);
                 }
@@ -670,7 +710,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
 
                 paramsJson.account_index = requestObj.AccountIndex;
                 paramsJson.subaddr_indices = new JArray(requestObj.SubAddressIndices);
-                paramsJson.priority = CommonXMR.GetPriority(requestObj.Priority);
+                paramsJson.priority = GetPriority(requestObj.Priority);
                 paramsJson.unlock_time = requestObj.UnlockTime;
                 paramsJson.payment_id = requestObj.PaymentId is null ? "" : requestObj.PaymentId;
                 paramsJson.get_tx_key = requestObj.GetTxKey;
@@ -696,7 +736,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -714,7 +754,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WTRS", ex);
+                Logger.LogException(CoinPrefix + ".WTRS", ex);
             }
 
             return responseObj;
@@ -761,7 +801,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -777,7 +817,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WRES", ex);
+                Logger.LogException(CoinPrefix + ".WRES", ex);
             }
 
             return responseObj;
@@ -789,7 +829,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
          *  bool hard;                          OPT
          */
 
-        //Rescan the blockchain from scratch. If 'hard' is specified, you will lose any information which can not be recovered from the blockchain itself.
+        // Rescan the blockchain from scratch. If 'hard' is specified, you will lose any information which can not be recovered from the blockchain itself.
         public async Task<RescanBlockchainResponse> RescanBlockchain(RpcBase rpc, RescanBlockchainRequest requestObj)
         {
             RescanBlockchainResponse responseObj = new();
@@ -814,7 +854,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -830,7 +870,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WRBN", ex);
+                Logger.LogException(CoinPrefix + ".WRBN", ex);
             }
 
             return responseObj;
@@ -873,7 +913,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -892,7 +932,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WMIA", ex);
+                Logger.LogException(CoinPrefix + ".WMIA", ex);
             }
 
             return responseObj;
@@ -911,7 +951,6 @@ namespace NervaOneWalletMiner.Rpc.Wallet
          *  bool strict_balances;
          *  bool regexp; // allow regular expression filters if set to true
          */
-
         public async Task<GetAccountsResponse> GetAccounts(RpcBase rpc, GetAccountsRequest requestObj)
         {
             GetAccountsResponse responseObj = new();
@@ -936,13 +975,13 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
                         ResGetAccounts getAccountsResponse = JsonConvert.DeserializeObject<ResGetAccounts>(jsonObject.SelectToken("result").ToString());
-                        responseObj.BalanceUnlocked = CommonXMR.DoubleAmountFromAtomicUnits(getAccountsResponse.total_unlocked_balance, 4);
-                        responseObj.BalanceTotal = CommonXMR.DoubleAmountFromAtomicUnits(getAccountsResponse.total_balance, 4);
+                        responseObj.BalanceUnlocked = AmountFromAtomicUnits(getAccountsResponse.total_unlocked_balance, 4);
+                        responseObj.BalanceTotal = AmountFromAtomicUnits(getAccountsResponse.total_balance, 4);
 
                         foreach (WalletAccount account in getAccountsResponse.subaddress_accounts)
                         {
@@ -952,8 +991,8 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                 Label = account.label,
                                 AddressFull = account.base_address,
                                 AddressShort = GlobalMethods.GetShorterString(account.base_address, 12),
-                                BalanceTotal = CommonXMR.DoubleAmountFromAtomicUnits(account.balance, 4),
-                                BalanceUnlocked = CommonXMR.DoubleAmountFromAtomicUnits(account.unlocked_balance, 4)
+                                BalanceTotal = AmountFromAtomicUnits(account.balance, 4),
+                                BalanceUnlocked = AmountFromAtomicUnits(account.unlocked_balance, 4)
                             };
 
                             responseObj.SubAccounts.Add(newAccount);
@@ -970,13 +1009,13 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WGTA", ex);
+                Logger.LogException(CoinPrefix + ".WGTA", ex);
             }
 
             return responseObj;
         }
 
-        // Internal helper obejcts used to interact with service
+        // Internal helper objects used to interact with service
         private class ResGetAccounts
         {
             public ulong total_balance { get; set; }
@@ -1002,7 +1041,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
          *  bool pending;
          *  bool failed;
          *  bool pool;
-         *  
+         *
          *  bool filter_by_height;
          *  uint64_t min_height;
          *  uint64_t max_height;
@@ -1049,7 +1088,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -1064,7 +1103,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                 AddressShort = GlobalMethods.GetShorterString(entry.address, 12),
                                 Height = entry.height,
                                 Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp).ToLocalTime(),
-                                Amount = CommonXMR.DoubleAmountFromAtomicUnits(entry.amount, 4),
+                                Amount = AmountFromAtomicUnits(entry.amount, 4),
                                 Type = entry.type
                             };
 
@@ -1080,7 +1119,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                 AddressShort = GlobalMethods.GetShorterString(entry.address, 12),
                                 Height = entry.height,
                                 Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp).ToLocalTime(),
-                                Amount = CommonXMR.DoubleAmountFromAtomicUnits(entry.amount, 4),
+                                Amount = AmountFromAtomicUnits(entry.amount, 4),
                                 Type = entry.type
                             };
 
@@ -1096,7 +1135,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                 AddressShort = GlobalMethods.GetShorterString(entry.address, 12),
                                 Height = entry.height,
                                 Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp).ToLocalTime(),
-                                Amount = CommonXMR.DoubleAmountFromAtomicUnits(entry.amount, 4),
+                                Amount = AmountFromAtomicUnits(entry.amount, 4),
                                 Type = entry.type
                             };
 
@@ -1114,13 +1153,13 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WGTF", ex);
+                Logger.LogException(CoinPrefix + ".WGTF", ex);
             }
 
             return responseObj;
         }
 
-        // Internal helper obejcts used to interact with service
+        // Internal helper objects used to interact with service
         private class ResGetTransfers
         {
             public List<TransferEntry> In { get; set; } = [];
@@ -1128,7 +1167,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             public List<TransferEntry> pending { get; set; } = [];
             public List<TransferEntry> failed { get; set; } = [];
             public List<TransferEntry> pool { get; set; } = [];
-        }        
+        }
         #endregion // Get Transfers
 
         #region Get Transfer By TxId
@@ -1167,7 +1206,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -1179,21 +1218,21 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                         responseObj.Type = getTransfByTxIdResponse.transfer.type;
                         responseObj.Height = getTransfByTxIdResponse.transfer.height;
                         responseObj.Timestamp = GlobalMethods.UnixTimeStampToDateTime(getTransfByTxIdResponse.transfer.timestamp).ToLocalTime();
-                        responseObj.Amount = CommonXMR.DoubleAmountFromAtomicUnits(getTransfByTxIdResponse.transfer.amount, 6);
-                        responseObj.Fee = CommonXMR.DoubleAmountFromAtomicUnits(getTransfByTxIdResponse.transfer.fee, 6);
+                        responseObj.Amount = AmountFromAtomicUnits(getTransfByTxIdResponse.transfer.amount, 6);
+                        responseObj.Fee = AmountFromAtomicUnits(getTransfByTxIdResponse.transfer.fee, 6);
                         responseObj.Note = getTransfByTxIdResponse.transfer.note;
                         responseObj.Confirmations = getTransfByTxIdResponse.transfer.confirmations;
 
                         foreach (TransferDestination destination in getTransfByTxIdResponse.transfer.destinations)
                         {
-                            responseObj.Destinations.Add(destination.address + " | " + CommonXMR.DoubleAmountFromAtomicUnits(destination.amount, 6));
+                            responseObj.Destinations.Add(destination.address + " | " + AmountFromAtomicUnits(destination.amount, 6));
                         }
 
-                        // There is also transfers but it seems to have the same info. Can you have more than 1 transfer for given transactioin id?
-                        //foreach (TransferEntry entry in getTransfersResponse.transfers)
+                        // There is also transfers but it seems to have the same info. Can you have more than 1 transfer for given transaction id?
+                        //foreach (TransferEntry entry in getTransfByTxIdResponse.transfers)
                         //{
 
-                        //}                       
+                        //}
 
                         responseObj.Error.IsError = false;
                     }
@@ -1206,13 +1245,13 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WGTI", ex);
+                Logger.LogException(CoinPrefix + ".WGTI", ex);
             }
 
             return responseObj;
         }
 
-        // Internal helper obejcts used to interact with service
+        // Internal helper objects used to interact with service
         private class ResGetTransferById
         {
             public TransferEntry transfer { get; set; } = new();
@@ -1245,7 +1284,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -1263,7 +1302,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WGHT", ex);
+                Logger.LogException(CoinPrefix + ".WGHT", ex);
             }
 
             return responseObj;
@@ -1279,9 +1318,9 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         /* RPC request params:
          *  std::string key_type;
          */
-        public async Task<GetPrivateKeysResponse> GetPrivateKeys(RpcBase rpc, GetPrivateKeysRequest requestObj)
+        public virtual async Task<GetPrivateKeysResponse> GetPrivateKeys(RpcBase rpc, GetPrivateKeysRequest requestObj)
         {
-            // TODO: I do not like how this is done. Change it!
+            // Default: two separate query_key calls for view_key and spend_key (XMR/WOW pattern)
 
             GetPrivateKeysResponse responseObj = new();
 
@@ -1289,9 +1328,9 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             {
                 // Build request content json
                 JObject requestJson = [];
-                
+
                 if (requestObj.KeyType == KeyType.Mnemonic)
-                {                    
+                {
                     requestJson = new JObject
                     {
                         ["jsonrpc"] = "2.0",
@@ -1300,7 +1339,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                         ["params"] = new JObject() { ["key_type"] = "mnemonic" }
                     };
                 }
-                else if(requestObj.KeyType == KeyType.AllViewSpend)
+                else if (requestObj.KeyType == KeyType.AllViewSpend)
                 {
                     requestJson = new JObject
                     {
@@ -1310,7 +1349,6 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                         ["params"] = new JObject() { ["key_type"] = "view_key" }
                     };
                 }
-
 
                 // Call service and process response
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
@@ -1322,20 +1360,20 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
-                        ResQueryKey getHeightResponse = JsonConvert.DeserializeObject<ResQueryKey>(jsonObject.SelectToken("result").ToString());
+                        ResQueryKey queryKeyResponse = JsonConvert.DeserializeObject<ResQueryKey>(jsonObject.SelectToken("result").ToString());
                         if (requestObj.KeyType == KeyType.Mnemonic)
                         {
-                            responseObj.Mnemonic = getHeightResponse.key;
+                            responseObj.Mnemonic = queryKeyResponse.key;
 
                             responseObj.Error.IsError = false;
                         }
                         else if (requestObj.KeyType == KeyType.AllViewSpend)
                         {
-                            responseObj.PrivateViewKey = getHeightResponse.key;
+                            responseObj.PrivateViewKey = queryKeyResponse.key;
 
                             // Call again to get spend key
                             requestJson = new JObject
@@ -1345,7 +1383,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                 ["method"] = "query_key",
                                 ["params"] = new JObject() { ["key_type"] = "spend_key" }
                             };
-                            
+
                             httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
                             if (httpResponse.IsSuccessStatusCode)
                             {
@@ -1355,12 +1393,12 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                 if (error != null)
                                 {
                                     // Set Service error
-                                    responseObj.Error = CommonXMR.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                                    responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                                 }
                                 else
                                 {
-                                    getHeightResponse = JsonConvert.DeserializeObject<ResQueryKey>(jsonObject.SelectToken("result").ToString());
-                                    responseObj.PrivateSpendKey = getHeightResponse.key;
+                                    queryKeyResponse = JsonConvert.DeserializeObject<ResQueryKey>(jsonObject.SelectToken("result").ToString());
+                                    responseObj.PrivateSpendKey = queryKeyResponse.key;
 
                                     responseObj.Error.IsError = false;
                                 }
@@ -1381,7 +1419,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WGPK", ex);
+                Logger.LogException(CoinPrefix + ".WGPK", ex);
             }
 
             return responseObj;
@@ -1434,7 +1472,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -1450,10 +1488,10 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                 Height = entry.height.ToString(),
                                 Type = entry.type,
                                 TimeStamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp),
-                                Amount = CommonXNV.DecimalAmountFromAtomicUnits(entry.amount, 12),
+                                Amount = AmountFromAtomicUnits(entry.amount, 12),
                                 TransactionId = entry.txid,
                                 PaymentId = entry.payment_id,
-                                Fee = CommonXNV.DecimalAmountFromAtomicUnits(entry.fee, 12),
+                                Fee = AmountFromAtomicUnits(entry.fee, 12),
                                 Note = entry.note
                             };
 
@@ -1479,10 +1517,10 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                 Height = entry.height.ToString(),
                                 Type = entry.type,
                                 TimeStamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp),
-                                Amount = CommonXNV.DecimalAmountFromAtomicUnits(entry.amount, 12),
+                                Amount = AmountFromAtomicUnits(entry.amount, 12),
                                 TransactionId = entry.txid,
                                 PaymentId = entry.payment_id,
-                                Fee = CommonXNV.DecimalAmountFromAtomicUnits(entry.fee, 12),
+                                Fee = AmountFromAtomicUnits(entry.fee, 12),
                                 Note = entry.note
                             };
 
@@ -1536,7 +1574,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("XMR.WGEX", ex);
+                Logger.LogException(CoinPrefix + ".WGEX", ex);
             }
 
             return responseObj;
