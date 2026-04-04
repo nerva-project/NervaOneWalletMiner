@@ -1,4 +1,4 @@
-﻿using NervaOneWalletMiner.Objects.DataGrid;
+using NervaOneWalletMiner.Objects.DataGrid;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Rpc.Common;
 using NervaOneWalletMiner.Rpc.Daemon.Requests;
@@ -12,11 +12,29 @@ using System.Threading.Tasks;
 
 namespace NervaOneWalletMiner.Rpc.Daemon
 {
-    // Nerva implementation as of 5/10/24: https://github.com/nerva-project/nerva
-    public class DaemonServiceXNV : IDaemonService
+    public abstract class DaemonServiceBaseXMR : IDaemonService
     {
-        private const double _blockSeconds = 60.0;
-        
+        protected abstract string CoinPrefix { get; }
+        protected abstract double BlockSeconds { get; }
+
+        protected ServiceError GetServiceError(string source, dynamic error)
+        {
+            ServiceError serviceError = new();
+
+            try
+            {
+                serviceError.IsError = true;
+                serviceError.Code = error["code"].ToString();
+                serviceError.Message = error["message"].ToString();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(CoinPrefix + ".CGSE", ex);
+            }
+
+            return serviceError;
+        }
+
         #region Start Mining
         /* RPC request params:
          *  std::string miner_address;
@@ -27,7 +45,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
         public async Task<StartMiningResponse> StartMining(RpcBase rpc, StartMiningRequest requestObj)
         {
             StartMiningResponse responseObj = new();
-            
+
             try
             {
                 // Build request content json
@@ -47,7 +65,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -68,18 +86,18 @@ namespace NervaOneWalletMiner.Rpc.Daemon
             }
             catch (Exception ex)
             {
-                Logger.LogException("XNV.DSTM", ex);
+                Logger.LogException(CoinPrefix + ".DSTM", ex);
             }
 
             return responseObj;
         }
         #endregion // Start Mining
-       
+
         #region Stop Mining
         public async Task<StopMiningResponse> StopMining(RpcBase rpc, StopMiningRequest requestObj)
         {
             StopMiningResponse responseObj = new();
-            
+
             try
             {
                 // Build request content json
@@ -95,7 +113,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -116,7 +134,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
             }
             catch (Exception ex)
             {
-                Logger.LogException("XNV.DSPM", ex);
+                Logger.LogException(CoinPrefix + ".DSPM", ex);
             }
 
             return responseObj;
@@ -143,7 +161,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                     }
                     else
                     {
@@ -161,7 +179,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
             }
             catch (Exception ex)
             {
-                Logger.LogException("XNV.DSPD", ex);
+                Logger.LogException(CoinPrefix + ".DSPD", ex);
             }
 
             return responseObj;
@@ -187,9 +205,9 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    if(string.IsNullOrEmpty(httpResponse.Content.ReadAsStringAsync().Result))
+                    if (string.IsNullOrEmpty(httpResponse.Content.ReadAsStringAsync().Result))
                     {
-                        Logger.LogInfo("XNV.DGTI", "Response Content is empty");
+                        Logger.LogInfo(CoinPrefix + ".DGTI", "Response Content is empty");
                     }
                     else
                     {
@@ -199,7 +217,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                         if (error != null)
                         {
                             // Set Service error
-                            responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                            responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                         }
                         else
                         {
@@ -208,7 +226,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
 
                             responseObj.Height = getInfoResponse.height;
                             responseObj.TargetHeight = getInfoResponse.target_height;
-                            responseObj.NetworkHashRate = (ulong)(getInfoResponse.difficulty / _blockSeconds);
+                            responseObj.NetworkHashRate = (ulong)(getInfoResponse.difficulty / BlockSeconds);
                             responseObj.ConnectionCountOut = getInfoResponse.outgoing_connections_count;
                             responseObj.ConnectionCountIn = getInfoResponse.incoming_connections_count;
                             responseObj.StartTime = GlobalMethods.UnixTimeStampToDateTime(getInfoResponse.start_time);
@@ -227,18 +245,20 @@ namespace NervaOneWalletMiner.Rpc.Daemon
             }
             catch (Exception ex)
             {
-                Logger.LogException("XNV.DGTI", ex);
+                Logger.LogException(CoinPrefix + ".DGTI", ex);
             }
 
             return responseObj;
         }
 
-        // Internal helper obejcts used to interact with service
+        // Internal helper objects used to interact with service
         private class ResGetInfo
         {
             public ulong height { get; set; }
             public ulong target_height { get; set; }
             public ulong difficulty { get; set; }
+            public string wide_difficulty { get; set; } = string.Empty;
+            public ulong difficulty_top64 { get; set; }
             public ulong target { get; set; }
             public ulong tx_count { get; set; }
             public ulong tx_pool_size { get; set; }
@@ -254,11 +274,13 @@ namespace NervaOneWalletMiner.Rpc.Daemon
             public string nettype { get; set; } = string.Empty;
             public string top_block_hash { get; set; } = string.Empty;
             public ulong cumulative_difficulty { get; set; }
+            public string wide_cumulative_difficulty { get; set; } = string.Empty;
             public ulong cumulative_difficulty_top64 { get; set; }
             public ulong block_size_limit { get; set; }
             public ulong block_weight_limit { get; set; }
             public ulong block_size_median { get; set; }
             public ulong block_weight_median { get; set; }
+            public ulong adjusted_time { get; set; }
             public ulong start_time { get; set; }
             public ulong free_space { get; set; }
             public bool offline { get; set; }
@@ -267,9 +289,12 @@ namespace NervaOneWalletMiner.Rpc.Daemon
             public bool was_bootstrap_ever_used { get; set; }
             public ulong database_size { get; set; }
             public bool update_available { get; set; }
+            public bool busy_syncing { get; set; }
             public string version { get; set; } = string.Empty;
-
-            // From base
+            public bool synchronized { get; set; }
+            public bool restricted { get; set; }
+            public ulong credits { get; set; }
+            public string top_hash { get; set; } = string.Empty;
             public string status { get; set; } = string.Empty;
             public bool untrusted { get; set; }
         }
@@ -296,7 +321,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 {
                     if (string.IsNullOrEmpty(httpResponse.Content.ReadAsStringAsync().Result))
                     {
-                        Logger.LogInfo("XNV.DGTC", "Response Content is empty");
+                        Logger.LogInfo(CoinPrefix + ".DGTC", "Response Content is empty");
                     }
                     else
                     {
@@ -306,10 +331,10 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                         if (error != null)
                         {
                             // Set Service error
-                            responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                            responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                         }
                         else
-                        {                           
+                        {
                             if (jsonObject.SelectToken("result.connections") != null)
                             {
                                 // Set successful response
@@ -325,11 +350,11 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                                         State = connection.state,
                                         IsIncoming = connection.incoming
                                     });
-                                }                                
+                                }
                             }
                             else
                             {
-                                Logger.LogInfo("XNV.DGTC", "Connections missing: " + GlobalMethods.RemoveLineBreaksAndSpaces(httpResponse.Content.ReadAsStringAsync().Result));
+                                Logger.LogInfo(CoinPrefix + ".DGTC", "Connections missing: " + GlobalMethods.RemoveLineBreaksAndSpaces(httpResponse.Content.ReadAsStringAsync().Result));
                             }
 
                             responseObj.Error.IsError = false;
@@ -344,7 +369,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
             }
             catch (Exception ex)
             {
-                Logger.LogException("XNV.DGTC", ex);
+                Logger.LogException(CoinPrefix + ".DGTC", ex);
             }
 
             return responseObj;
@@ -361,6 +386,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
             public string ip { get; set; } = string.Empty;
             public string port { get; set; } = string.Empty;
             public uint rpc_port { get; set; }
+            public uint rpc_credits_per_hash { get; set; }
             public string peer_id { get; set; } = string.Empty;
             public ulong recv_count { get; set; }
             public ulong recv_idle_time { get; set; }
@@ -396,7 +422,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 {
                     if (string.IsNullOrEmpty(httpResponse.Content.ReadAsStringAsync().Result))
                     {
-                        Logger.LogInfo("XNV.DMSS", "Response Content is empty");
+                        Logger.LogInfo(CoinPrefix + ".DMSS", "Response Content is empty");
                     }
                     else
                     {
@@ -406,7 +432,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                         if (error != null)
                         {
                             // Set Service error
-                            responseObj.Error = CommonXNV.GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                            responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
                         }
                         else
                         {
@@ -429,7 +455,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
             }
             catch (Exception ex)
             {
-                Logger.LogException("XNV.DMSS", ex);
+                Logger.LogException(CoinPrefix + ".DMSS", ex);
             }
 
             return responseObj;
@@ -441,6 +467,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
             public long speed { get; set; }
             public int threads_count { get; set; }
             public string address { get; set; } = string.Empty;
+            public string pow_algorithm { get; set; } = string.Empty;
             public bool is_background_mining_enabled { get; set; }
             public int bg_idle_threshold { get; set; }
             public int bg_min_idle_seconds { get; set; }
@@ -449,11 +476,13 @@ namespace NervaOneWalletMiner.Rpc.Daemon
             public int block_target { get; set; }
             public long block_reward { get; set; }
             public long difficulty { get; set; }
+            public string wide_difficulty { get; set; } = string.Empty;
+            public long difficulty_top64 { get; set; }
         }
-        #endregion //Mining Status
+        #endregion // Mining Status
 
 
-        // Internal helper obejcts used to interact with service
+        // Internal helper objects used to interact with service
         private class ResGeneric
         {
             public string status { get; set; } = string.Empty;
