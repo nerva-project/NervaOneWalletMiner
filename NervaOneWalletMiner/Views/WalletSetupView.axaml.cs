@@ -39,6 +39,39 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
+        public async void SweepBelow_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                var prereq = GetVm().CheckPrerequisites(true, "Sweep Below");
+                if (!prereq.IsSuccess)
+                {
+                    await new MessageBoxView(prereq.Title, prereq.Message, true).ShowDialog(GetWindow());
+                    return;
+                }
+
+                var window = new SweepBelowView();
+                DialogResult result = await window.ShowDialog<DialogResult>(GetWindow());
+
+                if (result == null || !result.IsOk)
+                {
+                    return;
+                }
+
+                var opResult = await GetVm().SweepBelow(result.SweepBelowAmount, result.SweepBelowAddress);
+
+                var owner = TopLevel.GetTopLevel(this) as Window;
+                if (owner != null)
+                {
+                    await new MessageBoxView(opResult.Title, opResult.Message, true).ShowDialog(owner);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("WAS.SWBC", ex);
+            }
+        }
+
         public void OpenWalletExportsFolder_Clicked(object sender, RoutedEventArgs args)
         {
             try

@@ -246,6 +246,37 @@ namespace NervaOneWalletMiner.ViewModels
             }
         }
 
+        public async Task<WalletOperationResult> SweepBelow(double amount, string address)
+        {
+            string title = "Sweep Below";
+
+            try
+            {
+                SweepBelowRequest request = new()
+                {
+                    Amount = amount,
+                    WalletAddress = address
+                };
+
+                Logger.LogDebug("WSM.SWBL", "Calling SweepBelow");
+                SweepBelowResponse response = await GlobalData.WalletService.SweepBelow(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
+
+                if (response.Error.IsError)
+                {
+                    Logger.LogError("WSM.SWBL", "Failed to sweep below | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
+                    return new WalletOperationResult(false, title, "Error running sweep below\r\n" + response.Error.Message);
+                }
+
+                Logger.LogDebug("WSM.SWBL", "Sweep below returned successfully");
+                return new WalletOperationResult(true, title, "Sweep below submitted successfully");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("WSM.SWBL", ex);
+                return new WalletOperationResult(false, title, ex.Message);
+            }
+        }
+
         public async Task<WalletOperationResult> RescanSpent()
         {
             string title = "Rescan Spent";
