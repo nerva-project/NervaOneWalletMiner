@@ -1614,6 +1614,66 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         }
         #endregion // Get Transfers Export
 
+        #region Sweep Below
+        /* RPC request params (sweep_all):
+         *  string address;
+         *  uint32_t account_index;
+         *  uint64_t below_amount;          OPT - only outputs below this amount will be swept
+         *  bool get_tx_keys;               OPT
+         *  bool do_not_relay;              OPT
+         *  bool get_tx_hex;                OPT
+         *  bool get_tx_metadata;           OPT
+         */
+        public async Task<SweepBelowResponse> SweepBelow(RpcBase rpc, SweepBelowRequest requestObj)
+        {
+            SweepBelowResponse responseObj = new();
+
+            try
+            {
+                dynamic paramsJson = new JObject();
+                paramsJson.address = requestObj.WalletAddress;
+                paramsJson.account_index = 0;
+                paramsJson.below_amount = AtomicUnitsFromAmount(Convert.ToDecimal(requestObj.Amount));
+
+                var requestJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = "0",
+                    ["method"] = "sweep_all",
+                    ["params"] = paramsJson
+                };
+
+                Logger.LogDebug(CoinPrefix + ".SWBL", "Calling sweep_all with below_amount: " + requestObj.Amount);
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString(), TimeSpan.FromMinutes(60));
+                Logger.LogDebug(CoinPrefix + ".SWBL", "sweep_all returned.");
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+
+                    var error = JObject.Parse(jsonObject.ToString())["error"];
+                    if (error != null)
+                    {
+                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                    }
+                    else
+                    {
+                        responseObj.Error.IsError = false;
+                    }
+                }
+                else
+                {
+                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(CoinPrefix + ".SWBL", ex);
+            }
+
+            return responseObj;
+        }
+        #endregion // Sweep Below
+
         #region Common Internal Helper Objects
         private class TransferEntry
         {

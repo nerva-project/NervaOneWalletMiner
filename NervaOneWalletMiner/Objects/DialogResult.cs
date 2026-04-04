@@ -38,5 +38,9 @@ namespace NervaOneWalletMiner.Objects
 
         // TextBox
         public string TextBoxValue { get; set; } = string.Empty;
+
+        // Sweep Below
+        public double SweepBelowAmount { get; set; } = 0;
+        public string SweepBelowAddress { get; set; } = string.Empty;
     }
 }

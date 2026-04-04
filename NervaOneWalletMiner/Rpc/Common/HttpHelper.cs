@@ -3,6 +3,7 @@ using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NervaOneWalletMiner.Rpc.Common
@@ -11,22 +12,31 @@ namespace NervaOneWalletMiner.Rpc.Common
     {
         private static readonly HttpClient _client = new HttpClient()
         {
-            Timeout = TimeSpan.FromSeconds(50)
+            Timeout = Timeout.InfiniteTimeSpan
         };
 
+        private static readonly TimeSpan _defaultTimeout = TimeSpan.FromSeconds(50);
+
         public static async Task<HttpResponseMessage> GetPostFromService(string serviceUrl, string postContent)
+        {
+            return await GetPostFromService(serviceUrl, postContent, _defaultTimeout);
+        }
+
+        public static async Task<HttpResponseMessage> GetPostFromService(string serviceUrl, string postContent, TimeSpan timeout)
         {
             HttpResponseMessage response = new HttpResponseMessage();
 
             try
             {
+                using CancellationTokenSource cts = new CancellationTokenSource(timeout);
+
                 HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, serviceUrl);
                 request.Content = new StringContent(postContent);
                 request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
                 //Logger.LogDebug("HTTP.GPFS", "Calling POST: " + serviceUrl);
 
-                response = await _client.SendAsync(request);
+                response = await _client.SendAsync(request, cts.Token);
 
                 //Logger.LogDebug("HTTP.GPFS", "Call returned: " + serviceUrl);
             }
@@ -40,10 +50,17 @@ namespace NervaOneWalletMiner.Rpc.Common
 
         public static async Task<HttpResponseMessage> GetPostFromService(string serviceUrl, string postContent, string userName, string password)
         {
+            return await GetPostFromService(serviceUrl, postContent, userName, password, _defaultTimeout);
+        }
+
+        public static async Task<HttpResponseMessage> GetPostFromService(string serviceUrl, string postContent, string userName, string password, TimeSpan timeout)
+        {
             HttpResponseMessage response = new HttpResponseMessage();
 
             try
             {
+                using CancellationTokenSource cts = new CancellationTokenSource(timeout);
+
                 HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, serviceUrl);
 
                 var authentication = userName + ":" + password;
@@ -55,7 +72,7 @@ namespace NervaOneWalletMiner.Rpc.Common
 
                 //Logger.LogDebug("HTTP.GPSA", "Calling POST: " + serviceUrl);
 
-                response = await _client.SendAsync(request);
+                response = await _client.SendAsync(request, cts.Token);
 
                 //Logger.LogDebug("HTTP.GPSA", "Call returned: " + serviceUrl);
             }
