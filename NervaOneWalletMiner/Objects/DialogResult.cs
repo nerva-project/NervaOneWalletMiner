@@ -10,7 +10,7 @@ namespace NervaOneWalletMiner.Objects
 
         // Open, create wallet, restore from seed
         public string WalletName { get; set; } = string.Empty;
-        public string WalletPassword { get; set; } = string.Empty;
+        public char[] WalletPassword { get; set; } = [];
 
         // Create wallet, restore from seed
         public string WalletLanguage { get; set; } = Language.English;
@@ -25,13 +25,13 @@ namespace NervaOneWalletMiner.Objects
         public bool IsSplitTranfer { get;set; } = false;
 
         // Restore from Seed
-        public string SeedPhrase { get; set; } = string.Empty;
+        public char[] SeedPhrase { get; set; } = [];
         public string SeedOffset { get; set; } = string.Empty;
 
         // Restore from Keys
         public string WalletAddress { get; set;} = string.Empty;
-        public string ViewKey { get; set; } = string.Empty;
-        public string SpendKey {  get; set; } = string.Empty;
+        public char[] ViewKey { get; set; } = [];
+        public char[] SpendKey {  get; set; } = [];
 
         // Restart with commands
         public string RestartOptions { get; set; } = string.Empty;

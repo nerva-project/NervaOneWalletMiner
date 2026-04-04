@@ -120,7 +120,7 @@ namespace NervaOneWalletMiner.ViewModels
             }
         }
 
-        public async Task<WalletOperationResult> CreateNewWallet(string walletName, string walletPassword, string walletLanguage)
+        public async Task<WalletOperationResult> CreateNewWallet(string walletName, char[] walletPassword, string walletLanguage)
         {
             string title = "Create Wallet";
             CreateWalletRequest request;
@@ -155,11 +155,12 @@ namespace NervaOneWalletMiner.ViewModels
             }
             finally
             {
+                Array.Clear(walletPassword, 0, walletPassword.Length);
                 request = new();
             }
         }
 
-        public async Task<WalletOperationResult> RestoreFromSeed(string seed, string seedOffset, string walletName, string walletPassword, string walletLanguage)
+        public async Task<WalletOperationResult> RestoreFromSeed(char[] seed, string seedOffset, string walletName, char[] walletPassword, string walletLanguage)
         {
             string title = "Restore from Seed";
             RestoreFromSeedRequest request;
@@ -195,26 +196,29 @@ namespace NervaOneWalletMiner.ViewModels
             }
             finally
             {
-                seed = walletPassword = string.Empty;
+                Array.Clear(seed, 0, seed.Length);
+                Array.Clear(walletPassword, 0, walletPassword.Length);
                 request = new();
             }
         }
 
-        public async Task<WalletOperationResult> RestoreFromKeys(string walletAddress, string viewKey, string spendKey, string walletName, string walletPassword, string walletLanguage)
+        public async Task<WalletOperationResult> RestoreFromKeys(string walletAddress, char[] viewKey, char[] spendKey, string walletName, char[] walletPassword, string walletLanguage)
         {
             string title = "Restore from Keys";
-            RestoreFromKeysRequest request = new()
-            {
-                WalletAddress = walletAddress,
-                ViewKey = viewKey,
-                SpendKey = spendKey,
-                WalletName = walletName,
-                Password = walletPassword,
-                Language = walletLanguage
-            };
+            RestoreFromKeysRequest request;
 
             try
             {
+                request = new()
+                {
+                    WalletAddress = walletAddress,
+                    ViewKey = viewKey,
+                    SpendKey = spendKey,
+                    WalletName = walletName,
+                    Password = walletPassword,
+                    Language = walletLanguage
+                };
+
                 RestoreFromKeysResponse response = await GlobalData.WalletService.RestoreFromKeys(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
 
                 if (response.Error.IsError)
@@ -235,7 +239,9 @@ namespace NervaOneWalletMiner.ViewModels
             }
             finally
             {
-                viewKey = spendKey = walletPassword = string.Empty;
+                Array.Clear(viewKey, 0, viewKey.Length);
+                Array.Clear(spendKey, 0, spendKey.Length);
+                Array.Clear(walletPassword, 0, walletPassword.Length);
                 request = new();
             }
         }
@@ -301,7 +307,7 @@ namespace NervaOneWalletMiner.ViewModels
             }
         }
 
-        public bool VerifyPasswordLocally(string password)
+        public bool VerifyPasswordLocally(char[] password)
         {
             try
             {
@@ -312,6 +318,10 @@ namespace NervaOneWalletMiner.ViewModels
                 Logger.LogException("WSM.VRPL", ex);
                 return false;
             }
+            finally
+            {
+                Array.Clear(password, 0, password.Length);
+            }
         }
 
         public async Task<WalletOperationResult> UnlockWithPassword(string password)
@@ -319,7 +329,7 @@ namespace NervaOneWalletMiner.ViewModels
             string title = "Unlock Wallet";
             UnlockWithPassRequest request = new()
             {
-                Password = password,
+                Password = password.ToCharArray(),
                 TimeoutInSeconds = GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].UnlockMinutes * 60
             };
 

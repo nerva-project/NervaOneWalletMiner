@@ -57,13 +57,16 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     {
                         IsOk = true,
                         WalletAddress = tbxWalletAddress.Text,
-                        ViewKey = tbxViewKey.Text,
-                        SpendKey = tbxSpendKey.Text!,
+                        ViewKey = tbxViewKey.Text.ToCharArray(),
+                        SpendKey = tbxSpendKey.Text!.ToCharArray(),
                         WalletName = tbxWalletName.Text,
-                        WalletPassword = tbxPassword.Text,
+                        WalletPassword = tbxPassword.Text.ToCharArray(),
                         WalletLanguage = cbxLanguage.SelectedValue == null ? Language.English : cbxLanguage.SelectedValue.ToString()!
                     };
 
+                    tbxViewKey.Text = string.Empty;
+                    tbxSpendKey.Text = string.Empty;
+                    tbxPassword.Text = string.Empty;
                     Close(result);
                 }
             }

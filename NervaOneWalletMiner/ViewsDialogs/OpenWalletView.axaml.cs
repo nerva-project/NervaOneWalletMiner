@@ -96,9 +96,10 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     {
                         IsOk = true,
                         WalletName = cbxWalletName.SelectedValue.ToString()!,
-                        WalletPassword = tbxPassword.Text!
+                        WalletPassword = tbxPassword.Text!.ToCharArray()
                     };
 
+                    tbxPassword.Text = string.Empty;
                     Close(result);
                 }
             }

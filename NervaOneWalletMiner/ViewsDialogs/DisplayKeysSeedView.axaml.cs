@@ -46,9 +46,11 @@ namespace NervaOneWalletMiner.ViewsDialogs
                 else
                 {
                     tbxPublicViewKey.Text = response.PublicViewKey;
-                    tbxPrivateViewKey.Text = response.PrivateViewKey;
+                    tbxPrivateViewKey.Text = new string(response.PrivateViewKey);
                     tbxPublicSpendKey.Text = response.PublicSpendKey;
-                    tbxPrivateSpendKey.Text = response.PrivateSpendKey;
+                    tbxPrivateSpendKey.Text = new string(response.PrivateSpendKey);
+                    Array.Clear(response.PrivateViewKey, 0, response.PrivateViewKey.Length);
+                    Array.Clear(response.PrivateSpendKey, 0, response.PrivateSpendKey.Length);
                     tbkMessage.Text = message;
                     response = new GetPrivateKeysResponse();
 
@@ -60,7 +62,8 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     }
                     else
                     {
-                        tbxMnemonicSeed.Text = response.Mnemonic;
+                        tbxMnemonicSeed.Text = new string(response.Mnemonic);
+                        Array.Clear(response.Mnemonic, 0, response.Mnemonic.Length);
                         response = new GetPrivateKeysResponse();
                     }                        
                 }
@@ -221,11 +224,14 @@ namespace NervaOneWalletMiner.ViewsDialogs
 
         protected override void OnClosing(WindowClosingEventArgs e)
         {
+            // Clear sensitive items as good as we can.
             tbxPublicViewKey.Text = "";
             tbxPrivateViewKey.Text = "";
             tbxPublicSpendKey.Text = "";
             tbxPrivateSpendKey.Text = "";
             tbxMnemonicSeed.Text = "";
+
+            TopLevel.GetTopLevel(this)?.Clipboard?.ClearAsync();
 
             base.OnClosing(e);
         }

@@ -48,10 +48,11 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     {
                         IsOk = true,
                         WalletName = tbxWalletName.Text,
-                        WalletPassword = tbxPassword.Text,
+                        WalletPassword = tbxPassword.Text.ToCharArray(),
                         WalletLanguage = cbxLanguage.SelectedValue == null ? Language.English : cbxLanguage.SelectedValue.ToString()!
                     };
 
+                    tbxPassword.Text = string.Empty;
                     Close(result);
                 }
             }

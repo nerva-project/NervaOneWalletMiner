@@ -2,7 +2,7 @@
 {
     public class UnlockWithPassRequest
     {
-        public string Password { get; set; } = string.Empty;
+        public char[] Password { get; set; } = [];
         public int TimeoutInSeconds { get; set; } = 60;
     }
 }

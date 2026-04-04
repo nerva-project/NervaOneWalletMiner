@@ -87,7 +87,7 @@ namespace NervaOneWalletMiner.Views
                     return;
                 }
 
-                if (string.IsNullOrEmpty(result.WalletName) || string.IsNullOrEmpty(result.WalletPassword))
+                if (string.IsNullOrEmpty(result.WalletName) || result.WalletPassword.Length == 0)
                 {
                     return;
                 }
@@ -130,7 +130,7 @@ namespace NervaOneWalletMiner.Views
                     return;
                 }
 
-                if (string.IsNullOrEmpty(result.SeedPhrase) || string.IsNullOrEmpty(result.WalletName) || string.IsNullOrEmpty(result.WalletPassword))
+                if (result.SeedPhrase.Length == 0 || string.IsNullOrEmpty(result.WalletName) || result.WalletPassword.Length == 0)
                 {
                     return;
                 }
@@ -171,8 +171,11 @@ namespace NervaOneWalletMiner.Views
                     return;
                 }
 
-                if (string.IsNullOrEmpty(result.WalletAddress) || string.IsNullOrEmpty(result.ViewKey) || string.IsNullOrEmpty(result.SpendKey)
-                    || string.IsNullOrEmpty(result.WalletName) || string.IsNullOrEmpty(result.WalletPassword))
+                if (string.IsNullOrEmpty(result.WalletAddress)
+                    || result.ViewKey.Length == 0
+                    || result.SpendKey.Length == 0
+                    || string.IsNullOrEmpty(result.WalletName)
+                    || result.WalletPassword.Length == 0)
                 {
                     return;
                 }
@@ -240,11 +243,13 @@ namespace NervaOneWalletMiner.Views
         #region View Keys/Seed
         public async void ViewKeysSeed_Clicked(object sender, RoutedEventArgs args)
         {
+            string title = "View Keys and Seed";
+
             try
             {
                 var vm = GetVm();
 
-                var prereq = vm.CheckPrerequisites(true, "View Keys and Seed");
+                var prereq = vm.CheckPrerequisites(true, title);
                 if (!prereq.IsSuccess)
                 {
                     await new MessageBoxView(prereq.Title, prereq.Message, true).ShowDialog(GetWindow());
@@ -268,10 +273,14 @@ namespace NervaOneWalletMiner.Views
 
                     if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPassRequiredToOpenWallet)
                     {
-                        isAuthorized = vm.VerifyPasswordLocally(passRes.TextBoxValue);
+                        isAuthorized = vm.VerifyPasswordLocally(passRes.TextBoxValue.ToCharArray());
                         if (isAuthorized)
                         {
                             GlobalData.WalletPassProvidedTime = DateTime.Now;
+                        }
+                        else
+                        {
+                            await new MessageBoxView(title, "Incorrect password", true).ShowDialog(GetWindow());
                         }
                     }
                     else

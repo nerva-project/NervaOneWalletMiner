@@ -131,7 +131,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 // Build request content json
                 var requestParams = new JObject
                 {
-                    ["passphrase"] = requestObj.Password,
+                    ["passphrase"] = new string(requestObj.Password),
                     ["timeout"] = requestObj.TimeoutInSeconds
                 };
 
@@ -170,6 +170,10 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             catch (Exception ex)
             {
                 Logger.LogException("DAS.WOPW", ex);
+            }
+            finally
+            {
+                Array.Clear(requestObj.Password, 0, requestObj.Password.Length);
             }
 
             return responseObj;
@@ -243,7 +247,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 var requestParams = new JObject
                 {
                     ["wallet_name"] = requestObj.WalletName,
-                    ["passphrase"] = requestObj.Password
+                    ["passphrase"] = new string(requestObj.Password)
                 };
 
                 var requestJson = new JObject
@@ -280,6 +284,10 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             catch (Exception ex)
             {
                 Logger.LogException("DAS.WCRW", ex);
+            }
+            finally
+            {
+                Array.Clear(requestObj.Password, 0, requestObj.Password.Length);
             }
 
             return responseObj;
