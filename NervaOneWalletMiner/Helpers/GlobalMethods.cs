@@ -1221,6 +1221,16 @@ namespace NervaOneWalletMiner.Helpers
             GlobalData.IsCliToolsDownloading = false;
             GlobalData.ConnectGuardLastGoodTime = DateTime.Now;
             GlobalData.ConnectGuardRestartCount = 1;
+
+            if (GlobalData.ViewModelPages.ContainsKey(SplitViewPages.DaemonSetup))
+            {
+                GlobalData.ViewModelPages[SplitViewPages.DaemonSetup] = new DaemonSetupViewModel();
+            }
+
+            if (GlobalData.ViewModelPages.ContainsKey(SplitViewPages.WalletSetup))
+            {
+                GlobalData.ViewModelPages[SplitViewPages.WalletSetup] = new WalletSetupViewModel();
+            }
         }
         #endregion // Misc Methods
 
