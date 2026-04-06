@@ -46,7 +46,7 @@ namespace NervaOneWalletMiner.Helpers
 
         // Those will be saved to and read from app.config
         public static ApplicationSettings AppSettings = new();
-        public static bool IsConfigFound = false;
+        public static volatile bool IsConfigFound = false;
 
         public static IWalletService WalletService = new WalletServiceXNV();
         public static IDaemonService DaemonService = new DaemonServiceXNV();
@@ -58,17 +58,17 @@ namespace NervaOneWalletMiner.Helpers
         public static readonly string ExportsDir = GlobalMethods.GetExportsDir();
         public static readonly string ConfigFileNameWithPath = GlobalMethods.GetConfigFileNameWithPath();
 
-        public static bool IsDaemonRestarting = false;
-        public static bool IsInitialDaemonConnectionSuccess = false;
+        public static volatile bool IsDaemonRestarting = false;
+        public static volatile bool IsInitialDaemonConnectionSuccess = false;
         public static DateTime LastDaemonResponseTime = DateTime.Now;
         public static DateTime LastDaemonRestartAttempt = DateTime.MinValue;
 
-        public static bool IsManualStoppedMining = false;        
-        public static bool IsNoConnectionsStoppedMining = false;
-        public static bool IsHashRateMonitoringStoppedMining = false;
+        public static volatile bool IsManualStoppedMining = false;
+        public static volatile bool IsNoConnectionsStoppedMining = false;
+        public static volatile bool IsHashRateMonitoringStoppedMining = false;
 
-        public static bool IsWalletOpen = false;
-        public static bool IsWalletJustOpened = true;
+        public static volatile bool IsWalletOpen = false;
+        public static volatile bool IsWalletJustOpened = true;
         public static string OpenedWalletName = string.Empty;
         public static DateTime WalletPassProvidedTime = DateTime.MinValue;
         
@@ -81,11 +81,13 @@ namespace NervaOneWalletMiner.Helpers
         public static StatsTransfers TransfersStats = new();
         public static AddressBook AddressBook = new();
 
-        public static bool IsGetAndSetTransfersDataComplete = true;
-        public static bool IsGetAndSetWalletDataComplete = true;
-        public static bool IsGetAndSetDaemonDataComplete = true;
-        public static bool IsCliToolsFound = true;
-        public static bool IsCliToolsDownloading = false;
+        public static volatile bool IsWalletUpdateComplete = true;
+        public static volatile bool IsGetAndSetTransfersDataComplete = true;
+        public static volatile bool IsGetAndSetWalletDataComplete = true;
+        public static volatile bool IsGetAndSetDaemonDataComplete = true;
+
+        public static volatile bool IsCliToolsFound = true;
+        public static volatile bool IsCliToolsDownloading = false;
 
         // Connections Guard
         public static DateTime ConnectGuardLastGoodTime = DateTime.Now;
@@ -107,7 +109,7 @@ namespace NervaOneWalletMiner.Helpers
         public static Bitmap Logo = GlobalMethods.GetLogo();
         
         // Views reaload when you switch pages so you will have the same event registered many times. This will prevent it
-        public static bool AreWalletEventsRegistered = false;
-        public static bool AreDaemonEventsRegistered = false;
+        public static volatile bool AreWalletEventsRegistered = false;
+        public static volatile bool AreDaemonEventsRegistered = false;
     }
 }

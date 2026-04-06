@@ -243,8 +243,8 @@ namespace NervaOneWalletMiner.Views
                         }
                         else
                         {
-                            Logger.LogDebug("WAL.SHRL", "Account label changed successfully to " + request.Label);
-                            UIManager.GetAndSetWalletData();
+                            Logger.LogDebug("WAL.SHRL", "Account label changed successfully to " + request.Label);                            
+                            UIManager.CallWalletDataMethodsInSync();
 
                             if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsSavingWalletSupported)
                             {

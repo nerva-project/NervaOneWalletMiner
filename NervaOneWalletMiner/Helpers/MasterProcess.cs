@@ -162,24 +162,9 @@ namespace NervaOneWalletMiner.Helpers
                     && (GlobalData.IsInitialDaemonConnectionSuccess || GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
                     && GlobalData.IsWalletOpen)
                 {
-                    if (GlobalData.IsWalletJustOpened)
+                    if (GlobalData.IsWalletJustOpened || (_masterTimerCount % (GlobalData.AppSettings.TimerIntervalMultiplier * 2) == 0))
                     {
-                        UIManager.GetAndSetWalletData();
-                        UIManager.GetAndSetTransfersData();
-                        if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletHeightSupported)
-                        {
-                            SetWalletHeight();
-                        }
-                    }
-                    else if (_masterTimerCount % (GlobalData.AppSettings.TimerIntervalMultiplier * 2) == 0)
-                    {
-                        // Update wallet every 2nd call because you do not need to do it more often
-                        UIManager.GetAndSetWalletData();
-                        UIManager.GetAndSetTransfersData();
-                        if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletHeightSupported)
-                        {
-                            SetWalletHeight();
-                        }
+                        UIManager.CallWalletDataMethodsInSync();
                     }
                 }
 
@@ -378,27 +363,6 @@ namespace NervaOneWalletMiner.Helpers
             catch (Exception ex)
             {
                 Logger.LogException("MSP.HMSS", ex);
-            }
-        }
-
-        public static async void SetWalletHeight()
-        {
-            try
-            {
-                GetHeightResponse response = await GlobalData.WalletService.GetHeight(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new GetHeightRequest());
-
-                if (response.Error.IsError)
-                {
-                    Logger.LogError("MSP.SWHT", "GetTransfers Error | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
-                }
-                else
-                {
-                    GlobalData.WalletHeight = response.Height;
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException("MSP.SWHT", ex);
             }
         }
     }

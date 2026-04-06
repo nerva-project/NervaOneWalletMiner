@@ -14,6 +14,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using System.Collections.ObjectModel;
 using Avalonia.Threading;
+using System.Threading.Tasks;
 
 namespace NervaOneWalletMiner.Helpers
 {
@@ -759,7 +760,34 @@ namespace NervaOneWalletMiner.Helpers
             }
         }
 
-        public static async void GetAndSetWalletData()
+        public static async void CallWalletDataMethodsInSync()
+        {
+            try
+            {
+                if (GlobalData.IsWalletUpdateComplete)
+                {
+                    GlobalData.IsWalletUpdateComplete = false;
+
+                    await GetAndSetWalletData();
+
+                    if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletHeightSupported)
+                    {
+                        await GetAndSetWalletHeight();
+                    }
+
+                    await GetAndSetTransfersData();
+
+                    GlobalData.IsWalletUpdateComplete = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("UIM.CWDS", ex);
+                GlobalData.IsWalletUpdateComplete = true;
+            }
+        }
+
+        public static async Task GetAndSetWalletData()
         {
             try
             {
@@ -802,7 +830,7 @@ namespace NervaOneWalletMiner.Helpers
             }
         }
 
-        public static async void GetAndSetTransfersData()
+        public static async Task GetAndSetTransfersData()
         {
             try
             {
@@ -875,6 +903,27 @@ namespace NervaOneWalletMiner.Helpers
             {
                 GlobalData.IsGetAndSetTransfersDataComplete = true;
                 Logger.LogException("UIM.GSTD", ex);
+            }
+        }
+
+        public static async Task GetAndSetWalletHeight()
+        {
+            try
+            {
+                GetHeightResponse response = await GlobalData.WalletService.GetHeight(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new GetHeightRequest());
+
+                if (response.Error.IsError)
+                {
+                    Logger.LogError("UIM.GSWH", "GetHeight Error | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
+                }
+                else
+                {
+                    GlobalData.WalletHeight = response.Height;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("UIM.GSWH", ex);
             }
         }
         #endregion // Get Data for UI
