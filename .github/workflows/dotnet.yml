@@ -175,3 +175,39 @@ jobs:
                 path: |
                   ./NervaOneWalletMiner.Desktop/bin/*
                   !./NervaOneWalletMiner.Desktop/bin/release/
+
+
+# ================================
+#              Android
+# ================================
+    build-android:
+        needs: setup
+        runs-on: ubuntu-latest
+
+        steps:
+          - name: Checkout Repository
+            uses: actions/checkout@v5
+
+          - name: Setup .NET
+            uses: actions/setup-dotnet@v5
+            with:
+                dotnet-version: 8.0.x
+
+          - name: Install Android Workload
+            run: dotnet workload install android
+
+          - name: Restore Dependencies
+            run: |
+                cd ./NervaOneWalletMiner.Android
+                dotnet restore
+
+          - name: Build for Android
+            run: |
+                cd ./NervaOneWalletMiner.Android
+                dotnet publish NervaOneWalletMiner.Android.csproj -c Release -f net8.0-android -p:ApplicationDisplayVersion=${{ needs.setup.outputs.version }}
+
+          - name: Upload Android Artifacts
+            uses: actions/upload-artifact@v6
+            with:
+                name: nervaone-mobile-v${{ needs.setup.outputs.version }}-android
+                path: ./NervaOneWalletMiner.Android/bin/Release/net8.0-android/publish/*.apk
