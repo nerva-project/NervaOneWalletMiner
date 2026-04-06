@@ -215,4 +215,4 @@ jobs:
             uses: actions/upload-artifact@v6
             with:
                 name: nervaone-mobile-v${{ needs.setup.outputs.version }}-android
-                path: ./NervaOneWalletMiner.Android/bin/Release/net8.0-android/android-arm64/publish/*.apk
+                path: ./NervaOneWalletMiner.Android/bin/Release/net8.0-android/android-arm64/publish/*-Signed.apk
