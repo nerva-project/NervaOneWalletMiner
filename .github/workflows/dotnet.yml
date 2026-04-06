@@ -209,8 +209,6 @@ jobs:
                 cd ./NervaOneWalletMiner.Android
                 dotnet publish NervaOneWalletMiner.Android.csproj -c Release -f net8.0-android \
                   -p:ApplicationDisplayVersion=${{ needs.setup.outputs.version }} \
-                  -p:RuntimeIdentifiers=android-arm64 \
-                  -p:PublishTrimmed=true \
                   -p:RunAOTCompilation=false
 
           - name: Upload Android Artifacts
