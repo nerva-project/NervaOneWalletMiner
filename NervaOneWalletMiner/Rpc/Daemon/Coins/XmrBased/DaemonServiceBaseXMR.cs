@@ -8,6 +8,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace NervaOneWalletMiner.Rpc.Daemon
@@ -17,15 +18,17 @@ namespace NervaOneWalletMiner.Rpc.Daemon
         protected abstract string CoinPrefix { get; }
         protected abstract double BlockSeconds { get; }
 
-        protected ServiceError GetServiceError(string source, dynamic error)
+        protected static string GetCallerName([CallerMemberName] string name = "") => name;
+
+        protected ServiceError GetServiceError(string source, JToken error)
         {
             ServiceError serviceError = new();
 
             try
             {
                 serviceError.IsError = true;
-                serviceError.Code = error["code"].ToString();
-                serviceError.Message = error["message"].ToString();
+                serviceError.Code = error["code"]?.ToString() ?? string.Empty;
+                serviceError.Message = error["message"]?.ToString() ?? string.Empty;
             }
             catch (Exception ex)
             {
@@ -59,18 +62,18 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "start_mining"), requestJson.ToString());
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+                    JObject jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
 
-                    var error = JObject.Parse(jsonObject.ToString())["error"];
+                    var error = jsonObject["error"];
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(GetCallerName(), error);
                     }
                     else
                     {
                         // Set successful response
-                        ResGeneric startMiningResponse = JsonConvert.DeserializeObject<ResGeneric>(jsonObject.ToString());
+                        ResGeneric startMiningResponse = JsonConvert.DeserializeObject<ResGeneric>(jsonObject.ToString())!;
 
                         responseObj.Status = startMiningResponse.status;
                         responseObj.Untrusted = startMiningResponse.untrusted;
@@ -81,7 +84,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 else
                 {
                     // Set HTTP error
-                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
+                    responseObj.Error = HttpHelper.GetHttpError(GetCallerName(), httpResponse);
                 }
             }
             catch (Exception ex)
@@ -107,18 +110,18 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "stop_mining"), requestJson.ToString());
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+                    JObject jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
 
-                    var error = JObject.Parse(jsonObject.ToString())["error"];
+                    var error = jsonObject["error"];
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(GetCallerName(), error);
                     }
                     else
                     {
                         // Set successful response
-                        ResGeneric startMiningResponse = JsonConvert.DeserializeObject<ResGeneric>(jsonObject.ToString());
+                        ResGeneric startMiningResponse = JsonConvert.DeserializeObject<ResGeneric>(jsonObject.ToString())!;
 
                         responseObj.Status = startMiningResponse.status;
                         responseObj.Untrusted = startMiningResponse.untrusted;
@@ -129,7 +132,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 else
                 {
                     // Set HTTP error
-                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
+                    responseObj.Error = HttpHelper.GetHttpError(GetCallerName(), httpResponse);
                 }
             }
             catch (Exception ex)
@@ -155,18 +158,18 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "stop_daemon"), requestJson.ToString());
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+                    JObject jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
 
-                    var error = JObject.Parse(jsonObject.ToString())["error"];
+                    var error = jsonObject["error"];
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(GetCallerName(), error);
                     }
                     else
                     {
                         // Set successful response
-                        ResGeneric startMiningResponse = JsonConvert.DeserializeObject<ResGeneric>(jsonObject.ToString());
+                        ResGeneric startMiningResponse = JsonConvert.DeserializeObject<ResGeneric>(jsonObject.ToString())!;
 
                         responseObj.Error.IsError = false;
                     }
@@ -174,7 +177,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 else
                 {
                     // Set HTTP error
-                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
+                    responseObj.Error = HttpHelper.GetHttpError(GetCallerName(), httpResponse);
                 }
             }
             catch (Exception ex)
@@ -211,18 +214,18 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                     }
                     else
                     {
-                        dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+                        JObject jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
 
-                        var error = JObject.Parse(jsonObject.ToString())["error"];
+                        var error = jsonObject["error"];
                         if (error != null)
                         {
                             // Set Service error
-                            responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                            responseObj.Error = GetServiceError(GetCallerName(), error);
                         }
                         else
                         {
                             // Set successful response
-                            ResGetInfo getInfoResponse = JsonConvert.DeserializeObject<ResGetInfo>(jsonObject.SelectToken("result").ToString());
+                            ResGetInfo getInfoResponse = JsonConvert.DeserializeObject<ResGetInfo>(jsonObject.SelectToken("result")!.ToString())!;
 
                             responseObj.Height = getInfoResponse.height;
                             responseObj.TargetHeight = getInfoResponse.target_height;
@@ -240,7 +243,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 else
                 {
                     // Set HTTP error
-                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
+                    responseObj.Error = HttpHelper.GetHttpError(GetCallerName(), httpResponse);
                 }
             }
             catch (Exception ex)
@@ -325,20 +328,20 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                     }
                     else
                     {
-                        dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+                        JObject jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
 
-                        var error = JObject.Parse(jsonObject.ToString())["error"];
+                        var error = jsonObject["error"];
                         if (error != null)
                         {
                             // Set Service error
-                            responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                            responseObj.Error = GetServiceError(GetCallerName(), error);
                         }
                         else
                         {
                             if (jsonObject.SelectToken("result.connections") != null)
                             {
                                 // Set successful response
-                                List<ResGetConnections> getConnectionsResponse = JsonConvert.DeserializeObject<List<ResGetConnections>>(jsonObject.SelectToken("result.connections").ToString());
+                                List<ResGetConnections> getConnectionsResponse = JsonConvert.DeserializeObject<List<ResGetConnections>>(jsonObject.SelectToken("result.connections")!.ToString())!;
 
                                 foreach (ResGetConnections connection in getConnectionsResponse)
                                 {
@@ -364,7 +367,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 else
                 {
                     // Set HTTP error
-                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
+                    responseObj.Error = HttpHelper.GetHttpError(GetCallerName(), httpResponse);
                 }
             }
             catch (Exception ex)
@@ -426,18 +429,18 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                     }
                     else
                     {
-                        dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+                        JObject jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
 
-                        var error = JObject.Parse(jsonObject.ToString())["error"];
+                        var error = jsonObject["error"];
                         if (error != null)
                         {
                             // Set Service error
-                            responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                            responseObj.Error = GetServiceError(GetCallerName(), error);
                         }
                         else
                         {
                             // Set successful response
-                            ResMiningStatus getConnectionsResponse = JsonConvert.DeserializeObject<ResMiningStatus>(jsonObject.ToString());
+                            ResMiningStatus getConnectionsResponse = JsonConvert.DeserializeObject<ResMiningStatus>(jsonObject.ToString())!;
 
                             responseObj.IsActive = getConnectionsResponse.active;
                             responseObj.Speed = getConnectionsResponse.speed;
@@ -450,7 +453,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 else
                 {
                     // Set HTTP error
-                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
+                    responseObj.Error = HttpHelper.GetHttpError(GetCallerName(), httpResponse);
                 }
             }
             catch (Exception ex)
