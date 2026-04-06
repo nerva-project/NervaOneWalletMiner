@@ -193,6 +193,9 @@ jobs:
             with:
                 dotnet-version: 8.0.x
 
+          - name: Pin .NET SDK Version
+            run: echo '{"sdk":{"version":"8.0.0","rollForward":"latestFeature"}}' > global.json
+
           - name: Install Android Workload
             run: dotnet workload install android
 
