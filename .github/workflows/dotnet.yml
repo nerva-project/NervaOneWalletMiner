@@ -159,7 +159,7 @@ jobs:
 
           - name: Generate Plist
             run: |
-              plist=$(sed -e "s/{APP_VERSION}/0.8.4.0/" -e "s/{DISPLAY_NAME}/NervaOne/" ./Builder/Info.plist.template)
+              plist=$(sed -e "s/{APP_VERSION}/${{ needs.setup.outputs.version }}/" ./Builder/Info.plist.template)
               echo "$plist" > ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop.app/Contents/Info.plist
 
           - name: Copy Icons and Launcher

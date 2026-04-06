@@ -2,8 +2,6 @@
 
 dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-bd=~/Downloads/NervaOneDesktop
-
 dd=~/.local/share/applications/nervaone.desktop
 
 
@@ -12,8 +10,8 @@ echo "[Desktop Entry]" > ${dd}
 echo "Type=Application" >> ${dd}
 echo "Name=NervaOne" >> ${dd}
 echo "Comment=NervaOne Desktop" >> ${dd}
-echo "Exec=${bd}/Contents/NervaOneDesktop" >> ${dd}
-echo "Icon=${bd}/Resources/nerva-logo-color.png" >> ${dd}
+echo "Exec=${dir}/Contents/NervaOneDesktop" >> ${dd}
+echo "Icon=${dir}/Resources/nerva-logo-color.png" >> ${dd}
 echo "Terminal=false" >> ${dd}
 
 chmod +x ${dd}

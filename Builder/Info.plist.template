@@ -14,8 +14,6 @@
 	<string>en</string>
 	<key>CFBundleIconFile</key>
 	<string>nerva-logo-color-2.icns</string>
-	<key>CFBundleVersion</key>
-    <string>1</string>
 	<key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundlePackageType</key>
