@@ -30,6 +30,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private string _CliUrlLinuxArm = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-aarch64-linux-gnu-v0.11.3.0.tar.bz2";
         private string _CliUrlMacIntel = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-x86_64-apple-darwin11-v0.11.3.0.tar.bz2";
         private string _CliUrlMacArm = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-aarch64-apple-darwin11-v0.11.3.0.tar.bz2";
+        private string _CliUrlAndroid = string.Empty;
 
         private string _PublicNodeUrlDefault = "node.monerodevs.org:34568";
 
@@ -65,6 +66,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public string CliUrlLinuxArm { get => _CliUrlLinuxArm; set => _CliUrlLinuxArm = value; }
         public string CliUrlMacIntel { get => _CliUrlMacIntel; set => _CliUrlMacIntel = value; }
         public string CliUrlMacArm { get => _CliUrlMacArm; set => _CliUrlMacArm = value; }
+        public string CliUrlAndroid { get => _CliUrlAndroid; set => _CliUrlAndroid = value; }
 
         public string PublicNodeUrlDefault { get => _PublicNodeUrlDefault; set => _PublicNodeUrlDefault = value; }
 

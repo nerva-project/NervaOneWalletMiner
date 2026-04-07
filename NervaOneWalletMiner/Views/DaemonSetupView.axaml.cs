@@ -109,11 +109,18 @@ namespace NervaOneWalletMiner.Views
                 string cliToolsLink = GetVm().GetCliToolsDownloadLink();
                 Logger.LogDebug("DMS.UCTC", "Updating client tools");
 
-                var window = new TextBoxView("Update Client Tools", "Client Tools Download Link", cliToolsLink, string.Empty);
-                DialogResult result = await window.ShowDialog<DialogResult>(GetWindow());
-                if (result != null && result.IsOk && !string.IsNullOrEmpty(result.TextBoxValue))
+                if (OperatingSystem.IsAndroid())
                 {
-                    await GetVm().PerformCliToolsUpdate(result.TextBoxValue);
+                    await GetVm().PerformCliToolsUpdate(cliToolsLink);
+                }
+                else
+                {
+                    var window = new TextBoxView("Update Client Tools", "Client Tools Download Link", cliToolsLink, string.Empty);
+                    DialogResult result = await window.ShowDialog<DialogResult>(GetWindow());
+                    if (result != null && result.IsOk && !string.IsNullOrEmpty(result.TextBoxValue))
+                    {
+                        await GetVm().PerformCliToolsUpdate(result.TextBoxValue);
+                    }
                 }
             }
             catch (Exception ex)

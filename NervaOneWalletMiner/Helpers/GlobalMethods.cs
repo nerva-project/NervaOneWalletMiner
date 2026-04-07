@@ -35,7 +35,15 @@ namespace NervaOneWalletMiner.Helpers
 
             try
             {
-                if (IsWindows())
+                if (IsAndroid())
+                {
+                    dataDir = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+                    if (string.IsNullOrEmpty(dataDir))
+                    {
+                        throw new DirectoryNotFoundException("Android dir not found");
+                    }
+                }
+                else if (IsWindows())
                 {
                     dataDir = Environment.GetEnvironmentVariable("APPDATA")!;
                     if (dataDir == null)
@@ -804,6 +812,11 @@ namespace NervaOneWalletMiner.Helpers
             return RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
         }
 
+        public static bool IsAndroid()
+        {
+            return OperatingSystem.IsAndroid();
+        }
+
         public static bool IsLinux()
         {
             return RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
@@ -827,7 +840,11 @@ namespace NervaOneWalletMiner.Helpers
             {
                 Architecture arch = GetCpuArchitecture();
 
-                if (IsLinux())
+                if (IsAndroid())
+                {
+                    cliDownloadLink = GlobalData.CoinSettings[coin].CliUrlAndroid;
+                }
+                else if (IsLinux())
                 {
                     switch (arch)
                     {
@@ -883,9 +900,11 @@ namespace NervaOneWalletMiner.Helpers
 
             try
             {
-                Architecture arch = GetCpuArchitecture();
-
-                if (IsLinux())
+                if (IsAndroid())
+                {
+                    defaultDataDir = GlobalData.CoinSettings[coin].DataDirLinux;
+                }
+                else if (IsLinux())
                 {
                     defaultDataDir = GlobalData.CoinSettings[coin].DataDirLinux;
                 }
