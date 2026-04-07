@@ -42,7 +42,7 @@ namespace NervaOneWalletMiner.Rpc.Common
             }
             catch (Exception ex)
             {
-                Logger.LogError("HTTP.GPFS", "Exception message: " + ex.Message);
+                Logger.LogError("HTTP.GPFS", "Exception message: " + ex.Message + (ex.InnerException != null ? " | Inner: " + ex.InnerException.Message : string.Empty));
             }
 
             return response;
