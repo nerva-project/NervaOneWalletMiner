@@ -108,6 +108,11 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
                 daemonCommand += " --detach";
             }
 
+            if (GlobalMethods.IsAndroid())
+            {
+                daemonCommand += " --rpc-ssl disabled";
+            }
+
             if(daemonSettings.UseNoAnalyticsFlag)
             {
                 daemonCommand += " --no-analytics";
