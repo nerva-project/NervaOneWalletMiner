@@ -749,6 +749,10 @@ namespace NervaOneWalletMiner.Helpers
                             Logger.LogDebug("GLM.EXFL", "Extracting: " + entry.Name);
                             string extFile = Path.Combine(destDir, entry.Name);
                             entry.ExtractToFile(extFile, true);
+                            if (!IsWindows())
+                            {
+                                File.SetUnixFileMode(extFile, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute | UnixFileMode.GroupRead | UnixFileMode.GroupExecute | UnixFileMode.OtherRead | UnixFileMode.OtherExecute);
+                            }
                         }
                     }
                 }
@@ -783,7 +787,12 @@ namespace NervaOneWalletMiner.Helpers
                     }
 
                     Logger.LogDebug("GLM.EXTR", "Extracting: " + entry.Name);
-                    entry.ExtractToFile(Path.Join(destDir, entry.Name.Substring(startIndex)), true);
+                    string extractedPath = Path.Join(destDir, entry.Name.Substring(startIndex));
+                    entry.ExtractToFile(extractedPath, true);
+                    if (!IsWindows())
+                    {
+                        File.SetUnixFileMode(extractedPath, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute | UnixFileMode.GroupRead | UnixFileMode.GroupExecute | UnixFileMode.OtherRead | UnixFileMode.OtherExecute);
+                    }
                 }
             }
             catch (Exception ex)
