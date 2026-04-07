@@ -751,7 +751,9 @@ namespace NervaOneWalletMiner.Helpers
                             entry.ExtractToFile(extFile, true);
                             if (!IsWindows())
                             {
+#pragma warning disable CA1416
                                 File.SetUnixFileMode(extFile, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute | UnixFileMode.GroupRead | UnixFileMode.GroupExecute | UnixFileMode.OtherRead | UnixFileMode.OtherExecute);
+#pragma warning restore CA1416
                             }
                         }
                     }
@@ -791,7 +793,9 @@ namespace NervaOneWalletMiner.Helpers
                     entry.ExtractToFile(extractedPath, true);
                     if (!IsWindows())
                     {
+#pragma warning disable CA1416
                         File.SetUnixFileMode(extractedPath, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute | UnixFileMode.GroupRead | UnixFileMode.GroupExecute | UnixFileMode.OtherRead | UnixFileMode.OtherExecute);
+#pragma warning restore CA1416
                     }
                 }
             }
