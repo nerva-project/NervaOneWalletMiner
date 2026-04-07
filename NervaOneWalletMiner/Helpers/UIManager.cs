@@ -670,6 +670,16 @@ namespace NervaOneWalletMiner.Helpers
                             GlobalData.NetworkStats.StatusSync += "Sync (Height " + infoRes.Height + " of " + infoRes.TargetHeight + ")";
 
                             // See if user wants to use QuickSync if they're far behind
+
+                            // TODO: ShowDialog not supported on Android. Turn off for now. Change in the future
+                            if (GlobalMethods.IsAndroid())
+                            {
+                                if (!_askedToQuickSync)
+                                {
+                                    _askedToQuickSync = true;
+                                }
+                            }
+
                             if (!_askedToQuickSync && !string.IsNullOrEmpty(GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].QuickSyncUrl))
                             {
                                 _askedToQuickSync = true;

@@ -60,7 +60,7 @@ namespace NervaOneWalletMiner.Helpers
 
         public static volatile bool IsDaemonRestarting = false;
         public static volatile bool IsInitialDaemonConnectionSuccess = false;
-        public static DateTime LastDaemonResponseTime = DateTime.Now;
+        public static DateTime LastDaemonResponseTime = DateTime.MinValue;
         public static DateTime LastDaemonRestartAttempt = DateTime.MinValue;
 
         public static volatile bool IsManualStoppedMining = false;
