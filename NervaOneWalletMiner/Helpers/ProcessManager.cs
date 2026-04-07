@@ -180,7 +180,6 @@ namespace NervaOneWalletMiner.Helpers
             Process? process = Process.Start(new ProcessStartInfo(fileName, arguments)
             {
                 UseShellExecute = false,
-                RedirectStandardInput = GlobalMethods.IsAndroid(),
                 RedirectStandardError = true,
                 RedirectStandardOutput = true,
                 CreateNoWindow = true,
