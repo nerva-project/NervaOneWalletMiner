@@ -127,7 +127,16 @@ namespace NervaOneWalletMiner.Helpers
         {
             Logger.LogDebug("PRM.STEP", "Starting process: " + ExeNameToProcessName(exePath) + " with args: " + args);
 
-            _ = Process.Start(new ProcessStartInfo(exePath, args)
+            string fileName = exePath;
+            string arguments = args;
+
+            if (GlobalMethods.IsAndroid())
+            {
+                fileName = "/system/bin/linker64";
+                arguments = exePath + " " + args;
+            }
+
+            _ = Process.Start(new ProcessStartInfo(fileName, arguments)
             {
                 UseShellExecute = false,
                 RedirectStandardError = true,
