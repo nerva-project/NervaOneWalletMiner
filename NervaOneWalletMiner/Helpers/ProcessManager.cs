@@ -132,7 +132,8 @@ namespace NervaOneWalletMiner.Helpers
                 UseShellExecute = false,
                 RedirectStandardError = true,
                 RedirectStandardOutput = true,
-                CreateNoWindow = true
+                CreateNoWindow = true,
+                WorkingDirectory = GlobalData.CliToolsDir
             });
         }
     }
