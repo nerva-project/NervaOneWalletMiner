@@ -29,7 +29,7 @@ function publish()
         mkdir -p ${bundle}/Contents/Resources
 
         # Generate plist
-        plist=$(sed -e "s/{APP_VERSION}/${APP_VERSION}/" -e "s/{DISPLAY_NAME}/NervaOne/" ${BUILDER_DIR}/Info.plist.template)
+        plist=$(sed -e "s/{APP_VERSION}/${APP_VERSION}/" ${BUILDER_DIR}/Info.plist.template)
         echo "$plist" > ${bundle}/Contents/Info.plist
 
         # Copy icons to resources

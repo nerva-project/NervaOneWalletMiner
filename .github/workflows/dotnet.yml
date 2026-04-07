@@ -159,7 +159,7 @@ jobs:
 
           - name: Generate Plist
             run: |
-              plist=$(sed -e "s/{APP_VERSION}/0.8.4.0/" -e "s/{DISPLAY_NAME}/NervaOne/" ./Builder/Info.plist.template)
+              plist=$(sed -e "s/{APP_VERSION}/${{ needs.setup.outputs.version }}/" ./Builder/Info.plist.template)
               echo "$plist" > ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop.app/Contents/Info.plist
 
           - name: Copy Icons and Launcher
@@ -175,3 +175,44 @@ jobs:
                 path: |
                   ./NervaOneWalletMiner.Desktop/bin/*
                   !./NervaOneWalletMiner.Desktop/bin/release/
+
+
+# ================================
+#              Android
+# ================================
+    build-android:
+        needs: setup
+        runs-on: ubuntu-latest
+
+        steps:
+          - name: Checkout Repository
+            uses: actions/checkout@v5
+
+          - name: Setup .NET
+            uses: actions/setup-dotnet@v5
+            with:
+                dotnet-version: 8.0.x
+
+          - name: Pin .NET SDK Version
+            run: echo '{"sdk":{"version":"8.0.0","rollForward":"latestFeature"}}' > global.json
+
+          - name: Install Android Workload
+            run: dotnet workload install android
+
+          - name: Restore Dependencies
+            run: |
+                cd ./NervaOneWalletMiner.Android
+                dotnet restore
+
+          - name: Build for Android
+            run: |
+                cd ./NervaOneWalletMiner.Android
+                dotnet publish NervaOneWalletMiner.Android.csproj -c Release -f net8.0-android \
+                  -p:ApplicationDisplayVersion=${{ needs.setup.outputs.version }} \
+                  -p:RunAOTCompilation=false
+
+          - name: Upload Android Artifacts
+            uses: actions/upload-artifact@v6
+            with:
+                name: nervaone-mobile-v${{ needs.setup.outputs.version }}-android
+                path: ./NervaOneWalletMiner.Android/bin/Release/net8.0-android/android-arm64/publish/*-Signed.apk

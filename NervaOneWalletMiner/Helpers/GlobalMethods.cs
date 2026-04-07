@@ -35,7 +35,15 @@ namespace NervaOneWalletMiner.Helpers
 
             try
             {
-                if (IsWindows())
+                if (IsAndroid())
+                {
+                    dataDir = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+                    if (string.IsNullOrEmpty(dataDir))
+                    {
+                        throw new DirectoryNotFoundException("Android dir not found");
+                    }
+                }
+                else if (IsWindows())
                 {
                     dataDir = Environment.GetEnvironmentVariable("APPDATA")!;
                     if (dataDir == null)
@@ -741,6 +749,12 @@ namespace NervaOneWalletMiner.Helpers
                             Logger.LogDebug("GLM.EXFL", "Extracting: " + entry.Name);
                             string extFile = Path.Combine(destDir, entry.Name);
                             entry.ExtractToFile(extFile, true);
+                            if (!IsWindows())
+                            {
+#pragma warning disable CA1416
+                                File.SetUnixFileMode(extFile, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute | UnixFileMode.GroupRead | UnixFileMode.GroupExecute | UnixFileMode.OtherRead | UnixFileMode.OtherExecute);
+#pragma warning restore CA1416
+                            }
                         }
                     }
                 }
@@ -775,7 +789,14 @@ namespace NervaOneWalletMiner.Helpers
                     }
 
                     Logger.LogDebug("GLM.EXTR", "Extracting: " + entry.Name);
-                    entry.ExtractToFile(Path.Join(destDir, entry.Name.Substring(startIndex)), true);
+                    string extractedPath = Path.Join(destDir, entry.Name.Substring(startIndex));
+                    entry.ExtractToFile(extractedPath, true);
+                    if (!IsWindows())
+                    {
+#pragma warning disable CA1416
+                        File.SetUnixFileMode(extractedPath, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute | UnixFileMode.GroupRead | UnixFileMode.GroupExecute | UnixFileMode.OtherRead | UnixFileMode.OtherExecute);
+#pragma warning restore CA1416
+                    }
                 }
             }
             catch (Exception ex)
@@ -804,6 +825,11 @@ namespace NervaOneWalletMiner.Helpers
             return RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
         }
 
+        public static bool IsAndroid()
+        {
+            return OperatingSystem.IsAndroid();
+        }
+
         public static bool IsLinux()
         {
             return RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
@@ -827,7 +853,11 @@ namespace NervaOneWalletMiner.Helpers
             {
                 Architecture arch = GetCpuArchitecture();
 
-                if (IsLinux())
+                if (IsAndroid())
+                {
+                    cliDownloadLink = GlobalData.CoinSettings[coin].CliUrlAndroid;
+                }
+                else if (IsLinux())
                 {
                     switch (arch)
                     {
@@ -883,9 +913,11 @@ namespace NervaOneWalletMiner.Helpers
 
             try
             {
-                Architecture arch = GetCpuArchitecture();
-
-                if (IsLinux())
+                if (IsAndroid())
+                {
+                    defaultDataDir = GlobalData.CoinSettings[coin].DataDirLinux;
+                }
+                else if (IsLinux())
                 {
                     defaultDataDir = GlobalData.CoinSettings[coin].DataDirLinux;
                 }

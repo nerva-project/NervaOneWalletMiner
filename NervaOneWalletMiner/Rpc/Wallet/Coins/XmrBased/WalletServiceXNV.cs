@@ -56,17 +56,17 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+                    JObject jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
 
-                    var error = JObject.Parse(jsonObject.ToString())["error"];
+                    var error = jsonObject["error"];
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(nameof(RestoreFromSeed), error);
                     }
                     else
                     {
-                        ResRestoreFromSeed createWalletResponse = JsonConvert.DeserializeObject<ResRestoreFromSeed>(jsonObject.SelectToken("result").ToString());
+                        ResRestoreFromSeed createWalletResponse = JsonConvert.DeserializeObject<ResRestoreFromSeed>(jsonObject.SelectToken("result")!.ToString())!;
                         responseObj.Address = createWalletResponse.address;
                         responseObj.Seed = createWalletResponse.seed;
                         responseObj.Info = createWalletResponse.info;
@@ -78,7 +78,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 else
                 {
                     // Set HTTP error
-                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
+                    responseObj.Error = HttpHelper.GetHttpError(nameof(RestoreFromSeed), httpResponse);
                 }
             }
             catch (Exception ex)
@@ -140,17 +140,17 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+                    JObject jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
 
-                    var error = JObject.Parse(jsonObject.ToString())["error"];
+                    var error = jsonObject["error"];
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(nameof(RestoreFromKeys), error);
                     }
                     else
                     {
-                        ResRestoreFromKeys createWalletResponse = JsonConvert.DeserializeObject<ResRestoreFromKeys>(jsonObject.SelectToken("result").ToString());
+                        ResRestoreFromKeys createWalletResponse = JsonConvert.DeserializeObject<ResRestoreFromKeys>(jsonObject.SelectToken("result")!.ToString())!;
                         responseObj.Address = createWalletResponse.address;
                         responseObj.Info = createWalletResponse.info;
 
@@ -160,7 +160,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 else
                 {
                     // Set HTTP error
-                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
+                    responseObj.Error = HttpHelper.GetHttpError(nameof(RestoreFromKeys), httpResponse);
                 }
             }
             catch (Exception ex)
@@ -218,17 +218,17 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    dynamic jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+                    JObject jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
 
-                    var error = JObject.Parse(jsonObject.ToString())["error"];
+                    var error = jsonObject["error"];
                     if (error != null)
                     {
                         // Set Service error
-                        responseObj.Error = GetServiceError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, error);
+                        responseObj.Error = GetServiceError(nameof(GetPrivateKeys), error);
                     }
                     else
                     {
-                        ResQueryKey queryKeyResponse = JsonConvert.DeserializeObject<ResQueryKey>(jsonObject.SelectToken("result").ToString());
+                        ResQueryKey queryKeyResponse = JsonConvert.DeserializeObject<ResQueryKey>(jsonObject.SelectToken("result")!.ToString())!;
                         responseObj.PublicViewKey = queryKeyResponse.public_view_key;
                         responseObj.PrivateViewKey = queryKeyResponse.private_view_key.ToCharArray();
                         responseObj.PublicSpendKey = queryKeyResponse.public_spend_key;
@@ -241,7 +241,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 else
                 {
                     // Set HTTP error
-                    responseObj.Error = HttpHelper.GetHttpError(System.Reflection.MethodBase.GetCurrentMethod()!.Name, httpResponse);
+                    responseObj.Error = HttpHelper.GetHttpError(nameof(GetPrivateKeys), httpResponse);
                 }
             }
             catch (Exception ex)

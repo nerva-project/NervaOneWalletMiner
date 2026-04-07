@@ -9,10 +9,36 @@ namespace NervaOneWalletMiner.Helpers
     {
         private static string ExeNameToProcessName(string exe) => Path.GetFileNameWithoutExtension(exe);
 
+        private static readonly Dictionary<string, Process> _androidTrackedProcesses = new();
+
         public static void Kill(string processName)
         {
             try
             {
+                if (GlobalMethods.IsAndroid())
+                {
+                    string name = ExeNameToProcessName(processName);
+                    if (_androidTrackedProcesses.TryGetValue(name, out Process? tracked))
+                    {
+                        if (tracked != null && !tracked.HasExited)
+                        {
+                            Logger.LogDebug("PRM.KILL", "Killing tracked process " + name + " with id " + tracked.Id);
+                            tracked.Kill();
+                            Logger.LogDebug("PRM.KILL", "Process " + tracked.Id + " killed");
+                        }
+                        else
+                        {
+                            Logger.LogDebug("PRM.KILL", "No instances of " + name + " to kill");
+                        }
+                        _androidTrackedProcesses.Remove(name);
+                    }
+                    else
+                    {
+                        Logger.LogDebug("PRM.KILL", "No instances of " + processName + " to kill");
+                    }
+                    return;
+                }
+
                 //Logger.LogDebug("PM.KIL", "Exe: " + exe);
                 List<Process> processList = GetRunningByName(processName);
 
@@ -50,6 +76,21 @@ namespace NervaOneWalletMiner.Helpers
         {
             try
             {
+                if (GlobalMethods.IsAndroid())
+                {
+                    string name = ExeNameToProcessName(processName);
+                    if (_androidTrackedProcesses.TryGetValue(name, out Process? tracked))
+                    {
+                        if (tracked != null && !tracked.HasExited)
+                        {
+                            return true;
+                        }
+                        Logger.LogDebug("PRM.ISRN", "CLI tool " + name + " exited unexpectedly");
+                        _androidTrackedProcesses.Remove(name);
+                    }
+                    return false;
+                }
+
                 //Logger.LogDebug("PM.IR", "Exe: " + processName);
                 List<Process> processList = GetRunningByName(processName);
 
@@ -127,13 +168,28 @@ namespace NervaOneWalletMiner.Helpers
         {
             Logger.LogDebug("PRM.STEP", "Starting process: " + ExeNameToProcessName(exePath) + " with args: " + args);
 
-            _ = Process.Start(new ProcessStartInfo(exePath, args)
+            string fileName = exePath;
+            string arguments = args;
+
+            if (GlobalMethods.IsAndroid())
+            {
+                fileName = "/system/bin/linker64";
+                arguments = exePath + " " + args;
+            }
+
+            Process? process = Process.Start(new ProcessStartInfo(fileName, arguments)
             {
                 UseShellExecute = false,
                 RedirectStandardError = true,
                 RedirectStandardOutput = true,
-                CreateNoWindow = true
+                CreateNoWindow = true,
+                WorkingDirectory = GlobalData.CliToolsDir
             });
+
+            if (GlobalMethods.IsAndroid() && process != null)
+            {
+                _androidTrackedProcesses[ExeNameToProcessName(exePath)] = process;
+            }
         }
     }
 }

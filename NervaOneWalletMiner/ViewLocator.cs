@@ -7,6 +7,7 @@ namespace NervaOneWalletMiner
 {
     public class ViewLocator : IDataTemplate
     {
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("ViewLocator uses Type.GetType for view resolution")]
         public Control? Build(object? param)
         {
             var name = param?.GetType().FullName!.Replace("ViewModel", "View");

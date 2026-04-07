@@ -1,5 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" android:installLocation="auto">
 	<uses-permission android:name="android.permission.INTERNET" />
-	<application android:label="AvaloniaTest" android:icon="@drawable/Icon" />
+	<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+	<uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+	<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+	<application android:label="NervaOne" android:icon="@drawable/Icon" android:debuggable="true" android:networkSecurityConfig="@xml/network_security_config" android:largeHeap="true">
+		<service android:name=".Services.NervaForegroundService" android:foregroundServiceType="dataSync" android:exported="false" />
+
+	</application>
 </manifest>

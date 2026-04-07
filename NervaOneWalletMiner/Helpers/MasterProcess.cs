@@ -247,7 +247,11 @@ namespace NervaOneWalletMiner.Helpers
                     Logger.LogDebug("MSP.KDNR", "No response from daemon since: " + GlobalData.LastDaemonResponseTime.ToLongTimeString() + " . Forcing restart...");
                 }
 
-                if (!ProcessManager.IsRunning(GlobalData.DaemonProcessName) || forceRestart)
+                // On Android nervad runs detached, so its tracked parent process exits immediately.
+                // Use LastDaemonResponseTime to confirm it is actually alive before restarting.
+                bool daemonRecentlyResponded = GlobalMethods.IsAndroid() && GlobalData.LastDaemonResponseTime.AddSeconds(60) > DateTime.Now;
+
+                if ((!ProcessManager.IsRunning(GlobalData.DaemonProcessName) && !daemonRecentlyResponded) || forceRestart)
                 {
                     if (GlobalData.LastDaemonRestartAttempt.AddSeconds(300) < DateTime.Now)
                     {

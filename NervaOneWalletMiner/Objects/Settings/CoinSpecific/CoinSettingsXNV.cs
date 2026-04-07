@@ -31,6 +31,9 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private string _CliUrlMacIntel = "https://github.com/nerva-project/nerva/releases/download/v0.2.0.0/nerva-macos-x64-v0.2.0.0.tar.bz2";
         private string _CliUrlMacArm = "https://github.com/nerva-project/nerva/releases/download/v0.2.0.0/nerva-macos-armv8-v0.2.0.0.tar.bz2";
 
+        // TODO: For testing purposes only. Change later.
+        private string _CliUrlAndroid = "https://nerva.one/quicksync/nerva-android-armv8.zip";
+
         private string _PublicNodeUrlDefault = "node.nerva.one:17566";
 
         private string _DataDirWindows = "C:/ProgramData/nerva";
@@ -65,6 +68,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public string CliUrlLinuxArm { get => _CliUrlLinuxArm; set => _CliUrlLinuxArm = value; }
         public string CliUrlMacIntel { get => _CliUrlMacIntel; set => _CliUrlMacIntel = value; }
         public string CliUrlMacArm { get => _CliUrlMacArm; set => _CliUrlMacArm = value; }
+        public string CliUrlAndroid { get => _CliUrlAndroid; set => _CliUrlAndroid = value; }
 
         public string PublicNodeUrlDefault { get => _PublicNodeUrlDefault; set => _PublicNodeUrlDefault = value; }
 
@@ -99,9 +103,14 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
                 daemonCommand += " --start-mining " + daemonSettings.MiningAddress + " --mining-threads " + daemonSettings.MiningThreads;
             }
 
-            if (GlobalMethods.IsLinux() || GlobalMethods.IsOsx())
+            if (GlobalMethods.IsAndroid() || GlobalMethods.IsLinux() || GlobalMethods.IsOsx())
             {
                 daemonCommand += " --detach";
+            }
+
+            if (GlobalMethods.IsAndroid())
+            {
+                daemonCommand += " --rpc-ssl disabled";
             }
 
             if(daemonSettings.UseNoAnalyticsFlag)

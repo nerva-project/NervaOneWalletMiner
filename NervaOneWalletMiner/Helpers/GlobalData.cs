@@ -16,7 +16,7 @@ namespace NervaOneWalletMiner.Helpers
     {
         public const string AppNameMain = "NervaOne";
         public const string AppNameDesktop = "NervaOneDesktop";
-        public const string Version = "0.8.5.1";
+        public const string Version = "0.8.5.2";
 
         public const string CliToolsDirName = "cli";
         public const string WalletDirName = "wallets";
@@ -60,7 +60,7 @@ namespace NervaOneWalletMiner.Helpers
 
         public static volatile bool IsDaemonRestarting = false;
         public static volatile bool IsInitialDaemonConnectionSuccess = false;
-        public static DateTime LastDaemonResponseTime = DateTime.Now;
+        public static DateTime LastDaemonResponseTime = DateTime.MinValue;
         public static DateTime LastDaemonRestartAttempt = DateTime.MinValue;
 
         public static volatile bool IsManualStoppedMining = false;

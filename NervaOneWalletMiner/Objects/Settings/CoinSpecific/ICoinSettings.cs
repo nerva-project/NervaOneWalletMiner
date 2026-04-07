@@ -27,6 +27,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         string CliUrlLinuxArm { get; set; }
         string CliUrlMacIntel { get; set; }
         string CliUrlMacArm { get; set; }
+        string CliUrlAndroid { get; set; }
 
         string PublicNodeUrlDefault { get; set; }
 

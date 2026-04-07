@@ -1,8 +1,11 @@
 ﻿using Android.App;
+using Android.Content;
 using Android.Content.PM;
+using Android.OS;
 
 using Avalonia;
 using Avalonia.Android;
+using NervaOneWalletMiner.Android.Services;
 using ReactiveUI.Avalonia;
 
 namespace NervaOneWalletMiner.Android;
@@ -15,6 +18,12 @@ namespace NervaOneWalletMiner.Android;
     ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize | ConfigChanges.UiMode)]
 public class MainActivity : AvaloniaMainActivity<App>
 {
+    protected override void OnCreate(Bundle? savedInstanceState)
+    {
+        base.OnCreate(savedInstanceState);
+        StartForegroundService(new Intent(this, typeof(NervaForegroundService)));
+    }
+
     protected override AppBuilder CustomizeAppBuilder(AppBuilder builder)
     {
         return base.CustomizeAppBuilder(builder)
