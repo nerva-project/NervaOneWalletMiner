@@ -41,7 +41,7 @@ jobs:
           - name: Setup .NET
             uses: actions/setup-dotnet@v5
             with:
-                dotnet-version: 8.0.x
+                dotnet-version: 10.0.x
 
           - name: Restore Dependencies
             run: |
@@ -54,7 +54,7 @@ jobs:
                 dotnet publish NervaOneWalletMiner.Desktop.csproj -c release -r ${{ matrix.rid }} -p:publishsinglefile=true
 
           - name: Remove PDB Files
-            run: Remove-Item -Path "./NervaOneWalletMiner.Desktop/bin/release/net8.0/${{ matrix.rid }}/publish/*.pdb" -Force -ErrorAction SilentlyContinue
+            run: Remove-Item -Path "./NervaOneWalletMiner.Desktop/bin/release/net10.0/${{ matrix.rid }}/publish/*.pdb" -Force -ErrorAction SilentlyContinue
             shell: pwsh
 
           - name: Upload Windows Artifacts
@@ -62,8 +62,8 @@ jobs:
             with:
                 name: nervaone-desktop-v${{ needs.setup.outputs.version }}-${{ matrix.rid }}
                 path: |
-                    ./NervaOneWalletMiner.Desktop/bin/release/net8.0/${{ matrix.rid }}/publish/*
-                    !./NervaOneWalletMiner.Desktop/bin/release/net8.0/${{ matrix.rid }}/publish/*.pdb
+                    ./NervaOneWalletMiner.Desktop/bin/release/net10.0/${{ matrix.rid }}/publish/*
+                    !./NervaOneWalletMiner.Desktop/bin/release/net10.0/${{ matrix.rid }}/publish/*.pdb
 
 # ================================
 #              Linux
@@ -82,7 +82,7 @@ jobs:
           - name: Setup .NET
             uses: actions/setup-dotnet@v5
             with:
-                dotnet-version: 8.0.x
+                dotnet-version: 10.0.x
 
           - name: Install Dependencies
             env:
@@ -112,7 +112,7 @@ jobs:
             run: |              
               cp ./Builder/logos/nerva-logo-color.png ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop/Resources/nerva-logo-color.png
               cp ./Builder/logos/nerva-logo-color-2.png ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop/Resources/nerva-logo-color-2.png
-              cp ./NervaOneWalletMiner.Desktop/bin/release/net8.0/${{ matrix.rid }}/publish/* ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop/Contents/
+              cp ./NervaOneWalletMiner.Desktop/bin/release/net10.0/${{ matrix.rid }}/publish/* ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop/Contents/
               cp ./Builder/install ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop/install
               chmod +x ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop/install
 
@@ -139,7 +139,7 @@ jobs:
           - name: Setup .NET
             uses: actions/setup-dotnet@v5
             with:
-                dotnet-version: 8.0.x
+                dotnet-version: 10.0.x
 
           - name: Restore Dependencies
             run: |
@@ -166,7 +166,7 @@ jobs:
             run: |
               cp ./Builder/logos/nerva-logo-color.icns ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop.app/Contents/Resources/nerva-logo-color.icns
               cp ./Builder/logos/nerva-logo-color-2.icns ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop.app/Contents/Resources/nerva-logo-color-2.icns
-              cp -R ./NervaOneWalletMiner.Desktop/bin/release/net8.0/${{ matrix.rid }}/publish/* ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop.app/Contents/MacOS/
+              cp -R ./NervaOneWalletMiner.Desktop/bin/release/net10.0/${{ matrix.rid }}/publish/* ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop.app/Contents/MacOS/
 
           - name: Upload Artifacts
             uses: actions/upload-artifact@v6
@@ -191,10 +191,10 @@ jobs:
           - name: Setup .NET
             uses: actions/setup-dotnet@v5
             with:
-                dotnet-version: 8.0.x
+                dotnet-version: 10.0.x
 
           - name: Pin .NET SDK Version
-            run: echo '{"sdk":{"version":"8.0.0","rollForward":"latestFeature"}}' > global.json
+            run: echo '{"sdk":{"version":"10.0.0","rollForward":"latestFeature"}}' > global.json
 
           - name: Install Android Workload
             run: dotnet workload install android
@@ -207,7 +207,7 @@ jobs:
           - name: Build for Android
             run: |
                 cd ./NervaOneWalletMiner.Android
-                dotnet publish NervaOneWalletMiner.Android.csproj -c Release -f net8.0-android \
+                dotnet publish NervaOneWalletMiner.Android.csproj -c Release \
                   -p:ApplicationDisplayVersion=${{ needs.setup.outputs.version }} \
                   -p:RunAOTCompilation=false
 
@@ -215,4 +215,4 @@ jobs:
             uses: actions/upload-artifact@v6
             with:
                 name: nervaone-mobile-v${{ needs.setup.outputs.version }}-android
-                path: ./NervaOneWalletMiner.Android/bin/Release/net8.0-android/android-arm64/publish/*-Signed.apk
+                path: ./NervaOneWalletMiner.Android/bin/Release/net10.0-android/android-arm64/publish/*-Signed.apk
