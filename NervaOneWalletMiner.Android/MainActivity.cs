@@ -6,6 +6,7 @@ using Android.OS;
 using Avalonia;
 using Avalonia.Android;
 using NervaOneWalletMiner.Android.Services;
+using NervaOneWalletMiner.Helpers;
 using ReactiveUI.Avalonia;
 
 namespace NervaOneWalletMiner.Android;
@@ -29,5 +30,16 @@ public class MainActivity : AvaloniaMainActivity<App>
         return base.CustomizeAppBuilder(builder)
             .WithInterFont()
             .UseReactiveUI();
+    }
+
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+
+        if (IsFinishing && GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopOnExit)
+        {
+            StopService(new Intent(this, typeof(NervaForegroundService)));
+            GlobalMethods.Shutdown();
+        }
     }
 }
