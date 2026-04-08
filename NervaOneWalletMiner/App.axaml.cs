@@ -87,8 +87,16 @@ public partial class App : Application
 
             if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads == 0)
             {
-                // By default use 50% of threads
-                GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads = GlobalData.CpuThreadCount > 1 ? Convert.ToInt32(Math.Floor(GlobalData.CpuThreadCount / 2.00)) : 1;
+                if (GlobalMethods.IsAndroid())
+                {
+                    // On mobile default to 1
+                    GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads = 1;
+                }
+                else
+                {
+                    // By default use 50% of threads
+                    GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads = GlobalData.CpuThreadCount > 1 ? Convert.ToInt32(Math.Floor(GlobalData.CpuThreadCount / 2.00)) : 1;
+                }
             }
         }
         catch (Exception ex)

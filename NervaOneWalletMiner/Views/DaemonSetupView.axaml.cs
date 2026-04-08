@@ -59,7 +59,7 @@ namespace NervaOneWalletMiner.Views
                 {
                     Logger.LogDebug("DMS.SSC1", "Restart required. Asking user");
                     MessageBoxView confirmDaemonRestart = new("Restart Daemon?", "You've made changes to daemon setup. For those changes to take effect, restart is required.\r\n\r\nWould you like to restart daemon now?", false, true);
-                    DialogResult confirmRestart = await DialogService.ShowAsync<DialogResult>(confirmDaemonRestart);
+                    DialogResult? confirmRestart = await DialogService.ShowAsync<DialogResult>(confirmDaemonRestart);
 
                     if (confirmRestart != null && confirmRestart.IsOk)
                     {
@@ -108,18 +108,11 @@ namespace NervaOneWalletMiner.Views
                 string cliToolsLink = GetVm().GetCliToolsDownloadLink();
                 Logger.LogDebug("DMS.UCTC", "Updating client tools");
 
-                if (OperatingSystem.IsAndroid())
+                var window = new TextBoxView("Update Client Tools", "Client Tools Download Link", cliToolsLink, string.Empty);
+                DialogResult? result = await DialogService.ShowAsync<DialogResult>(window);
+                if (result != null && result.IsOk && !string.IsNullOrEmpty(result.TextBoxValue))
                 {
-                    await GetVm().PerformCliToolsUpdate(cliToolsLink);
-                }
-                else
-                {
-                    var window = new TextBoxView("Update Client Tools", "Client Tools Download Link", cliToolsLink, string.Empty);
-                    DialogResult result = await DialogService.ShowAsync<DialogResult>(window);
-                    if (result != null && result.IsOk && !string.IsNullOrEmpty(result.TextBoxValue))
-                    {
-                        await GetVm().PerformCliToolsUpdate(result.TextBoxValue);
-                    }
+                    await GetVm().PerformCliToolsUpdate(result.TextBoxValue);
                 }
             }
             catch (Exception ex)
@@ -135,7 +128,7 @@ namespace NervaOneWalletMiner.Views
             try
             {
                 var window = new RestartWithCommandView();
-                DialogResult result = await DialogService.ShowAsync<DialogResult>(window);
+                DialogResult? result = await DialogService.ShowAsync<DialogResult>(window);
                 if (result != null && result.IsOk)
                 {
                     GetVm().RestartWithCommand(result.RestartOptions);

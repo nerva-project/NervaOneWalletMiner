@@ -52,7 +52,7 @@ public partial class MainWindow : Window
             {
                 MessageBoxView window = new("QuickSync", "You're currently only " + percentSynced.ToString("P1") + " synchronized "
                     + "\n\r\n\rWould you like to use QuickSync to synchronize faster?", false);
-                DialogResult result = await DialogService.ShowAsync<DialogResult>(window);
+                DialogResult? result = await DialogService.ShowAsync<DialogResult>(window);
                 if (result != null && result.IsOk)
                 {
                     GlobalMethods.RestartWithQuickSync();

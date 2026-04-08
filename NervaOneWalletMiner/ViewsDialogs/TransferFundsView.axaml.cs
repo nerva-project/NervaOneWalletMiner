@@ -105,7 +105,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                         + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits
                         + ". Once transfer is started, it cannot be stopped. Do you want to continue?",
                         false, true);
-                    DialogResult confirmRes = await DialogService.ShowAsync<DialogResult>(confirmWindow);
+                    DialogResult? confirmRes = await DialogService.ShowAsync<DialogResult>(confirmWindow);
 
                     if (confirmRes != null && confirmRes.IsOk)
                     {
@@ -115,7 +115,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                         {
                             // Password required
                             TextBoxView textWindow = new TextBoxView("Provide Wallet Password", "Please provide wallet password", string.Empty, "Required - Wallet password", true, true);
-                            DialogResult passRes = await DialogService.ShowAsync<DialogResult>(textWindow);
+                            DialogResult? passRes = await DialogService.ShowAsync<DialogResult>(textWindow);
                             if (passRes != null && passRes.IsOk)
                             {
                                 if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPassRequiredToOpenWallet)

@@ -164,7 +164,7 @@ namespace NervaOneWalletMiner.Views
             try
             {
                 var window = new TextBoxView("Create Account", "Account Label", string.Empty, "Enter new account label", false);
-                DialogResult result = await DialogService.ShowAsync<DialogResult>(window);
+                DialogResult? result = await DialogService.ShowAsync<DialogResult>(window);
                 if (result != null && result.IsOk)
                 {
                     CreateAccountRequest request = new()
@@ -212,7 +212,7 @@ namespace NervaOneWalletMiner.Views
                 {
                     Account selectedItem = (Account)dtgAccounts.SelectedItem;
                     var window = new TextBoxView("Change Account Label", "Account Label", selectedItem.Label, string.Empty, false);
-                    DialogResult result = await DialogService.ShowAsync<DialogResult>(window);
+                    DialogResult? result = await DialogService.ShowAsync<DialogResult>(window);
                     if (result != null && result.IsOk)
                     {
                         LabelAccountRequest request = new()

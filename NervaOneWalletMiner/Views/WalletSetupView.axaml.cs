@@ -292,7 +292,7 @@ namespace NervaOneWalletMiner.Views
                 else
                 {
                     TextBoxView textWindow = new("Provide Wallet Password", "Please provide wallet password", string.Empty, "Required - Wallet password", true, true);
-                    DialogResult passRes = await DialogService.ShowAsync<DialogResult>(textWindow);
+                    DialogResult? passRes = await DialogService.ShowAsync<DialogResult>(textWindow);
 
                     if (passRes == null || !passRes.IsOk)
                     {
