@@ -305,13 +305,19 @@ namespace NervaOneWalletMiner.Helpers
             {
                 if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
                 {
-                    UpdateDaemonStatus(GlobalData.NetworkStats.StatusSync);
-                    UpdateDaemonVersion("Remote Node");
+                    string remoteStatus = "Remote" + (string.IsNullOrEmpty(GlobalData.NetworkStats.StatusSync) ? "" : " | " + GlobalData.NetworkStats.StatusSync);
+                    UpdateDaemonStatus(remoteStatus);
                 }
                 else
                 {
-                    UpdateDaemonStatus("Connections: " + GlobalData.NetworkStats.ConnectionsOut + "(out) + " + GlobalData.NetworkStats.ConnectionsIn + "(in)" + (string.IsNullOrEmpty(GlobalData.NetworkStats.StatusSync) ? "" : " | " + GlobalData.NetworkStats.StatusSync));
-                    UpdateDaemonVersion(GlobalData.NetworkStats.Version.ToLower().StartsWith("v") ? GlobalData.NetworkStats.Version : "v: " + GlobalData.NetworkStats.Version);
+                    string rawVersion = GlobalData.NetworkStats.Version.ToLower().StartsWith("v") ? GlobalData.NetworkStats.Version : "v" + GlobalData.NetworkStats.Version;
+
+                    // Keep only the numeric part: e.g. "v0.18.4.5-release" -> "v0.18.4.5"
+                    int dashIndex = rawVersion.IndexOf('-');
+                    string version = dashIndex > 0 ? rawVersion[..dashIndex] : rawVersion;
+                    string connections = "↑" + GlobalData.NetworkStats.ConnectionsOut + "  ↓" + GlobalData.NetworkStats.ConnectionsIn;
+                    string sync = " | " + (string.IsNullOrEmpty(GlobalData.NetworkStats.StatusSync) ? "Connecting to daemon..." : GlobalData.NetworkStats.StatusSync);
+                    UpdateDaemonStatus(version + " | " + connections + sync);
                 }
             }
             catch (Exception ex)
@@ -422,7 +428,7 @@ namespace NervaOneWalletMiner.Helpers
                     ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).OpenCloseWallet = StatusWallet.CloseWallet;
 
                     // Status Bar
-                    string statusBarMessage = GlobalData.OpenedWalletName + " | Account(s): " + ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).WalletAddresses.Count + " | Balance: " + GlobalData.WalletStats.BalanceTotal + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits + (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletHeightSupported ? " | Height: " + GlobalData.WalletHeight : string.Empty);
+                    string statusBarMessage = GlobalData.OpenedWalletName + " | Accts: " + ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).WalletAddresses.Count + " | " + GlobalData.WalletStats.BalanceTotal.ToString("F2") + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits + (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletHeightSupported ? " | H: " + GlobalData.WalletHeight : string.Empty);
                     if (((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).WalletStatus != statusBarMessage)
                     {
                         ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).WalletStatus = statusBarMessage;
@@ -575,7 +581,7 @@ namespace NervaOneWalletMiner.Helpers
                 {
                     GlobalData.NetworkStats = new()
                     {
-                        StatusSync = "Downloading client tools. Please wait...",
+                        StatusSync = "Downloading client tools...",
                         Connections = []
                     };
                 }
@@ -591,7 +597,7 @@ namespace NervaOneWalletMiner.Helpers
                 {
                     GlobalData.NetworkStats = new()
                     {
-                        StatusSync = "Using " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].PublicNodeAddress,
+                        StatusSync = GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].PublicNodeAddress,
                         Connections = []
                     };
                 }
@@ -607,7 +613,7 @@ namespace NervaOneWalletMiner.Helpers
                 {
                     GlobalData.NetworkStats = new()
                     {
-                        StatusSync = "Establishing connection with daemon...",
+                        StatusSync = "Connecting to daemon...",
                         Connections = []
                     };
                 }
@@ -687,7 +693,7 @@ namespace NervaOneWalletMiner.Helpers
                         GlobalData.NetworkStats.StatusSync = "";
                         if (infoRes.TargetHeight != 0 && infoRes.Height < infoRes.TargetHeight)
                         {
-                            GlobalData.NetworkStats.StatusSync += "Sync (Height " + infoRes.Height + " of " + infoRes.TargetHeight + ")";
+                            GlobalData.NetworkStats.StatusSync += "Sync (" + infoRes.Height + " of " + infoRes.TargetHeight + ")";
 
                             // See if user wants to use QuickSync if they're far behind
 
@@ -713,7 +719,7 @@ namespace NervaOneWalletMiner.Helpers
                         }
                         else
                         {
-                            GlobalData.NetworkStats.StatusSync += "Sync OK | Status " + infoRes.Status;
+                            GlobalData.NetworkStats.StatusSync += "Sync OK";
                         }
 
                         if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsCpuMiningSupported)

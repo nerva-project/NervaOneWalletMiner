@@ -23,18 +23,14 @@
 		
 		<Label Grid.Row="0"
 			   Grid.Column="1"
+			   Grid.ColumnSpan="2"
 			   Margin="10,0,0,0"
-			   Content="{Binding DaemonStatus}"/>			
+			   Content="{Binding DaemonStatus}"/>
 		<Label Grid.Row="1"
 			   Grid.Column="1"
 			   Grid.ColumnSpan="2"
 			   Margin="10,0,0,0"
 			   Content="{Binding WalletStatus}"/>
-
-		<Label Grid.Row="0"
-			   Grid.Column="2"
-			   Content="{Binding DaemonVersion}"
-			   HorizontalAlignment="Right"/>
 	</Grid>
 	
 </UserControl>

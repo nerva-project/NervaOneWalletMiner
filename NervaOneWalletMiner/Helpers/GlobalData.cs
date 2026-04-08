@@ -28,7 +28,7 @@ namespace NervaOneWalletMiner.Helpers
         public const string AddressBookFileName = "address.book";
         public const string WalletDumpFileName = "dump.txt";
 
-        public static string WalletClosedMessage = "Wallet offline - see Wallet screen to open";
+        public static string WalletClosedMessage = "Wallet offline - open via Wallet screen";
         public static string CoinDirName = Coin.XNV;
         public static int CpuThreadCount = Environment.ProcessorCount;
                
