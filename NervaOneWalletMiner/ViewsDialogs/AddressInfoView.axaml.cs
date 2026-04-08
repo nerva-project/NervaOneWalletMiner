@@ -11,16 +11,14 @@ using NervaOneWalletMiner.Rpc.Wallet.Responses;
 
 namespace NervaOneWalletMiner.ViewsDialogs
 {
-    public partial class AddressInfoView : Window
+    public partial class AddressInfoView : UserControl
     {
-        Window GetWindow() => TopLevel.GetTopLevel(this) as Window ?? throw new NullReferenceException("Invalid Owner");
-
         // <Label + AddressShort, AddressFull>
         Dictionary<string, string> _accounts = [];
 
         // Not used but designer will complain without it
         public AddressInfoView()
-        {            
+        {
             InitializeComponent();
         }
 
@@ -29,7 +27,6 @@ namespace NervaOneWalletMiner.ViewsDialogs
             try
             {
                 InitializeComponent();
-                Icon = GlobalMethods.GetWindowIcon();
 
                 if (!GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].AreIntegratedAddressesSupported)
                 {
@@ -65,7 +62,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             {
                 var cbxAccount = this.Get<ComboBox>("cbxAccount");
                 var tbxWalletAddress = this.Get<TextBox>("tbxWalletAddress");
-                if(_accounts.ContainsKey(cbxAccount.SelectedValue?.ToString()!))
+                if (_accounts.ContainsKey(cbxAccount.SelectedValue?.ToString()!))
                 {
                     tbxWalletAddress.Text = _accounts[cbxAccount.SelectedValue?.ToString()!];
                 }
@@ -73,7 +70,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             catch (Exception ex)
             {
                 Logger.LogException("AID.ASC1", ex);
-            }                       
+            }
         }
 
         public void MakeIntegratedAddress_Clicked(object sender, RoutedEventArgs args)
@@ -92,7 +89,6 @@ namespace NervaOneWalletMiner.ViewsDialogs
         {
             try
             {
-                // TODO: Current GUI does not pass payment_id. Do we need it?
                 MakeIntegratedAddressRequest request = new()
                 {
                     StandardAddress = walletAddress,
@@ -104,10 +100,9 @@ namespace NervaOneWalletMiner.ViewsDialogs
                 if (response.Error.IsError)
                 {
                     Logger.LogError("AID.MIA1", "Failed to make integrated address | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
-                    await Dispatcher.UIThread.Invoke(async () =>
+                    await Dispatcher.UIThread.InvokeAsync(async () =>
                     {
-                        MessageBoxView window = new("Make Integrated Address", "Error making integrated address\r\n" + response.Error.Message, true);
-                        await window.ShowDialog(GetWindow());
+                        await DialogService.ShowAsync<DialogResult>(new MessageBoxView("Make Integrated Address", "Error making integrated address\r\n" + response.Error.Message, true));
                     });
                 }
                 else
@@ -132,7 +127,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     IsCancel = true
                 };
 
-                Close(result);
+                DialogService.Close(result);
             }
             catch (Exception ex)
             {
@@ -144,7 +139,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
         {
             try
             {
-                GlobalMethods.CopyToClipboard(this, tbxWalletAddress.Text!);            
+                GlobalMethods.CopyToClipboard(this, tbxWalletAddress.Text!);
             }
             catch (Exception ex)
             {

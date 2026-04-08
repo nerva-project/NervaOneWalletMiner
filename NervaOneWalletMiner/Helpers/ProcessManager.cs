@@ -85,7 +85,7 @@ namespace NervaOneWalletMiner.Helpers
                         {
                             return true;
                         }
-                        Logger.LogDebug("PRM.ISRN", "CLI tool " + name + " exited unexpectedly");
+                        Logger.LogDebug("PRM.ISRN", "Android CLI tool " + name + " exited unexpectedly");
                         _androidTrackedProcesses.Remove(name);
                     }
                     return false;

@@ -12,8 +12,6 @@ namespace NervaOneWalletMiner.Views
 {
     public partial class AddressBookView : UserControl
     {
-        Window GetWindow() => TopLevel.GetTopLevel(this) as Window ?? throw new NullReferenceException("Invalid Owner");
-
         public AddressBookView()
         {
             try
@@ -72,38 +70,7 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
-        private void Transfer_Clicked(object sender, RoutedEventArgs args)
-        {
-            try
-            {
-                AddressInfo selectedAddress = (AddressInfo)dtgAddressBook.SelectedItem;
-
-                if(selectedAddress == null)
-                {
-                    MessageBoxView window = new("Transfer", "Please select Address first.", true);
-                    window.ShowDialog(GetWindow());
-                }
-                else
-                {
-                    if(!GlobalData.AreWalletEventsRegistered)
-                    {
-                        MessageBoxView window = new("Transfer", "Please open wallet first.", true);
-                        window.ShowDialog(GetWindow());
-                    }
-                    else
-                    {
-                        Logger.LogDebug("ADB.TRCL", "Calling Transfer passing address: " + GlobalMethods.GetShorterString(selectedAddress.Address, 12));
-                        ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).TransferUi(GetWindow(), selectedAddress.Address, selectedAddress.PaymentId);
-                    }                    
-                }                
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException("ADB.TRCL", ex);
-            }
-        }
-
-        private void Delete_Clicked(object sender, RoutedEventArgs args)
+        private async void Transfer_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
@@ -111,8 +78,36 @@ namespace NervaOneWalletMiner.Views
 
                 if (selectedAddress == null)
                 {
-                    MessageBoxView window = new("Delete", "Please select Address first.", true);
-                    window.ShowDialog(GetWindow());
+                    await DialogService.ShowAsync(new MessageBoxView("Transfer", "Please select Address first.", true));
+                }
+                else
+                {
+                    if (!GlobalData.AreWalletEventsRegistered)
+                    {
+                        await DialogService.ShowAsync(new MessageBoxView("Transfer", "Please open wallet first.", true));
+                    }
+                    else
+                    {
+                        Logger.LogDebug("ADB.TRCL", "Calling Transfer passing address: " + GlobalMethods.GetShorterString(selectedAddress.Address, 12));
+                        ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).TransferUi(selectedAddress.Address, selectedAddress.PaymentId);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("ADB.TRCL", ex);
+            }
+        }
+
+        private async void Delete_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                AddressInfo selectedAddress = (AddressInfo)dtgAddressBook.SelectedItem;
+
+                if (selectedAddress == null)
+                {
+                    await DialogService.ShowAsync(new MessageBoxView("Delete", "Please select Address first.", true));
                 }
                 else
                 {
@@ -144,7 +139,7 @@ namespace NervaOneWalletMiner.Views
                             highestIdAddress = address;
                         }
                     }
-                }                
+                }
             }
             catch (Exception ex)
             {

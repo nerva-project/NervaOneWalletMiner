@@ -10,7 +10,6 @@ namespace NervaOneWalletMiner.ViewsDialogs
 {
     public partial class OpenWalletView : Window
     {
-        Window GetWindow() => TopLevel.GetTopLevel(this) as Window ?? throw new NullReferenceException("Invalid Owner");
 
         public OpenWalletView()
         {
@@ -76,19 +75,17 @@ namespace NervaOneWalletMiner.ViewsDialogs
             return wallets;
         }
 
-        public void OkButton_Clicked(object sender, RoutedEventArgs args)
+        public async void OkButton_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
                 if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPassRequiredToOpenWallet && string.IsNullOrEmpty(tbxPassword.Text))
                 {
-                    MessageBoxView window = new("Open Wallet", "Password cannot be empty", true);
-                    window.ShowDialog(GetWindow());
+                    await DialogService.ShowAsync(new MessageBoxView("Open Wallet", "Password cannot be empty", true));
                 }
-                else if(string.IsNullOrEmpty(cbxWalletName.SelectedValue!.ToString()))
+                else if (string.IsNullOrEmpty(cbxWalletName.SelectedValue!.ToString()))
                 {
-                    MessageBoxView window = new("Open Wallet", "Wallet Name cannot be empty", true);
-                    window.ShowDialog(GetWindow());
+                    await DialogService.ShowAsync(new MessageBoxView("Open Wallet", "Wallet Name cannot be empty", true));
                 }
                 else
                 {

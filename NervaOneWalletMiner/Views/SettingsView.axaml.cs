@@ -14,8 +14,6 @@ namespace NervaOneWalletMiner.Views
 {
     public partial class SettingsView : UserControl
     {
-        Window GetWindow() => TopLevel.GetTopLevel(this) as Window ?? throw new NullReferenceException("Invalid Owner");
-
         public SettingsView()
         {
             try
@@ -98,7 +96,7 @@ namespace NervaOneWalletMiner.Views
                         Logger.LogDebug("SET.SSCL", "CLI tools not found. Opening Coin Setup View.");
 
                         var window = new CoinSetupView();
-                        DialogResult cliResult = await window.ShowDialog<DialogResult>(GetWindow());
+                        DialogResult cliResult = await window.ShowDialog<DialogResult>(TopLevel.GetTopLevel(this) as Window ?? throw new NullReferenceException("Invalid Owner"));
                         if (cliResult != null && cliResult.IsOk)
                         {
                             Logger.LogDebug("SET.CTLC", "Attempting to download CLI tools from: " + cliResult.TextBoxValue);
@@ -115,9 +113,8 @@ namespace NervaOneWalletMiner.Views
                             Logger.LogDebug("SET.CTLC", "CLI tools download cancelled");
                             GlobalData.IsCliToolsDownloading = false;
 
-                            MessageBoxView msgWindow = new("Client Tools Missing", "NervaOne cannot run without client tools. Switch coin or restart to download client tools. "
-                                + "Alternatively you can put your own client tools in Daemon Setup > Open Client Tools Folder", true);
-                            await msgWindow.ShowDialog(GetWindow());
+                            await DialogService.ShowAsync(new MessageBoxView("Client Tools Missing", "NervaOne cannot run without client tools. Switch coin or restart to download client tools. "
+                                + "Alternatively you can put your own client tools in Daemon Setup > Open Client Tools Folder", true));
                         }
                     }
                 }

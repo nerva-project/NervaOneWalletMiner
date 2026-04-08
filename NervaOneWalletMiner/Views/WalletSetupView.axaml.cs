@@ -46,7 +46,7 @@ namespace NervaOneWalletMiner.Views
                 var prereq = GetVm().CheckPrerequisites(true, "Sweep Below");
                 if (!prereq.IsSuccess)
                 {
-                    await new MessageBoxView(prereq.Title, prereq.Message, true).ShowDialog(GetWindow());
+                    await DialogService.ShowAsync(new MessageBoxView(prereq.Title, prereq.Message, true));
                     return;
                 }
 
@@ -59,12 +59,7 @@ namespace NervaOneWalletMiner.Views
                 }
 
                 var opResult = await GetVm().SweepBelow(result.SweepBelowAmount, result.SweepBelowAddress);
-
-                var owner = TopLevel.GetTopLevel(this) as Window;
-                if (owner != null)
-                {
-                    await new MessageBoxView(opResult.Title, opResult.Message, true).ShowDialog(owner);
-                }
+                await DialogService.ShowAsync(new MessageBoxView(opResult.Title, opResult.Message, true));
             }
             catch (Exception ex)
             {
@@ -91,7 +86,7 @@ namespace NervaOneWalletMiner.Views
                 var error = GetVm().ValidateAndApplySettings();
                 if (!error.IsSuccess)
                 {
-                    await new MessageBoxView(error.Title, error.Message, true).ShowDialog(GetWindow());
+                    await DialogService.ShowAsync(new MessageBoxView(error.Title, error.Message, true));
                 }
             }
             catch (Exception ex)
@@ -108,7 +103,7 @@ namespace NervaOneWalletMiner.Views
                 var prereq = GetVm().CheckPrerequisites(false, "Create New Wallet");
                 if (!prereq.IsSuccess)
                 {
-                    await new MessageBoxView(prereq.Title, prereq.Message, true).ShowDialog(GetWindow());
+                    await DialogService.ShowAsync(new MessageBoxView(prereq.Title, prereq.Message, true));
                     return;
                 }
 
@@ -129,11 +124,11 @@ namespace NervaOneWalletMiner.Views
 
                 if (opResult.IsSuccess)
                 {
-                    await new DisplayKeysSeedView("Wallet created successfully! Your new wallet is now open.\r\n\r\nPlease make sure to save your seed phrase and keys to a safe place. You'll need them if you ever need to restore your wallet. If somebody gets a hold of those, they can steal your funds!").ShowDialog(GetWindow());
+                    await DialogService.ShowAsync(new DisplayKeysSeedView("Wallet created successfully! Your new wallet is now open.\r\n\r\nPlease make sure to save your seed phrase and keys to a safe place. You'll need them if you ever need to restore your wallet. If somebody gets a hold of those, they can steal your funds!"));
                 }
                 else if (!string.IsNullOrEmpty(opResult.Message))
                 {
-                    await new MessageBoxView(opResult.Title, opResult.Message, true).ShowDialog(GetWindow());
+                    await DialogService.ShowAsync(new MessageBoxView(opResult.Title, opResult.Message, true));
                 }
             }
             catch (Exception ex)
@@ -151,7 +146,7 @@ namespace NervaOneWalletMiner.Views
                 var prereq = GetVm().CheckPrerequisites(false, "Restore Wallet from Seed");
                 if (!prereq.IsSuccess)
                 {
-                    await new MessageBoxView(prereq.Title, prereq.Message, true).ShowDialog(GetWindow());
+                    await DialogService.ShowAsync(new MessageBoxView(prereq.Title, prereq.Message, true));
                     return;
                 }
 
@@ -175,7 +170,7 @@ namespace NervaOneWalletMiner.Views
                 }
 
                 var opResult = await GetVm().RestoreFromSeed(result.SeedPhrase, result.SeedOffset, result.WalletName, result.WalletPassword, result.WalletLanguage);
-                await new MessageBoxView(opResult.Title, opResult.Message, true).ShowDialog(GetWindow());
+                await DialogService.ShowAsync(new MessageBoxView(opResult.Title, opResult.Message, true));
             }
             catch (Exception ex)
             {
@@ -192,7 +187,7 @@ namespace NervaOneWalletMiner.Views
                 var prereq = GetVm().CheckPrerequisites(false, "Restore Wallet from Keys");
                 if (!prereq.IsSuccess)
                 {
-                    await new MessageBoxView(prereq.Title, prereq.Message, true).ShowDialog(GetWindow());
+                    await DialogService.ShowAsync(new MessageBoxView(prereq.Title, prereq.Message, true));
                     return;
                 }
 
@@ -220,7 +215,7 @@ namespace NervaOneWalletMiner.Views
                 }
 
                 var opResult = await GetVm().RestoreFromKeys(result.WalletAddress, result.ViewKey, result.SpendKey, result.WalletName, result.WalletPassword, result.WalletLanguage);
-                await new MessageBoxView(opResult.Title, opResult.Message, true).ShowDialog(GetWindow());
+                await DialogService.ShowAsync(new MessageBoxView(opResult.Title, opResult.Message, true));
             }
             catch (Exception ex)
             {
@@ -237,12 +232,12 @@ namespace NervaOneWalletMiner.Views
                 var prereq = GetVm().CheckPrerequisites(true, "Rescan Spent");
                 if (!prereq.IsSuccess)
                 {
-                    await new MessageBoxView(prereq.Title, prereq.Message, true).ShowDialog(GetWindow());
+                    await DialogService.ShowAsync(new MessageBoxView(prereq.Title, prereq.Message, true));
                     return;
                 }
 
                 var opResult = await GetVm().RescanSpent();
-                await new MessageBoxView(opResult.Title, opResult.Message, true).ShowDialog(GetWindow());
+                await DialogService.ShowAsync(new MessageBoxView(opResult.Title, opResult.Message, true));
             }
             catch (Exception ex)
             {
@@ -259,12 +254,12 @@ namespace NervaOneWalletMiner.Views
                 var prereq = GetVm().CheckPrerequisites(true, "Rescan Blockchain");
                 if (!prereq.IsSuccess)
                 {
-                    await new MessageBoxView(prereq.Title, prereq.Message, true).ShowDialog(GetWindow());
+                    await DialogService.ShowAsync(new MessageBoxView(prereq.Title, prereq.Message, true));
                     return;
                 }
 
                 var opResult = await GetVm().RescanBlockchain();
-                await new MessageBoxView(opResult.Title, opResult.Message, true).ShowDialog(GetWindow());
+                await DialogService.ShowAsync(new MessageBoxView(opResult.Title, opResult.Message, true));
             }
             catch (Exception ex)
             {
@@ -285,7 +280,7 @@ namespace NervaOneWalletMiner.Views
                 var prereq = vm.CheckPrerequisites(true, title);
                 if (!prereq.IsSuccess)
                 {
-                    await new MessageBoxView(prereq.Title, prereq.Message, true).ShowDialog(GetWindow());
+                    await DialogService.ShowAsync(new MessageBoxView(prereq.Title, prereq.Message, true));
                     return;
                 }
 
@@ -297,7 +292,7 @@ namespace NervaOneWalletMiner.Views
                 else
                 {
                     TextBoxView textWindow = new("Provide Wallet Password", "Please provide wallet password", string.Empty, "Required - Wallet password", true, true);
-                    DialogResult passRes = await textWindow.ShowDialog<DialogResult>(GetWindow());
+                    DialogResult passRes = await DialogService.ShowAsync<DialogResult>(textWindow);
 
                     if (passRes == null || !passRes.IsOk)
                     {
@@ -313,7 +308,7 @@ namespace NervaOneWalletMiner.Views
                         }
                         else
                         {
-                            await new MessageBoxView(title, "Incorrect password", true).ShowDialog(GetWindow());
+                            await DialogService.ShowAsync(new MessageBoxView(title, "Incorrect password", true));
                         }
                     }
                     else
@@ -321,7 +316,7 @@ namespace NervaOneWalletMiner.Views
                         var unlockResult = await vm.UnlockWithPassword(passRes.TextBoxValue);
                         if (!unlockResult.IsSuccess && !string.IsNullOrEmpty(unlockResult.Message))
                         {
-                            await new MessageBoxView(unlockResult.Title, unlockResult.Message, true).ShowDialog(GetWindow());
+                            await DialogService.ShowAsync(new MessageBoxView(unlockResult.Title, unlockResult.Message, true));
                         }
                         isAuthorized = unlockResult.IsSuccess;
                     }
@@ -337,12 +332,12 @@ namespace NervaOneWalletMiner.Views
                     var (isSuccess, dumpPath) = await vm.DumpKeysToFile();
                     if (isSuccess)
                     {
-                        await new TextBoxView("View Private Keys", "Keys have been exported to below file", dumpPath, string.Empty).ShowDialog(GetWindow());
+                        await DialogService.ShowAsync(new TextBoxView("View Private Keys", "Keys have been exported to below file", dumpPath, string.Empty));
                     }
                 }
                 else
                 {
-                    await new DisplayKeysSeedView("Please make sure to save your seed phrase and keys to a safe place. You'll need them if you ever need to restore your wallet. If somebody gets a hold of those, they can steal your funds!").ShowDialog(GetWindow());
+                    await DialogService.ShowAsync(new DisplayKeysSeedView("Please make sure to save your seed phrase and keys to a safe place. You'll need them if you ever need to restore your wallet. If somebody gets a hold of those, they can steal your funds!"));
                 }
             }
             catch (Exception ex)

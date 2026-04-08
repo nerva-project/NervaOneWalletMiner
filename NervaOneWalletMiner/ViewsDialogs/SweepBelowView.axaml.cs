@@ -9,8 +9,6 @@ namespace NervaOneWalletMiner.ViewsDialogs;
 
 public partial class SweepBelowView : Window
 {
-    Window GetWindow() => TopLevel.GetTopLevel(this) as Window ?? throw new NullReferenceException("Invalid Owner");
-
     public SweepBelowView()
     {
         try
@@ -30,19 +28,13 @@ public partial class SweepBelowView : Window
         {
             if (string.IsNullOrEmpty(tbxAmount.Text) || string.IsNullOrEmpty(tbxAddress.Text))
             {
-                await Dispatcher.UIThread.Invoke(async () =>
-                {
-                    await new MessageBoxView("Sweep Below", "Amount and address are required", true).ShowDialog(GetWindow());
-                });
+                await DialogService.ShowAsync(new MessageBoxView("Sweep Below", "Amount and address are required", true));
                 return;
             }
 
             if (!double.TryParse(tbxAmount.Text, out double amount) || amount <= 0)
             {
-                await Dispatcher.UIThread.Invoke(async () =>
-                {
-                    await new MessageBoxView("Sweep Below", "Amount must be a positive number", true).ShowDialog(GetWindow());
-                });
+                await DialogService.ShowAsync(new MessageBoxView("Sweep Below", "Amount must be a positive number", true));
                 return;
             }
 

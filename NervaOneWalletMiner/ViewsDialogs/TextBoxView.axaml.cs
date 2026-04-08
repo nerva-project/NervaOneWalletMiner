@@ -6,11 +6,10 @@ using NervaOneWalletMiner.Helpers;
 
 namespace NervaOneWalletMiner.ViewsDialogs
 {
-    public partial class TextBoxView : Window
+    public partial class TextBoxView : UserControl
     {
-        Window GetWindow() => TopLevel.GetTopLevel(this) as Window ?? throw new NullReferenceException("Invalid Owner");
-
         bool _isTextRequired = false;
+        string _title = string.Empty;
 
         // Not used but designer will complain without it
         public TextBoxView()
@@ -23,11 +22,11 @@ namespace NervaOneWalletMiner.ViewsDialogs
             try
             {
                 InitializeComponent();
-                Icon = GlobalMethods.GetWindowIcon();
 
                 _isTextRequired = isTextRequired;
+                _title = title;
 
-                Title = title;
+                tbkTitle.Text = title;
                 lblValue.Content = labelValue;
                 tbxValue.Text = textValue;
                 tbxValue.Watermark = textWatermark;
@@ -43,16 +42,15 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
         }
 
-        public void OkButton_Clicked(object sender, RoutedEventArgs args)
+        public async void OkButton_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
                 var tbxValue = this.Get<TextBox>("tbxValue");
 
-                if(_isTextRequired && string.IsNullOrEmpty(tbxValue.Text))
+                if (_isTextRequired && string.IsNullOrEmpty(tbxValue.Text))
                 {
-                    MessageBoxView window = new(Title!, "Value is required.", true);
-                    window.ShowDialog(GetWindow());
+                    await DialogService.ShowAsync<DialogResult>(new MessageBoxView(_title, "Value is required.", true));
                 }
                 else
                 {
@@ -62,7 +60,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                         TextBoxValue = tbxValue.Text!,
                     };
 
-                    Close(result);
+                    DialogService.Close(result);
                 }
             }
             catch (Exception ex)
@@ -80,7 +78,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     IsCancel = true
                 };
 
-                Close(result);
+                DialogService.Close(result);
             }
             catch (Exception ex)
             {

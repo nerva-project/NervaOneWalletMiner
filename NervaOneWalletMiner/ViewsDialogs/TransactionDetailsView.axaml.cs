@@ -8,7 +8,7 @@ using System;
 
 namespace NervaOneWalletMiner.ViewsDialogs
 {
-    public partial class TransactionDetailsView : Window
+    public partial class TransactionDetailsView : UserControl
     {
         private string _transactionId = string.Empty;
         private int _accountIndex = 0;
@@ -19,13 +19,12 @@ namespace NervaOneWalletMiner.ViewsDialogs
         {
             InitializeComponent();
         }
-        
+
         public TransactionDetailsView(string transactionId, int accountIndex, decimal amount)
         {
             try
             {
                 InitializeComponent();
-                Icon = GlobalMethods.GetWindowIcon();
 
                 _transactionId = transactionId;
                 _accountIndex = accountIndex;
@@ -56,7 +55,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                 }
                 else
                 {
-                    this.Get<TextBox>("tbxYourAddress").Text = response.Address;                    
+                    this.Get<TextBox>("tbxYourAddress").Text = response.Address;
                     this.Get<TextBox>("tbxTransactionId").Text = response.TransactionId;
 
                     this.Get<Label>("lblPaymentId").Content = response.PaymentId;
@@ -64,7 +63,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     this.Get<Label>("lblType").Content = response.Type;
                     this.Get<Label>("lblHeight").Content = response.Height;
                     this.Get<Label>("lblAmount").Content = response.Amount;
-                    this.Get<Label>("lblFee").Content = response.Fee;                    
+                    this.Get<Label>("lblFee").Content = response.Fee;
                     this.Get<Label>("lblTime").Content = response.Timestamp;
                     this.Get<Label>("lblConfirmations").Content = response.Confirmations;
 
@@ -98,7 +97,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     IsCancel = true
                 };
 
-                Close(result);
+                DialogService.Close(result);
             }
             catch (Exception ex)
             {

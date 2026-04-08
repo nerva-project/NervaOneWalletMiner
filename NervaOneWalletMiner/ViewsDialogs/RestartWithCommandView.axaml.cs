@@ -6,19 +6,18 @@ using NervaOneWalletMiner.Helpers;
 
 namespace NervaOneWalletMiner.ViewsDialogs
 {
-    public partial class RestartWithCommandView : Window
+    public partial class RestartWithCommandView : UserControl
     {
         public RestartWithCommandView()
         {
             try
             {
                 InitializeComponent();
-                Icon = GlobalMethods.GetWindowIcon();
             }
             catch (Exception ex)
             {
                 Logger.LogException("RCD.CONS", ex);
-            }            
+            }
         }
 
         public void OkButton_Clicked(object sender, RoutedEventArgs args)
@@ -33,7 +32,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     RestartOptions = tbxRestartOptions.Text!
                 };
 
-                Close(result);
+                DialogService.Close(result);
             }
             catch (Exception ex)
             {
@@ -50,7 +49,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     IsCancel = true
                 };
 
-                Close(result);
+                DialogService.Close(result);
             }
             catch (Exception ex)
             {

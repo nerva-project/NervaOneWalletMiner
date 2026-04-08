@@ -13,7 +13,6 @@ namespace NervaOneWalletMiner.Views
 {
     public partial class DaemonSetupView : UserControl
     {
-        Window GetWindow() => TopLevel.GetTopLevel(this) as Window ?? throw new NullReferenceException("Invalid Owner");
         TopLevel GetTopLevel() => TopLevel.GetTopLevel(this) ?? throw new NullReferenceException("Invalid Owner");
         DaemonSetupViewModel GetVm() => (DaemonSetupViewModel)DataContext!;
 
@@ -39,7 +38,7 @@ namespace NervaOneWalletMiner.Views
 
                 if (vm.IsWalletOnly && string.IsNullOrEmpty(vm.RemoteNodeAddress))
                 {
-                    await new MessageBoxView("Remote Node Required", "Remote Node Address or IP is required.", true).ShowDialog<DialogResult>(GetWindow());
+                    await DialogService.ShowAsync(new MessageBoxView("Remote Node Required", "Remote Node Address or IP is required.", true));
                     return;
                 }
 
@@ -60,7 +59,7 @@ namespace NervaOneWalletMiner.Views
                 {
                     Logger.LogDebug("DMS.SSC1", "Restart required. Asking user");
                     MessageBoxView confirmDaemonRestart = new("Restart Daemon?", "You've made changes to daemon setup. For those changes to take effect, restart is required.\r\n\r\nWould you like to restart daemon now?", false, true);
-                    DialogResult confirmRestart = await confirmDaemonRestart.ShowDialog<DialogResult>(GetWindow());
+                    DialogResult confirmRestart = await DialogService.ShowAsync<DialogResult>(confirmDaemonRestart);
 
                     if (confirmRestart != null && confirmRestart.IsOk)
                     {
@@ -70,7 +69,7 @@ namespace NervaOneWalletMiner.Views
                 }
                 else
                 {
-                    await new MessageBoxView("Daemon Setting", "Changes saved successfully.", true).ShowDialog(GetWindow());
+                    await DialogService.ShowAsync(new MessageBoxView("Daemon Setting", "Changes saved successfully.", true));
                 }
             }
             catch (Exception ex)
@@ -81,13 +80,13 @@ namespace NervaOneWalletMiner.Views
         #endregion // Save Settings
 
         #region Restart With QuickSync
-        public void RestartWithQuickSync_Clicked(object sender, RoutedEventArgs args)
+        public async void RestartWithQuickSync_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
                 if (!GetVm().IsQuickSyncSupported())
                 {
-                    new MessageBoxView("Restart with QuickSync", "Error, " + GlobalData.AppSettings.ActiveCoin.ToUpper() + " does not support QuickSync.", true).ShowDialog(GetWindow());
+                    await DialogService.ShowAsync(new MessageBoxView("Restart with QuickSync", "Error, " + GlobalData.AppSettings.ActiveCoin.ToUpper() + " does not support QuickSync.", true));
                 }
                 else
                 {
@@ -116,7 +115,7 @@ namespace NervaOneWalletMiner.Views
                 else
                 {
                     var window = new TextBoxView("Update Client Tools", "Client Tools Download Link", cliToolsLink, string.Empty);
-                    DialogResult result = await window.ShowDialog<DialogResult>(GetWindow());
+                    DialogResult result = await DialogService.ShowAsync<DialogResult>(window);
                     if (result != null && result.IsOk && !string.IsNullOrEmpty(result.TextBoxValue))
                     {
                         await GetVm().PerformCliToolsUpdate(result.TextBoxValue);
@@ -136,7 +135,7 @@ namespace NervaOneWalletMiner.Views
             try
             {
                 var window = new RestartWithCommandView();
-                DialogResult result = await window.ShowDialog<DialogResult>(GetWindow());
+                DialogResult result = await DialogService.ShowAsync<DialogResult>(window);
                 if (result != null && result.IsOk)
                 {
                     GetVm().RestartWithCommand(result.RestartOptions);

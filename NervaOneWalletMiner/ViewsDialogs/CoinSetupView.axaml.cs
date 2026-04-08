@@ -9,7 +9,6 @@ namespace NervaOneWalletMiner;
 
 public partial class CoinSetupView : Window
 {
-    Window GetWindow() => TopLevel.GetTopLevel(this) as Window ?? throw new NullReferenceException("Invalid Owner");
 
     public CoinSetupView()
     {
@@ -59,19 +58,17 @@ public partial class CoinSetupView : Window
         }
     }
 
-    public void OkButton_Clicked(object sender, RoutedEventArgs args)
+    public async void OkButton_Clicked(object sender, RoutedEventArgs args)
     {
         try
         {
             if (string.IsNullOrEmpty(tbxCliDownloadUrl.Text))
             {
-                MessageBoxView window = new(Title!, "Client Tools Download URL is required.", true);
-                window.ShowDialog(GetWindow());
+                await DialogService.ShowAsync(new MessageBoxView(Title!, "Client Tools Download URL is required.", true));
             }
-            else if((bool)RemoteNode.IsChecked! && string.IsNullOrEmpty(tbxRemoteNode.Text))
+            else if ((bool)RemoteNode.IsChecked! && string.IsNullOrEmpty(tbxRemoteNode.Text))
             {
-                MessageBoxView window = new(Title!, "Remote Node is required.", true);
-                window.ShowDialog(GetWindow());
+                await DialogService.ShowAsync(new MessageBoxView(Title!, "Remote Node is required.", true));
             }
             else
             {

@@ -1,0 +1,22 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="NervaOneWalletMiner.Views.OverlayDialogHost"
+             IsVisible="False">
+    <Panel>
+        <Border Background="#A0000000"/>
+        <Border HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                BorderThickness="1"
+                CornerRadius="4"
+                MaxWidth="660"
+                MaxHeight="740"
+                Margin="20">
+            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled">
+                <ContentControl Name="cctDialog"/>
+            </ScrollViewer>
+        </Border>
+    </Panel>
+</UserControl>

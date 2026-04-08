@@ -14,8 +14,6 @@ namespace NervaOneWalletMiner.ViewsDialogs
 {
     public partial class TransferFundsView : Window
     {
-        Window GetWindow() => TopLevel.GetTopLevel(this) as Window ?? throw new NullReferenceException("Invalid Owner");
-
         Dictionary<uint, string> _accounts = [];
 
         // Not used but designer will complain without it
@@ -97,11 +95,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
 
                 if (string.IsNullOrEmpty(cbxSendFrom.SelectedValue!.ToString()) || string.IsNullOrEmpty(tbxSendTo.Text) || string.IsNullOrEmpty(tbxAmount.Text))
                 {
-                    await Dispatcher.UIThread.Invoke(async () =>
-                    {
-                        MessageBoxView window = new("Transfer Funds", "From Address, To Address and Amount are required", true);
-                        await window.ShowDialog(GetWindow());
-                    });
+                    await DialogService.ShowAsync(new MessageBoxView("Transfer Funds", "From Address, To Address and Amount are required", true));
                 }
                 else
                 {
@@ -111,7 +105,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                         + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits
                         + ". Once transfer is started, it cannot be stopped. Do you want to continue?",
                         false, true);
-                    DialogResult confirmRes = await confirmWindow.ShowDialog<DialogResult>(this);
+                    DialogResult confirmRes = await DialogService.ShowAsync<DialogResult>(confirmWindow);
 
                     if (confirmRes != null && confirmRes.IsOk)
                     {
@@ -121,7 +115,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                         {
                             // Password required
                             TextBoxView textWindow = new TextBoxView("Provide Wallet Password", "Please provide wallet password", string.Empty, "Required - Wallet password", true, true);
-                            DialogResult passRes = await textWindow.ShowDialog<DialogResult>(GetWindow());
+                            DialogResult passRes = await DialogService.ShowAsync<DialogResult>(textWindow);
                             if (passRes != null && passRes.IsOk)
                             {
                                 if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPassRequiredToOpenWallet)
@@ -132,7 +126,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                                         isAuthorized = true;
                                         GlobalData.WalletPassProvidedTime = DateTime.Now;
                                         passRes.TextBoxValue = "";
-                                    }                                    
+                                    }
                                 }
                                 else
                                 {
@@ -148,11 +142,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                                     if (response.Error.IsError)
                                     {
                                         Logger.LogError("TFD.OKBC", "Unlock error | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
-                                        await Dispatcher.UIThread.Invoke(async () =>
-                                        {
-                                            MessageBoxView window = new("Unlock Wallet", "Unlock error\r\n\r\n" + response.Error.Message, true);
-                                            await window.ShowDialog(GetWindow());
-                                        });
+                                        await DialogService.ShowAsync(new MessageBoxView("Unlock Wallet", "Unlock error\r\n\r\n" + response.Error.Message, true));
                                     }
                                     else
                                     {
@@ -167,7 +157,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                             isAuthorized = true;
                         }
 
-                        if(isAuthorized)
+                        if (isAuthorized)
                         {
                             DialogResult result = new()
                             {
@@ -184,8 +174,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                         }
                         else
                         {
-                            MessageBoxView window = new("Transfer Funds", "Autherization failed", true);
-                            await window.ShowDialog(GetWindow());
+                            await DialogService.ShowAsync(new MessageBoxView("Transfer Funds", "Autherization failed", true));
                         }
                     }
                 }

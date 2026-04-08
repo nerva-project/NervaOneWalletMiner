@@ -1,83 +1,85 @@
-<Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="500"
-        x:Class="NervaOneWalletMiner.ViewsDialogs.TransactionDetailsView"
-		Width="600"
-		Height="500"
-		Topmost="True"
-		WindowStartupLocation="CenterOwner"
-        Title="Transaction Details">
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="500"
+             x:Class="NervaOneWalletMiner.ViewsDialogs.TransactionDetailsView">
 
-	<StackPanel Spacing="5" Margin="10">
-		<Label Content="Your Address"/>
-		<DockPanel>
-			<TextBox Name="tbxYourAddress" Width="500"/>
-			
-			<Button Name="btnCopyYourAddressToClipboard"
-					Content="Copy"
-					Margin="10,0,0,0"
-					Click="CopyYourAddressToClipboard_Clicked"/>
-		</DockPanel>
-		
-		<Label Content="Transaction Id"/>
-		<DockPanel>
-			<TextBox Name="tbxTransactionId" Width="500"/>
+    <StackPanel>
+        <TextBlock Text="Transaction Details"
+                   FontSize="16"
+                   FontWeight="SemiBold"
+                   Margin="12,12,12,6"/>
+        <Separator/>
+        <StackPanel Spacing="5" Margin="10">
+            <Label Content="Your Address"/>
+            <DockPanel>
+                <TextBox Name="tbxYourAddress" Width="500"/>
 
-			<Button Name="btnCopyTransactionIdToClipboard"
-					Content="Copy"
-					Margin="10,0,0,0"
-					Click="CopyTransactionIdToClipboard_Clicked"/>
-		</DockPanel>
-		
-		<Grid Margin="0,15,0,0">
-			<Grid.RowDefinitions>
-				<RowDefinition Height="35"/>
-				<RowDefinition Height="35"/>
-				<RowDefinition Height="35"/>
-				<RowDefinition Height="35"/>
-			</Grid.RowDefinitions>
+                <Button Name="btnCopyYourAddressToClipboard"
+                        Content="Copy"
+                        Margin="10,0,0,0"
+                        Click="CopyYourAddressToClipboard_Clicked"/>
+            </DockPanel>
 
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="120"/>
-				<ColumnDefinition Width="*"/>
-				<ColumnDefinition Width="120"/>
-				<ColumnDefinition Width="*"/>
-			</Grid.ColumnDefinitions>		
+            <Label Content="Transaction Id"/>
+            <DockPanel>
+                <TextBox Name="tbxTransactionId" Width="500"/>
 
-			<Label Grid.Row="0" Grid.Column="0" Content="Type:"/>
-			<Label Grid.Row="0" Grid.Column="1" Name="lblType" Content=""/>
-			<Label Grid.Row="0" Grid.Column="2" Content="Height:"/>
-			<Label Grid.Row="0" Grid.Column="3" Name="lblHeight" Content=""/>
-			
-			<Label Grid.Row="1" Grid.Column="0" Content="Amount:"/>
-			<Label Grid.Row="1" Grid.Column="1" Name="lblAmount" Content=""/>
-			<Label Grid.Row="1" Grid.Column="2" Content="Fee:"/>
-			<Label Grid.Row="1" Grid.Column="3" Name="lblFee" Content=""/>
+                <Button Name="btnCopyTransactionIdToClipboard"
+                        Content="Copy"
+                        Margin="10,0,0,0"
+                        Click="CopyTransactionIdToClipboard_Clicked"/>
+            </DockPanel>
 
-			<Label Grid.Row="2" Grid.Column="0" Content="Time:"/>
-			<Label Grid.Row="2" Grid.Column="1" Name="lblTime" Content=""/>
-			<Label Grid.Row="2" Grid.Column="2" Content="Confirmations:"/>
-			<Label Grid.Row="2" Grid.Column="3" Name="lblConfirmations" Content=""/>
+            <Grid Margin="0,15,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="35"/>
+                    <RowDefinition Height="35"/>
+                    <RowDefinition Height="35"/>
+                    <RowDefinition Height="35"/>
+                </Grid.RowDefinitions>
 
-			<Label Grid.Row="3" Grid.Column="0" Content="Payment Id:"/>
-			<Label Grid.Row="3" Grid.Column="1" Name="lblPaymentId"/>
-			<Label Grid.Row="3" Grid.Column="2" Content="Note:"/>
-			<Label Grid.Row="3" Grid.Column="3" Name="lblNote"/>
-		</Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-		<Label Content="Destination Info" Margin="0,15,0,0"/>
-		<SelectableTextBlock Name="stbkDestinationInfo"
-							 TextWrapping="Wrap"
-							 Margin="5,0,5,0"/>
+                <Label Grid.Row="0" Grid.Column="0" Content="Type:"/>
+                <Label Grid.Row="0" Grid.Column="1" Name="lblType" Content=""/>
+                <Label Grid.Row="0" Grid.Column="2" Content="Height:"/>
+                <Label Grid.Row="0" Grid.Column="3" Name="lblHeight" Content=""/>
 
-		<DockPanel Margin="0,15,0,0">
-			<Button Name="btnClancel"
-					Content="Cancel"
-					Click="CancelButton_Clicked"
-					Margin="10,0,0,0"/>
-		</DockPanel>
-	</StackPanel>
-	
-</Window>
+                <Label Grid.Row="1" Grid.Column="0" Content="Amount:"/>
+                <Label Grid.Row="1" Grid.Column="1" Name="lblAmount" Content=""/>
+                <Label Grid.Row="1" Grid.Column="2" Content="Fee:"/>
+                <Label Grid.Row="1" Grid.Column="3" Name="lblFee" Content=""/>
+
+                <Label Grid.Row="2" Grid.Column="0" Content="Time:"/>
+                <Label Grid.Row="2" Grid.Column="1" Name="lblTime" Content=""/>
+                <Label Grid.Row="2" Grid.Column="2" Content="Confirmations:"/>
+                <Label Grid.Row="2" Grid.Column="3" Name="lblConfirmations" Content=""/>
+
+                <Label Grid.Row="3" Grid.Column="0" Content="Payment Id:"/>
+                <Label Grid.Row="3" Grid.Column="1" Name="lblPaymentId"/>
+                <Label Grid.Row="3" Grid.Column="2" Content="Note:"/>
+                <Label Grid.Row="3" Grid.Column="3" Name="lblNote"/>
+            </Grid>
+
+            <Label Content="Destination Info" Margin="0,15,0,0"/>
+            <SelectableTextBlock Name="stbkDestinationInfo"
+                                 TextWrapping="Wrap"
+                                 Margin="5,0,5,0"/>
+
+            <DockPanel Margin="0,15,0,0">
+                <Button Name="btnClancel"
+                        Content="Cancel"
+                        Click="CancelButton_Clicked"
+                        Margin="10,0,0,0"/>
+            </DockPanel>
+        </StackPanel>
+    </StackPanel>
+
+</UserControl>

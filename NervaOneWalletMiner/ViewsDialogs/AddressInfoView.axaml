@@ -1,64 +1,64 @@
-<Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="500"
-        x:Class="NervaOneWalletMiner.ViewsDialogs.AddressInfoView"
-		Width="500"
-		Height="500"
-		Topmost="True"
-		WindowStartupLocation="CenterOwner"
-		Title="Address Information">
-	
-	<StackPanel Spacing="5" Margin="10">
-		<Label Content="Select Account to View Full Address"/>
-		<ComboBox Name="cbxAccount"
-				  HorizontalAlignment="Stretch"
-				  SelectionChanged="AccountSelectionChanged"/>
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="500"
+             x:Class="NervaOneWalletMiner.ViewsDialogs.AddressInfoView">
 
-		<Label Content="Wallet Address" Margin="0,15,0,0"/>
-		<DockPanel>
-			<TextBox Name="tbxWalletAddress" Width="400"/>
+    <StackPanel>
+        <TextBlock Text="Address Information"
+                   FontSize="16"
+                   FontWeight="SemiBold"
+                   Margin="12,12,12,6"/>
+        <Separator/>
+        <StackPanel Spacing="5" Margin="10">
+            <Label Content="Select Account to View Full Address"/>
+            <ComboBox Name="cbxAccount"
+                      HorizontalAlignment="Stretch"
+                      SelectionChanged="AccountSelectionChanged"/>
 
-			<Button Name="btnCopyWalletToClipboard"
-					Content="Copy"
-					Margin="10,0,0,0"
-					Click="CopyWalletToClipboard_Clicked"/>
-		</DockPanel>
-	
-		<Separator Margin="0,20,0,0"/>
-		
-		<Button Name="btnMakeIntegratedAddress"
-				Content="Make Integrated Address"
-				Click="MakeIntegratedAddress_Clicked"
-				Margin="0,15,0,0"/>
+            <Label Content="Wallet Address" Margin="0,15,0,0"/>
+            <DockPanel>
+                <TextBox Name="tbxWalletAddress" Width="400"/>
 
-		<Label Content="Integrated Address" Margin="0,15,0,0"/>
-		<DockPanel>
-			<TextBox Name="tbxIntegratedAddress" Width="400"/>
-			
-			<Button Name="btnCopyIntegratedAddressToClipboard"
-					Content="Copy"
-					Margin="10,0,0,0"
-					Click="CopyIntegratedAddressToClipboard_Clicked"/>
-		</DockPanel>
-		
+                <Button Name="btnCopyWalletToClipboard"
+                        Content="Copy"
+                        Margin="10,0,0,0"
+                        Click="CopyWalletToClipboard_Clicked"/>
+            </DockPanel>
 
-		<Label Content="Payment Id" Margin="0,15,0,0"/>
-		<DockPanel>
-			<TextBox Name="tbxPaymentId" Width="400"/>
-			
-			<Button Name="btnCopyPaymentIdToClipboard"
-					Content="Copy"
-					Margin="10,0,0,0"
-					Click="CopyPaymentIdToClipboard_Clicked"/>
-		</DockPanel>
-		
+            <Separator Margin="0,20,0,0"/>
 
-		<Button Name="btnClose"
-				Content="Close"
-				Click="CloseButton_Clicked"
-				Margin="0,15,0,0"/>		
-	</StackPanel>
-	
-</Window>
+            <Button Name="btnMakeIntegratedAddress"
+                    Content="Make Integrated Address"
+                    Click="MakeIntegratedAddress_Clicked"
+                    Margin="0,15,0,0"/>
+
+            <Label Content="Integrated Address" Margin="0,15,0,0"/>
+            <DockPanel>
+                <TextBox Name="tbxIntegratedAddress" Width="400"/>
+
+                <Button Name="btnCopyIntegratedAddressToClipboard"
+                        Content="Copy"
+                        Margin="10,0,0,0"
+                        Click="CopyIntegratedAddressToClipboard_Clicked"/>
+            </DockPanel>
+
+            <Label Content="Payment Id" Margin="0,15,0,0"/>
+            <DockPanel>
+                <TextBox Name="tbxPaymentId" Width="400"/>
+
+                <Button Name="btnCopyPaymentIdToClipboard"
+                        Content="Copy"
+                        Margin="10,0,0,0"
+                        Click="CopyPaymentIdToClipboard_Clicked"/>
+            </DockPanel>
+
+            <Button Name="btnClose"
+                    Content="Close"
+                    Click="CloseButton_Clicked"
+                    Margin="0,15,0,0"/>
+        </StackPanel>
+    </StackPanel>
+
+</UserControl>

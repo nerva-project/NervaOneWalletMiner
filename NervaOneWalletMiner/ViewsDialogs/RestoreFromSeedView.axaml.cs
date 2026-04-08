@@ -9,8 +9,6 @@ namespace NervaOneWalletMiner.ViewsDialogs
 {
     public partial class RestoreFromSeedView : Window
     {
-        Window GetWindow() => TopLevel.GetTopLevel(this) as Window ?? throw new NullReferenceException("Invalid Owner");
-
         public RestoreFromSeedView()
         {
             try
@@ -29,7 +27,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
         }
 
-        public void OkButton_Clicked(object sender, RoutedEventArgs args)
+        public async void OkButton_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
@@ -43,8 +41,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
 
                 if (string.IsNullOrEmpty(tbxSeedPhrase.Text) || string.IsNullOrEmpty(tbxWalletName.Text) || string.IsNullOrEmpty(tbxPassword.Text))
                 {
-                    MessageBoxView window = new("Restore From Seed", "Seed Phrase, Wallet Name and Password are all required.", true);
-                    window.ShowDialog(GetWindow());
+                    await DialogService.ShowAsync(new MessageBoxView("Restore From Seed", "Seed Phrase, Wallet Name and Password are all required.", true));
                 }
                 else
                 {

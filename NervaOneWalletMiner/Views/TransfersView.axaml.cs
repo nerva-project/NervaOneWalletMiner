@@ -12,8 +12,6 @@ namespace NervaOneWalletMiner.Views
 {
     public partial class TransfersView : UserControl
     {
-        Window GetWindow() => TopLevel.GetTopLevel(this) as Window ?? throw new NullReferenceException("Invalid Owner");
-
         public TransfersView()
         {
             try
@@ -24,7 +22,7 @@ namespace NervaOneWalletMiner.Views
             catch (Exception ex)
             {
                 Logger.LogException("TRA.CONS", ex);
-            }            
+            }
         }
 
         public void TransactionDetails_Clicked(object sender, RoutedEventArgs args)
@@ -49,19 +47,16 @@ namespace NervaOneWalletMiner.Views
                     if (response.Error.IsError)
                     {
                         Logger.LogError("TRA.EXAC", "ExportTranfers Error | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
-                        MessageBoxView window = new("Export All", "Error exporting:\r\n" + response.Error.Message, true);
-                        await window.ShowDialog(GetWindow());
+                        await DialogService.ShowAsync(new MessageBoxView("Export All", "Error exporting:\r\n" + response.Error.Message, true));
                     }
                     else
                     {
-                        var window = new TextBoxView("Export All", "Transactions have been exported to below file", exportFile, string.Empty);
-                        await window.ShowDialog(GetWindow());
+                        await DialogService.ShowAsync(new TextBoxView("Export All", "Transactions have been exported to below file", exportFile, string.Empty));
                     }
                 }
                 else
                 {
-                    MessageBoxView window = new("Export All", "Please open wallet first.", true);
-                    await window.ShowDialog(GetWindow());
+                    await DialogService.ShowAsync(new MessageBoxView("Export All", "Please open wallet first.", true));
                 }
             }
             catch (Exception ex)
@@ -75,7 +70,7 @@ namespace NervaOneWalletMiner.Views
             OpenTransactionDetailsView();
         }
 
-        private void OpenTransactionDetailsView()
+        private async void OpenTransactionDetailsView()
         {
             try
             {
@@ -84,19 +79,16 @@ namespace NervaOneWalletMiner.Views
                 if (dtgTransactions.SelectedItem != null)
                 {
                     Transfer selectedItem = (Transfer)dtgTransactions.SelectedItem;
-                    var window = new TransactionDetailsView(selectedItem.TransactionId, selectedItem.AccountIndex, selectedItem.Amount);
-                    window.ShowDialog(GetWindow());
+                    await DialogService.ShowAsync(new TransactionDetailsView(selectedItem.TransactionId, selectedItem.AccountIndex, selectedItem.Amount));
                 }
                 else
                 {
                     Logger.LogDebug("TRA.OTDV", "Opening Transfer transaction details view");
-                    Dispatcher.UIThread.Invoke(async () =>
-                    {                        
-                        MessageBoxView window = new("Transaction Details", "Please select transaction", true);
-                        await window.ShowDialog(GetWindow());
+                    await Dispatcher.UIThread.InvokeAsync(async () =>
+                    {
+                        await DialogService.ShowAsync(new MessageBoxView("Transaction Details", "Please select transaction", true));
                     });
                 }
-
             }
             catch (Exception ex)
             {

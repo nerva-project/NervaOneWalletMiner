@@ -9,8 +9,6 @@ namespace NervaOneWalletMiner.ViewsDialogs
 {
     public partial class RestoreFromKeysView : Window
     {
-        Window GetWindow() => TopLevel.GetTopLevel(this) as Window ?? throw new NullReferenceException("Invalid Owner");
-
         public RestoreFromKeysView()
         {
             try
@@ -29,7 +27,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
         }
 
-        public void OkButtonClicked(object sender, RoutedEventArgs args)
+        public async void OkButtonClicked(object sender, RoutedEventArgs args)
         {
             try
             {
@@ -48,8 +46,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     || string.IsNullOrEmpty(tbxWalletName.Text)
                     || string.IsNullOrEmpty(tbxPassword.Text))
                 {
-                    MessageBoxView window = new("Restore From Keys", "Wallet Address, View Key, Spend Key, Wallet Name and Password are all required.", true);
-                    window.ShowDialog(GetWindow());
+                    await DialogService.ShowAsync(new MessageBoxView("Restore From Keys", "Wallet Address, View Key, Spend Key, Wallet Name and Password are all required.", true));
                 }
                 else
                 {

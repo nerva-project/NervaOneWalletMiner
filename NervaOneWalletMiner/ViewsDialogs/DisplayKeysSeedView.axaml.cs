@@ -9,7 +9,7 @@ using System;
 
 namespace NervaOneWalletMiner.ViewsDialogs
 {
-    public partial class DisplayKeysSeedView : Window
+    public partial class DisplayKeysSeedView : UserControl
     {
         #region Constructors and Loading
         // Not used but designer will complain without it
@@ -23,7 +23,6 @@ namespace NervaOneWalletMiner.ViewsDialogs
             try
             {
                 InitializeComponent();
-                Icon = GlobalMethods.GetWindowIcon();               
 
                 GetAndShowKeys(message);
             }
@@ -65,7 +64,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                         tbxMnemonicSeed.Text = new string(response.Mnemonic);
                         Array.Clear(response.Mnemonic, 0, response.Mnemonic.Length);
                         response = new GetPrivateKeysResponse();
-                    }                        
+                    }
                 }
             }
             catch (Exception ex)
@@ -75,7 +74,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
         }
         #endregion // Constructors and Loading
 
-        #region Events        
+        #region Events
         public void CopyPublicViewKeyToClipboardButton_Clicked(object sender, RoutedEventArgs args)
         {
             try
@@ -106,13 +105,11 @@ namespace NervaOneWalletMiner.ViewsDialogs
             {
                 if (tbxPrivateViewKey.RevealPassword)
                 {
-                    // Reveal was true, so hide
                     tbxPrivateViewKey.RevealPassword = false;
                     btnShowHidePrivateViewKey.Content = "Show";
                 }
                 else
                 {
-                    // Reveal was false, so show
                     tbxPrivateViewKey.RevealPassword = true;
                     btnShowHidePrivateViewKey.Content = "Hide";
                 }
@@ -153,13 +150,11 @@ namespace NervaOneWalletMiner.ViewsDialogs
             {
                 if (tbxPrivateSpendKey.RevealPassword)
                 {
-                    // Reveal was true, so hide
                     tbxPrivateSpendKey.RevealPassword = false;
                     btnShowHidePrivateSpendKey.Content = "Show";
                 }
                 else
                 {
-                    // Reveal was false, so show
                     tbxPrivateSpendKey.RevealPassword = true;
                     btnShowHidePrivateSpendKey.Content = "Hide";
                 }
@@ -188,13 +183,11 @@ namespace NervaOneWalletMiner.ViewsDialogs
             {
                 if (tbxMnemonicSeed.RevealPassword)
                 {
-                    // Reveal was true, so hide
                     tbxMnemonicSeed.RevealPassword = false;
                     btnShowHideSeed.Content = "Show";
                 }
                 else
                 {
-                    // Reveal was false, so show
                     tbxMnemonicSeed.RevealPassword = true;
                     btnShowHideSeed.Content = "Hide";
                 }
@@ -209,31 +202,25 @@ namespace NervaOneWalletMiner.ViewsDialogs
         {
             try
             {
+                // Clear sensitive data before closing
+                tbxPublicViewKey.Text = "";
+                tbxPrivateViewKey.Text = "";
+                tbxPublicSpendKey.Text = "";
+                tbxPrivateSpendKey.Text = "";
+                tbxMnemonicSeed.Text = "";
+                TopLevel.GetTopLevel(this)?.Clipboard?.ClearAsync();
+
                 DialogResult result = new()
                 {
                     IsCancel = true
                 };
 
-                Close(result);
+                DialogService.Close(result);
             }
             catch (Exception ex)
             {
                 Logger.LogException("DKD.CLBC", ex);
             }
-        }
-
-        protected override void OnClosing(WindowClosingEventArgs e)
-        {
-            // Clear sensitive items as good as we can.
-            tbxPublicViewKey.Text = "";
-            tbxPrivateViewKey.Text = "";
-            tbxPublicSpendKey.Text = "";
-            tbxPrivateSpendKey.Text = "";
-            tbxMnemonicSeed.Text = "";
-
-            TopLevel.GetTopLevel(this)?.Clipboard?.ClearAsync();
-
-            base.OnClosing(e);
         }
         #endregion // Events
     }
