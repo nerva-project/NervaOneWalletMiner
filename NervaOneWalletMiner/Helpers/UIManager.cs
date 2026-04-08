@@ -51,6 +51,7 @@ namespace NervaOneWalletMiner.Helpers
                 { SplitViewPages.WalletSetup, new PickCoinViewModel() },
                 { SplitViewPages.Settings, new PickCoinViewModel() },
                 { SplitViewPages.About, new PickCoinViewModel() },
+                { SplitViewPages.CoinSetup, new CoinSetupViewModel() },
 
                 { SplitViewPages.MainView, _mainView }
             };
@@ -71,6 +72,7 @@ namespace NervaOneWalletMiner.Helpers
                 { SplitViewPages.WalletSetup, new WalletSetupViewModel() },
                 { SplitViewPages.Settings, new SettingsViewModel() },
                 { SplitViewPages.About, new AboutViewModel() },
+                { SplitViewPages.CoinSetup, new CoinSetupViewModel() },
 
                 { SplitViewPages.MainView, _mainView }
             };
@@ -118,6 +120,24 @@ namespace NervaOneWalletMiner.Helpers
                 default:
                     ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.Daemon];
                     break;
+            }
+        }
+
+        public static void NavigateToCoinSetup()
+        {
+            GlobalData.ViewModelPages[SplitViewPages.CoinSetup] = new CoinSetupViewModel();
+            ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.CoinSetup];
+        }
+
+        public static void NavigateToDefaultPage()
+        {
+            if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
+            {
+                ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.Wallet];
+            }
+            else
+            {
+                ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.Daemon];
             }
         }
 

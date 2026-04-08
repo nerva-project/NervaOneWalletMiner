@@ -1,8 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using NervaOneWalletMiner.Helpers;
-using NervaOneWalletMiner.Objects.Constants;
-using NervaOneWalletMiner.ViewModels;
 using System;
 
 namespace NervaOneWalletMiner.Views
@@ -28,7 +26,12 @@ namespace NervaOneWalletMiner.Views
 
                 UIManager.SetUpPages();
 
-                ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CheckAndGetCliTools();
+                if (!GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
+                {
+                    GlobalData.IsCliToolsFound = false;
+                    Logger.LogDebug("PIC.OKBC", "CLI tools not found. Navigating to Coin Setup View.");
+                    UIManager.NavigateToCoinSetup();
+                }
             }
             catch (Exception ex)
             {
