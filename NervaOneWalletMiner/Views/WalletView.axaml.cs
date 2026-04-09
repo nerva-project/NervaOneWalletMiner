@@ -269,22 +269,7 @@ namespace NervaOneWalletMiner.Views
                         selectedIndex = selectedItem.Index;
                     }
 
-                    var window = new TransferFundsView(selectedIndex, toAddress, paymentId);
-                    DialogResult result = await window.ShowDialog<DialogResult>(TopLevel.GetTopLevel(this) as Window ?? throw new NullReferenceException("Invalid Owner"));
-                    if (result != null && result.IsOk)
-                    {
-                        if (!string.IsNullOrEmpty(result.SendToAddress) && result.SendAmount > 0)
-                        {
-                            if (result.IsSplitTranfer)
-                            {
-                                MakeTransferSplit(result.SendFromAddressIndex, result.SendToAddress, result.SendAmount, result.SendPaymentId, result.Priority);
-                            }
-                            else
-                            {
-                                MakeTransfer(result.SendFromAddressIndex, result.SendToAddress, result.SendAmount, result.SendPaymentId, result.Priority);
-                            }
-                        }
-                    }
+                    UIManager.NavigateToTransferFunds(selectedIndex, toAddress, paymentId);
                 }
                 else
                 {
@@ -294,80 +279,6 @@ namespace NervaOneWalletMiner.Views
             catch (Exception ex)
             {
                 Logger.LogException("WAL.STRD", ex);
-            }
-        }
-
-        private async void MakeTransfer(uint sendFromAccountIndex, string sendToAddress, decimal amount, string paymentId, string priority)
-        {
-            try
-            {
-                TransferRequest request = new()
-                {
-                    Destinations = [new() { Amount = amount, Address = sendToAddress }],
-                    AccountIndex = sendFromAccountIndex,
-                    Priority = priority,
-                    PaymentId = paymentId
-                };
-
-                TransferResponse response = await GlobalData.WalletService.Transfer(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
-
-                if (response.Error.IsError)
-                {
-                    Logger.LogError("WAL.MKTR", "Transfer error | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
-                    await Dispatcher.UIThread.InvokeAsync(async () =>
-                    {
-                        await DialogService.ShowAsync(new MessageBoxView("Transfer Funds", "Transfer error\r\n\r\n" + response.Error.Message, true));
-                    });
-                }
-                else
-                {
-                    Logger.LogDebug("WAL.MKTR", "Transfer successful");
-                    await Dispatcher.UIThread.InvokeAsync(async () =>
-                    {
-                        await DialogService.ShowAsync(new MessageBoxView("Transfer Funds", "Transfer successful!", true));
-                    });
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException("WAL.MKTR", ex);
-            }
-        }
-
-        private async void MakeTransferSplit(uint sendFromAccountIndex, string sendToAddress, decimal amount, string paymentId, string priority)
-        {
-            try
-            {
-                TransferRequest request = new()
-                {
-                    Destinations = [new() { Amount = amount, Address = sendToAddress }],
-                    AccountIndex = sendFromAccountIndex,
-                    Priority = priority,
-                    PaymentId = paymentId
-                };
-
-                TransferResponse response = await GlobalData.WalletService.TransferSplit(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
-
-                if (response.Error.IsError)
-                {
-                    Logger.LogError("WAL.MTSP", "Split transfer error | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
-                    await Dispatcher.UIThread.InvokeAsync(async () =>
-                    {
-                        await DialogService.ShowAsync(new MessageBoxView("Transfer Split", "Transfer error\r\n\r\n" + response.Error.Message, true));
-                    });
-                }
-                else
-                {
-                    Logger.LogDebug("WAL.MTSP", "Transfer Split successful");
-                    await Dispatcher.UIThread.InvokeAsync(async () =>
-                    {
-                        await DialogService.ShowAsync(new MessageBoxView("Transfer Split", "Transfer successful!", true));
-                    });
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException("WAL.MTSP", ex);
             }
         }
         #endregion // Transfer Funds

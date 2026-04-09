@@ -15,6 +15,7 @@
         public const string AddressInfo = "address_info";
         public const string CreateWallet = "create_wallet";
         public const string OpenWallet = "open_wallet";
+        public const string TransferFunds = "transfer_funds";
 
         // Non-UI View. Needed so I have reference to it
         public const string MainView = "main_view";
