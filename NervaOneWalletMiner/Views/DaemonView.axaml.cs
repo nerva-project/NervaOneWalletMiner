@@ -14,6 +14,7 @@ namespace NervaOneWalletMiner.Views
 {
     public partial class DaemonView : UserControl
     {
+        private DataGridTextColumn? _colHeight;
         public DaemonView()
         {
             try
@@ -28,13 +29,58 @@ namespace NervaOneWalletMiner.Views
 
                 Initialized += DaemonView_Initialized;
 
-                var nupThreads = this.Get<NumericUpDown>("nupThreads");
-                nupThreads.Maximum = GlobalData.CpuThreadCount;
-                nupThreads.Value = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads;
+                // Index 2 = Height column (icon=0, Address=1, Height=2, LiveTime=3, State=4)
+                var dgConnections = this.Get<DataGrid>("dgConnections");
+                _colHeight = (DataGridTextColumn)dgConnections.Columns[2];
+
+                for (int i = 1; i <= GlobalData.CpuThreadCount; i++)
+                {
+                    cbxThreads.Items.Add(i);
+                }
+                cbxThreads.SelectedItem = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads;
             }
             catch (Exception ex)
             {
                 Logger.LogException("DMN.CONS", ex);
+            }
+        }
+
+        private void DaemonView_SizeChanged(object? sender, SizeChangedEventArgs e)
+        {
+            try
+            {
+                if (e.NewSize.Width < 450)
+                {
+                    // Narrow: threads+button below icon/label
+                    grdHeader.ColumnDefinitions = ColumnDefinitions.Parse("Auto,*");
+                    Grid.SetRow(spThreadsAndButton, 1);
+                    Grid.SetColumn(spThreadsAndButton, 0);
+
+                    // Narrow: miner stats below daemon stats
+                    grdStats.ColumnDefinitions = ColumnDefinitions.Parse("200,Auto");
+                    Grid.SetColumn(grdMinerStats, 0);
+                    Grid.SetRow(grdMinerStats, 1);
+
+                    if (_colHeight != null) { _colHeight.IsVisible = false; }
+                }
+                else
+                {
+                    // Wide: threads+button on the right of icon/label
+                    grdHeader.ColumnDefinitions = ColumnDefinitions.Parse("Auto,*,Auto");
+                    Grid.SetRow(spThreadsAndButton, 0);
+                    Grid.SetColumn(spThreadsAndButton, 2);
+
+                    // Wide: miner stats on the right
+                    grdStats.ColumnDefinitions = ColumnDefinitions.Parse("200,*,200");
+                    Grid.SetColumn(grdMinerStats, 2);
+                    Grid.SetRow(grdMinerStats, 0);
+
+                    if (_colHeight != null) { _colHeight.IsVisible = true; }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DMN.DVSC", ex);
             }
         }
 
@@ -57,13 +103,20 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
-        private void nupThreads_ValueChanged(object sender, NumericUpDownValueChangedEventArgs args)
+        private void cbxThreads_SelectionChanged(object sender, SelectionChangedEventArgs args)
         {
-            if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads != nupThreads.Value)
+            try
             {
-                GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads = Convert.ToInt32(nupThreads.Value);
-                Logger.LogDebug("DMN.NTVC", "Setting mining threads: " + GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
-                GlobalMethods.SaveConfig();
+                if (cbxThreads.SelectedItem is int selected &&  GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads != selected)
+                {
+                    GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads = selected;
+                    Logger.LogDebug("DMN.CTSC", "Setting mining threads: " + selected);
+                    GlobalMethods.SaveConfig();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DMN.CTSC", ex); ;
             }
         }
 
@@ -72,7 +125,6 @@ namespace NervaOneWalletMiner.Views
             try
             {
                 var btnStartStopMining = this.Get<Button>("btnStartStopMining");
-                var nupThreads = this.Get<NumericUpDown>("nupThreads");
 
                 if (btnStartStopMining.Content!.ToString()!.Equals(StatusMiner.StopMining))
                 {
@@ -81,7 +133,7 @@ namespace NervaOneWalletMiner.Views
                     GlobalData.IsManualStoppedMining = true;
                     StopMiningAsync();
                     btnStartStopMining.Content = StatusMiner.StartMining;
-                    nupThreads.IsEnabled = true;
+                    cbxThreads.IsEnabled = true;
                 }
                 else
                 {
@@ -118,16 +170,16 @@ namespace NervaOneWalletMiner.Views
                         else
                         {
                             // Start mining
-                            if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads != nupThreads.Value)
+                            if (cbxThreads.SelectedItem is int selected && GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads != selected)
                             {
-                                GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads = Convert.ToInt32(nupThreads.Value);
+                                GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads = selected;
                                 GlobalMethods.SaveConfig();
                             }
 
                             Logger.LogDebug("DMN.SSMC", "Starting mining");
                             StartMiningAsync(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
                             btnStartStopMining.Content = StatusMiner.StopMining;
-                            nupThreads.IsEnabled = false;
+                            cbxThreads.IsEnabled = false;
                         }
                     }
                 }
