@@ -60,6 +60,7 @@ namespace NervaOneWalletMiner.Helpers
                 { SplitViewPages.AddressBookEntry, new AddressBookEntryViewModel() },
                 { SplitViewPages.RestoreFromKeys, new RestoreFromKeysViewModel() },
                 { SplitViewPages.RestoreFromSeed, new RestoreFromSeedViewModel() },
+                { SplitViewPages.SweepBelow, new SweepBelowViewModel() },
 
                 { SplitViewPages.MainView, _mainView }
             };
@@ -89,6 +90,7 @@ namespace NervaOneWalletMiner.Helpers
                 { SplitViewPages.AddressBookEntry, new AddressBookEntryViewModel() },
                 { SplitViewPages.RestoreFromKeys, new RestoreFromKeysViewModel() },
                 { SplitViewPages.RestoreFromSeed, new RestoreFromSeedViewModel() },
+                { SplitViewPages.SweepBelow, new SweepBelowViewModel() },
 
                 { SplitViewPages.MainView, _mainView }
             };
@@ -197,6 +199,12 @@ namespace NervaOneWalletMiner.Helpers
         {
             GlobalData.ViewModelPages[SplitViewPages.RestoreFromSeed] = new RestoreFromSeedViewModel();
             ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.RestoreFromSeed];
+        }
+
+        public static void NavigateToSweepBelow()
+        {
+            GlobalData.ViewModelPages[SplitViewPages.SweepBelow] = new SweepBelowViewModel();
+            ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.SweepBelow];
         }
 
         public static void NavigateToPage(string page)

@@ -50,16 +50,7 @@ namespace NervaOneWalletMiner.Views
                     return;
                 }
 
-                var window = new SweepBelowView();
-                DialogResult result = await window.ShowDialog<DialogResult>(GetWindow());
-
-                if (result == null || !result.IsOk)
-                {
-                    return;
-                }
-
-                var opResult = await GetVm().SweepBelow(result.SweepBelowAmount, result.SweepBelowAddress);
-                await DialogService.ShowAsync(new MessageBoxView(opResult.Title, opResult.Message, true));
+                UIManager.NavigateToSweepBelow();
             }
             catch (Exception ex)
             {
