@@ -107,29 +107,7 @@ namespace NervaOneWalletMiner.Views
                     return;
                 }
 
-                var window = new CreateWalletView();
-                DialogResult result = await window.ShowDialog<DialogResult>(GetWindow());
-
-                if (result == null || !result.IsOk)
-                {
-                    return;
-                }
-
-                if (string.IsNullOrEmpty(result.WalletName) || result.WalletPassword.Length == 0)
-                {
-                    return;
-                }
-
-                var opResult = await GetVm().CreateNewWallet(result.WalletName, result.WalletPassword, result.WalletLanguage);
-
-                if (opResult.IsSuccess)
-                {
-                    await DialogService.ShowAsync(new DisplayKeysSeedView("Wallet created successfully! Your new wallet is now open.\r\n\r\nPlease make sure to save your seed phrase and keys to a safe place. You'll need them if you ever need to restore your wallet. If somebody gets a hold of those, they can steal your funds!"));
-                }
-                else if (!string.IsNullOrEmpty(opResult.Message))
-                {
-                    await DialogService.ShowAsync(new MessageBoxView(opResult.Title, opResult.Message, true));
-                }
+                UIManager.NavigateToCreateWallet();
             }
             catch (Exception ex)
             {
@@ -337,7 +315,7 @@ namespace NervaOneWalletMiner.Views
                 }
                 else
                 {
-                    await DialogService.ShowAsync(new DisplayKeysSeedView("Please make sure to save your seed phrase and keys to a safe place. You'll need them if you ever need to restore your wallet. If somebody gets a hold of those, they can steal your funds!"));
+                    await DialogService.ShowAsync(new DisplayKeysSeedView("Save your seed phrase and keys to a safe place. You'll need them to restore your wallet. Keep them private - anyone with access can steal your funds!"));
                 }
             }
             catch (Exception ex)
