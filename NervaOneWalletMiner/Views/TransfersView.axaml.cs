@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Objects.DataGrid;
 using NervaOneWalletMiner.Rpc.Wallet.Requests;
 using NervaOneWalletMiner.Rpc.Wallet.Responses;
@@ -12,16 +13,54 @@ namespace NervaOneWalletMiner.Views
 {
     public partial class TransfersView : UserControl
     {
+        private DataGridTextColumn? _colHeight;
+        private DataGridTextColumn? _colAddress;
+
         public TransfersView()
         {
             try
             {
                 InitializeComponent();
                 imgCoinIcon.Source = GlobalMethods.GetLogo();
+
+                // Index 1=Height, 4=Address (icon=0, Time=2, Amount=3)
+                _colHeight = (DataGridTextColumn)dtgTransactions.Columns[1];
+                _colAddress = (DataGridTextColumn)dtgTransactions.Columns[4];
             }
             catch (Exception ex)
             {
                 Logger.LogException("TRA.CONS", ex);
+            }
+        }
+
+        private void TransfersView_SizeChanged(object? sender, SizeChangedEventArgs e)
+        {
+            try
+            {
+                if (e.NewSize.Width < 450)
+                {
+                    // Narrow: button below icon/label
+                    grdHeader.ColumnDefinitions = ColumnDefinitions.Parse("Auto,*");
+                    Grid.SetRow(btnTransactionDetails, 1);
+                    Grid.SetColumn(btnTransactionDetails, 0);
+
+                    if (_colHeight != null) { _colHeight.IsVisible = false; }
+                    if (_colAddress != null) { _colAddress.IsVisible = false; }
+                }
+                else
+                {
+                    // Wide: button on the right of icon/label
+                    grdHeader.ColumnDefinitions = ColumnDefinitions.Parse("Auto,*,Auto");
+                    Grid.SetRow(btnTransactionDetails, 0);
+                    Grid.SetColumn(btnTransactionDetails, 2);
+
+                    if (_colHeight != null) { _colHeight.IsVisible = true; }
+                    if (_colAddress != null) { _colAddress.IsVisible = true; }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("TRA.TVSC", ex);
             }
         }
 
@@ -79,11 +118,11 @@ namespace NervaOneWalletMiner.Views
                 if (dtgTransactions.SelectedItem != null)
                 {
                     Transfer selectedItem = (Transfer)dtgTransactions.SelectedItem;
-                    await DialogService.ShowAsync(new TransactionDetailsView(selectedItem.TransactionId, selectedItem.AccountIndex, selectedItem.Amount));
+                    UIManager.NavigateToTransactionDetails(selectedItem.TransactionId, selectedItem.AccountIndex, selectedItem.Amount);
                 }
                 else
                 {
-                    Logger.LogDebug("TRA.OTDV", "Opening Transfer transaction details view");
+                    Logger.LogDebug("TRA.OTDV", "No transaction selected");
                     await Dispatcher.UIThread.InvokeAsync(async () =>
                     {
                         await DialogService.ShowAsync(new MessageBoxView("Transaction Details", "Please select transaction", true));

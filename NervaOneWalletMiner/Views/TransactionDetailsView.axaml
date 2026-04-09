@@ -1,0 +1,96 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:NervaOneWalletMiner.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="550"
+             x:DataType="vm:TransactionDetailsViewModel"
+             x:Class="NervaOneWalletMiner.Views.TransactionDetailsView">
+
+	<Design.DataContext>
+		<vm:TransactionDetailsViewModel/>
+	</Design.DataContext>
+
+	<ScrollViewer>
+		<StackPanel HorizontalAlignment="Stretch"
+					Spacing="5"
+					Margin="10"
+					MaxWidth="650">
+
+			<Grid ColumnDefinitions="32,*">
+				<Image Grid.Column="0" Name="imgCoinIcon"/>
+				<Label Grid.Column="1"
+					   Content="Transaction Details"
+					   Height="24"
+					   Margin="5,0,0,0"/>
+			</Grid>
+
+			<Label Content="Your Address" Margin="0,10,0,0"/>
+			<DockPanel>
+				<Button DockPanel.Dock="Right"
+						Name="btnCopyYourAddressToClipboard"
+						Content="Copy"
+						Margin="10,0,0,0"
+						Click="CopyYourAddressToClipboard_Clicked"/>
+				<TextBox Name="tbxYourAddress" IsReadOnly="True"/>
+			</DockPanel>
+
+			<Label Content="Transaction Id" Margin="0,10,0,0"/>
+			<DockPanel>
+				<Button DockPanel.Dock="Right"
+						Name="btnCopyTransactionIdToClipboard"
+						Content="Copy"
+						Margin="10,0,0,0"
+						Click="CopyTransactionIdToClipboard_Clicked"/>
+				<TextBox Name="tbxTransactionId" IsReadOnly="True"/>
+			</DockPanel>
+
+			<Grid Margin="0,15,0,0">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="26"/>
+					<RowDefinition Height="26"/>
+					<RowDefinition Height="26"/>
+					<RowDefinition Height="26"/>
+					<RowDefinition Height="26"/>
+					<RowDefinition Height="26"/>
+					<RowDefinition Height="26"/>
+					<RowDefinition Height="26"/>
+				</Grid.RowDefinitions>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="130"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+
+				<Label Grid.Row="0" Grid.Column="0" Content="Type:"/>
+				<Label Grid.Row="0" Grid.Column="1" Name="lblType"/>
+				<Label Grid.Row="1" Grid.Column="0" Content="Height:"/>
+				<Label Grid.Row="1" Grid.Column="1" Name="lblHeight"/>
+				<Label Grid.Row="2" Grid.Column="0" Content="Amount:"/>
+				<Label Grid.Row="2" Grid.Column="1" Name="lblAmount"/>
+				<Label Grid.Row="3" Grid.Column="0" Content="Fee:"/>
+				<Label Grid.Row="3" Grid.Column="1" Name="lblFee"/>
+				<Label Grid.Row="4" Grid.Column="0" Content="Time:"/>
+				<Label Grid.Row="4" Grid.Column="1" Name="lblTime"/>
+				<Label Grid.Row="5" Grid.Column="0" Content="Confirmations:"/>
+				<Label Grid.Row="5" Grid.Column="1" Name="lblConfirmations"/>
+				<Label Grid.Row="6" Grid.Column="0" Content="Payment Id:"/>
+				<Label Grid.Row="6" Grid.Column="1" Name="lblPaymentId"/>
+				<Label Grid.Row="7" Grid.Column="0" Content="Note:"/>
+				<Label Grid.Row="7" Grid.Column="1" Name="lblNote"/>
+			</Grid>
+
+			<Label Content="Destination Info" Margin="0,15,0,0"/>
+			<SelectableTextBlock Name="stbkDestinationInfo"
+								 TextWrapping="Wrap"
+								 Margin="5,0,5,0"/>
+
+			<StackPanel Orientation="Horizontal" Spacing="10" Margin="0,20,0,0">
+				<Button Name="btnClose"
+						Content="Back"
+						Click="CloseButton_Clicked"/>
+			</StackPanel>
+
+		</StackPanel>
+	</ScrollViewer>
+
+</UserControl>
