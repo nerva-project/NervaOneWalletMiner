@@ -12,6 +12,7 @@
         public const string AddressBook = "address_book";
 
         public const string CoinSetup = "coin_setup";
+        public const string AddressInfo = "address_info";
 
         // Non-UI View. Needed so I have reference to it
         public const string MainView = "main_view";

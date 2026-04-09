@@ -1,32 +1,33 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using NervaOneWalletMiner.Objects.DataGrid;
-using NervaOneWalletMiner.Objects;
 using System;
 using NervaOneWalletMiner.Helpers;
 using System.Collections.Generic;
 using Avalonia.Threading;
 using NervaOneWalletMiner.Rpc.Wallet.Requests;
 using NervaOneWalletMiner.Rpc.Wallet.Responses;
+using NervaOneWalletMiner.ViewModels;
+using NervaOneWalletMiner.ViewsDialogs;
 
-namespace NervaOneWalletMiner.ViewsDialogs
+namespace NervaOneWalletMiner.Views
 {
     public partial class AddressInfoView : UserControl
     {
         // <display key, Account>
         Dictionary<string, Account> _accounts = [];
 
-        // Not used but designer will complain without it
         public AddressInfoView()
         {
             InitializeComponent();
+            Initialized += AddressInfoView_Initialized;
         }
 
-        public AddressInfoView(int accountIndex)
+        private void AddressInfoView_Initialized(object? sender, EventArgs e)
         {
             try
             {
-                InitializeComponent();
+                int accountIndex = DataContext is AddressInfoViewModel vm ? vm.AccountIndex : 0;
 
                 if (!GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].AreIntegratedAddressesSupported)
                 {
@@ -51,7 +52,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("AID.CONS", ex);
+                Logger.LogException("AIV.INIT", ex);
             }
         }
 
@@ -68,7 +69,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("AID.ASC1", ex);
+                Logger.LogException("AIV.ASC1", ex);
             }
         }
 
@@ -85,20 +86,20 @@ namespace NervaOneWalletMiner.ViewsDialogs
                         Label = tbxWalletLabel.Text ?? string.Empty
                     };
 
-                    Logger.LogDebug("AID.SVLC", "Saving label for account " + account.Index + ": " + request.Label);
+                    Logger.LogDebug("AIV.SVLC", "Saving label for account " + account.Index + ": " + request.Label);
                     LabelAccountResponse response = await GlobalData.WalletService.LabelAccount(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
 
                     if (response.Error.IsError)
                     {
-                        Logger.LogError("AID.SVLC", "Failed to save label | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
+                        Logger.LogError("AIV.SVLC", "Failed to save label | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
                         await Dispatcher.UIThread.InvokeAsync(async () =>
                         {
-                            await DialogService.ShowAsync<DialogResult>(new MessageBoxView("Save Label", "Error saving label\r\n" + response.Error.Message, true));
+                            await DialogService.ShowAsync(new MessageBoxView("Save Label", "Error saving label\r\n" + response.Error.Message, true));
                         });
                     }
                     else
                     {
-                        Logger.LogDebug("AID.SVLC", "Label saved successfully");
+                        Logger.LogDebug("AIV.SVLC", "Label saved successfully");
                         account.Label = tbxWalletLabel.Text ?? string.Empty;
                         UIManager.CallWalletDataMethodsInSync();
 
@@ -111,7 +112,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("AID.SVLC", ex);
+                Logger.LogException("AIV.SVLC", ex);
             }
         }
 
@@ -123,7 +124,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("AID.MIAC", ex);
+                Logger.LogException("AIV.MIAC", ex);
             }
         }
 
@@ -136,44 +137,40 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     StandardAddress = walletAddress,
                 };
 
-                Logger.LogError("AID.MIA1", "Making integrated address for: " + GlobalMethods.GetShorterString(walletAddress, 12));
+                Logger.LogDebug("AIV.MIA1", "Making integrated address for: " + GlobalMethods.GetShorterString(walletAddress, 12));
                 MakeIntegratedAddressResponse response = await GlobalData.WalletService.MakeIntegratedAddress(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
 
                 if (response.Error.IsError)
                 {
-                    Logger.LogError("AID.MIA1", "Failed to make integrated address | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
+                    Logger.LogError("AIV.MIA1", "Failed to make integrated address | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
                     await Dispatcher.UIThread.InvokeAsync(async () =>
                     {
-                        await DialogService.ShowAsync<DialogResult>(new MessageBoxView("Make Integrated Address", "Error making integrated address\r\n" + response.Error.Message, true));
+                        await DialogService.ShowAsync(new MessageBoxView("Make Integrated Address", "Error making integrated address\r\n" + response.Error.Message, true));
                     });
                 }
                 else
                 {
-                    Logger.LogError("AID.MIA1", "Integrated address created successfully");
+                    Logger.LogDebug("AIV.MIA1", "Integrated address created successfully");
                     tbxIntegratedAddress.Text = response.IntegratedAddress;
                     tbxPaymentId.Text = response.PaymentId;
                 }
             }
             catch (Exception ex)
             {
-                Logger.LogException("AID.MIA1", ex);
+                Logger.LogException("AIV.MIA1", ex);
             }
         }
 
-        public void CloseButton_Clicked(object sender, RoutedEventArgs args)
+        public void BackButton_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
-                DialogResult result = new()
-                {
-                    IsCancel = true
-                };
-
-                DialogService.Close(result);
+                Logger.LogDebug("AIV.BACK", "Navigating back to Wallet");
+                UIManager.NavigateToPage(Objects.Constants.SplitViewPages.Wallet);
             }
             catch (Exception ex)
             {
-                Logger.LogException("AID.CBC1", ex);
+                Logger.LogException("AIV.BACK", ex);
             }
         }
 
@@ -185,7 +182,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("AID.CWCC", ex);
+                Logger.LogException("AIV.CWCC", ex);
             }
         }
 
@@ -197,7 +194,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("AID.CIAC", ex);
+                Logger.LogException("AIV.CIAC", ex);
             }
         }
 
@@ -209,7 +206,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             }
             catch (Exception ex)
             {
-                Logger.LogException("AID.CPIC", ex);
+                Logger.LogException("AIV.CPIC", ex);
             }
         }
     }

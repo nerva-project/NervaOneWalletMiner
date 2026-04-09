@@ -449,20 +449,13 @@ namespace NervaOneWalletMiner.Views
             {
                 if (GlobalData.IsWalletOpen)
                 {
-                    var dtgAccounts = this.Get<DataGrid>("dtgAccounts");
-                    AddressInfoView window;
-
+                    int accountIndex = 0;
                     if (dtgAccounts.SelectedItem != null)
                     {
-                        Account selectedItem = (Account)dtgAccounts.SelectedItem;
-                        window = new AddressInfoView((int)selectedItem.Index);
-                    }
-                    else
-                    {
-                        window = new AddressInfoView(0);
+                        accountIndex = (int)((Account)dtgAccounts.SelectedItem).Index;
                     }
 
-                    await DialogService.ShowAsync(window);
+                    UIManager.NavigateToAddressInfo(accountIndex);
                 }
                 else
                 {
