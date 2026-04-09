@@ -18,6 +18,7 @@ namespace NervaOneWalletMiner.Views
     public partial class TransferFundsView : UserControl
     {
         Dictionary<uint, string> _accounts = [];
+        private string _returnPage = SplitViewPages.Wallet;
 
         public TransferFundsView()
         {
@@ -40,6 +41,7 @@ namespace NervaOneWalletMiner.Views
                 uint selectedAccountIndex = DataContext is TransferFundsViewModel vm ? vm.SelectedAccountIndex : 0;
                 string toAddress = DataContext is TransferFundsViewModel vm2 ? vm2.ToAddress : string.Empty;
                 string paymentId = DataContext is TransferFundsViewModel vm3 ? vm3.PaymentId : string.Empty;
+                _returnPage = DataContext is TransferFundsViewModel vm4 ? vm4.ReturnPage : SplitViewPages.Wallet;
 
                 foreach (Account account in GlobalData.WalletStats.Subaddresses.Values)
                 {
@@ -223,7 +225,7 @@ namespace NervaOneWalletMiner.Views
             try
             {
                 Logger.LogDebug("TFV.CNCL", "Transfer funds cancelled");
-                UIManager.NavigateToPage(SplitViewPages.Wallet);
+                UIManager.NavigateToPage(_returnPage);
             }
             catch (Exception ex)
             {

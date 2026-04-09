@@ -3,21 +3,27 @@ using Avalonia.Interactivity;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Objects.DataGrid;
-using NervaOneWalletMiner.ViewModels;
 using NervaOneWalletMiner.ViewsDialogs;
 using System;
-using System.Security.Principal;
+using System.Linq;
 
 namespace NervaOneWalletMiner.Views
 {
     public partial class AddressBookView : UserControl
     {
+        private DataGridTextColumn? _colDescription;
+        private DataGridTextColumn? _colPaymentId;
+
         public AddressBookView()
         {
             try
             {
                 InitializeComponent();
                 imgCoinIcon.Source = GlobalMethods.GetLogo();
+
+                // Index 1=Description, 3=PaymentId (Name=0, Description=1, Address=2, PaymentId=3)
+                _colDescription = (DataGridTextColumn)dtgAddressBook.Columns[1];
+                _colPaymentId = (DataGridTextColumn)dtgAddressBook.Columns[3];
 
                 PopulateAddressBookGrid();
             }
@@ -27,46 +33,87 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
-        private void PopulateAddressBookGrid()
-        {
-            GlobalMethods.LoadAddressBook();
-
-            if (GlobalData.AddressBook.List.Count == 0)
-            {
-                // Add blank row so user can add new address
-                GlobalData.AddressBook.List.Add(new AddressInfo());
-            }
-            else
-            {
-                AddressInfo addressWithHighestId = GetAddressWithHighestId();
-
-                if (!string.IsNullOrEmpty(addressWithHighestId.Address))
-                {
-                    // Only add new row if there isn't one already based on Address
-                    GlobalData.AddressBook.List.Add(new AddressInfo { Id = addressWithHighestId.Id + 1 });
-                }
-            }
-
-            dtgAddressBook.ItemsSource = GlobalData.AddressBook.List;
-        }
-
-        private void AddressBook_RowEditEnded(object? sender, DataGridRowEditEndedEventArgs e)
+        private void AddressBookView_SizeChanged(object? sender, SizeChangedEventArgs e)
         {
             try
             {
-                // Just save. Don't need to complicate things
-                GlobalMethods.SaveAddressBook();
-
-                // Add blank row if new one was just added
-                AddressInfo addressWithHighestId = GetAddressWithHighestId();
-                if (!string.IsNullOrEmpty(addressWithHighestId.Address))
+                if (e.NewSize.Width < 450)
                 {
-                    GlobalData.AddressBook.List.Add(new AddressInfo { Id = addressWithHighestId.Id + 1 });
+                    // Narrow: buttons below icon/label
+                    grdHeader.ColumnDefinitions = ColumnDefinitions.Parse("Auto,*");
+                    Grid.SetRow(spHeaderButtons, 1);
+                    Grid.SetColumn(spHeaderButtons, 0);
+
+                    // Narrow: Name + Address
+                    if (_colDescription != null) { _colDescription.IsVisible = false; }
+                    if (_colPaymentId != null) { _colPaymentId.IsVisible = false; }
+                }
+                else if (e.NewSize.Width < 700)
+                {
+                    // Medium: buttons inline
+                    grdHeader.ColumnDefinitions = ColumnDefinitions.Parse("Auto,*,Auto");
+                    Grid.SetRow(spHeaderButtons, 0);
+                    Grid.SetColumn(spHeaderButtons, 2);
+
+                    // Medium: Name + Description + Address
+                    if (_colDescription != null) { _colDescription.IsVisible = true; }
+                    if (_colPaymentId != null) { _colPaymentId.IsVisible = false; }
+                }
+                else
+                {
+                    // Wide: buttons inline
+                    grdHeader.ColumnDefinitions = ColumnDefinitions.Parse("Auto,*,Auto");
+                    Grid.SetRow(spHeaderButtons, 0);
+                    Grid.SetColumn(spHeaderButtons, 2);
+
+                    // Wide: all columns
+                    if (_colDescription != null) { _colDescription.IsVisible = true; }
+                    if (_colPaymentId != null) { _colPaymentId.IsVisible = true; }
                 }
             }
             catch (Exception ex)
             {
-                Logger.LogException("ADB.ABRE", ex);
+                Logger.LogException("ADB.AVSC", ex);
+            }
+        }
+
+        private void PopulateAddressBookGrid()
+        {
+            GlobalMethods.LoadAddressBook();
+            dtgAddressBook.ItemsSource = GlobalData.AddressBook.List.Where(a => !string.IsNullOrEmpty(a.Address)).ToList();
+        }
+
+        private void AddressBook_DoubleTapped(object? sender, Avalonia.Input.TappedEventArgs e)
+        {
+            OpenEditView();
+        }
+
+        private void Add_Clicked(object sender, RoutedEventArgs args)
+        {
+            UIManager.NavigateToAddressBookEntry(true);
+        }
+
+        private void Edit_Clicked(object sender, RoutedEventArgs args)
+        {
+            OpenEditView();
+        }
+
+        private void OpenEditView()
+        {
+            try
+            {
+                if (dtgAddressBook.SelectedItem is AddressInfo selected)
+                {
+                    UIManager.NavigateToAddressBookEntry(false, selected.Id, selected.Name, selected.Description, selected.Address, selected.PaymentId);
+                }
+                else
+                {
+                    _ = DialogService.ShowAsync(new MessageBoxView("Edit Address", "Please select an address first.", true));
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("ADB.ODEV", ex);
             }
         }
 
@@ -74,23 +121,18 @@ namespace NervaOneWalletMiner.Views
         {
             try
             {
-                AddressInfo selectedAddress = (AddressInfo)dtgAddressBook.SelectedItem;
-
-                if (selectedAddress == null)
+                if (dtgAddressBook.SelectedItem is not AddressInfo selectedAddress)
                 {
-                    await DialogService.ShowAsync(new MessageBoxView("Transfer", "Please select Address first.", true));
+                    await DialogService.ShowAsync(new MessageBoxView("Transfer", "Please select an address first.", true));
+                }
+                else if (!GlobalData.IsWalletOpen)
+                {
+                    await DialogService.ShowAsync(new MessageBoxView("Transfer", "Please open wallet first.", true));
                 }
                 else
                 {
-                    if (!GlobalData.AreWalletEventsRegistered)
-                    {
-                        await DialogService.ShowAsync(new MessageBoxView("Transfer", "Please open wallet first.", true));
-                    }
-                    else
-                    {
-                        Logger.LogDebug("ADB.TRCL", "Calling Transfer passing address: " + GlobalMethods.GetShorterString(selectedAddress.Address, 12));
-                        ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).TransferUi(selectedAddress.Address, selectedAddress.PaymentId);
-                    }
+                    Logger.LogDebug("ADB.TRCL", "Navigating to Transfer Funds for address: " + GlobalMethods.GetShorterString(selectedAddress.Address, 12));
+                    UIManager.NavigateToTransferFunds(0, selectedAddress.Address, selectedAddress.PaymentId, SplitViewPages.AddressBook);
                 }
             }
             catch (Exception ex)
@@ -103,11 +145,9 @@ namespace NervaOneWalletMiner.Views
         {
             try
             {
-                AddressInfo selectedAddress = (AddressInfo)dtgAddressBook.SelectedItem;
-
-                if (selectedAddress == null)
+                if (dtgAddressBook.SelectedItem is not AddressInfo selectedAddress)
                 {
-                    await DialogService.ShowAsync(new MessageBoxView("Delete", "Please select Address first.", true));
+                    await DialogService.ShowAsync(new MessageBoxView("Delete", "Please select an address first.", true));
                 }
                 else
                 {
@@ -121,32 +161,6 @@ namespace NervaOneWalletMiner.Views
             {
                 Logger.LogException("ADB.DELC", ex);
             }
-        }
-
-        private AddressInfo GetAddressWithHighestId()
-        {
-            AddressInfo highestIdAddress = new();
-
-            try
-            {
-                if (GlobalData.AddressBook.List.Count > 0)
-                {
-                    highestIdAddress = GlobalData.AddressBook.List[0];
-                    foreach (AddressInfo address in GlobalData.AddressBook.List)
-                    {
-                        if (address.Id > highestIdAddress.Id)
-                        {
-                            highestIdAddress = address;
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException("ADB.GAHI", ex);
-            }
-
-            return highestIdAddress;
         }
     }
 }

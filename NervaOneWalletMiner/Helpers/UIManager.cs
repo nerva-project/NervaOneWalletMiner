@@ -57,6 +57,7 @@ namespace NervaOneWalletMiner.Helpers
                 { SplitViewPages.OpenWallet, new OpenWalletViewModel() },
                 { SplitViewPages.TransferFunds, new TransferFundsViewModel() },
                 { SplitViewPages.TransactionDetails, new TransactionDetailsViewModel() },
+                { SplitViewPages.AddressBookEntry, new AddressBookEntryViewModel() },
 
                 { SplitViewPages.MainView, _mainView }
             };
@@ -83,6 +84,7 @@ namespace NervaOneWalletMiner.Helpers
                 { SplitViewPages.OpenWallet, new OpenWalletViewModel() },
                 { SplitViewPages.TransferFunds, new TransferFundsViewModel() },
                 { SplitViewPages.TransactionDetails, new TransactionDetailsViewModel() },
+                { SplitViewPages.AddressBookEntry, new AddressBookEntryViewModel() },
 
                 { SplitViewPages.MainView, _mainView }
             };
@@ -157,9 +159,9 @@ namespace NervaOneWalletMiner.Helpers
             ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.OpenWallet];
         }
 
-        public static void NavigateToTransferFunds(uint selectedAccountIndex, string toAddress, string paymentId)
+        public static void NavigateToTransferFunds(uint selectedAccountIndex, string toAddress, string paymentId, string returnPage = SplitViewPages.Wallet)
         {
-            GlobalData.ViewModelPages[SplitViewPages.TransferFunds] = new TransferFundsViewModel(selectedAccountIndex, toAddress, paymentId);
+            GlobalData.ViewModelPages[SplitViewPages.TransferFunds] = new TransferFundsViewModel(selectedAccountIndex, toAddress, paymentId, returnPage);
             ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.TransferFunds];
         }
 
@@ -167,6 +169,18 @@ namespace NervaOneWalletMiner.Helpers
         {
             GlobalData.ViewModelPages[SplitViewPages.TransactionDetails] = new TransactionDetailsViewModel(transactionId, accountIndex, amount);
             ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.TransactionDetails];
+        }
+
+        public static void NavigateToAddressBook()
+        {
+            GlobalData.ViewModelPages[SplitViewPages.AddressBook] = new AddressBookViewModel();
+            ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.AddressBook];
+        }
+
+        public static void NavigateToAddressBookEntry(bool isNew, int id = 0, string name = "", string description = "", string address = "", string paymentId = "")
+        {
+            GlobalData.ViewModelPages[SplitViewPages.AddressBookEntry] = new AddressBookEntryViewModel(isNew, id, name, description, address, paymentId);
+            ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.AddressBookEntry];
         }
 
         public static void NavigateToPage(string page)
