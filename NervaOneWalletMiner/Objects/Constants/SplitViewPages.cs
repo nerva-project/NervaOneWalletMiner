@@ -18,6 +18,7 @@
         public const string TransferFunds = "transfer_funds";
         public const string TransactionDetails = "transaction_details";
         public const string AddressBookEntry = "address_book_entry";
+        public const string RestoreFromKeys = "restore_from_keys";
 
         // Non-UI View. Needed so I have reference to it
         public const string MainView = "main_view";
