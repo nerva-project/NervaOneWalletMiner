@@ -2,7 +2,6 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using NervaOneWalletMiner.Helpers;
-using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Objects.DataGrid;
 using NervaOneWalletMiner.Rpc.Wallet.Requests;
 using NervaOneWalletMiner.Rpc.Wallet.Responses;
@@ -44,16 +43,29 @@ namespace NervaOneWalletMiner.Views
                     Grid.SetRow(btnTransactionDetails, 1);
                     Grid.SetColumn(btnTransactionDetails, 0);
 
+                    // Narrow: icon + Time + Amount
                     if (_colHeight != null) { _colHeight.IsVisible = false; }
                     if (_colAddress != null) { _colAddress.IsVisible = false; }
                 }
-                else
+                else if (e.NewSize.Width < 700)
                 {
-                    // Wide: button on the right of icon/label
+                    // Medium: button inline
                     grdHeader.ColumnDefinitions = ColumnDefinitions.Parse("Auto,*,Auto");
                     Grid.SetRow(btnTransactionDetails, 0);
                     Grid.SetColumn(btnTransactionDetails, 2);
 
+                    // Medium: icon + Height + Time + Amount
+                    if (_colHeight != null) { _colHeight.IsVisible = true; }
+                    if (_colAddress != null) { _colAddress.IsVisible = false; }
+                }
+                else
+                {
+                    // Wide: button inline
+                    grdHeader.ColumnDefinitions = ColumnDefinitions.Parse("Auto,*,Auto");
+                    Grid.SetRow(btnTransactionDetails, 0);
+                    Grid.SetColumn(btnTransactionDetails, 2);
+
+                    // Wide: all columns
                     if (_colHeight != null) { _colHeight.IsVisible = true; }
                     if (_colAddress != null) { _colAddress.IsVisible = true; }
                 }

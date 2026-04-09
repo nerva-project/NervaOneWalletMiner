@@ -64,8 +64,28 @@ namespace NervaOneWalletMiner.Views
                     Grid.SetRow(grdWalletButtons, 1);
                     grdWalletButtons.HorizontalAlignment = HorizontalAlignment.Left;
 
+                    // Narrow: icon + Label + Balance
                     if (_colId != null) { _colId.IsVisible = false; }
                     if (_colAddress != null) { _colAddress.IsVisible = false; }
+                    if (_colUnlocked != null) { _colUnlocked.IsVisible = false; }
+                }
+                else if (e.NewSize.Width < 700)
+                {
+                    // Medium: Open Wallet button on the right of icon/label
+                    grdHeader.ColumnDefinitions = ColumnDefinitions.Parse("Auto,*,Auto");
+                    Grid.SetRow(btnOpenCloseWallet, 0);
+                    Grid.SetColumn(btnOpenCloseWallet, 2);
+
+                    // Medium: Transfer/Address buttons on the right
+                    grdStats.ColumnDefinitions = ColumnDefinitions.Parse("200,*,200");
+                    grdBalances.RowDefinitions = RowDefinitions.Parse("35,35");
+                    Grid.SetColumn(grdWalletButtons, 2);
+                    Grid.SetRow(grdWalletButtons, 0);
+                    grdWalletButtons.HorizontalAlignment = HorizontalAlignment.Right;
+
+                    // Medium: icon + Label + Address + Balance
+                    if (_colId != null) { _colId.IsVisible = false; }
+                    if (_colAddress != null) { _colAddress.IsVisible = true; }
                     if (_colUnlocked != null) { _colUnlocked.IsVisible = false; }
                 }
                 else
@@ -82,6 +102,7 @@ namespace NervaOneWalletMiner.Views
                     Grid.SetRow(grdWalletButtons, 0);
                     grdWalletButtons.HorizontalAlignment = HorizontalAlignment.Right;
 
+                    // Wide: all columns
                     if (_colId != null) { _colId.IsVisible = true; }
                     if (_colAddress != null) { _colAddress.IsVisible = true; }
                     if (_colUnlocked != null) { _colUnlocked.IsVisible = true; }

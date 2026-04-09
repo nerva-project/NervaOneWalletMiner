@@ -15,6 +15,7 @@ namespace NervaOneWalletMiner.Views
     public partial class DaemonView : UserControl
     {
         private DataGridTextColumn? _colHeight;
+        private DataGridTextColumn? _colState;
         public DaemonView()
         {
             try
@@ -29,9 +30,10 @@ namespace NervaOneWalletMiner.Views
 
                 Initialized += DaemonView_Initialized;
 
-                // Index 2 = Height column (icon=0, Address=1, Height=2, LiveTime=3, State=4)
+                // Index 2 = Height, 4 = State (icon=0, Address=1, Height=2, LiveTime=3, State=4)
                 var dgConnections = this.Get<DataGrid>("dgConnections");
                 _colHeight = (DataGridTextColumn)dgConnections.Columns[2];
+                _colState = (DataGridTextColumn)dgConnections.Columns[4];
 
                 for (int i = 1; i <= GlobalData.CpuThreadCount; i++)
                 {
@@ -61,7 +63,25 @@ namespace NervaOneWalletMiner.Views
                     Grid.SetColumn(grdMinerStats, 0);
                     Grid.SetRow(grdMinerStats, 1);
 
+                    // Narrow: icon + Address + LiveTime
                     if (_colHeight != null) { _colHeight.IsVisible = false; }
+                    if (_colState != null) { _colState.IsVisible = false; }
+                }
+                else if (e.NewSize.Width < 700)
+                {
+                    // Medium: threads+button inline
+                    grdHeader.ColumnDefinitions = ColumnDefinitions.Parse("Auto,*,Auto");
+                    Grid.SetRow(spThreadsAndButton, 0);
+                    Grid.SetColumn(spThreadsAndButton, 2);
+
+                    // Medium: miner stats on the right
+                    grdStats.ColumnDefinitions = ColumnDefinitions.Parse("200,*,200");
+                    Grid.SetColumn(grdMinerStats, 2);
+                    Grid.SetRow(grdMinerStats, 0);
+
+                    // Medium: icon + Address + Height + LiveTime
+                    if (_colHeight != null) { _colHeight.IsVisible = true; }
+                    if (_colState != null) { _colState.IsVisible = false; }
                 }
                 else
                 {
@@ -75,7 +95,9 @@ namespace NervaOneWalletMiner.Views
                     Grid.SetColumn(grdMinerStats, 2);
                     Grid.SetRow(grdMinerStats, 0);
 
+                    // Wide: all columns
                     if (_colHeight != null) { _colHeight.IsVisible = true; }
+                    if (_colState != null) { _colState.IsVisible = true; }
                 }
             }
             catch (Exception ex)
