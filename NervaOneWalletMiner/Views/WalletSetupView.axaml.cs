@@ -128,27 +128,7 @@ namespace NervaOneWalletMiner.Views
                     return;
                 }
 
-                var window = new RestoreFromSeedView();
-                DialogResult result = await window.ShowDialog<DialogResult>(GetWindow());
-
-                if (result == null || !result.IsOk)
-                {
-                    return;
-                }
-
-                if (result.SeedPhrase.Length == 0 || string.IsNullOrEmpty(result.WalletName) || result.WalletPassword.Length == 0)
-                {
-                    return;
-                }
-
-                if (GlobalData.IsWalletOpen)
-                {
-                    GlobalMethods.ForceWalletClose();
-                    GlobalMethods.WalletClosedOrErrored();
-                }
-
-                var opResult = await GetVm().RestoreFromSeed(result.SeedPhrase, result.SeedOffset, result.WalletName, result.WalletPassword, result.WalletLanguage);
-                await DialogService.ShowAsync(new MessageBoxView(opResult.Title, opResult.Message, true));
+                UIManager.NavigateToRestoreFromSeed();
             }
             catch (Exception ex)
             {

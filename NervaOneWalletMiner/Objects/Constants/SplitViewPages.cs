@@ -19,6 +19,7 @@
         public const string TransactionDetails = "transaction_details";
         public const string AddressBookEntry = "address_book_entry";
         public const string RestoreFromKeys = "restore_from_keys";
+        public const string RestoreFromSeed = "restore_from_seed";
 
         // Non-UI View. Needed so I have reference to it
         public const string MainView = "main_view";
