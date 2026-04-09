@@ -54,6 +54,7 @@ namespace NervaOneWalletMiner.Helpers
                 { SplitViewPages.CoinSetup, new CoinSetupViewModel() },
                 { SplitViewPages.AddressInfo, new AddressInfoViewModel() },
                 { SplitViewPages.CreateWallet, new CreateWalletViewModel() },
+                { SplitViewPages.OpenWallet, new OpenWalletViewModel() },
 
                 { SplitViewPages.MainView, _mainView }
             };
@@ -77,6 +78,7 @@ namespace NervaOneWalletMiner.Helpers
                 { SplitViewPages.CoinSetup, new CoinSetupViewModel() },
                 { SplitViewPages.AddressInfo, new AddressInfoViewModel() },
                 { SplitViewPages.CreateWallet, new CreateWalletViewModel() },
+                { SplitViewPages.OpenWallet, new OpenWalletViewModel() },
 
                 { SplitViewPages.MainView, _mainView }
             };
@@ -143,6 +145,12 @@ namespace NervaOneWalletMiner.Helpers
         {
             GlobalData.ViewModelPages[SplitViewPages.CreateWallet] = new CreateWalletViewModel();
             ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.CreateWallet];
+        }
+
+        public static void NavigateToOpenWallet()
+        {
+            GlobalData.ViewModelPages[SplitViewPages.OpenWallet] = new OpenWalletViewModel();
+            ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.OpenWallet];
         }
 
         public static void NavigateToPage(string page)

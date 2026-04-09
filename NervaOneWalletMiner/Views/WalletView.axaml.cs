@@ -132,17 +132,8 @@ namespace NervaOneWalletMiner.Views
                     }
                     else
                     {
-                        // Open wallet dialog
-                        Logger.LogDebug("WAL.OCWC", "Opening wallet dialog");
-                        var window = new OpenWalletView();
-                        DialogResult result = await window.ShowDialog<DialogResult>(TopLevel.GetTopLevel(this) as Window ?? throw new NullReferenceException("Invalid Owner"));
-                        if (result != null && result.IsOk)
-                        {
-                            OpenUserWallet(result.WalletName, result.WalletPassword);
-
-                            // WalletPassword is zeroed inside OpenUserWallet's finally block but do it here again anyways
-                            Array.Clear(result.WalletPassword, 0, result.WalletPassword.Length);
-                        }
+                        Logger.LogDebug("WAL.OCWC", "Navigating to Open Wallet page");
+                        UIManager.NavigateToOpenWallet();
                     }
                 }
                 else
@@ -155,57 +146,6 @@ namespace NervaOneWalletMiner.Views
             catch (Exception ex)
             {
                 Logger.LogException("WAL.OCWC", ex);
-            }
-        }
-
-        private async void OpenUserWallet(string walletName, char[] walletPassword)
-        {
-            OpenWalletRequest request;
-
-            try
-            {
-                request = new()
-                {
-                    WalletName = walletName,
-                    Password = walletPassword
-                };
-
-                // Need this before OpenWallet as password will be cleared there
-                string walletPasswordHash = Hashing.Hash(walletPassword);
-
-                OpenWalletResponse response = await GlobalData.WalletService.OpenWallet(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
-
-                if (response.Error.IsError)
-                {
-                    GlobalMethods.WalletClosedOrErrored();
-
-                    Logger.LogDebug("WAL.OUWT", "Error opening " + walletName + " wallet | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
-                    await Dispatcher.UIThread.InvokeAsync(async () =>
-                    {
-                        await DialogService.ShowAsync(new MessageBoxView("Open Wallet", "Error opening " + walletName + " wallet\r\n" + response.Error.Message, true));
-                    });
-                }
-                else
-                {
-                    GlobalMethods.WalletJustOpened(walletName);
-
-                    if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPassRequiredToOpenWallet)
-                    {
-                        GlobalData.WalletPassProvidedTime = DateTime.Now;
-                        GlobalData.WalletPasswordHash = walletPasswordHash;
-                    }
-
-                    Logger.LogDebug("WAL.OUWT", "Wallet " + walletName + " opened successfully");
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException("WAL.OUWT", ex);
-            }
-            finally
-            {
-                Array.Clear(walletPassword, 0, walletPassword.Length);
-                request = new();
             }
         }
         #endregion // Open Wallet

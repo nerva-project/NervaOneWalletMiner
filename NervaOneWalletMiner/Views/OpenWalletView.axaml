@@ -1,0 +1,56 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:NervaOneWalletMiner.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="350"
+             x:DataType="vm:OpenWalletViewModel"
+             x:Class="NervaOneWalletMiner.Views.OpenWalletView">
+
+	<Design.DataContext>
+		<vm:OpenWalletViewModel/>
+	</Design.DataContext>
+
+	<ScrollViewer>
+		<StackPanel HorizontalAlignment="Stretch"
+					Spacing="5"
+					Margin="10"
+					MaxWidth="650">
+
+			<TextBlock Text="Open Wallet"
+					   FontSize="16"
+					   FontWeight="SemiBold"
+					   Margin="0,5,0,5"/>
+			<Separator/>
+
+			<Label Content="Wallet Name" Margin="0,10,0,0"/>
+			<ComboBox Name="cbxWalletName" HorizontalAlignment="Stretch"/>
+
+			<Label Content="Password" Margin="0,15,0,0"/>
+			<DockPanel>
+				<Button Name="btnShowHidePassword"
+						DockPanel.Dock="Right"
+						Content="Show"
+						Margin="10,0,0,0"
+						IsTabStop="False"
+						Click="ShowHidePassword_Clicked"/>
+				<TextBox Name="tbxPassword"
+						 Watermark="Enter wallet password"
+						 PasswordChar="*"
+						 RevealPassword="False"
+						 KeyDown="Password_KeyDown"/>
+			</DockPanel>
+
+			<StackPanel Orientation="Horizontal" Spacing="10" Margin="0,20,0,0">
+				<Button Name="btnOk"
+						Content="OK"
+						Click="OkButton_Clicked"/>
+				<Button Name="btnCancel"
+						Content="Cancel"
+						Click="CancelButton_Clicked"/>
+			</StackPanel>
+
+		</StackPanel>
+	</ScrollViewer>
+
+</UserControl>
