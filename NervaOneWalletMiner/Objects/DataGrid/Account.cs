@@ -13,7 +13,7 @@ namespace NervaOneWalletMiner.Objects.DataGrid
         }
 
         // Properties that need to be refreshed
-        private string _label = string.Empty;        
+        private string _label = string.Empty;
         public string Label
         {
             get { return _label; }
@@ -23,9 +23,14 @@ namespace NervaOneWalletMiner.Objects.DataGrid
                 {
                     _label = value;
                     OnPropertyChanged(nameof(Label));
+                    OnPropertyChanged(nameof(DisplayLabel));
                 }
             }
         }
+
+        public string DisplayLabel => string.IsNullOrWhiteSpace(Label) || Label == "Untitled account"
+            ? AddressShort
+            : Label;
 
         private decimal _balanceTotal;
         public decimal BalanceTotal

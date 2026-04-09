@@ -13,8 +13,8 @@ namespace NervaOneWalletMiner.ViewsDialogs
 {
     public partial class AddressInfoView : UserControl
     {
-        // <Label + AddressShort, AddressFull>
-        Dictionary<string, string> _accounts = [];
+        // <display key, Account>
+        Dictionary<string, Account> _accounts = [];
 
         // Not used but designer will complain without it
         public AddressInfoView()
@@ -39,14 +39,13 @@ namespace NervaOneWalletMiner.ViewsDialogs
 
                 foreach (Account account in GlobalData.WalletStats.Subaddresses.Values)
                 {
-                    string accountValue = string.IsNullOrEmpty(account.Label) ? "No label" + " (" + account.AddressShort + ")" : account.Label + " (" + account.AddressShort + ")";
-                    if (!_accounts.ContainsKey(accountValue))
+                    string accountKey = string.IsNullOrEmpty(account.Label) ? "No label" + " (" + account.AddressShort + ")" : account.Label + " (" + account.AddressShort + ")";
+                    if (!_accounts.ContainsKey(accountKey))
                     {
-                        _accounts.Add(accountValue, account.AddressFull);
+                        _accounts.Add(accountKey, account);
                     }
                 }
 
-                var cbxAccount = this.Get<ComboBox>("cbxAccount");
                 cbxAccount.ItemsSource = _accounts.Keys;
                 cbxAccount.SelectedIndex = accountIndex;
             }
@@ -60,16 +59,59 @@ namespace NervaOneWalletMiner.ViewsDialogs
         {
             try
             {
-                var cbxAccount = this.Get<ComboBox>("cbxAccount");
-                var tbxWalletAddress = this.Get<TextBox>("tbxWalletAddress");
-                if (_accounts.ContainsKey(cbxAccount.SelectedValue?.ToString()!))
+                string key = cbxAccount.SelectedValue?.ToString()!;
+                if (_accounts.TryGetValue(key, out Account? account))
                 {
-                    tbxWalletAddress.Text = _accounts[cbxAccount.SelectedValue?.ToString()!];
+                    tbxWalletAddress.Text = account.AddressFull;
+                    tbxWalletLabel.Text = account.Label;
                 }
             }
             catch (Exception ex)
             {
                 Logger.LogException("AID.ASC1", ex);
+            }
+        }
+
+        public async void SaveLabel_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                string key = cbxAccount.SelectedValue?.ToString()!;
+                if (_accounts.TryGetValue(key, out Account? account))
+                {
+                    LabelAccountRequest request = new()
+                    {
+                        AccountIndex = account.Index,
+                        Label = tbxWalletLabel.Text ?? string.Empty
+                    };
+
+                    Logger.LogDebug("AID.SVLC", "Saving label for account " + account.Index + ": " + request.Label);
+                    LabelAccountResponse response = await GlobalData.WalletService.LabelAccount(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
+
+                    if (response.Error.IsError)
+                    {
+                        Logger.LogError("AID.SVLC", "Failed to save label | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
+                        await Dispatcher.UIThread.InvokeAsync(async () =>
+                        {
+                            await DialogService.ShowAsync<DialogResult>(new MessageBoxView("Save Label", "Error saving label\r\n" + response.Error.Message, true));
+                        });
+                    }
+                    else
+                    {
+                        Logger.LogDebug("AID.SVLC", "Label saved successfully");
+                        account.Label = tbxWalletLabel.Text ?? string.Empty;
+                        UIManager.CallWalletDataMethodsInSync();
+
+                        if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsSavingWalletSupported)
+                        {
+                            GlobalMethods.SaveWallet();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("AID.SVLC", ex);
             }
         }
 

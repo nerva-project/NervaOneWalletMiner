@@ -4,102 +4,114 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:vm="clr-namespace:NervaOneWalletMiner.ViewModels"
              mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="550"
-             x:Class="NervaOneWalletMiner.Views.WalletView">
+             x:Class="NervaOneWalletMiner.Views.WalletView"
+             SizeChanged="WalletView_SizeChanged">
 
 	<Design.DataContext>
 		<vm:WalletViewModel/>
 	</Design.DataContext>
 
-	<Grid RowDefinitions="140, *">
+	<Grid RowDefinitions="Auto, *">
 		<Grid Grid.Row="0">
-			<StackPanel HorizontalAlignment="Stretch"
-						Spacing="5"
-						Margin="10"
-						MaxWidth="650">
-				<Grid ColumnDefinitions="200,*,120">			
-					<Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="32,*">
-						<Image Grid.Row="0"
-							   Grid.Column="0"
-							   Name="imgCoinIcon"/>
-						<Label Grid.Row="0"
-							   Grid.Column="1"
-							   Content="Wallet"
-							   Height="24"
-							   Margin="5,0,0,0"/>
+			<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch"
+						Spacing="5" Margin="10" MaxWidth="650">
+
+				<Grid Name="grdHeader" ColumnDefinitions="Auto,*,Auto">
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+					</Grid.RowDefinitions>
+
+					<!-- Component 1: Icon + Label -->
+					<Grid Grid.Row="0" Grid.Column="0"
+						  ColumnDefinitions="32,Auto"
+						  VerticalAlignment="Center"
+						  Margin="0,0,5,0">
+						<Image Grid.Column="0" Name="imgCoinIcon"/>
+						<Label Grid.Column="1" Content="Wallet"
+							   Height="24" Margin="5,0,0,0"/>
 					</Grid>
 
-					<Button Name="btnOpenCloseWallet"
-							Grid.Row="0" Grid.Column="2"					
-							Content="{Binding OpenCloseWallet}"
-							DockPanel.Dock="Right"
+					<!-- Component 2: Open/Close Wallet button -->
+					<Button Grid.Row="0" Grid.Column="2"
+							Name="btnOpenCloseWallet"
+							Content="{Binding OpenCloseWallet}"														
 							Width="120"
+							Margin="0,10,5,0"							
 							Click="OpenCloseWallet_Clicked"/>
 				</Grid>
 
-				<Grid ColumnDefinitions="200,*,200" Margin="0,20,0,0">
-					<Grid ColumnDefinitions="120,100" Grid.Row="0" Grid.Column="0">
+				<Grid Name="grdStats"
+					  ColumnDefinitions="200,*,200" Margin="0,10,5,0">
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+					</Grid.RowDefinitions>
+
+					<!-- Component 3: Total locked/unlocked balances -->
+					<Grid Grid.Row="0" Grid.Column="0"
+						  Name="grdBalances"
+						  ColumnDefinitions="120,100"
+						  Margin="0,10,5,0">
 						<Grid.RowDefinitions>
 							<RowDefinition Height="35"/>
 							<RowDefinition Height="35"/>
 						</Grid.RowDefinitions>
 
-						<Label Grid.Row="0" 
-							   Grid.Column="0"
+						<Label Grid.Row="0" Grid.Column="0"
 							   Content="{Binding TotalLockedLabel}"/>
-						<Label Grid.Row="0"
-							   Grid.Column="1"
-							   Content="{Binding TotalCoins}"
+						<Label Grid.Row="0" Grid.Column="1"	 
+							   Content="{Binding TotalCoins}"							   						   
 							   Width="160"
 							   HorizontalAlignment="Left"/>
-						<Label Grid.Row="1"
-							   Grid.Column="0"
+						<Label Grid.Row="1" Grid.Column="0"
 							   Content="{Binding TotalUnlockedLabel}"/>
-						<Label Grid.Row="1"
-							   Grid.Column="1"
+						<Label Grid.Row="1" Grid.Column="1"
 							   Content="{Binding UnlockedCoins}"
 							   Width="160"
 							   HorizontalAlignment="Left"/>
 					</Grid>
 
-					<Grid ColumnDefinitions="120"
-						  Grid.Row="0"
-						  Grid.Column="2"
-						  HorizontalAlignment="Right">
+					<!-- Component 4: Transfer + Address Info buttons -->
+					<Grid Grid.Row="0" Grid.Column="2"
+						  Name="grdWalletButtons"
+						  ColumnDefinitions="120"
+						  HorizontalAlignment="Right"
+						  Margin="0,10,0,0">
 						<Grid.RowDefinitions>
-							<RowDefinition Height="30"/>
-							<RowDefinition Height="30"/>
+							<RowDefinition Height="35"/>
+							<RowDefinition Height="35"/>
 						</Grid.RowDefinitions>
 
-						<Button Name="btnTransferFunds"
-								Content="Transfer Funds"
-								Grid.Row="0" Grid.Column="0"						
+						<Button Grid.Row="0" Grid.Column="0"
+								Name="btnTransferFunds"
+								Content="Transfer Funds"								
 								HorizontalAlignment="Stretch"
 								Click="TransferFunds_Clicked"/>
-				
-						<Button Name="btnAddressInfo"
-								Grid.Row="1" Grid.Column="0"
+
+						<Button Grid.Row="1" Grid.Column="0"
+								Name="btnAddressInfo"								
 								Content="Address Info"
 								HorizontalAlignment="Stretch"
 								Click="AddressInfo_Clicked"/>
 					</Grid>
 				</Grid>
-				
 
 			</StackPanel>
 		</Grid>
 
 		<Grid Grid.Row="1">
 			<DataGrid Name="dtgAccounts"
-						  ItemsSource="{Binding WalletAddresses, Mode=OneWay}"
-						  AutoGenerateColumns="False"
-						  GridLinesVisibility="Horizontal"
-						  IsReadOnly="True"
-						  Margin="0,20,0,0"
-						  MaxWidth="650"
-						  DoubleTapped="DtgAccounts_DoubleTapped">
+					  ItemsSource="{Binding WalletAddresses, Mode=OneWay}"
+					  GridLinesVisibility="Horizontal"
+					  AutoGenerateColumns="False"
+					  IsReadOnly="True"
+					  Margin="0,20,0,0"
+					  MaxWidth="650"
+					  DoubleTapped="DtgAccounts_DoubleTapped">
 					<DataGrid.Styles>
 						<Style Selector="DataGridCell:current /template/ Grid#FocusVisual">
-							<Setter Property="IsVisible" Value="false" />
+							<Setter Property="IsVisible" Value="false"/>
 						</Style>
 					</DataGrid.Styles>
 					<DataGrid.Columns>
@@ -110,14 +122,12 @@
 						</DataGridTemplateColumn>
 						<DataGridTextColumn Header="Id"
 											Binding="{Binding Index}"/>
-						<DataGridTextColumn Header="Label"
-											MinWidth="120"
-											Width="*"
-											Binding="{Binding Label}"/>
+						<DataGridTextColumn Header="Label" 
+											Binding="{Binding DisplayLabel}"
+											MinWidth="120" Width="*"/>
 						<DataGridTextColumn Header="Address"
-											MinWidth="120"
-											Width="*"
-											Binding="{Binding AddressShort}"/>
+											Binding="{Binding AddressShort}"											
+											MinWidth="120" Width="*"/>
 						<DataGridTextColumn Header="Balance"
 											Binding="{Binding BalanceTotal}"/>
 						<DataGridTextColumn Header="Unlocked"
@@ -133,7 +143,7 @@
 							<MenuItem Header="Create New Account"
 									  Click="CreateAccount_Clicked"/>
 							<MenuItem Header="Rename Label"
-									  Click="RenameLabel_Clicked"/>	
+									  Click="RenameLabel_Clicked"/>
 							<MenuItem Name="miStartMining"
 									  Header="Start Mining"
 									  Click="StartMining_Clicked"/>
@@ -147,5 +157,5 @@
 			</DataGrid>
 		</Grid>
 	</Grid>
-	
+
 </UserControl>

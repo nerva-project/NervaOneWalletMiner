@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
+using Avalonia.Layout;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects;
 using NervaOneWalletMiner.Objects.Constants;
@@ -16,12 +17,21 @@ namespace NervaOneWalletMiner.Views
 {
     public partial class WalletView : UserControl
     {
+        private DataGridTextColumn? _colId;
+        private DataGridTextColumn? _colAddress;
+        private DataGridTextColumn? _colUnlocked;
+
         public WalletView()
         {
             try
             {
                 InitializeComponent();
                 imgCoinIcon.Source = GlobalMethods.GetLogo();
+
+                // Index 1=Id, 3=Address, 5=Unlocked (icon=0, Label=2, Balance=4)
+                _colId = (DataGridTextColumn)dtgAccounts.Columns[1];
+                _colAddress = (DataGridTextColumn)dtgAccounts.Columns[3];
+                _colUnlocked = (DataGridTextColumn)dtgAccounts.Columns[5];
 
                 if (!GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsCpuMiningSupported)
                 {
@@ -33,6 +43,53 @@ namespace NervaOneWalletMiner.Views
             catch (Exception ex)
             {
                 Logger.LogException("WAL.CONS", ex);
+            }
+        }
+
+        private void WalletView_SizeChanged(object? sender, SizeChangedEventArgs e)
+        {
+            try
+            {
+                if (e.NewSize.Width < 450)
+                {
+                    // Narrow: Open Wallet button below icon/label
+                    grdHeader.ColumnDefinitions = ColumnDefinitions.Parse("Auto,*");
+                    Grid.SetRow(btnOpenCloseWallet, 1);
+                    Grid.SetColumn(btnOpenCloseWallet, 0);
+
+                    // Narrow: Transfer/Address buttons below balances
+                    grdStats.ColumnDefinitions = ColumnDefinitions.Parse("200,Auto");
+                    grdBalances.RowDefinitions = RowDefinitions.Parse("26,26");
+                    Grid.SetColumn(grdWalletButtons, 0);
+                    Grid.SetRow(grdWalletButtons, 1);
+                    grdWalletButtons.HorizontalAlignment = HorizontalAlignment.Left;
+
+                    if (_colId != null) { _colId.IsVisible = false; }
+                    if (_colAddress != null) { _colAddress.IsVisible = false; }
+                    if (_colUnlocked != null) { _colUnlocked.IsVisible = false; }
+                }
+                else
+                {
+                    // Wide: Open Wallet button on the right of icon/label
+                    grdHeader.ColumnDefinitions = ColumnDefinitions.Parse("Auto,*,Auto");
+                    Grid.SetRow(btnOpenCloseWallet, 0);
+                    Grid.SetColumn(btnOpenCloseWallet, 2);
+
+                    // Wide: Transfer/Address buttons on the right
+                    grdStats.ColumnDefinitions = ColumnDefinitions.Parse("200,*,200");
+                    grdBalances.RowDefinitions = RowDefinitions.Parse("35,35");
+                    Grid.SetColumn(grdWalletButtons, 2);
+                    Grid.SetRow(grdWalletButtons, 0);
+                    grdWalletButtons.HorizontalAlignment = HorizontalAlignment.Right;
+
+                    if (_colId != null) { _colId.IsVisible = true; }
+                    if (_colAddress != null) { _colAddress.IsVisible = true; }
+                    if (_colUnlocked != null) { _colUnlocked.IsVisible = true; }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("WAL.WVSC", ex);
             }
         }
 
