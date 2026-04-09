@@ -20,6 +20,7 @@ namespace NervaOneWalletMiner.Views
         public AddressInfoView()
         {
             InitializeComponent();
+            imgCoinIcon.Source = GlobalMethods.GetLogo();
             Initialized += AddressInfoView_Initialized;
         }
 

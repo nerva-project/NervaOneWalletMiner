@@ -17,6 +17,7 @@ namespace NervaOneWalletMiner.Views
             {
                 InitializeComponent();
 
+                imgCoinIcon.Source = GlobalMethods.GetLogo();
                 cbxLanguage.ItemsSource = GlobalMethods.GetSupportedLanguages();
                 cbxLanguage.SelectedIndex = 0;
             }
@@ -41,6 +42,11 @@ namespace NervaOneWalletMiner.Views
                 string walletLanguage = cbxLanguage.SelectedValue == null ? Language.English : cbxLanguage.SelectedValue.ToString()!;
 
                 tbxPassword.Text = string.Empty;
+                btnOk.Content = "Creating...";
+                btnOk.IsEnabled = false;
+                btnCancel.IsEnabled = false;
+                tbxWalletName.IsEnabled = false;
+                cbxLanguage.IsEnabled = false;
 
                 Logger.LogDebug("CWV.OKBC", "Creating wallet: " + walletName);
 
@@ -63,6 +69,11 @@ namespace NervaOneWalletMiner.Views
                     GlobalMethods.WalletClosedOrErrored();
                     Logger.LogError("CWV.OKBC", "Failed to create wallet " + walletName + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
                     await DialogService.ShowAsync(new MessageBoxView("Create Wallet", "Error creating " + walletName + " wallet\r\n" + response.Error.Message, true));
+                    btnOk.Content = "OK";
+                    btnOk.IsEnabled = true;
+                    btnCancel.IsEnabled = true;
+                    tbxWalletName.IsEnabled = true;
+                    cbxLanguage.IsEnabled = true;
                     return;
                 }
 

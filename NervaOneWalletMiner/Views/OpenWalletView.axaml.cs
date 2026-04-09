@@ -21,6 +21,8 @@ namespace NervaOneWalletMiner.Views
             {
                 InitializeComponent();
 
+                imgCoinIcon.Source = GlobalMethods.GetLogo();
+
                 if (!GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPassRequiredToOpenWallet)
                 {
                     tbxPassword.IsEnabled = false;

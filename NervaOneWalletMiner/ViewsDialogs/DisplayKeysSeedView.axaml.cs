@@ -36,6 +36,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
         {
             try
             {
+                Logger.LogDebug("DKD.GASK", "Querying keys for: " + GlobalData.OpenedWalletName);
                 GetPrivateKeysResponse response = await GlobalData.WalletService.GetPrivateKeys(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new GetPrivateKeysRequest() { KeyType = KeyType.AllViewSpend });
 
                 if (response.Error.IsError)
@@ -64,6 +65,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                         tbxMnemonicSeed.Text = new string(response.Mnemonic);
                         Array.Clear(response.Mnemonic, 0, response.Mnemonic.Length);
                         response = new GetPrivateKeysResponse();
+                        Logger.LogDebug("DKD.GASK", "Keys and seed loaded successfully");
                     }
                 }
             }

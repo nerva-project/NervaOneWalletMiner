@@ -5,98 +5,97 @@
              mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="550"
              x:Class="NervaOneWalletMiner.ViewsDialogs.DisplayKeysSeedView">
 
-    <StackPanel>
-        <TextBlock Text="Keys and Seed Phrase"
-                   FontSize="16"
-                   FontWeight="SemiBold"
-                   Margin="12,12,12,6"/>
-        <Separator/>
+    <ScrollViewer>
         <StackPanel Spacing="5" Margin="10">
+            <TextBlock Text="Keys and Seed Phrase"
+                       FontSize="16"
+                       FontWeight="SemiBold"
+                       Margin="0,5,0,5"/>
+            <Separator/>
+
             <TextBlock Name="tbkMessage"
-                       TextWrapping="WrapWithOverflow"
-                       Text="Message"
-                       Margin="0 5" />
+                       TextWrapping="Wrap"
+                       Margin="0,5,0,5"/>
 
             <Label Content="Public View Key"/>
             <DockPanel>
-                <TextBox Name="tbxPublicViewKey" Width="515"/>
                 <Button Name="btnCopyPublicViewKeyToClipboard"
+                        DockPanel.Dock="Right"
                         Content="Copy"
                         Margin="10,0,0,0"
                         Click="CopyPublicViewKeyToClipboardButton_Clicked"/>
+                <TextBox Name="tbxPublicViewKey"/>
             </DockPanel>
 
-            <Label Content="Private View Key"/>
+            <Label Content="Private View Key" Margin="0,10,0,0"/>
             <DockPanel>
-                <TextBox Name="tbxPrivateViewKey"
-                         PasswordChar="*"
-                         Width="450"/>
-                <Button Name="btnShowHidePrivateViewKey"
-                        Content="Show"
-                        Margin="10,0,0,0"
-                        Click="ShowHidePrivateViewKeyButton_Clicked"/>
                 <Button Name="btnCopyPrivateViewKeyToClipboard"
+                        DockPanel.Dock="Right"
                         Content="Copy"
                         Margin="10,0,0,0"
                         Click="CopyPrivateViewKeyToClipboardButton_Clicked"/>
+                <Button Name="btnShowHidePrivateViewKey"
+                        DockPanel.Dock="Right"
+                        Content="Show"
+                        Margin="10,0,0,0"
+                        Click="ShowHidePrivateViewKeyButton_Clicked"/>
+                <TextBox Name="tbxPrivateViewKey"
+                         PasswordChar="*"/>
             </DockPanel>
 
-            <Separator Margin="0,20,0,10"/>
+            <Separator Margin="0,15,0,5"/>
 
             <Label Content="Public Spend Key"/>
             <DockPanel>
-                <TextBox Name="tbxPublicSpendKey" Width="515"/>
                 <Button Name="btnCopyPublicSpendKeyToClipboard"
+                        DockPanel.Dock="Right"
                         Content="Copy"
                         Margin="10,0,0,0"
                         Click="CopyPublicSpendKeyToClipboardButton_Clicked"/>
+                <TextBox Name="tbxPublicSpendKey"/>
             </DockPanel>
 
-            <Label Content="Private Spend Key"/>
+            <Label Content="Private Spend Key" Margin="0,10,0,0"/>
             <DockPanel>
-                <TextBox Name="tbxPrivateSpendKey"
-                         PasswordChar="*"
-                         Width="450"/>
-                <Button Name="btnShowHidePrivateSpendKey"
-                        Content="Show"
-                        Margin="10,0,0,0"
-                        Click="ShowHidePrivateSpendKeyButton_Clicked"/>
                 <Button Name="btnCopyPrivateSpendKeyToClipboard"
+                        DockPanel.Dock="Right"
                         Content="Copy"
                         Margin="10,0,0,0"
                         Click="CopyPrivateSpendKeyToClipboardButton_Clicked"/>
+                <Button Name="btnShowHidePrivateSpendKey"
+                        DockPanel.Dock="Right"
+                        Content="Show"
+                        Margin="10,0,0,0"
+                        Click="ShowHidePrivateSpendKeyButton_Clicked"/>
+                <TextBox Name="tbxPrivateSpendKey"
+                         PasswordChar="*"/>
             </DockPanel>
 
-            <Separator Margin="0,20,0,10"/>
+            <Separator Margin="0,15,0,5"/>
 
             <Label Content="Mnemonic Seed"/>
             <DockPanel>
+                <StackPanel DockPanel.Dock="Right" Spacing="5" Margin="10,0,0,0">
+                    <Button Name="btnShowHideSeed"
+                            Content="Show"
+                            Click="ShowHideSeedButton_Clicked"/>
+                    <Button Name="btnCopySeedToClipboard"
+                            Content="Copy"
+                            Click="CopySeedToClipboardButton_Clicked"/>
+                </StackPanel>
                 <TextBox Name="tbxMnemonicSeed"
                          PasswordChar="*"
                          AcceptsReturn="True"
                          TextWrapping="Wrap"
-                         Height="80"
-                         Width="515"/>
-
-                <StackPanel>
-                    <Button Name="btnShowHideSeed"
-                            Content="Show"
-                            Margin="10,0,0,10"
-                            Click="ShowHideSeedButton_Clicked"/>
-                    <Button Name="btnCopySeedToClipboard"
-                            Content="Copy"
-                            Margin="10,0,0,0"
-                            Click="CopySeedToClipboardButton_Clicked"/>
-                </StackPanel>
+                         Height="80"/>
             </DockPanel>
 
-            <DockPanel Margin="0,15,0,0">
-                <Button Name="btnClancel"
-                        Content="Cancel"
-                        Click="CancelButton_Clicked"
-                        Margin="10,0,0,0"/>
-            </DockPanel>
+            <Button Name="btnClancel"
+                    Content="Close"
+                    Margin="0,15,0,0"
+                    Click="CancelButton_Clicked"/>
+
         </StackPanel>
-    </StackPanel>
+    </ScrollViewer>
 
 </UserControl>
