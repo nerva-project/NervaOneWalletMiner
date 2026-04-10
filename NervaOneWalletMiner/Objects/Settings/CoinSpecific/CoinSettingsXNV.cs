@@ -23,6 +23,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private int _LogLevelDaemon = 1;
         private int _LogLevelWallet = 1;
 
+        // https://github.com/nerva-project/nerva/releases
         private string _CliUrlWindows64 = "https://github.com/nerva-project/nerva/releases/download/v0.2.0.0/nerva-windows-x64-v0.2.0.0.zip";
         private string _CliUrlWindows32 = "https://github.com/nerva-project/nerva/releases/download/v0.2.0.0/nerva-windows-x32-v0.2.0.0.zip";
         private string _CliUrlLinux64 = "https://github.com/nerva-project/nerva/releases/download/v0.2.0.0/nerva-linux-x86_64-v0.2.0.0.tar.bz2";
@@ -31,7 +32,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private string _CliUrlMacIntel = "https://github.com/nerva-project/nerva/releases/download/v0.2.0.0/nerva-macos-x64-v0.2.0.0.tar.bz2";
         private string _CliUrlMacArm = "https://github.com/nerva-project/nerva/releases/download/v0.2.0.0/nerva-macos-armv8-v0.2.0.0.tar.bz2";
 
-        // TODO: For testing purposes only. Change later.
+        // TODO: For testing purposes only. Change before release
         private string _CliUrlAndroid = "https://nerva.one/quicksync/nerva-android-armv8.zip";
 
         private string _PublicNodeUrlDefault = "node.nerva.one:17566";

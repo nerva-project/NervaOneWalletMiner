@@ -23,6 +23,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private int _LogLevelDaemon = 0;
         private int _LogLevelWallet = 0;
 
+        // https://codeberg.org/wownero/wownero/releases
         private string _CliUrlWindows64 = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-x86_64-w64-mingw32-v0.11.3.0.zip";
         private string _CliUrlWindows32 = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-i686-w64-mingw32-v0.11.3.0.zip";
         private string _CliUrlLinux64 = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-x86_64-linux-gnu-v0.11.3.0.tar.bz2";
@@ -30,7 +31,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private string _CliUrlLinuxArm = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-aarch64-linux-gnu-v0.11.3.0.tar.bz2";
         private string _CliUrlMacIntel = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-x86_64-apple-darwin11-v0.11.3.0.tar.bz2";
         private string _CliUrlMacArm = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-aarch64-apple-darwin11-v0.11.3.0.tar.bz2";
-        private string _CliUrlAndroid = string.Empty;
+        private string _CliUrlAndroid = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-aarch64-linux-android-v0.11.3.0.tar.bz2";
 
         private string _PublicNodeUrlDefault = "node.monerodevs.org:34568";
 
@@ -101,9 +102,14 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
                 daemonCommand += " --start-mining " + daemonSettings.MiningAddress + " --mining-threads " + daemonSettings.MiningThreads;
             }
 
-            if (GlobalMethods.IsLinux() || GlobalMethods.IsOsx())
+            if (GlobalMethods.IsAndroid() || GlobalMethods.IsLinux() || GlobalMethods.IsOsx())
             {
                 daemonCommand += " --detach";
+            }
+
+            if (GlobalMethods.IsAndroid())
+            {
+                daemonCommand += " --rpc-ssl disabled";
             }
 
             if (!string.IsNullOrEmpty(daemonSettings.AdditionalArguments))
