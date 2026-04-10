@@ -17,6 +17,7 @@ namespace NervaOneWalletMiner.Views
             {
                 InitializeComponent();
                 imgCoinIcon.Source = GlobalMethods.GetLogo();
+                btnOpenLogsFolder.IsVisible = !GlobalMethods.IsAndroid();
 
                 var cbxThemeVariants = this.Get<ComboBox>("cbxThemeVariants");
                 cbxThemeVariants.SelectedItem = Application.Current!.RequestedThemeVariant;
@@ -44,6 +45,24 @@ namespace NervaOneWalletMiner.Views
             {
                 Logger.LogException("SET.CONS", ex);
             }            
+        }
+
+        public void ViewAppLogs_Clicked(object sender, RoutedEventArgs args)
+        {
+            Logger.LogDebug("SET.VALC", "Navigating to View Logs - App Logs tab");
+            UIManager.NavigateToViewLogs("app");
+        }
+
+        public void ViewCliLogs_Clicked(object sender, RoutedEventArgs args)
+        {
+            Logger.LogDebug("SET.VCLC", "Navigating to View Logs - CLI Tool Logs tab");
+            UIManager.NavigateToViewLogs("cli");
+        }
+
+        public void ViewWalletExports_Clicked(object sender, RoutedEventArgs args)
+        {
+            Logger.LogDebug("SET.VWEC", "Navigating to View Logs - Wallet Exports tab");
+            UIManager.NavigateToViewLogs("exports");
         }
 
         public async void SaveSettings_Clicked(object sender, RoutedEventArgs args)

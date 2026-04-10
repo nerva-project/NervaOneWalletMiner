@@ -20,6 +20,14 @@ namespace NervaOneWalletMiner.Views
             {
                 InitializeComponent();
                 imgCoinIcon.Source = GlobalMethods.GetLogo();
+
+                // Disable folder UI items on Android.
+                if(GlobalMethods.IsAndroid())
+                {
+                    btnOpenWalletsFolder.IsVisible = false;
+                    btnOpenWalletExportsFolder.IsVisible = false;
+                    sepOpenFolders.IsVisible = false;
+                }
             }
             catch (Exception ex)
             {

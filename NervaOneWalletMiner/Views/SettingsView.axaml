@@ -26,9 +26,22 @@
 				   Margin="5,0,0,0"/>
 		</Grid>
 		
-		<Button Command="{Binding OpenLogsFolderCommand}"
+		<Button Name="btnOpenLogsFolder"
+				Command="{Binding OpenLogsFolderCommand}"
 				Content="Open Logs Folder"
 				Margin="0,10,0,0"/>
+
+		<Button Name="btnViewAppLogs"
+				Content="View App Logs"
+				Click="ViewAppLogs_Clicked"/>
+
+		<Button Name="btnViewCliLogs"
+				Content="View CLI Tool Logs"
+				Click="ViewCliLogs_Clicked"/>
+
+		<Button Name="btnViewWalletExports"
+				Content="View Wallet Exports"
+				Click="ViewWalletExports_Clicked"/>
 
 		<Separator Margin="0,20,0,0"/>
 		

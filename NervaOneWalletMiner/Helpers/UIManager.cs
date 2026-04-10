@@ -62,6 +62,7 @@ namespace NervaOneWalletMiner.Helpers
                 { SplitViewPages.RestoreFromSeed, new RestoreFromSeedViewModel() },
                 { SplitViewPages.SweepBelow, new SweepBelowViewModel() },
                 { SplitViewPages.DisplayKeysSeed, new DisplayKeysSeedViewModel() },
+                { SplitViewPages.ViewLogs, new ViewLogsViewModel() },
 
                 { SplitViewPages.MainView, _mainView }
             };
@@ -93,6 +94,7 @@ namespace NervaOneWalletMiner.Helpers
                 { SplitViewPages.RestoreFromSeed, new RestoreFromSeedViewModel() },
                 { SplitViewPages.SweepBelow, new SweepBelowViewModel() },
                 { SplitViewPages.DisplayKeysSeed, new DisplayKeysSeedViewModel() },
+                { SplitViewPages.ViewLogs, new ViewLogsViewModel() },
 
                 { SplitViewPages.MainView, _mainView }
             };
@@ -213,6 +215,12 @@ namespace NervaOneWalletMiner.Helpers
         {
             GlobalData.ViewModelPages[SplitViewPages.DisplayKeysSeed] = new DisplayKeysSeedViewModel(message, returnPage);
             ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.DisplayKeysSeed];
+        }
+
+        public static void NavigateToViewLogs(string initialTab = "app")
+        {
+            GlobalData.ViewModelPages[SplitViewPages.ViewLogs] = new ViewLogsViewModel { InitialTab = initialTab };
+            ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.ViewLogs];
         }
 
         public static void NavigateToPage(string page)
@@ -787,16 +795,6 @@ namespace NervaOneWalletMiner.Helpers
                             GlobalData.NetworkStats.StatusSync += "Sync (" + infoRes.Height + " of " + infoRes.TargetHeight + ")";
 
                             // See if user wants to use QuickSync if they're far behind
-
-                            // TODO: ShowDialog not supported on Android. Turn off for now. Change in the future
-                            if (GlobalMethods.IsAndroid())
-                            {
-                                if (!_askedToQuickSync)
-                                {
-                                    _askedToQuickSync = true;
-                                }
-                            }
-
                             if (!_askedToQuickSync && !string.IsNullOrEmpty(GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].QuickSyncUrl))
                             {
                                 _askedToQuickSync = true;

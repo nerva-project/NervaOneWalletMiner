@@ -25,6 +25,12 @@ namespace NervaOneWalletMiner.Views
                 _colDescription = (DataGridTextColumn)dtgAddressBook.Columns[1];
                 _colPaymentId = (DataGridTextColumn)dtgAddressBook.Columns[3];
 
+                // Prevent row selection from scrolling the outer ScrollViewer
+                dtgAddressBook.AddHandler(
+                    RequestBringIntoViewEvent,
+                    (object? sender, RequestBringIntoViewEventArgs e) => { e.Handled = true; },
+                    RoutingStrategies.Bubble);
+
                 PopulateAddressBookGrid();
             }
             catch (Exception ex)

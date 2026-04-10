@@ -25,6 +25,7 @@
 				   CompactPaneLength="46"
 				   Grid.Row="0">
 			<SplitView.Pane>
+				<ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
 				<StackPanel Spacing="3" Margin="2">
 					<Button Name="btnLines"
 							Width="32"
@@ -91,6 +92,7 @@
 						</ListBoxItem>
 					</ListBox>
 				</StackPanel>
+				</ScrollViewer>
 			</SplitView.Pane>
 		
 			<SplitView.Content>

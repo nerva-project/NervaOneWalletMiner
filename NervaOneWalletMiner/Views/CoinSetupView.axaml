@@ -47,18 +47,20 @@
 						 Name="FullNode"
 						 Margin="0,20,0,0"
 						 IsChecked="True"
-						 IsCheckedChanged="NodeType_IsCheckedChanged"
-						 Content="Full Node: Blockchain runs on your device"/>
+						 IsCheckedChanged="NodeType_IsCheckedChanged">
+				<TextBlock Text="Full Node: Blockchain runs on your device" TextWrapping="Wrap"/>
+			</RadioButton>
 
 			<RadioButton GroupName="NodeType"
 						 Name="RemoteNode"
 						 Margin="0,0,0,0"
-						 IsCheckedChanged="NodeType_IsCheckedChanged"
-						 Content="Wallet Only: Connect to remote node and get wallet functionality"/>
+						 IsCheckedChanged="NodeType_IsCheckedChanged">
+				<TextBlock Text="Wallet Only: Connect to remote node and get wallet functionality" TextWrapping="Wrap"/>
+			</RadioButton>
 
 			<StackPanel Name="spRemoteNode" Spacing="5" Margin="25,0,0,0" IsVisible="False">
-				<Label Name="lblRemoteNode"
-					   Content="Remote Node Address or IP (Include port number)"/>
+				<TextBlock Name="lblRemoteNode"
+					   Text="Remote Node Address or IP (Include port number)" TextWrapping="Wrap"/>
 				<TextBox Name="tbxRemoteNode"/>
 			</StackPanel>
 
