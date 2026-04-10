@@ -62,6 +62,7 @@ namespace NervaOneWalletMiner.Helpers
                 { SplitViewPages.RestoreFromSeed, new RestoreFromSeedViewModel() },
                 { SplitViewPages.SweepBelow, new SweepBelowViewModel() },
                 { SplitViewPages.DisplayKeysSeed, new DisplayKeysSeedViewModel() },
+                { SplitViewPages.ViewLogs, new ViewLogsViewModel() },
 
                 { SplitViewPages.MainView, _mainView }
             };
@@ -93,6 +94,7 @@ namespace NervaOneWalletMiner.Helpers
                 { SplitViewPages.RestoreFromSeed, new RestoreFromSeedViewModel() },
                 { SplitViewPages.SweepBelow, new SweepBelowViewModel() },
                 { SplitViewPages.DisplayKeysSeed, new DisplayKeysSeedViewModel() },
+                { SplitViewPages.ViewLogs, new ViewLogsViewModel() },
 
                 { SplitViewPages.MainView, _mainView }
             };
@@ -213,6 +215,12 @@ namespace NervaOneWalletMiner.Helpers
         {
             GlobalData.ViewModelPages[SplitViewPages.DisplayKeysSeed] = new DisplayKeysSeedViewModel(message, returnPage);
             ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.DisplayKeysSeed];
+        }
+
+        public static void NavigateToViewLogs(string initialTab = "app")
+        {
+            GlobalData.ViewModelPages[SplitViewPages.ViewLogs] = new ViewLogsViewModel { InitialTab = initialTab };
+            ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.ViewLogs];
         }
 
         public static void NavigateToPage(string page)

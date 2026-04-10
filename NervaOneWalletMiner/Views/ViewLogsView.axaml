@@ -1,0 +1,74 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:NervaOneWalletMiner.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="700"
+             x:DataType="vm:ViewLogsViewModel"
+             x:Class="NervaOneWalletMiner.Views.ViewLogsView">
+
+	<Design.DataContext>
+		<vm:ViewLogsViewModel/>
+	</Design.DataContext>
+
+	<DockPanel Margin="10">
+
+		<!-- Header + controls fixed at top -->
+		<StackPanel DockPanel.Dock="Top" Spacing="5" MaxWidth="650">
+			<Grid ColumnDefinitions="32,*">
+				<Image Grid.Column="0"
+					   Name="imgCoinIcon"/>
+				<Label Grid.Column="1"
+					   Content="View Logs"
+					   Height="24"
+					   Margin="5,0,0,0"/>
+			</Grid>
+
+			<!-- Log source tabs -->
+			<StackPanel Orientation="Horizontal" Spacing="5" Margin="0,10,0,0">
+				<Button Name="btnTabAppLogs"
+						Content="App Logs"
+						Click="TabAppLogs_Clicked"/>
+				<Button Name="btnTabCliLogs"
+						Content="CLI Tool Logs"
+						Click="TabCliLogs_Clicked"/>
+				<Button Name="btnTabExports"
+						Content="Wallet Exports"
+						Click="TabExports_Clicked"/>
+			</StackPanel>
+
+			<!-- File selector row -->
+			<DockPanel Margin="0,5,0,0">
+				<Button DockPanel.Dock="Right"
+						Content="Refresh"
+						Margin="10,0,0,0"
+						Click="Refresh_Clicked"/>
+				<ComboBox Name="cbxFiles"
+						  HorizontalAlignment="Stretch"
+						  SelectionChanged="FileSelection_Changed"/>
+			</DockPanel>
+
+			<!-- Action buttons -->
+			<StackPanel Orientation="Horizontal" Spacing="10" Margin="0,5,0,5">
+				<Button Name="btnSaveFullFile"
+						Content="Save Full File"
+						Click="SaveFullFile_Clicked"/>
+				<Button Name="btnBack"
+						Content="Back"
+						Click="Back_Clicked"/>
+			</StackPanel>
+		</StackPanel>
+
+		<!-- Scrollable log content fills remaining space -->
+		<TextBox Name="tbxLogContent"
+				 IsReadOnly="True"
+				 AcceptsReturn="True"
+				 TextWrapping="NoWrap"
+				 FontFamily="Courier New"
+				 FontSize="11"
+				 ScrollViewer.HorizontalScrollBarVisibility="Auto"
+				 ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+
+	</DockPanel>
+
+</UserControl>

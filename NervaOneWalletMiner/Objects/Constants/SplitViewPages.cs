@@ -22,6 +22,7 @@
         public const string RestoreFromSeed = "restore_from_seed";
         public const string SweepBelow = "sweep_below";
         public const string DisplayKeysSeed = "display_keys_seed";
+        public const string ViewLogs = "view_logs";
 
         // Non-UI View. Needed so I have reference to it
         public const string MainView = "main_view";

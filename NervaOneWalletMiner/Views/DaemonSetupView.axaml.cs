@@ -22,6 +22,7 @@ namespace NervaOneWalletMiner.Views
             {
                 InitializeComponent();
                 imgCoinIcon.Source = GlobalMethods.GetLogo();
+                btnOpenCliToolsFolder.IsVisible = !GlobalMethods.IsAndroid();
             }
             catch (Exception ex)
             {
