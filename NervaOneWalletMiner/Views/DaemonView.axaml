@@ -11,7 +11,8 @@
 		<vm:DaemonViewModel/>
 	</Design.DataContext>
 
-	<Grid RowDefinitions="Auto,*">
+	<ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
+	<Grid RowDefinitions="Auto,Auto">
 		<Grid Grid.Row="0">
 			<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch"
 						Spacing="5" Margin="10" MaxWidth="650">
@@ -155,5 +156,6 @@
 			</DataGrid>
 		</Grid>
 	</Grid>
+	</ScrollViewer>
 
 </UserControl>
