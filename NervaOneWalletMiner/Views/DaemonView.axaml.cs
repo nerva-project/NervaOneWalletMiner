@@ -1,4 +1,4 @@
-﻿using Avalonia.Controls;
+using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using NervaOneWalletMiner.Helpers;
@@ -14,8 +14,8 @@ namespace NervaOneWalletMiner.Views
 {
     public partial class DaemonView : UserControl
     {
-        Window GetWindow() => TopLevel.GetTopLevel(this) as Window ?? throw new NullReferenceException("Invalid Owner");
-
+        private DataGridTextColumn? _colHeight;
+        private DataGridTextColumn? _colState;
         public DaemonView()
         {
             try
@@ -30,13 +30,79 @@ namespace NervaOneWalletMiner.Views
 
                 Initialized += DaemonView_Initialized;
 
-                var nupThreads = this.Get<NumericUpDown>("nupThreads");
-                nupThreads.Maximum = GlobalData.CpuThreadCount;
-                nupThreads.Value = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads;
+                // Index 2 = Height, 4 = State (icon=0, Address=1, Height=2, LiveTime=3, State=4)
+                var dgConnections = this.Get<DataGrid>("dgConnections");
+                _colHeight = (DataGridTextColumn)dgConnections.Columns[2];
+                _colState = (DataGridTextColumn)dgConnections.Columns[4];
+
+                for (int i = 1; i <= GlobalData.CpuThreadCount; i++)
+                {
+                    cbxThreads.Items.Add(i);
+                }
+                cbxThreads.SelectedItem = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads;
             }
             catch (Exception ex)
             {
                 Logger.LogException("DMN.CONS", ex);
+            }
+        }
+
+        private void DaemonView_SizeChanged(object? sender, SizeChangedEventArgs e)
+        {
+            try
+            {
+                if (e.NewSize.Width < 450)
+                {
+                    // Narrow: threads+button below icon/label
+                    grdHeader.ColumnDefinitions = ColumnDefinitions.Parse("Auto,*");
+                    Grid.SetRow(spThreadsAndButton, 1);
+                    Grid.SetColumn(spThreadsAndButton, 0);
+
+                    // Narrow: miner stats below daemon stats
+                    grdStats.ColumnDefinitions = ColumnDefinitions.Parse("200,Auto");
+                    Grid.SetColumn(grdMinerStats, 0);
+                    Grid.SetRow(grdMinerStats, 1);
+
+                    // Narrow: icon + Address + LiveTime
+                    if (_colHeight != null) { _colHeight.IsVisible = false; }
+                    if (_colState != null) { _colState.IsVisible = false; }
+                }
+                else if (e.NewSize.Width < 700)
+                {
+                    // Medium: threads+button inline
+                    grdHeader.ColumnDefinitions = ColumnDefinitions.Parse("Auto,*,Auto");
+                    Grid.SetRow(spThreadsAndButton, 0);
+                    Grid.SetColumn(spThreadsAndButton, 2);
+
+                    // Medium: miner stats on the right
+                    grdStats.ColumnDefinitions = ColumnDefinitions.Parse("200,*,200");
+                    Grid.SetColumn(grdMinerStats, 2);
+                    Grid.SetRow(grdMinerStats, 0);
+
+                    // Medium: icon + Address + Height + LiveTime
+                    if (_colHeight != null) { _colHeight.IsVisible = true; }
+                    if (_colState != null) { _colState.IsVisible = false; }
+                }
+                else
+                {
+                    // Wide: threads+button on the right of icon/label
+                    grdHeader.ColumnDefinitions = ColumnDefinitions.Parse("Auto,*,Auto");
+                    Grid.SetRow(spThreadsAndButton, 0);
+                    Grid.SetColumn(spThreadsAndButton, 2);
+
+                    // Wide: miner stats on the right
+                    grdStats.ColumnDefinitions = ColumnDefinitions.Parse("200,*,200");
+                    Grid.SetColumn(grdMinerStats, 2);
+                    Grid.SetRow(grdMinerStats, 0);
+
+                    // Wide: all columns
+                    if (_colHeight != null) { _colHeight.IsVisible = true; }
+                    if (_colState != null) { _colState.IsVisible = true; }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DMN.DVSC", ex);
             }
         }
 
@@ -47,7 +113,7 @@ namespace NervaOneWalletMiner.Views
                 if (!GlobalData.AreDaemonEventsRegistered)
                 {
                     DaemonViewModel vm = (DaemonViewModel)DataContext!;
-                    vm.StartMiningUiEvent += (owner, threads) => StartMiningAsync(owner, threads);
+                    vm.StartMiningUiEvent += threads => StartMiningAsync(threads);
                     vm.StartMiningNonUiEvent += StartMiningNonUi;
                     vm.StopMiningNonUiEvent += StopMiningNonUi;
                     GlobalData.AreDaemonEventsRegistered = true;
@@ -55,17 +121,24 @@ namespace NervaOneWalletMiner.Views
             }
             catch (Exception ex)
             {
-                Logger.LogException("DMN.DAVI", ex); ;
+                Logger.LogException("DMN.DAVI", ex);
             }
         }
 
-        private void nupThreads_ValueChanged(object sender, NumericUpDownValueChangedEventArgs args)
+        private void cbxThreads_SelectionChanged(object sender, SelectionChangedEventArgs args)
         {
-            if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads != nupThreads.Value)
+            try
             {
-                GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads = Convert.ToInt32(nupThreads.Value);
-                Logger.LogDebug("DMN.NTVC", "Setting mining threads: " + GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
-                GlobalMethods.SaveConfig();
+                if (cbxThreads.SelectedItem is int selected &&  GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads != selected)
+                {
+                    GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads = selected;
+                    Logger.LogDebug("DMN.CTSC", "Setting mining threads: " + selected);
+                    GlobalMethods.SaveConfig();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DMN.CTSC", ex); ;
             }
         }
 
@@ -74,33 +147,32 @@ namespace NervaOneWalletMiner.Views
             try
             {
                 var btnStartStopMining = this.Get<Button>("btnStartStopMining");
-                var nupThreads = this.Get<NumericUpDown>("nupThreads");
 
                 if (btnStartStopMining.Content!.ToString()!.Equals(StatusMiner.StopMining))
                 {
                     // Stop mining
                     Logger.LogDebug("DMN.SSMC", "Stopping mining");
                     GlobalData.IsManualStoppedMining = true;
-                    StopMiningAsync(GetWindow());
+                    StopMiningAsync();
                     btnStartStopMining.Content = StatusMiner.StartMining;
-                    nupThreads.IsEnabled = true;
+                    cbxThreads.IsEnabled = true;
                 }
                 else
                 {
-                    if(string.IsNullOrEmpty(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress))
+                    if (string.IsNullOrEmpty(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress))
                     {
                         // Get and save Mining Address
                         Logger.LogDebug("DMN.SSMC", "Mining address missing. Asking user to provide it");
                         var window = new TextBoxView("Start Mining", "Please provide mining address", string.Empty, "Required - Mining Address");
-                        DialogResult dialogRes = await window.ShowDialog<DialogResult>(GetWindow());
+                        DialogResult? dialogRes = await DialogService.ShowAsync<DialogResult>(window);
 
                         if (dialogRes != null && dialogRes.IsOk)
                         {
-                            if(!string.IsNullOrEmpty(dialogRes.TextBoxValue))
-                            {                                
+                            if (!string.IsNullOrEmpty(dialogRes.TextBoxValue))
+                            {
                                 GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress = dialogRes.TextBoxValue;
                                 Logger.LogDebug("DMN.SSMC", "Setting and saving mining address: " + GlobalMethods.GetShorterString(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress, 12));
-                                GlobalMethods.SaveConfig();                                
+                                GlobalMethods.SaveConfig();
                             }
                         }
                     }
@@ -108,50 +180,49 @@ namespace NervaOneWalletMiner.Views
                     if (string.IsNullOrEmpty(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress))
                     {
                         Logger.LogDebug("DMN.SSMC", "Mining address still missing. Aborting mining");
-                        MessageBoxView window = new("Start Mining", "Cannot start mining without Mining Address", true);
-                        await window.ShowDialog(GetWindow());
+                        await DialogService.ShowAsync(new MessageBoxView("Start Mining", "Cannot start mining without Mining Address", true));
                     }
                     else
                     {
                         if (GlobalData.NetworkStats.NetHeight > GlobalData.NetworkStats.YourHeight)
                         {
                             Logger.LogDebug("DMN.SSMC", "Incorrect height. Aborting mining. NetHeight: " + GlobalData.NetworkStats.NetHeight + " | YourHeight: " + GlobalData.NetworkStats.YourHeight);
-                            MessageBoxView window = new("Start Mining", "Cannot start mining because you're not fully synchronized.\r\nPlease try again later.", true);
-                            await window.ShowDialog(GetWindow());
+                            await DialogService.ShowAsync(new MessageBoxView("Start Mining", "Cannot start mining because you're not fully synchronized.\r\nPlease try again later.", true));
                         }
                         else
                         {
                             // Start mining
-                            if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads != nupThreads.Value)
+                            if (cbxThreads.SelectedItem is int selected && GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads != selected)
                             {
-                                GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads = Convert.ToInt32(nupThreads.Value);
+                                GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads = selected;
                                 GlobalMethods.SaveConfig();
                             }
 
-                            Logger.LogDebug("DMN.SSMC", "Starting mining");                            
-                            StartMiningAsync(GetWindow(), GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
+                            Logger.LogDebug("DMN.SSMC", "Starting mining");
+                            StartMiningAsync(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads);
                             btnStartStopMining.Content = StatusMiner.StopMining;
-                            nupThreads.IsEnabled = false;
+                            cbxThreads.IsEnabled = false;
                         }
                     }
-                }                
+                }
             }
             catch (Exception ex)
             {
                 Logger.LogException("DMN.SSMC", ex);
             }
         }
-        
+
         public void StartMiningNonUi(int threads)
         {
             // Master Process does not have owner so do not attempt to show messages
-            StartMiningAsync(null, threads, false);
+            StartMiningAsync(threads, false);
         }
-        public async void StartMiningAsync(Window? owner, int threads, bool isUiThread = true)
+
+        public async void StartMiningAsync(int threads, bool isUiThread = true)
         {
             try
             {
-                if(string.IsNullOrEmpty(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress))
+                if (string.IsNullOrEmpty(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress))
                 {
                     Logger.LogError("DMN.STMA", "Mining address missing. Cannot start mining");
                 }
@@ -166,7 +237,7 @@ namespace NervaOneWalletMiner.Views
                     Logger.LogDebug("DMN.STMA", "Calling StartMining. Address: " + GlobalMethods.GetShorterString(request.MiningAddress, 12) + " | Threads: " + request.ThreadCount);
                     StartMiningResponse response = await GlobalData.DaemonService.StartMining(
                             GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, request);
-                    
+
                     if (response.Error.IsError)
                     {
                         Logger.LogDebug("DMN.STMA", "Error starting mining | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
@@ -175,15 +246,14 @@ namespace NervaOneWalletMiner.Views
                         Console.WriteLine(response.Error.Message);
                         if (isUiThread && !string.Equals(response.Error.Message, "Network hash too high"))
                         {
-                            await Dispatcher.UIThread.Invoke(async () =>
+                            await Dispatcher.UIThread.InvokeAsync(async () =>
                             {
-                                MessageBoxView window = new("Start Mining", "Error when starting mining\r\n\r\n" + response.Error.Message, true);
-                                await window.ShowDialog(owner!);
+                                await DialogService.ShowAsync(new MessageBoxView("Start Mining", "Error when starting mining\r\n\r\n" + response.Error.Message, true));
                             });
                         }
                     }
                     else
-                    {                       
+                    {
                         // Some errors are not reported as errors, such as not being able to mine to subaddress
                         Logger.LogDebug("DMN.STMA", "Start mining response status: " + response.Status);
 
@@ -192,10 +262,9 @@ namespace NervaOneWalletMiner.Views
 
                         if (isUiThread)
                         {
-                            await Dispatcher.UIThread.Invoke(async () =>
+                            await Dispatcher.UIThread.InvokeAsync(async () =>
                             {
-                                MessageBoxView window = new("Start Mining", "Response: " + response.Status, true);
-                                await window.ShowDialog(owner!);
+                                await DialogService.ShowAsync(new MessageBoxView("Start Mining", "Response: " + response.Status, true));
                             });
                         }
                     }
@@ -212,9 +281,10 @@ namespace NervaOneWalletMiner.Views
         public void StopMiningNonUi()
         {
             // Master Process does not have owner so do not attempt to show messages
-            StopMiningAsync(null, false);
+            StopMiningAsync(false);
         }
-        public async void StopMiningAsync(Window? owner, bool isUiThread = true)
+
+        public async void StopMiningAsync(bool isUiThread = true)
         {
             try
             {
@@ -224,15 +294,14 @@ namespace NervaOneWalletMiner.Views
                 StopMiningResponse response =
                     await GlobalData.DaemonService.StopMining(
                         GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, request);
-                    
+
                 if (response.Error.IsError)
                 {
                     if (isUiThread)
                     {
-                        await Dispatcher.UIThread.Invoke(async () =>
+                        await Dispatcher.UIThread.InvokeAsync(async () =>
                         {
-                            MessageBoxView window = new("Stop Mining", "Error when stopping mining\r\n\r\n" + response.Error.Message, true);
-                            await window.ShowDialog(owner!);
+                            await DialogService.ShowAsync(new MessageBoxView("Stop Mining", "Error when stopping mining\r\n\r\n" + response.Error.Message, true));
                         });
                     }
                 }

@@ -15,6 +15,7 @@
 	</Design.DataContext>
 	
 	<Grid RowDefinitions="*,50">
+		<uc:OverlayDialogHost Name="overlayHost" Grid.RowSpan="2" ZIndex="100"/>
 		<SplitView Name="spvMain"
 				   IsPaneOpen="{Binding IsPaneOpen}"
 				   PaneOpened="spvMain_PaneOpenedClosed"

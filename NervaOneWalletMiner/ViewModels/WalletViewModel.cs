@@ -1,5 +1,4 @@
-﻿using Avalonia.Controls;
-using NervaOneWalletMiner.Objects.Constants;
+﻿using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Objects.DataGrid;
 using ReactiveUI;
 using System.Collections.ObjectModel;
@@ -9,11 +8,11 @@ namespace NervaOneWalletMiner.ViewModels
 {
     internal class WalletViewModel : ViewModelBase
     {
-        public delegate void TransferUiAction(Window owner, string toAddress, string paymentId);
+        public delegate void TransferUiAction(string toAddress, string paymentId);
         public event TransferUiAction? TransferUiEvent = null;
-        public void TransferUi(Window owner, string toAddress, string paymentId)
+        public void TransferUi(string toAddress, string paymentId)
         {
-            TransferUiEvent!.Invoke(owner, toAddress, paymentId);
+            TransferUiEvent!.Invoke(toAddress, paymentId);
         }
 
         public delegate Task<bool> CloseWalletNonUiAction();

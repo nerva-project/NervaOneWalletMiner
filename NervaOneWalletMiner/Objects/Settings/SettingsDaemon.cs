@@ -12,7 +12,7 @@ namespace NervaOneWalletMiner.Objects.Settings
 
         public bool AutoStartMining { get; set; } = false;
 
-        public bool EnableConnectionsGuard { get; set; } = true;
+        public bool EnableConnectionsGuard { get; set; } = false;
 
         public string MiningAddress { get; set; } = string.Empty;
 

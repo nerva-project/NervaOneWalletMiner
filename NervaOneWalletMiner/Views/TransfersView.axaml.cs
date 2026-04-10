@@ -12,7 +12,8 @@ namespace NervaOneWalletMiner.Views
 {
     public partial class TransfersView : UserControl
     {
-        Window GetWindow() => TopLevel.GetTopLevel(this) as Window ?? throw new NullReferenceException("Invalid Owner");
+        private DataGridTextColumn? _colHeight;
+        private DataGridTextColumn? _colAddress;
 
         public TransfersView()
         {
@@ -20,11 +21,59 @@ namespace NervaOneWalletMiner.Views
             {
                 InitializeComponent();
                 imgCoinIcon.Source = GlobalMethods.GetLogo();
+
+                // Index 1=Height, 4=Address (icon=0, Time=2, Amount=3)
+                _colHeight = (DataGridTextColumn)dtgTransactions.Columns[1];
+                _colAddress = (DataGridTextColumn)dtgTransactions.Columns[4];
             }
             catch (Exception ex)
             {
                 Logger.LogException("TRA.CONS", ex);
-            }            
+            }
+        }
+
+        private void TransfersView_SizeChanged(object? sender, SizeChangedEventArgs e)
+        {
+            try
+            {
+                if (e.NewSize.Width < 450)
+                {
+                    // Narrow: button below icon/label
+                    grdHeader.ColumnDefinitions = ColumnDefinitions.Parse("Auto,*");
+                    Grid.SetRow(btnTransactionDetails, 1);
+                    Grid.SetColumn(btnTransactionDetails, 0);
+
+                    // Narrow: icon + Time + Amount
+                    if (_colHeight != null) { _colHeight.IsVisible = false; }
+                    if (_colAddress != null) { _colAddress.IsVisible = false; }
+                }
+                else if (e.NewSize.Width < 700)
+                {
+                    // Medium: button inline
+                    grdHeader.ColumnDefinitions = ColumnDefinitions.Parse("Auto,*,Auto");
+                    Grid.SetRow(btnTransactionDetails, 0);
+                    Grid.SetColumn(btnTransactionDetails, 2);
+
+                    // Medium: icon + Height + Time + Amount
+                    if (_colHeight != null) { _colHeight.IsVisible = true; }
+                    if (_colAddress != null) { _colAddress.IsVisible = false; }
+                }
+                else
+                {
+                    // Wide: button inline
+                    grdHeader.ColumnDefinitions = ColumnDefinitions.Parse("Auto,*,Auto");
+                    Grid.SetRow(btnTransactionDetails, 0);
+                    Grid.SetColumn(btnTransactionDetails, 2);
+
+                    // Wide: all columns
+                    if (_colHeight != null) { _colHeight.IsVisible = true; }
+                    if (_colAddress != null) { _colAddress.IsVisible = true; }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("TRA.TVSC", ex);
+            }
         }
 
         public void TransactionDetails_Clicked(object sender, RoutedEventArgs args)
@@ -49,19 +98,16 @@ namespace NervaOneWalletMiner.Views
                     if (response.Error.IsError)
                     {
                         Logger.LogError("TRA.EXAC", "ExportTranfers Error | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
-                        MessageBoxView window = new("Export All", "Error exporting:\r\n" + response.Error.Message, true);
-                        await window.ShowDialog(GetWindow());
+                        await DialogService.ShowAsync(new MessageBoxView("Export All", "Error exporting:\r\n" + response.Error.Message, true));
                     }
                     else
                     {
-                        var window = new TextBoxView("Export All", "Transactions have been exported to below file", exportFile, string.Empty);
-                        await window.ShowDialog(GetWindow());
+                        await DialogService.ShowAsync(new TextBoxView("Export All", "Transactions have been exported to below file", exportFile, string.Empty));
                     }
                 }
                 else
                 {
-                    MessageBoxView window = new("Export All", "Please open wallet first.", true);
-                    await window.ShowDialog(GetWindow());
+                    await DialogService.ShowAsync(new MessageBoxView("Export All", "Please open wallet first.", true));
                 }
             }
             catch (Exception ex)
@@ -75,7 +121,7 @@ namespace NervaOneWalletMiner.Views
             OpenTransactionDetailsView();
         }
 
-        private void OpenTransactionDetailsView()
+        private async void OpenTransactionDetailsView()
         {
             try
             {
@@ -84,19 +130,16 @@ namespace NervaOneWalletMiner.Views
                 if (dtgTransactions.SelectedItem != null)
                 {
                     Transfer selectedItem = (Transfer)dtgTransactions.SelectedItem;
-                    var window = new TransactionDetailsView(selectedItem.TransactionId, selectedItem.AccountIndex, selectedItem.Amount);
-                    window.ShowDialog(GetWindow());
+                    UIManager.NavigateToTransactionDetails(selectedItem.TransactionId, selectedItem.AccountIndex, selectedItem.Amount);
                 }
                 else
                 {
-                    Logger.LogDebug("TRA.OTDV", "Opening Transfer transaction details view");
-                    Dispatcher.UIThread.Invoke(async () =>
-                    {                        
-                        MessageBoxView window = new("Transaction Details", "Please select transaction", true);
-                        await window.ShowDialog(GetWindow());
+                    Logger.LogDebug("TRA.OTDV", "No transaction selected");
+                    await Dispatcher.UIThread.InvokeAsync(async () =>
+                    {
+                        await DialogService.ShowAsync(new MessageBoxView("Transaction Details", "Please select transaction", true));
                     });
                 }
-
             }
             catch (Exception ex)
             {

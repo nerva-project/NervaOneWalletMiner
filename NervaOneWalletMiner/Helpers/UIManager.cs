@@ -51,6 +51,17 @@ namespace NervaOneWalletMiner.Helpers
                 { SplitViewPages.WalletSetup, new PickCoinViewModel() },
                 { SplitViewPages.Settings, new PickCoinViewModel() },
                 { SplitViewPages.About, new PickCoinViewModel() },
+                { SplitViewPages.CoinSetup, new CoinSetupViewModel() },
+                { SplitViewPages.AddressInfo, new AddressInfoViewModel() },
+                { SplitViewPages.CreateWallet, new CreateWalletViewModel() },
+                { SplitViewPages.OpenWallet, new OpenWalletViewModel() },
+                { SplitViewPages.TransferFunds, new TransferFundsViewModel() },
+                { SplitViewPages.TransactionDetails, new TransactionDetailsViewModel() },
+                { SplitViewPages.AddressBookEntry, new AddressBookEntryViewModel() },
+                { SplitViewPages.RestoreFromKeys, new RestoreFromKeysViewModel() },
+                { SplitViewPages.RestoreFromSeed, new RestoreFromSeedViewModel() },
+                { SplitViewPages.SweepBelow, new SweepBelowViewModel() },
+                { SplitViewPages.DisplayKeysSeed, new DisplayKeysSeedViewModel() },
 
                 { SplitViewPages.MainView, _mainView }
             };
@@ -71,6 +82,17 @@ namespace NervaOneWalletMiner.Helpers
                 { SplitViewPages.WalletSetup, new WalletSetupViewModel() },
                 { SplitViewPages.Settings, new SettingsViewModel() },
                 { SplitViewPages.About, new AboutViewModel() },
+                { SplitViewPages.CoinSetup, new CoinSetupViewModel() },
+                { SplitViewPages.AddressInfo, new AddressInfoViewModel() },
+                { SplitViewPages.CreateWallet, new CreateWalletViewModel() },
+                { SplitViewPages.OpenWallet, new OpenWalletViewModel() },
+                { SplitViewPages.TransferFunds, new TransferFundsViewModel() },
+                { SplitViewPages.TransactionDetails, new TransactionDetailsViewModel() },
+                { SplitViewPages.AddressBookEntry, new AddressBookEntryViewModel() },
+                { SplitViewPages.RestoreFromKeys, new RestoreFromKeysViewModel() },
+                { SplitViewPages.RestoreFromSeed, new RestoreFromSeedViewModel() },
+                { SplitViewPages.SweepBelow, new SweepBelowViewModel() },
+                { SplitViewPages.DisplayKeysSeed, new DisplayKeysSeedViewModel() },
 
                 { SplitViewPages.MainView, _mainView }
             };
@@ -118,6 +140,95 @@ namespace NervaOneWalletMiner.Helpers
                 default:
                     ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.Daemon];
                     break;
+            }
+        }
+
+        public static void NavigateToCoinSetup()
+        {
+            GlobalData.ViewModelPages[SplitViewPages.CoinSetup] = new CoinSetupViewModel();
+            ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.CoinSetup];
+        }
+
+        public static void NavigateToAddressInfo(int accountIndex)
+        {
+            GlobalData.ViewModelPages[SplitViewPages.AddressInfo] = new AddressInfoViewModel(accountIndex);
+            ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.AddressInfo];
+        }
+
+        public static void NavigateToCreateWallet()
+        {
+            GlobalData.ViewModelPages[SplitViewPages.CreateWallet] = new CreateWalletViewModel();
+            ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.CreateWallet];
+        }
+
+        public static void NavigateToOpenWallet()
+        {
+            GlobalData.ViewModelPages[SplitViewPages.OpenWallet] = new OpenWalletViewModel();
+            ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.OpenWallet];
+        }
+
+        public static void NavigateToTransferFunds(uint selectedAccountIndex, string toAddress, string paymentId, string returnPage = SplitViewPages.Wallet)
+        {
+            GlobalData.ViewModelPages[SplitViewPages.TransferFunds] = new TransferFundsViewModel(selectedAccountIndex, toAddress, paymentId, returnPage);
+            ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.TransferFunds];
+        }
+
+        public static void NavigateToTransactionDetails(string transactionId, int accountIndex, decimal amount)
+        {
+            GlobalData.ViewModelPages[SplitViewPages.TransactionDetails] = new TransactionDetailsViewModel(transactionId, accountIndex, amount);
+            ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.TransactionDetails];
+        }
+
+        public static void NavigateToAddressBook()
+        {
+            GlobalData.ViewModelPages[SplitViewPages.AddressBook] = new AddressBookViewModel();
+            ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.AddressBook];
+        }
+
+        public static void NavigateToAddressBookEntry(bool isNew, int id = 0, string name = "", string description = "", string address = "", string paymentId = "")
+        {
+            GlobalData.ViewModelPages[SplitViewPages.AddressBookEntry] = new AddressBookEntryViewModel(isNew, id, name, description, address, paymentId);
+            ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.AddressBookEntry];
+        }
+
+        public static void NavigateToRestoreFromKeys()
+        {
+            GlobalData.ViewModelPages[SplitViewPages.RestoreFromKeys] = new RestoreFromKeysViewModel();
+            ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.RestoreFromKeys];
+        }
+
+        public static void NavigateToRestoreFromSeed()
+        {
+            GlobalData.ViewModelPages[SplitViewPages.RestoreFromSeed] = new RestoreFromSeedViewModel();
+            ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.RestoreFromSeed];
+        }
+
+        public static void NavigateToSweepBelow()
+        {
+            GlobalData.ViewModelPages[SplitViewPages.SweepBelow] = new SweepBelowViewModel();
+            ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.SweepBelow];
+        }
+
+        public static void NavigateToDisplayKeysSeed(string message, string returnPage = SplitViewPages.WalletSetup)
+        {
+            GlobalData.ViewModelPages[SplitViewPages.DisplayKeysSeed] = new DisplayKeysSeedViewModel(message, returnPage);
+            ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.DisplayKeysSeed];
+        }
+
+        public static void NavigateToPage(string page)
+        {
+            ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[page];
+        }
+
+        public static void NavigateToDefaultPage()
+        {
+            if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
+            {
+                ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.Wallet];
+            }
+            else
+            {
+                ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.Daemon];
             }
         }
 
@@ -285,13 +396,19 @@ namespace NervaOneWalletMiner.Helpers
             {
                 if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
                 {
-                    UpdateDaemonStatus(GlobalData.NetworkStats.StatusSync);
-                    UpdateDaemonVersion("Remote Node");
+                    string remoteStatus = "Remote" + (string.IsNullOrEmpty(GlobalData.NetworkStats.StatusSync) ? "" : " | " + GlobalData.NetworkStats.StatusSync);
+                    UpdateDaemonStatus(remoteStatus);
                 }
                 else
                 {
-                    UpdateDaemonStatus("Connections: " + GlobalData.NetworkStats.ConnectionsOut + "(out) + " + GlobalData.NetworkStats.ConnectionsIn + "(in)" + (string.IsNullOrEmpty(GlobalData.NetworkStats.StatusSync) ? "" : " | " + GlobalData.NetworkStats.StatusSync));
-                    UpdateDaemonVersion(GlobalData.NetworkStats.Version.ToLower().StartsWith("v") ? GlobalData.NetworkStats.Version : "v: " + GlobalData.NetworkStats.Version);
+                    string rawVersion = GlobalData.NetworkStats.Version.ToLower().StartsWith("v") ? GlobalData.NetworkStats.Version : "v" + GlobalData.NetworkStats.Version;
+
+                    // Keep only the numeric part: e.g. "v0.18.4.5-release" -> "v0.18.4.5"
+                    int dashIndex = rawVersion.IndexOf('-');
+                    string version = dashIndex > 0 ? rawVersion[..dashIndex] : rawVersion;
+                    string connections = "↑" + GlobalData.NetworkStats.ConnectionsOut + "  ↓" + GlobalData.NetworkStats.ConnectionsIn;
+                    string sync = " | " + (string.IsNullOrEmpty(GlobalData.NetworkStats.StatusSync) ? "Connecting to daemon..." : GlobalData.NetworkStats.StatusSync);
+                    UpdateDaemonStatus(version + " | " + connections + sync);
                 }
             }
             catch (Exception ex)
@@ -402,7 +519,7 @@ namespace NervaOneWalletMiner.Helpers
                     ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).OpenCloseWallet = StatusWallet.CloseWallet;
 
                     // Status Bar
-                    string statusBarMessage = GlobalData.OpenedWalletName + " | Account(s): " + ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).WalletAddresses.Count + " | Balance: " + GlobalData.WalletStats.BalanceTotal + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits + (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletHeightSupported ? " | Height: " + GlobalData.WalletHeight : string.Empty);
+                    string statusBarMessage = GlobalData.OpenedWalletName + " | " + GlobalData.WalletStats.BalanceTotal.ToString("F2") + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits + (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletHeightSupported ? " | H: " + GlobalData.WalletHeight : string.Empty);
                     if (((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).WalletStatus != statusBarMessage)
                     {
                         ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).WalletStatus = statusBarMessage;
@@ -555,7 +672,7 @@ namespace NervaOneWalletMiner.Helpers
                 {
                     GlobalData.NetworkStats = new()
                     {
-                        StatusSync = "Downloading client tools. Please wait...",
+                        StatusSync = "Downloading client tools...",
                         Connections = []
                     };
                 }
@@ -571,7 +688,7 @@ namespace NervaOneWalletMiner.Helpers
                 {
                     GlobalData.NetworkStats = new()
                     {
-                        StatusSync = "Using " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].PublicNodeAddress,
+                        StatusSync = GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].PublicNodeAddress,
                         Connections = []
                     };
                 }
@@ -587,7 +704,7 @@ namespace NervaOneWalletMiner.Helpers
                 {
                     GlobalData.NetworkStats = new()
                     {
-                        StatusSync = "Establishing connection with daemon...",
+                        StatusSync = "Connecting to daemon...",
                         Connections = []
                     };
                 }
@@ -667,7 +784,7 @@ namespace NervaOneWalletMiner.Helpers
                         GlobalData.NetworkStats.StatusSync = "";
                         if (infoRes.TargetHeight != 0 && infoRes.Height < infoRes.TargetHeight)
                         {
-                            GlobalData.NetworkStats.StatusSync += "Sync (Height " + infoRes.Height + " of " + infoRes.TargetHeight + ")";
+                            GlobalData.NetworkStats.StatusSync += "Sync (" + infoRes.Height + " of " + infoRes.TargetHeight + ")";
 
                             // See if user wants to use QuickSync if they're far behind
 
@@ -693,7 +810,7 @@ namespace NervaOneWalletMiner.Helpers
                         }
                         else
                         {
-                            GlobalData.NetworkStats.StatusSync += "Sync OK | Status " + infoRes.Status;
+                            GlobalData.NetworkStats.StatusSync += "Sync OK";
                         }
 
                         if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsCpuMiningSupported)

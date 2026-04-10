@@ -16,7 +16,7 @@ namespace NervaOneWalletMiner.Helpers
     {
         public const string AppNameMain = "NervaOne";
         public const string AppNameDesktop = "NervaOneDesktop";
-        public const string Version = "0.8.5.2";
+        public const string Version = "0.8.5.3";
 
         public const string CliToolsDirName = "cli";
         public const string WalletDirName = "wallets";
@@ -28,7 +28,7 @@ namespace NervaOneWalletMiner.Helpers
         public const string AddressBookFileName = "address.book";
         public const string WalletDumpFileName = "dump.txt";
 
-        public static string WalletClosedMessage = "Wallet offline - see Wallet screen to open";
+        public static string WalletClosedMessage = "Wallet offline - open via Wallet screen";
         public static string CoinDirName = Coin.XNV;
         public static int CpuThreadCount = Environment.ProcessorCount;
                

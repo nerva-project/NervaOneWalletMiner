@@ -12,6 +12,11 @@ public partial class MainView : UserControl
 		{
             InitializeComponent();
 
+            DialogService.SetHost(
+                (dialog, callback) => overlayHost.Push(dialog, callback),
+                result => overlayHost.Pop(result)
+            );
+
             if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
             {
                 wallet.IsSelected = true;                

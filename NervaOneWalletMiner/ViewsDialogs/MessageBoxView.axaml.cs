@@ -3,28 +3,26 @@ using Avalonia.Interactivity;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects;
 using System;
-using System.Linq;
 
 namespace NervaOneWalletMiner.ViewsDialogs
 {
-    public partial class MessageBoxView : Window
+    public partial class MessageBoxView : UserControl
     {
         // Not used but designer will complain without it
         public MessageBoxView()
         {
-            InitializeComponent();         
+            InitializeComponent();
         }
 
-        public MessageBoxView(string title, string textMessage, bool hideCancelButton) : this(title, textMessage, hideCancelButton, false) { }        
+        public MessageBoxView(string title, string textMessage, bool hideCancelButton) : this(title, textMessage, hideCancelButton, false) { }
 
         public MessageBoxView(string title, string textMessage, bool hideCancelButton, bool isYesNoButtons)
         {
             try
             {
                 InitializeComponent();
-                Icon = GlobalMethods.GetWindowIcon();
 
-                Title = title;
+                tbkTitle.Text = title;
                 tbkMessage.Text = textMessage;
 
                 if(isYesNoButtons)
@@ -42,10 +40,6 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     btnCancel.IsVisible = true;
                 }
 
-                // Change height based on number of lines. Assume 70 characters per line
-                double numberOfLines = Math.Ceiling(textMessage.Length / 70.0);
-                int numberOfNewLines = textMessage.Where(x => (x == '\n')).Count();
-                Height = 80 + (numberOfLines * 18) + (numberOfNewLines * 18);
             }
             catch (Exception ex)
             {
@@ -62,7 +56,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     IsOk = true
                 };
 
-                Close(result);
+                DialogService.Close(result);
             }
             catch (Exception ex)
             {
@@ -79,7 +73,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                     IsCancel = true
                 };
 
-                Close(result);
+                DialogService.Close(result);
             }
             catch (Exception ex)
             {

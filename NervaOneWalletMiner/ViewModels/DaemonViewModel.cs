@@ -1,5 +1,4 @@
-﻿using Avalonia.Controls;
-using NervaOneWalletMiner.Objects.Constants;
+﻿using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Objects.DataGrid;
 using ReactiveUI;
 using System.Collections.ObjectModel;
@@ -8,11 +7,11 @@ namespace NervaOneWalletMiner.ViewModels
 {
     internal class DaemonViewModel : ViewModelBase
     {
-        public delegate void StartMiningUiAction(Window owner, int miningThreads);
+        public delegate void StartMiningUiAction(int miningThreads);
         public event StartMiningUiAction? StartMiningUiEvent;
-        public void StartMiningUi(Window owner,int miningThreads)
+        public void StartMiningUi(int miningThreads)
         {
-            StartMiningUiEvent!.Invoke(owner, miningThreads);
+            StartMiningUiEvent!.Invoke(miningThreads);
         }
 
         public delegate void StartMiningNonUiAction(int miningThreads);

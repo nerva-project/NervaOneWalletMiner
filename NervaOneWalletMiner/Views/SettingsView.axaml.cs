@@ -2,20 +2,15 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Styling;
-using Avalonia.Threading;
 using NervaOneWalletMiner.Helpers;
-using NervaOneWalletMiner.Objects;
 using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.ViewModels;
-using NervaOneWalletMiner.ViewsDialogs;
 using System;
 
 namespace NervaOneWalletMiner.Views
 {
     public partial class SettingsView : UserControl
     {
-        Window GetWindow() => TopLevel.GetTopLevel(this) as Window ?? throw new NullReferenceException("Invalid Owner");
-
         public SettingsView()
         {
             try
@@ -93,32 +88,10 @@ namespace NervaOneWalletMiner.Views
 
                     if (!GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
                     {
-                        // CLI tools missing. Need to download                        
-                        GlobalData.IsCliToolsFound = false;                       
-                        Logger.LogDebug("SET.SSCL", "CLI tools not found. Opening Coin Setup View.");
-
-                        var window = new CoinSetupView();
-                        DialogResult cliResult = await window.ShowDialog<DialogResult>(GetWindow());
-                        if (cliResult != null && cliResult.IsOk)
-                        {
-                            Logger.LogDebug("SET.CTLC", "Attempting to download CLI tools from: " + cliResult.TextBoxValue);
-                            GlobalData.IsCliToolsDownloading = true;
-
-                            if (!string.IsNullOrEmpty(cliResult.TextBoxValue))
-                            {
-                                // Download and extract CLI tools
-                                GlobalMethods.SetUpCliTools(cliResult.TextBoxValue, GlobalData.CliToolsDir);
-                            }
-                        }
-                        else
-                        {
-                            Logger.LogDebug("SET.CTLC", "CLI tools download cancelled");
-                            GlobalData.IsCliToolsDownloading = false;
-
-                            MessageBoxView msgWindow = new("Client Tools Missing", "NervaOne cannot run without client tools. Switch coin or restart to download client tools. "
-                                + "Alternatively you can put your own client tools in Daemon Setup > Open Client Tools Folder", true);
-                            await msgWindow.ShowDialog(GetWindow());
-                        }
+                        // CLI tools missing. Navigate to Coin Setup page
+                        GlobalData.IsCliToolsFound = false;
+                        Logger.LogDebug("SET.SSCL", "CLI tools not found. Navigating to Coin Setup View.");
+                        UIManager.NavigateToCoinSetup();
                     }
                 }
 

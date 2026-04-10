@@ -9,7 +9,39 @@ namespace NervaOneWalletMiner.Helpers
     {
         private static string ExeNameToProcessName(string exe) => Path.GetFileNameWithoutExtension(exe);
 
-        private static readonly Dictionary<string, Process> _androidTrackedProcesses = new();
+        private static List<int> GetAndroidPidsByName(string processName)
+        {
+            List<int> pids = [];
+            try
+            {
+                foreach (string pidDir in Directory.GetDirectories("/proc"))
+                {
+                    string dirName = Path.GetFileName(pidDir);
+                    if (!int.TryParse(dirName, out int pid))
+                    {
+                        continue;
+                    }
+
+                    try
+                    {
+                        string cmdline = File.ReadAllText(Path.Combine(pidDir, "cmdline"));
+                        if (cmdline.Contains(processName))
+                        {
+                            pids.Add(pid);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        // /proc entries can vanish or be unreadable - ignore
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("PRM.GAPN", ex);
+            }
+            return pids;
+        }
 
         public static void Kill(string processName)
         {
@@ -18,23 +50,26 @@ namespace NervaOneWalletMiner.Helpers
                 if (GlobalMethods.IsAndroid())
                 {
                     string name = ExeNameToProcessName(processName);
-                    if (_androidTrackedProcesses.TryGetValue(name, out Process? tracked))
+                    List<int> pids = GetAndroidPidsByName(name);
+                    if (pids.Count == 0)
                     {
-                        if (tracked != null && !tracked.HasExited)
-                        {
-                            Logger.LogDebug("PRM.KILL", "Killing tracked process " + name + " with id " + tracked.Id);
-                            tracked.Kill();
-                            Logger.LogDebug("PRM.KILL", "Process " + tracked.Id + " killed");
-                        }
-                        else
-                        {
-                            Logger.LogDebug("PRM.KILL", "No instances of " + name + " to kill");
-                        }
-                        _androidTrackedProcesses.Remove(name);
+                        Logger.LogDebug("PRM.KILL", "Android: No instances of " + name + " to kill on");
                     }
                     else
                     {
-                        Logger.LogDebug("PRM.KILL", "No instances of " + processName + " to kill");
+                        foreach (int pid in pids)
+                        {
+                            try
+                            {
+                                Logger.LogDebug("PRM.KILL", "Android: Killing " + name + " with pid " + pid);
+                                Process.GetProcessById(pid).Kill();
+                                Logger.LogDebug("PRM.KILL", "Android: Killed pid " + pid);
+                            }
+                            catch (Exception ex)
+                            {
+                                Logger.LogException("PRM.KILL", "Android: Could not kill pid " + pid, ex);
+                            }
+                        }
                     }
                     return;
                 }
@@ -79,16 +114,7 @@ namespace NervaOneWalletMiner.Helpers
                 if (GlobalMethods.IsAndroid())
                 {
                     string name = ExeNameToProcessName(processName);
-                    if (_androidTrackedProcesses.TryGetValue(name, out Process? tracked))
-                    {
-                        if (tracked != null && !tracked.HasExited)
-                        {
-                            return true;
-                        }
-                        Logger.LogDebug("PRM.ISRN", "CLI tool " + name + " exited unexpectedly");
-                        _androidTrackedProcesses.Remove(name);
-                    }
-                    return false;
+                    return GetAndroidPidsByName(name).Count > 0;
                 }
 
                 //Logger.LogDebug("PM.IR", "Exe: " + processName);
@@ -186,10 +212,6 @@ namespace NervaOneWalletMiner.Helpers
                 WorkingDirectory = GlobalData.CliToolsDir
             });
 
-            if (GlobalMethods.IsAndroid() && process != null)
-            {
-                _androidTrackedProcesses[ExeNameToProcessName(exePath)] = process;
-            }
         }
     }
 }
