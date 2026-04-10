@@ -16,7 +16,7 @@ namespace NervaOneWalletMiner.Helpers
     {
         public const string AppNameMain = "NervaOne";
         public const string AppNameDesktop = "NervaOneDesktop";
-        public const string Version = "0.8.5.3";
+        public const string Version = "0.8.5.4";
 
         public const string CliToolsDirName = "cli";
         public const string WalletDirName = "wallets";
