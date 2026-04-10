@@ -86,9 +86,7 @@ namespace NervaOneWalletMiner.Views
                 }
                 Logger.LogDebug("CWV.OKBC", "Wallet " + walletName + " created successfully");
 
-                await DialogService.ShowAsync(new DisplayKeysSeedView("Wallet created and opened successfully! Save your seed phrase and keys to a safe place. You'll need them to restore your wallet. Keep them private - anyone with access can steal your funds!"));
-
-                UIManager.NavigateToPage(SplitViewPages.WalletSetup);
+                UIManager.NavigateToDisplayKeysSeed("Wallet created and opened successfully! Save your seed phrase and keys to a safe place. You'll need them to restore your wallet. Keep them private - anyone with access can steal your funds!");
             }
             catch (Exception ex)
             {

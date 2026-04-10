@@ -262,7 +262,7 @@ namespace NervaOneWalletMiner.Views
                 }
                 else
                 {
-                    await DialogService.ShowAsync(new DisplayKeysSeedView("Save your seed phrase and keys to a safe place. You'll need them to restore your wallet. Keep them private - anyone with access can steal your funds!"));
+                    UIManager.NavigateToDisplayKeysSeed("Save your seed phrase and keys to a safe place. You'll need them to restore your wallet. Keep them private - anyone with access can steal your funds!");
                 }
             }
             catch (Exception ex)
