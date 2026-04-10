@@ -33,6 +33,12 @@ namespace NervaOneWalletMiner.Views
                 _colAddress = (DataGridTextColumn)dtgAccounts.Columns[3];
                 _colUnlocked = (DataGridTextColumn)dtgAccounts.Columns[5];
 
+                // Prevent row selection from scrolling the outer ScrollViewer
+                dtgAccounts.AddHandler(
+                    RequestBringIntoViewEvent,
+                    (object? sender, RequestBringIntoViewEventArgs e) => { e.Handled = true; },
+                    RoutingStrategies.Bubble);
+
                 if (!GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsCpuMiningSupported)
                 {
                     miStartMining.IsEnabled = false;

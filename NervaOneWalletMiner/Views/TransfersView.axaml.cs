@@ -25,6 +25,12 @@ namespace NervaOneWalletMiner.Views
                 // Index 1=Height, 4=Address (icon=0, Time=2, Amount=3)
                 _colHeight = (DataGridTextColumn)dtgTransactions.Columns[1];
                 _colAddress = (DataGridTextColumn)dtgTransactions.Columns[4];
+
+                // Prevent row selection from scrolling the outer ScrollViewer
+                dtgTransactions.AddHandler(
+                    RequestBringIntoViewEvent,
+                    (object? sender, RequestBringIntoViewEventArgs e) => { e.Handled = true; },
+                    RoutingStrategies.Bubble);
             }
             catch (Exception ex)
             {
