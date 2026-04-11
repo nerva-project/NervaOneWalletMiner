@@ -33,5 +33,9 @@ namespace NervaOneWalletMiner.Objects.Settings
         public bool UseNoAnalyticsFlag { get; set; } = false;
         
         public bool UseNoDnsFlag { get; set; } = false;
+
+        public bool IsPublicNode { get; set; } = false;
+        public string PublicNodeArguments { get; set; } = string.Empty;
+        public string PublicNodeIp { get; set; } = string.Empty;
     }
 }

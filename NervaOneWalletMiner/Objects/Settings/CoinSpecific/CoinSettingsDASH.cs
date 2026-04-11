@@ -32,7 +32,8 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private string _CliUrlMacArm = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-arm64-apple-darwin.tar.gz";
         private string _CliUrlAndroid = string.Empty;
 
-        private string _PublicNodeUrlDefault = "N/A";
+        private string _RemotePublicNodeUrlDefault = string.Empty;
+        private string _LocalPublicNodeArgumentsDefault = string.Empty;
 
         private string _DataDirWindows = Path.Combine(GlobalMethods.GetDataDir(), "DashCore");
         private string _DataDirLinux = Path.Combine(GlobalMethods.GetDataDir(), "DashCore");
@@ -68,13 +69,14 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public string CliUrlMacArm { get => _CliUrlMacArm; set => _CliUrlMacArm = value; }
         public string CliUrlAndroid { get => _CliUrlAndroid; set => _CliUrlAndroid = value; }
 
-        public string PublicNodeUrlDefault { get => _PublicNodeUrlDefault; set => _PublicNodeUrlDefault = value; }
+        public string RemotePublicNodeUrlDefault { get => _RemotePublicNodeUrlDefault; set => _RemotePublicNodeUrlDefault = value; }
+        public string LocalPublicNodeArgumentsDefault { get => _LocalPublicNodeArgumentsDefault; set => _LocalPublicNodeArgumentsDefault = value; }
 
         public string DataDirWindows { get => _DataDirWindows; set => _DataDirWindows = value; }
         public string DataDirLinux { get => _DataDirLinux; set => _DataDirLinux = value; }
         public string DataDirMac { get => _DataDirMac; set => _DataDirMac = value; }
 
-        public string QuickSyncUrl { get => _QuickSyncUrl; set => _QuickSyncUrl = value; }
+        public string QuickSyncUrl { get => _QuickSyncUrl; set => _QuickSyncUrl = value; }        
         #endregion // Interface Variables
 
         #region Interface Methods

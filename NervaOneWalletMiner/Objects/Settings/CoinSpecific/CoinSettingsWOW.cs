@@ -33,7 +33,8 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private string _CliUrlMacArm = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-aarch64-apple-darwin11-v0.11.3.0.tar.bz2";
         private string _CliUrlAndroid = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-aarch64-linux-android-v0.11.3.0.tar.bz2";
 
-        private string _PublicNodeUrlDefault = "node.monerodevs.org:34568";
+        private string _RemotePublicNodeUrlDefault = "node.monerodevs.org:34568";
+        private string _LocalPublicNodeArgumentsDefault = "--rpc-bind-ip 0.0.0.0 --confirm-external-bind --restricted-rpc";
 
         private string _DataDirWindows = "C:/ProgramData/wownero";
         private string _DataDirLinux = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".wownero");
@@ -69,13 +70,14 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public string CliUrlMacArm { get => _CliUrlMacArm; set => _CliUrlMacArm = value; }
         public string CliUrlAndroid { get => _CliUrlAndroid; set => _CliUrlAndroid = value; }
 
-        public string PublicNodeUrlDefault { get => _PublicNodeUrlDefault; set => _PublicNodeUrlDefault = value; }
+        public string RemotePublicNodeUrlDefault { get => _RemotePublicNodeUrlDefault; set => _RemotePublicNodeUrlDefault = value; }
+        public string LocalPublicNodeArgumentsDefault { get => _LocalPublicNodeArgumentsDefault; set => _LocalPublicNodeArgumentsDefault = value; }
 
         public string DataDirWindows { get => _DataDirWindows; set => _DataDirWindows = value; }
         public string DataDirLinux { get => _DataDirLinux; set => _DataDirLinux = value; }
         public string DataDirMac { get => _DataDirMac; set => _DataDirMac = value; }
 
-        public string QuickSyncUrl { get => _QuickSyncUrl; set => _QuickSyncUrl = value; }
+        public string QuickSyncUrl { get => _QuickSyncUrl; set => _QuickSyncUrl = value; }        
         #endregion // Interface Variables
 
         #region Interface Methods
@@ -110,6 +112,11 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
             if (GlobalMethods.IsAndroid())
             {
                 daemonCommand += " --rpc-ssl disabled";
+            }
+
+            if (daemonSettings.IsPublicNode && !string.IsNullOrEmpty(daemonSettings.PublicNodeArguments))
+            {
+                daemonCommand += " " + daemonSettings.PublicNodeArguments;
             }
 
             if (!string.IsNullOrEmpty(daemonSettings.AdditionalArguments))

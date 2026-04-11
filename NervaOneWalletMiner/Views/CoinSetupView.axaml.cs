@@ -16,7 +16,7 @@ namespace NervaOneWalletMiner.Views
 
                 imgCoinIcon.Source = GlobalMethods.GetLogo();
                 tbxCliDownloadUrl.Text = GlobalMethods.GetCliToolsDownloadLink(GlobalData.AppSettings.ActiveCoin);
-                tbxRemoteNode.Text = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].PublicNodeUrlDefault;
+                tbxRemoteNode.Text = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].RemotePublicNodeUrlDefault;
             }
             catch (Exception ex)
             {

@@ -29,14 +29,15 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         string CliUrlMacArm { get; set; }
         string CliUrlAndroid { get; set; }
 
-        string PublicNodeUrlDefault { get; set; }
+        string RemotePublicNodeUrlDefault { get; set; }
+        string LocalPublicNodeArgumentsDefault { get; }
 
         string DataDirWindows { get; set; }
         string DataDirLinux { get; set; }
         string DataDirMac { get; set; }
 
         string QuickSyncUrl { get; set; }
-
+        
 
         string GenerateWalletOptions(SettingsWallet walletSettings, SettingsDaemon daemonSettings);
         string GenerateDaemonOptions(SettingsDaemon daemonSettings);
