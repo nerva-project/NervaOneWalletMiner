@@ -1,4 +1,4 @@
-﻿using Android.App;
+using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
@@ -29,7 +29,14 @@ public class MainActivity : AvaloniaMainActivity<App>
     {
         return base.CustomizeAppBuilder(builder)
             .WithInterFont()
-            .UseReactiveUI();
+            .UseReactiveUI()
+            // EGL (GPU) mode renders at the display refresh rate via Choreographer even when
+            // the UI is idle, causing constant background CPU/battery drain. Software mode
+            // renders only on dirty regions, matching the idle behavior of Avalonia 11.0.x.
+            .With(new AndroidPlatformOptions
+            {
+                RenderingMode = [AndroidRenderingMode.Software]
+            });
     }
 
     protected override void OnDestroy()
