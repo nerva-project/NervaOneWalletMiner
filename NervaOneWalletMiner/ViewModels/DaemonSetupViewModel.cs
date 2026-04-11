@@ -133,7 +133,7 @@ namespace NervaOneWalletMiner.ViewModels
                 HashThreshold = daemonSettings.StopMiningThreshold;
                 IsWalletOnly = daemonSettings.IsWalletOnly;
                 RemoteNodeAddress = string.IsNullOrEmpty(walletSettings.PublicNodeAddress)
-                    ? GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].PublicNodeUrlDefault
+                    ? GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].RemotePublicNodeUrlDefault
                     : walletSettings.PublicNodeAddress;
             }
             catch (Exception ex)

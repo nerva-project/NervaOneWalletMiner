@@ -101,6 +101,20 @@ namespace NervaOneWalletMiner.Views
         }
         #endregion // Restart With QuickSync
 
+        #region Public Node Setup
+        public void PublicNodeSetup_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                UIManager.NavigateToPublicNodeSetup();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DMS.PNSC", ex);
+            }
+        }
+        #endregion // Public Node Setup
+
         #region Update Client Tools
         public async void UpdateClientTools_Clicked(object sender, RoutedEventArgs args)
         {

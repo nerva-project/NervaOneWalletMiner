@@ -23,6 +23,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private int _LogLevelDaemon = 1;
         private int _LogLevelWallet = 1;
 
+        // https://github.com/nerva-project/nerva/releases
         private string _CliUrlWindows64 = "https://github.com/nerva-project/nerva/releases/download/v0.2.0.0/nerva-windows-x64-v0.2.0.0.zip";
         private string _CliUrlWindows32 = "https://github.com/nerva-project/nerva/releases/download/v0.2.0.0/nerva-windows-x32-v0.2.0.0.zip";
         private string _CliUrlLinux64 = "https://github.com/nerva-project/nerva/releases/download/v0.2.0.0/nerva-linux-x86_64-v0.2.0.0.tar.bz2";
@@ -31,10 +32,11 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private string _CliUrlMacIntel = "https://github.com/nerva-project/nerva/releases/download/v0.2.0.0/nerva-macos-x64-v0.2.0.0.tar.bz2";
         private string _CliUrlMacArm = "https://github.com/nerva-project/nerva/releases/download/v0.2.0.0/nerva-macos-armv8-v0.2.0.0.tar.bz2";
 
-        // TODO: For testing purposes only. Change later.
+        // TODO: For testing purposes only. Change before release
         private string _CliUrlAndroid = "https://nerva.one/quicksync/nerva-android-armv8.zip";
 
-        private string _PublicNodeUrlDefault = "node.nerva.one:17566";
+        private string _RemotePublicNodeUrlDefault = "node.nerva.one:17566";
+        private string _LocalPublicNodeArgumentsDefault = "--rpc-bind-ip 0.0.0.0 --confirm-external-bind";
 
         private string _DataDirWindows = "C:/ProgramData/nerva";
         private string _DataDirLinux = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nerva");
@@ -70,7 +72,8 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public string CliUrlMacArm { get => _CliUrlMacArm; set => _CliUrlMacArm = value; }
         public string CliUrlAndroid { get => _CliUrlAndroid; set => _CliUrlAndroid = value; }
 
-        public string PublicNodeUrlDefault { get => _PublicNodeUrlDefault; set => _PublicNodeUrlDefault = value; }
+        public string RemotePublicNodeUrlDefault { get => _RemotePublicNodeUrlDefault; set => _RemotePublicNodeUrlDefault = value; }
+        public string LocalPublicNodeArgumentsDefault { get => _LocalPublicNodeArgumentsDefault; set => _LocalPublicNodeArgumentsDefault = value; }
 
         public string DataDirWindows { get => _DataDirWindows; set => _DataDirWindows = value; }
         public string DataDirLinux { get => _DataDirLinux; set => _DataDirLinux = value; }
@@ -111,6 +114,11 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
             if (GlobalMethods.IsAndroid())
             {
                 daemonCommand += " --rpc-ssl disabled";
+            }
+
+            if (daemonSettings.IsPublicNode && !string.IsNullOrEmpty(daemonSettings.PublicNodeArguments))
+            {
+                daemonCommand += " " + daemonSettings.PublicNodeArguments;
             }
 
             if(daemonSettings.UseNoAnalyticsFlag)

@@ -1,0 +1,114 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:NervaOneWalletMiner.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="600"
+             x:DataType="vm:PublicNodeSetupViewModel"
+             x:Class="NervaOneWalletMiner.Views.PublicNodeSetupView">
+
+	<Design.DataContext>
+		<vm:PublicNodeSetupViewModel/>
+	</Design.DataContext>
+
+	<ScrollViewer>
+		<StackPanel HorizontalAlignment="Stretch"
+					Spacing="5"
+					Margin="10"
+					MaxWidth="650">
+
+			<Grid ColumnDefinitions="32,*">
+				<Image Grid.Column="0"
+					   Name="imgCoinIcon"/>
+				<Label Grid.Column="1"
+					   Content="Public Node Setup"
+					   Height="24"
+					   Margin="5,0,0,0"/>
+			</Grid>
+
+			<Separator Margin="0,10,0,0"/>
+
+			<!-- Enable toggle -->
+			<CheckBox Name="cbxIsPublicNode"
+					  Content="Enable Public Node (allow remote wallets to connect)"
+					  IsChecked="{Binding IsPublicNode, Mode=TwoWay}"
+					  Margin="0,10,0,0"/>
+
+			<!-- External IP display -->
+			<Label Content="Your External IP Address" Margin="0,10,0,0"/>
+			<Grid ColumnDefinitions="*,Auto">
+				<TextBox Grid.Column="0"
+						 Name="tbxPublicIp"
+						 Text="{Binding PublicIp, Mode=TwoWay}"
+						 Watermark="Not detected — enter your IP manually"/>
+				<Button Grid.Column="1"
+						Name="btnDetectIp"
+						Content="Detect"
+						Margin="10,0,0,0"
+						Click="DetectIp_Clicked"/>
+			</Grid>
+			<TextBlock Name="tbkIpifyLink"
+					   Text="Can't detect your IP? Visit https://api.ipify.org to find it."
+					   TextWrapping="Wrap"
+					   Margin="0,4,0,0"
+					   FontStyle="Italic"
+					   Opacity="0.7"/>
+
+			<!-- Shareable address -->
+			<Label Content="Node Address to Share" Margin="0,10,0,0"/>
+			<Grid ColumnDefinitions="*,Auto">
+				<TextBox Grid.Column="0"
+						 Name="tbxNodeAddress"
+						 Text="{Binding NodeAddress}"
+						 IsReadOnly="True"
+						 Watermark="IP:Port will appear here once IP is set"/>
+				<Button Grid.Column="1"
+						Name="btnCopyAddress"
+						Content="Copy"
+						Margin="10,0,0,0"
+						Click="CopyAddress_Clicked"/>
+			</Grid>
+
+			<!-- Daemon arguments -->
+			<Label Content="Public Node Startup Arguments" Margin="0,10,0,0"/>
+			<TextBox Name="tbxPublicNodeArguments"
+					 Text="{Binding PublicNodeArguments, Mode=TwoWay}"
+					 Watermark="--rpc-bind-ip 0.0.0.0 --confirm-external-bind"/>
+
+			<!-- Firewall warning -->
+			<Border Background="#33FF8C00"
+					BorderBrush="#FFFF8C00"
+					BorderThickness="1"
+					CornerRadius="4"
+					Padding="10"
+					Margin="0,10,0,0">
+				<StackPanel Spacing="4">
+					<TextBlock Text="Firewall &amp; Router Configuration Required"
+							   FontWeight="Bold"
+							   TextWrapping="Wrap"/>
+					<TextBlock TextWrapping="Wrap">
+						<Run Text="To allow remote connections you must open port "/>
+						<Run Name="runPort" Text="17566"/>
+						<Run Text=" (TCP) in:"/>
+					</TextBlock>
+					<TextBlock Text="  • Your device firewall (Windows Firewall / iptables)" TextWrapping="Wrap"/>
+					<TextBlock Text="  • Your router port forwarding rules (forward external port to this device)" TextWrapping="Wrap"/>
+					<TextBlock Text="Without this, remote wallets will not be able to reach your node." TextWrapping="Wrap" Opacity="0.8"/>
+				</StackPanel>
+			</Border>
+
+			<Separator Margin="0,10,0,0"/>
+
+			<StackPanel Orientation="Horizontal" Spacing="10" Margin="0,10,0,0">
+				<Button Name="btnSave"
+						Content="Save Settings"
+						Click="Save_Clicked"/>
+				<Button Name="btnBack"
+						Content="Back"
+						Click="Back_Clicked"/>
+			</StackPanel>
+
+		</StackPanel>
+	</ScrollViewer>
+
+</UserControl>

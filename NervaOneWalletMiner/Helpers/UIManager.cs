@@ -63,6 +63,7 @@ namespace NervaOneWalletMiner.Helpers
                 { SplitViewPages.SweepBelow, new SweepBelowViewModel() },
                 { SplitViewPages.DisplayKeysSeed, new DisplayKeysSeedViewModel() },
                 { SplitViewPages.ViewLogs, new ViewLogsViewModel() },
+                { SplitViewPages.PublicNodeSetup, new PublicNodeSetupViewModel() },
 
                 { SplitViewPages.MainView, _mainView }
             };
@@ -95,6 +96,7 @@ namespace NervaOneWalletMiner.Helpers
                 { SplitViewPages.SweepBelow, new SweepBelowViewModel() },
                 { SplitViewPages.DisplayKeysSeed, new DisplayKeysSeedViewModel() },
                 { SplitViewPages.ViewLogs, new ViewLogsViewModel() },
+                { SplitViewPages.PublicNodeSetup, new PublicNodeSetupViewModel() },
 
                 { SplitViewPages.MainView, _mainView }
             };
@@ -221,6 +223,12 @@ namespace NervaOneWalletMiner.Helpers
         {
             GlobalData.ViewModelPages[SplitViewPages.ViewLogs] = new ViewLogsViewModel { InitialTab = initialTab };
             ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.ViewLogs];
+        }
+
+        public static void NavigateToPublicNodeSetup()
+        {
+            GlobalData.ViewModelPages[SplitViewPages.PublicNodeSetup] = new PublicNodeSetupViewModel();
+            ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.PublicNodeSetup];
         }
 
         public static void NavigateToPage(string page)
@@ -416,7 +424,8 @@ namespace NervaOneWalletMiner.Helpers
                     string version = dashIndex > 0 ? rawVersion[..dashIndex] : rawVersion;
                     string connections = "↑" + GlobalData.NetworkStats.ConnectionsOut + "  ↓" + GlobalData.NetworkStats.ConnectionsIn;
                     string sync = " | " + (string.IsNullOrEmpty(GlobalData.NetworkStats.StatusSync) ? "Connecting to daemon..." : GlobalData.NetworkStats.StatusSync);
-                    UpdateDaemonStatus(version + " | " + connections + sync);
+                    string publicIndicator = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsPublicNode ? " | Public" : string.Empty;
+                    UpdateDaemonStatus(version + " | " + connections + sync + publicIndicator);
                 }
             }
             catch (Exception ex)

@@ -23,6 +23,7 @@
         public const string SweepBelow = "sweep_below";
         public const string DisplayKeysSeed = "display_keys_seed";
         public const string ViewLogs = "view_logs";
+        public const string PublicNodeSetup = "public_node_setup";
 
         // Non-UI View. Needed so I have reference to it
         public const string MainView = "main_view";

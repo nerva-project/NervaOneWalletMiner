@@ -57,18 +57,20 @@
 				<TextBlock Text="Wallet Only: Connect to remote node and get wallet functionality only" TextWrapping="Wrap"/>
 			</RadioButton>
 
+			<Separator Margin="0,20,0,0"/>
+
 			<StackPanel Name="spWalletOnly" IsVisible="{Binding IsWalletOnly}">
 				<TextBlock Name="lblRemoteNode"
-					   Text="Remote Node Address or IP (Including port number)" TextWrapping="Wrap"/>
+						   Text="Remote Node Address or IP (Including port number)"
+						   TextWrapping="Wrap"
+						   Margin="0,10,0,10"/>
 				<TextBox Name="tbxRemoteNode"
 						 Text="{Binding RemoteNodeAddress, Mode=TwoWay}"/>
 			</StackPanel>
 
 			<StackPanel Name="spFullNode" IsVisible="{Binding !IsWalletOnly}">
-				<Separator Margin="0,20,0,0"/>
-
 				<Button Name="btnRestartWithCommand"
-						Content="Restart with optional Command"
+						Content="Restart with Optional Command"
 						DockPanel.Dock="Right"
 						Margin="0,10,0,0"
 						Click="RestartWithCommand_Clicked"/>
@@ -78,6 +80,12 @@
 						DockPanel.Dock="Right"
 						Margin="0,10,0,0"
 						Click="RestartWithQuickSync_Clicked"/>
+
+				<Button Name="btnPublicNodeSetup"
+						Content="Public Node Setup"
+						DockPanel.Dock="Right"
+						Margin="0,10,0,0"
+						Click="PublicNodeSetup_Clicked"/>
 
 				<Separator Margin="0,20,0,0"/>
 
