@@ -29,6 +29,7 @@ namespace NervaOneWalletMiner.Helpers
         public static void ExitBackgroundMode()
         {
             _isInBackgroundMode = false;
+            _masterTimerCount = 0;
         }
         
 
