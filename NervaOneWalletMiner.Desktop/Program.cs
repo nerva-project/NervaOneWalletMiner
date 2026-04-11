@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 
 using Avalonia;
 using ReactiveUI.Avalonia;
@@ -17,9 +18,27 @@ class Program
 
     // Avalonia configuration, don't remove; also used by visual designer.
     public static AppBuilder BuildAvaloniaApp()
-        => AppBuilder.Configure<App>()
+    {
+        AppBuilder builder = AppBuilder.Configure<App>()
             .UsePlatformDetect()
             .WithInterFont()
             .LogToTrace()
             .UseReactiveUI();
+
+        // Avalonia 11.1+ defaults to WinUIComposition → DirectComposition, both of which
+        // run a continuous compositor loop even when the UI is idle. On low-end or older
+        // hardware this causes significant baseline CPU usage.
+        // Force RedirectionSurface, the traditional GDI-backed mode that only renders on
+        // dirty regions — matching the idle behavior of Avalonia 11.0.x.
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            builder = builder.With(new Win32PlatformOptions
+            {
+                RenderingMode = [Win32RenderingMode.AngleEgl, Win32RenderingMode.Software],
+                CompositionMode = [Win32CompositionMode.RedirectionSurface]
+            });
+        }
+
+        return builder;
+    }
 }

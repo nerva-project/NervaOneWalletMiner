@@ -1,21 +1,36 @@
 ﻿using NervaOneWalletMiner.Objects.Constants;
-using NervaOneWalletMiner.Rpc.Daemon.Requests;
-using NervaOneWalletMiner.Rpc.Wallet.Requests;
-using NervaOneWalletMiner.Rpc.Wallet.Responses;
 using NervaOneWalletMiner.ViewModels;
 using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace NervaOneWalletMiner.Helpers
 {
     public static class MasterProcess
     {
         public static System.Timers.Timer? _masterUpdateTimer;
-        public const int _masterTimerInterval = 1000;        
+        public static readonly int _masterTimerInterval = GlobalMethods.IsAndroid() ? 2000 : 1000;
         public static DateTime _cliToolsRunningLastCheck = DateTime.MinValue;
         public static bool _killMasterProcess = false;
         public static int _masterTimerCount = 0;
+
+        // When the Android activity is paused (screen off / app in background), skip all UI
+        // updates and RPC calls — only keep-alive checks still run.
+        public static volatile bool _isInBackgroundMode = false;
+
+        // Set by GetAndSetDaemonData when fresh data arrives; cleared after UpdateDaemonView runs.
+        // Prevents UpdateDaemonView from firing every timer tick when data only changes every
+        // TimerIntervalMultiplier ticks.
+        public static volatile bool _isDaemonDataFresh = false;
+
+        public static void EnterBackgroundMode()
+        {
+            _isInBackgroundMode = true;
+        }
+
+        public static void ExitBackgroundMode()
+        {
+            _isInBackgroundMode = false;
+            _masterTimerCount = 0;
+        }
         
 
         public static void StartMasterUpdateProcess()
@@ -56,13 +71,8 @@ namespace NervaOneWalletMiner.Helpers
                     _masterUpdateTimer.Stop();
                 }
 
-                if (UIManager.GetCoinIcon() != GlobalMethods.GetLogo())
-                {
-                    UIManager.UpdateCoinIcon(GlobalMethods.GetLogo());
-                }
-
-                // If kill master process is issued at any point, skip everything else and do not restart master timer            
-                if (_cliToolsRunningLastCheck.AddSeconds(10) < DateTime.Now)
+                // If kill master process is issued at any point, skip everything else and do not restart master timer
+                if (_cliToolsRunningLastCheck.AddSeconds(30) < DateTime.Now)
                 {
                     _cliToolsRunningLastCheck = DateTime.Now;
 
@@ -135,78 +145,83 @@ namespace NervaOneWalletMiner.Helpers
                 }
 
 
-                // Get Daemon data
-                if(!GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
+                if (!_isInBackgroundMode)
                 {
-                    if (!_killMasterProcess && _masterTimerCount % GlobalData.AppSettings.TimerIntervalMultiplier == 0)
+                    // Get Daemon data
+                    if (!GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
+                    {
+                        if (!_killMasterProcess && _masterTimerCount % GlobalData.AppSettings.TimerIntervalMultiplier == 0)
+                        {
+                            UIManager.HandleNetworkStats();
+                            UIManager.GetAndSetDaemonData();
+                        }
+
+                        // Actual Daemon UI update — only run when GetAndSetDaemonData just produced
+                        // fresh data, not on every timer tick. _isDaemonDataFresh is set by
+                        // GetAndSetDaemonData and cleared here after the view is updated.
+                        if (_isDaemonDataFresh && GlobalData.IsGetAndSetDaemonDataComplete)
+                        {
+                            _isDaemonDataFresh = false;
+                            UIManager.UpdateDaemonView();
+                            UIManager.UpdateStatusBar();
+                        }
+                    }
+                    else
                     {
                         UIManager.HandleNetworkStats();
-                        UIManager.GetAndSetDaemonData();
-                    }
-
-                    // Actual Daemon UI update
-                    if (GlobalData.IsGetAndSetDaemonDataComplete)
-                    {
-                        UIManager.UpdateDaemonView();
                         UIManager.UpdateStatusBar();
                     }
-                }
-                else
-                {
-                    UIManager.HandleNetworkStats();
-                    UIManager.UpdateStatusBar();
-                }
 
-                // Get Wallets/Transfers data
-                if (!_killMasterProcess
-                    && (GlobalData.IsInitialDaemonConnectionSuccess || GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
-                    && GlobalData.IsWalletOpen)
-                {
-                    if (GlobalData.IsWalletJustOpened || (_masterTimerCount % (GlobalData.AppSettings.TimerIntervalMultiplier * 2) == 0))
+                    // Get Wallets/Transfers data
+                    if (!_killMasterProcess
+                        && (GlobalData.IsInitialDaemonConnectionSuccess || GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
+                        && GlobalData.IsWalletOpen)
                     {
-                        UIManager.CallWalletDataMethodsInSync();
-                    }
-                }
-
-                // Actual Wallets/Transfers UI update
-                if(GlobalData.IsGetAndSetWalletDataComplete)
-                {
-                    UIManager.UpdateWalletView();
-                }
-                if (GlobalData.IsGetAndSetTransfersDataComplete)
-                {
-                    UIManager.UpdateTransfersView();
-                }
-
-
-                if (GlobalData.IsWalletJustOpened)
-                {
-                    // Will use this to auto-save wallet so need to reset it at the end
-                    GlobalData.IsWalletJustOpened = false;
-                }
-
-                if (GlobalData.IsWalletOpen & _masterTimerCount % 300 == 0)
-                {
-                    if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsSavingWalletSupported)
-                    {
-                        // Auto save wallet every 5 min
-                        Logger.LogDebug("MSP.MUPS", "Auto saving wallet: " + GlobalData.OpenedWalletName);
-
-                        GlobalMethods.SaveWallet();
-                    }
-                }
-
-                if (!GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
-                {
-                    if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].EnableConnectionsGuard)
-                    {
-                        if (GlobalData.ConnectGuardLastGoodTime.AddMinutes(GlobalData.ConnectGuardMinutes * GlobalData.ConnectGuardRestartCount) < DateTime.Now)
+                        if (GlobalData.IsWalletJustOpened || (_masterTimerCount % (GlobalData.AppSettings.TimerIntervalMultiplier * 2) == 0))
                         {
-                            Logger.LogDebug("MSP.MUPS", "Connections guard forcing restart. Last good time: " + GlobalData.ConnectGuardLastGoodTime.ToLongTimeString() + " | Restart Ct: " + GlobalData.ConnectGuardRestartCount);
+                            UIManager.CallWalletDataMethodsInSync();
+                        }
+                    }
 
-                            // Pop blocks every 3rd restart
-                            ConnectionsGuardRestart(GlobalData.ConnectGuardRestartCount % 3 == 0);
-                            GlobalData.ConnectGuardRestartCount++;
+                    // Actual Wallets/Transfers UI update
+                    if (GlobalData.IsGetAndSetWalletDataComplete)
+                    {
+                        UIManager.UpdateWalletView();
+                    }
+                    if (GlobalData.IsGetAndSetTransfersDataComplete)
+                    {
+                        UIManager.UpdateTransfersView();
+                    }
+
+                    if (GlobalData.IsWalletJustOpened)
+                    {
+                        // Will use this to auto-save wallet so need to reset it at the end
+                        GlobalData.IsWalletJustOpened = false;
+                    }
+
+                    if (GlobalData.IsWalletOpen & _masterTimerCount % 300 == 0)
+                    {
+                        if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsSavingWalletSupported)
+                        {
+                            // Auto save wallet every 5 min
+                            Logger.LogDebug("MSP.MUPS", "Auto saving wallet: " + GlobalData.OpenedWalletName);
+
+                            GlobalMethods.SaveWallet();
+                        }
+                    }
+
+                    if (!GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
+                    {
+                        if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].EnableConnectionsGuard)
+                        {
+                            if (GlobalData.ConnectGuardLastGoodTime.AddMinutes(GlobalData.ConnectGuardMinutes * GlobalData.ConnectGuardRestartCount) < DateTime.Now)
+                            {
+                                Logger.LogDebug("MSP.MUPS", "Connections guard forcing restart. Last good time: " + GlobalData.ConnectGuardLastGoodTime.ToLongTimeString() + " | Restart Ct: " + GlobalData.ConnectGuardRestartCount);
+
+                                // Pop blocks every 3rd restart
+                                ConnectionsGuardRestart(GlobalData.ConnectGuardRestartCount % 3 == 0);
+                                GlobalData.ConnectGuardRestartCount++;
+                            }
                         }
                     }
                 }

@@ -112,6 +112,7 @@ namespace NervaOneWalletMiner.Helpers
 
             MasterProcess.StartMasterUpdateProcess();
 
+            UpdateCoinIcon(GlobalMethods.GetLogo());
             UpdateDaemonView();
             UpdateStatusBar();
         }
@@ -270,18 +271,6 @@ namespace NervaOneWalletMiner.Helpers
             }
         }
 
-        public static Bitmap GetCoinIcon()
-        {
-            if (GlobalData.ViewModelPages.ContainsKey(SplitViewPages.MainView))
-            {
-                return ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CoinIcon;
-            }
-            else
-            {
-                return GlobalMethods.GetLogo();
-            }
-        }
-
         public static void UpdateCoinIcon(Bitmap icon)
         {
             if (GlobalData.ViewModelPages.ContainsKey(SplitViewPages.MainView))
@@ -295,115 +284,106 @@ namespace NervaOneWalletMiner.Helpers
         {
             try
             {
-                // Daemon View
-                ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).NetHeight = GlobalData.NetworkStats.NetHeight.ToString();
-                ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).YourHeight = GlobalData.NetworkStats.YourHeight.ToString();
-                ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).NetHash = GlobalData.NetworkStats.NetHashString;
-                ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).RunTime = GlobalData.NetworkStats.RunTime;
+                DaemonViewModel vm = (DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon];
 
-                ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).MinerMessage = GlobalData.NetworkStats.MinerStatus;
-                ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).YourHash = GlobalData.NetworkStats.YourHash;
-                ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).BlockTime = GlobalData.NetworkStats.BlockTime;
-                ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).MiningAddress = GlobalData.NetworkStats.MiningAddress;
-
-
-                if (((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).Connections.Count == 0)
+                // All updates on the UI thread so PropertyChanged events are coalesced into one render pass
+                Dispatcher.UIThread.Invoke(() =>
                 {
-                    ObservableCollection<Connection> initialConnections = [.. GlobalData.NetworkStats.Connections.Values];
+                    vm.NetHeight = GlobalData.NetworkStats.NetHeight.ToString();
+                    vm.YourHeight = GlobalData.NetworkStats.YourHeight.ToString();
+                    vm.NetHash = GlobalData.NetworkStats.NetHashString;
+                    vm.RunTime = GlobalData.NetworkStats.RunTime;
+                    vm.MinerMessage = GlobalData.NetworkStats.MinerStatus;
+                    vm.YourHash = GlobalData.NetworkStats.YourHash;
+                    vm.BlockTime = GlobalData.NetworkStats.BlockTime;
+                    vm.MiningAddress = GlobalData.NetworkStats.MiningAddress;
 
-                    if (initialConnections.Count > 0)
+                    if (GlobalData.NetworkStats.MinerStatus.Equals(StatusMiner.Mining))
                     {
-                        Dispatcher.UIThread.Invoke(() =>
+                        if (vm.StartStopMining.Equals(StatusMiner.StartMining))
                         {
-                            ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).Connections = [.. initialConnections];
-                        });
-                    }
-                }
-                else
-                {
-                // Trying to avoid loop within a loop
-                List<Connection> deleteConnections = [];
-                HashSet<string> checkedAddresses = [];
-
-
-                    foreach (Connection connection in ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).Connections)
-                    {
-                        string connectionsKey = connection.Address + connection.IsIncoming;
-                        checkedAddresses.Add(connectionsKey);
-
-                        if (GlobalData.NetworkStats.Connections.ContainsKey(connectionsKey))
-                        {
-                            // Update, only if value changed
-                            if (!connection.Height.Equals(GlobalData.NetworkStats.Connections[connectionsKey].Height))
-                            {
-                                connection.Height = GlobalData.NetworkStats.Connections[connectionsKey].Height;
-                            }
-                            if (!connection.LiveTime.Equals(GlobalData.NetworkStats.Connections[connectionsKey].LiveTime))
-                            {
-                                connection.LiveTime = GlobalData.NetworkStats.Connections[connectionsKey].LiveTime;
-                            }
-                            if (!connection.State.Equals(GlobalData.NetworkStats.Connections[connectionsKey].State))
-                            {
-                                connection.State = GlobalData.NetworkStats.Connections[connectionsKey].State;
-                            }
+                            vm.StartStopMining = StatusMiner.StopMining;
                         }
-                        else
+                        if (vm.IsNumThreadsEnabled)
                         {
-                            // Connections to remove
-                            deleteConnections.Add(connection);
+                            vm.IsNumThreadsEnabled = false;
+                        }
+                    }
+                    else
+                    {
+                        if (vm.StartStopMining.Equals(StatusMiner.StopMining))
+                        {
+                            vm.StartStopMining = StatusMiner.StartMining;
+                        }
+                        if (!vm.IsNumThreadsEnabled)
+                        {
+                            vm.IsNumThreadsEnabled = true;
                         }
                     }
 
-                    foreach (Connection connection in deleteConnections)
+                    if (vm.Connections.Count == 0)
                     {
-                        Dispatcher.UIThread.Invoke(() =>
+                        if (GlobalData.NetworkStats.Connections.Count > 0)
                         {
-                            ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).Connections.Remove(connection);
-                        });
-                    }
-
-                    foreach (string key in GlobalData.NetworkStats.Connections.Keys)
-                    {
-                        if (!checkedAddresses.Contains(key))
-                        {
-                            // Need to add new wallet
-                            Dispatcher.UIThread.Invoke(() =>
-                            {
-                                ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).Connections.Add(GlobalData.NetworkStats.Connections[key]);
-                            });
+                            vm.Connections = [.. GlobalData.NetworkStats.Connections.Values];
                         }
                     }
-                }
+                    else
+                    {
+                        List<Connection> deleteConnections = [];
+                        List<Connection> addConnections = [];
+                        HashSet<string> checkedAddresses = [];
 
-                if (GlobalData.NetworkStats.MinerStatus.Equals(StatusMiner.Mining))
-                {
-                    // Mining so disable number of threads and show Stop Mining
-                    if (((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).StartStopMining.Equals(StatusMiner.StartMining))
-                    {
-                        ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).StartStopMining = StatusMiner.StopMining;
+                        foreach (Connection connection in vm.Connections)
+                        {
+                            string connectionsKey = connection.Address + connection.IsIncoming;
+                            checkedAddresses.Add(connectionsKey);
+
+                            if (GlobalData.NetworkStats.Connections.ContainsKey(connectionsKey))
+                            {
+                                // Update, only if value changed
+                                if (!connection.Height.Equals(GlobalData.NetworkStats.Connections[connectionsKey].Height))
+                                {
+                                    connection.Height = GlobalData.NetworkStats.Connections[connectionsKey].Height;
+                                }
+                                if (!connection.LiveTime.Equals(GlobalData.NetworkStats.Connections[connectionsKey].LiveTime))
+                                {
+                                    connection.LiveTime = GlobalData.NetworkStats.Connections[connectionsKey].LiveTime;
+                                }
+                                if (!connection.State.Equals(GlobalData.NetworkStats.Connections[connectionsKey].State))
+                                {
+                                    connection.State = GlobalData.NetworkStats.Connections[connectionsKey].State;
+                                }
+                            }
+                            else
+                            {
+                                deleteConnections.Add(connection);
+                            }
+                        }
+
+                        foreach (string key in GlobalData.NetworkStats.Connections.Keys)
+                        {
+                            if (!checkedAddresses.Contains(key))
+                            {
+                                addConnections.Add(GlobalData.NetworkStats.Connections[key]);
+                            }
+                        }
+
+                        foreach (Connection connection in deleteConnections)
+                        {
+                            vm.Connections.Remove(connection);
+                        }
+                        foreach (Connection connection in addConnections)
+                        {
+                            vm.Connections.Add(connection);
+                        }
                     }
-                    if (((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).IsNumThreadsEnabled)
-                    {
-                        ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).IsNumThreadsEnabled = false;
-                    }
-                }
-                else
-                {
-                    // Not mining so enable number of threads and set Start Mining
-                    if (((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).StartStopMining.Equals(StatusMiner.StopMining))
-                    {
-                        ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).StartStopMining = StatusMiner.StartMining;
-                    }
-                    if (!((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).IsNumThreadsEnabled)
-                    {
-                        ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).IsNumThreadsEnabled = true;
-                    }
-                }
+                });
             }
             catch (Exception ex)
             {
                 Logger.LogException("UIM.UPDV", ex);
-            }          
+            }
         }
 
         public static void UpdateStatusBar()
@@ -438,153 +418,152 @@ namespace NervaOneWalletMiner.Helpers
         {
             try
             {
+                WalletViewModel walletVm = (WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet];
+                MainViewModel mainViewVm = (MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView];
+
                 if (GlobalData.IsWalletOpen)
                 {
-                    if (!((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).TotalCoins.Equals(GlobalData.WalletStats.BalanceTotal.ToString()))
-                    {
-                        ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).TotalCoins = GlobalData.WalletStats.BalanceTotal.ToString();
-                    }
+                    // Compute collection changes on timer thread before marshaling to UI thread
+                    List<Account> deleteAccounts = [];
+                    List<Account> addAccounts = [];
 
-                    if (!((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).UnlockedCoins.Equals(GlobalData.WalletStats.BalanceUnlocked.ToString()))
+                    if (walletVm.WalletAddresses.Count > 0)
                     {
-                        ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).UnlockedCoins = GlobalData.WalletStats.BalanceUnlocked.ToString();
-                    }
-
-                    string totalLockedLabel = "Total " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits + ":";
-                    if (!((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).TotalLockedLabel.Equals(totalLockedLabel))
-                    {
-                        ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).TotalLockedLabel = totalLockedLabel;
-                    }
-
-                    string totalUnlockedLabel = "Unlocked " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits + ":";
-                    if (!((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).TotalUnlockedLabel.Equals(totalUnlockedLabel))
-                    {
-                        ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).TotalUnlockedLabel = totalUnlockedLabel;
-                    }
-
-                    if (((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).WalletAddresses.Count == 0 && GlobalData.WalletStats.Subaddresses.Values.Count > 0)
-                    {
-                        ObservableCollection<Account> initialAccounts = [.. GlobalData.WalletStats.Subaddresses.Values];
-
-                        if (initialAccounts.Count > 0)
-                        {
-                            Dispatcher.UIThread.Invoke(() =>
-                            {
-                                ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).WalletAddresses = [.. initialAccounts];
-                            });
-                        }
-                    }
-                    else
-                    {
-                        // Trying to avoid loop within a loop
-                        List<Account> deleteWallets = [];
                         HashSet<uint> checkedIndexes = [];
 
-                        foreach (Account wallet in ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).WalletAddresses)
+                        foreach (Account wallet in walletVm.WalletAddresses)
                         {
                             checkedIndexes.Add(wallet.Index);
 
-                            if (GlobalData.WalletStats.Subaddresses.ContainsKey(wallet.Index))
+                            if (!GlobalData.WalletStats.Subaddresses.ContainsKey(wallet.Index))
                             {
-                                // Update, only if value changed
-                                // GlobalData.WalletStats.Subaddresses get cleared in asynchronouse call so sometimes even though you check if key exists, it will not exist anymore
-                                if (!wallet.Label.Equals(GlobalData.WalletStats.Subaddresses[wallet.Index].Label))
-                                {
-                                    wallet.Label = GlobalData.WalletStats.Subaddresses[wallet.Index].Label;
-                                }
-                                if (!wallet.AddressShort.Equals(GlobalData.WalletStats.Subaddresses[wallet.Index].AddressShort))
-                                {
-                                    wallet.AddressShort = GlobalData.WalletStats.Subaddresses[wallet.Index].AddressShort;
-                                }
-                                if (wallet.BalanceTotal != (GlobalData.WalletStats.Subaddresses[wallet.Index].BalanceTotal))
-                                {
-                                    wallet.BalanceTotal = GlobalData.WalletStats.Subaddresses[wallet.Index].BalanceTotal;
-                                }
-                                if (wallet.BalanceUnlocked != (GlobalData.WalletStats.Subaddresses[wallet.Index].BalanceUnlocked))
-                                {
-                                    wallet.BalanceUnlocked = GlobalData.WalletStats.Subaddresses[wallet.Index].BalanceUnlocked;
-                                }
+                                deleteAccounts.Add(wallet);
                             }
-                            else
-                            {
-                                // Wallets to remove
-                                deleteWallets.Add(wallet);
-                            }
-                        }
-
-                        foreach (Account wallet in deleteWallets)
-                        {
-                            Dispatcher.UIThread.Invoke(() =>
-                            {
-                                ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).WalletAddresses.Remove(wallet);
-                            });
                         }
 
                         foreach (uint index in GlobalData.WalletStats.Subaddresses.Keys)
                         {
                             if (!checkedIndexes.Contains(index))
                             {
-                                // Need to add new wallet
-                                Dispatcher.UIThread.Invoke(() =>
-                                {
-                                    ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).WalletAddresses.Add(GlobalData.WalletStats.Subaddresses[index]);
-                                });
+                                addAccounts.Add(GlobalData.WalletStats.Subaddresses[index]);
                             }
                         }
                     }
 
-                    ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).OpenCloseWallet = StatusWallet.CloseWallet;
-
-                    // Status Bar
+                    string totalLockedLabel = "Total " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits + ":";
+                    string totalUnlockedLabel = "Unlocked " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits + ":";
                     string statusBarMessage = GlobalData.OpenedWalletName + " | " + GlobalData.WalletStats.BalanceTotal.ToString("F2") + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits + (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletHeightSupported ? " | H: " + GlobalData.WalletHeight : string.Empty);
-                    if (((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).WalletStatus != statusBarMessage)
+
+                    Dispatcher.UIThread.Invoke(() =>
                     {
-                        ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).WalletStatus = statusBarMessage;
-                    }
+                        if (!walletVm.TotalCoins.Equals(GlobalData.WalletStats.BalanceTotal.ToString()))
+                        {
+                            walletVm.TotalCoins = GlobalData.WalletStats.BalanceTotal.ToString();
+                        }
+                        if (!walletVm.UnlockedCoins.Equals(GlobalData.WalletStats.BalanceUnlocked.ToString()))
+                        {
+                            walletVm.UnlockedCoins = GlobalData.WalletStats.BalanceUnlocked.ToString();
+                        }
+                        if (!walletVm.TotalLockedLabel.Equals(totalLockedLabel))
+                        {
+                            walletVm.TotalLockedLabel = totalLockedLabel;
+                        }
+                        if (!walletVm.TotalUnlockedLabel.Equals(totalUnlockedLabel))
+                        {
+                            walletVm.TotalUnlockedLabel = totalUnlockedLabel;
+                        }
+
+                        if (walletVm.WalletAddresses.Count == 0 && GlobalData.WalletStats.Subaddresses.Count > 0)
+                        {
+                            walletVm.WalletAddresses = [.. GlobalData.WalletStats.Subaddresses.Values];
+                        }
+                        else
+                        {
+                            // Update existing account fields, only if value changed
+                            // GlobalData.WalletStats.Subaddresses get cleared in asynchronous call so sometimes even though you check if key exists, it will not exist anymore
+                            foreach (Account wallet in walletVm.WalletAddresses)
+                            {
+                                if (GlobalData.WalletStats.Subaddresses.ContainsKey(wallet.Index))
+                                {
+                                    if (!wallet.Label.Equals(GlobalData.WalletStats.Subaddresses[wallet.Index].Label))
+                                    {
+                                        wallet.Label = GlobalData.WalletStats.Subaddresses[wallet.Index].Label;
+                                    }
+                                    if (!wallet.AddressShort.Equals(GlobalData.WalletStats.Subaddresses[wallet.Index].AddressShort))
+                                    {
+                                        wallet.AddressShort = GlobalData.WalletStats.Subaddresses[wallet.Index].AddressShort;
+                                    }
+                                    if (wallet.BalanceTotal != GlobalData.WalletStats.Subaddresses[wallet.Index].BalanceTotal)
+                                    {
+                                        wallet.BalanceTotal = GlobalData.WalletStats.Subaddresses[wallet.Index].BalanceTotal;
+                                    }
+                                    if (wallet.BalanceUnlocked != GlobalData.WalletStats.Subaddresses[wallet.Index].BalanceUnlocked)
+                                    {
+                                        wallet.BalanceUnlocked = GlobalData.WalletStats.Subaddresses[wallet.Index].BalanceUnlocked;
+                                    }
+                                }
+                            }
+
+                            foreach (Account wallet in deleteAccounts)
+                            {
+                                walletVm.WalletAddresses.Remove(wallet);
+                            }
+                            foreach (Account wallet in addAccounts)
+                            {
+                                walletVm.WalletAddresses.Add(wallet);
+                            }
+                        }
+
+                        walletVm.OpenCloseWallet = StatusWallet.CloseWallet;
+
+                        if (mainViewVm.WalletStatus != statusBarMessage)
+                        {
+                            mainViewVm.WalletStatus = statusBarMessage;
+                        }
+                    });
                 }
                 else
                 {
                     // If wallet is closed/was closed by the user, clear fields
-                    if (!string.IsNullOrEmpty(((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).TotalCoins))
-                    {
-                        ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).TotalCoins = string.Empty;
-                    }
-
-                    if (!string.IsNullOrEmpty(((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).UnlockedCoins))
-                    {
-                        ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).UnlockedCoins = string.Empty;
-                    }
-
                     string totalLockedLabel = "Total " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits + ":";
-                    if (!((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).TotalLockedLabel.Equals(totalLockedLabel))
-                    {
-                        ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).TotalLockedLabel = totalLockedLabel;
-                    }
-
                     string totalUnlockedLabel = "Unlocked " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits + ":";
-                    if (!((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).TotalUnlockedLabel.Equals(totalUnlockedLabel))
-                    {
-                        ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).TotalUnlockedLabel = totalUnlockedLabel;
-                    }
 
-                    if (((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).WalletAddresses.Count != 0)
+                    Dispatcher.UIThread.Invoke(() =>
                     {
-                        ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).WalletAddresses = [];
-                    }
+                        if (!string.IsNullOrEmpty(walletVm.TotalCoins))
+                        {
+                            walletVm.TotalCoins = string.Empty;
+                        }
+                        if (!string.IsNullOrEmpty(walletVm.UnlockedCoins))
+                        {
+                            walletVm.UnlockedCoins = string.Empty;
+                        }
+                        if (!walletVm.TotalLockedLabel.Equals(totalLockedLabel))
+                        {
+                            walletVm.TotalLockedLabel = totalLockedLabel;
+                        }
+                        if (!walletVm.TotalUnlockedLabel.Equals(totalUnlockedLabel))
+                        {
+                            walletVm.TotalUnlockedLabel = totalUnlockedLabel;
+                        }
+                        if (walletVm.WalletAddresses.Count != 0)
+                        {
+                            walletVm.WalletAddresses = [];
+                        }
 
-                    ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).OpenCloseWallet = StatusWallet.OpenWallet;
+                        walletVm.OpenCloseWallet = StatusWallet.OpenWallet;
 
-                    // Status Bar
-                    if (((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).WalletStatus != GlobalData.WalletClosedMessage)
-                    {
-                        ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).WalletStatus = GlobalData.WalletClosedMessage;
-                    }
+                        if (mainViewVm.WalletStatus != GlobalData.WalletClosedMessage)
+                        {
+                            mainViewVm.WalletStatus = GlobalData.WalletClosedMessage;
+                        }
+                    });
                 }
             }
             catch (Exception ex)
             {
                 Logger.LogException("UIM.UPWV", ex);
-            }      
+            }
         }
 
         public static void UpdateTransfersView()
@@ -593,9 +572,11 @@ namespace NervaOneWalletMiner.Helpers
 
             try
             {
+                TransfersViewModel transfersViewVm = (TransfersViewModel)GlobalData.ViewModelPages[SplitViewPages.Transfers];
+
                 if (GlobalData.IsWalletOpen)
                 {
-                    if (((TransfersViewModel)GlobalData.ViewModelPages[SplitViewPages.Transfers]).Transactions.Count == 0)
+                    if (transfersViewVm.Transactions.Count == 0)
                     {
                         ObservableCollection<Transfer> initialTransfers = [.. GlobalData.TransfersStats.Transactions.Values];
 
@@ -603,37 +584,28 @@ namespace NervaOneWalletMiner.Helpers
                         {
                             Dispatcher.UIThread.Invoke(() =>
                             {
-                                ((TransfersViewModel)GlobalData.ViewModelPages[SplitViewPages.Transfers]).Transactions = [.. initialTransfers.OrderByDescending(t => t.Height)];
+                                transfersViewVm.Transactions = [.. initialTransfers.OrderByDescending(t => t.Height)];
                             });
 
                             // Need to clear transfers AFTER we process them otherwise we might clear them before we process them
                             GlobalData.TransfersStats.Transactions = [];
                         }
 
-                        if (((TransfersViewModel)GlobalData.ViewModelPages[SplitViewPages.Transfers]).Transactions.Count > 0)
+                        if (transfersViewVm.Transactions.Count > 0)
                         {
                             // This will also save after initial open BUT it will cover restoring wallet
-                            newTransfersCount = ((TransfersViewModel)GlobalData.ViewModelPages[SplitViewPages.Transfers]).Transactions.Count;
+                            newTransfersCount = transfersViewVm.Transactions.Count;
                         }
                     }
                     else
                     {
+                        // Compute new transfers on timer thread before marshaling to UI thread
                         List<Transfer> newTransfers = [];
+                        HashSet<string> existingKeys = [.. transfersViewVm.Transactions.Select(t => t.TransactionId + t.Type)];
 
                         foreach (string newTransferKey in GlobalData.TransfersStats.Transactions.Keys)
                         {
-                            // Check if transaction already exists in datagrid and add it to the top if it does not
-                            bool isFound = false;
-                            foreach (Transfer transfer in ((TransfersViewModel)GlobalData.ViewModelPages[SplitViewPages.Transfers]).Transactions)
-                            {
-                                if (transfer.TransactionId + transfer.Type == newTransferKey)
-                                {
-                                    isFound = true;
-                                    break;
-                                }
-                            }
-
-                            if (!isFound)
+                            if (!existingKeys.Contains(newTransferKey))
                             {
                                 newTransfers.Add(GlobalData.TransfersStats.Transactions[newTransferKey]);
                             }
@@ -641,14 +613,16 @@ namespace NervaOneWalletMiner.Helpers
 
                         if (newTransfers.Count > 0)
                         {
-                            foreach (Transfer transfer in newTransfers.OrderBy(t => t.Height))
+                            List<Transfer> ordered = [.. newTransfers.OrderBy(t => t.Height)];
+
+                            Dispatcher.UIThread.Invoke(() =>
                             {
-                                Dispatcher.UIThread.Invoke(() =>
+                                foreach (Transfer transfer in ordered)
                                 {
-                                    ((TransfersViewModel)GlobalData.ViewModelPages[SplitViewPages.Transfers]).Transactions.Insert(0, transfer);
-                                });
-                            }
-                            
+                                    transfersViewVm.Transactions.Insert(0, transfer);
+                                }
+                            });
+
                             // Need to clear transfers AFTER we process them otherwise we might clear them before we process them
                             GlobalData.TransfersStats.Transactions = [];
                             newTransfersCount = newTransfers.Count;
@@ -667,9 +641,12 @@ namespace NervaOneWalletMiner.Helpers
                 else
                 {
                     // If wallet is closed/was closed by the user, clear fields
-                    if (((TransfersViewModel)GlobalData.ViewModelPages[SplitViewPages.Transfers]).Transactions.Count != 0)
+                    if (transfersViewVm.Transactions.Count != 0)
                     {
-                        ((TransfersViewModel)GlobalData.ViewModelPages[SplitViewPages.Transfers]).Transactions = [];
+                        Dispatcher.UIThread.Invoke(() =>
+                        {
+                            transfersViewVm.Transactions = [];
+                        });
                     }
                 }
             }
@@ -884,11 +861,13 @@ namespace NervaOneWalletMiner.Helpers
                         }
                     }
 
+                    MasterProcess._isDaemonDataFresh = true;
                     GlobalData.IsGetAndSetDaemonDataComplete = true;
                 }
             }
             catch (Exception ex)
             {
+                MasterProcess._isDaemonDataFresh = true;
                 GlobalData.IsGetAndSetDaemonDataComplete = true;
                 Logger.LogException("UIM.GSDD", ex);
             }

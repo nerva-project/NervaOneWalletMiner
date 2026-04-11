@@ -22,7 +22,7 @@ namespace NervaOneWalletMiner.Helpers
             fileAppender.RollingStyle = RollingFileAppender.RollingMode.Date;
             fileAppender.DatePattern = "_yyyMMdd.'log'";
             fileAppender.StaticLogFileName = false;
-            fileAppender.LockingModel = new FileAppender.MinimalLock();
+            fileAppender.LockingModel = new FileAppender.ExclusiveLock();
             
             PatternLayout pl = new PatternLayout();
             pl.ConversionPattern = "%-5level %date - %message%newline";
