@@ -112,6 +112,7 @@ namespace NervaOneWalletMiner.Helpers
 
             MasterProcess.StartMasterUpdateProcess();
 
+            UpdateCoinIcon(GlobalMethods.GetLogo());
             UpdateDaemonView();
             UpdateStatusBar();
         }
@@ -267,18 +268,6 @@ namespace NervaOneWalletMiner.Helpers
                 {
                     ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).DaemonVersion = version;
                 }
-            }
-        }
-
-        public static Bitmap GetCoinIcon()
-        {
-            if (GlobalData.ViewModelPages.ContainsKey(SplitViewPages.MainView))
-            {
-                return ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CoinIcon;
-            }
-            else
-            {
-                return GlobalMethods.GetLogo();
             }
         }
 
@@ -884,11 +873,13 @@ namespace NervaOneWalletMiner.Helpers
                         }
                     }
 
+                    MasterProcess._isDaemonDataFresh = true;
                     GlobalData.IsGetAndSetDaemonDataComplete = true;
                 }
             }
             catch (Exception ex)
             {
+                MasterProcess._isDaemonDataFresh = true;
                 GlobalData.IsGetAndSetDaemonDataComplete = true;
                 Logger.LogException("UIM.GSDD", ex);
             }

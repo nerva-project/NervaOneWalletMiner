@@ -8,6 +8,7 @@ using Avalonia.Android;
 using NervaOneWalletMiner.Android.Services;
 using NervaOneWalletMiner.Helpers;
 using ReactiveUI.Avalonia;
+using System;
 
 namespace NervaOneWalletMiner.Android;
 
@@ -37,6 +38,37 @@ public class MainActivity : AvaloniaMainActivity<App>
             {
                 RenderingMode = [AndroidRenderingMode.Software]
             });
+    }
+
+    protected override void OnPause()
+    {
+        base.OnPause();
+
+        try
+        {
+            // Activity is no longer visible (screen off, app switched, etc.).
+            // Skip all UI updates and RPC calls until the user returns — only
+            // daemon keep-alive checks continue to run in the background.
+            MasterProcess.EnterBackgroundMode();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException("MNA.ONPS", ex);
+        }
+    }
+
+    protected override void OnResume()
+    {
+        base.OnResume();
+
+        try
+        {
+            MasterProcess.ExitBackgroundMode();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException("MNA.ONRS", ex);
+        }
     }
 
     protected override void OnDestroy()

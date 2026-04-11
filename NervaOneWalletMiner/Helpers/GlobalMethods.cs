@@ -1263,6 +1263,8 @@ namespace NervaOneWalletMiner.Helpers
             {
                 GlobalData.ViewModelPages[SplitViewPages.WalletSetup] = new WalletSetupViewModel();
             }
+
+            UIManager.UpdateCoinIcon(GetLogo());
         }
         #endregion // Misc Methods
 
