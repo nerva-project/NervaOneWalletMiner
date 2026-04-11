@@ -284,115 +284,106 @@ namespace NervaOneWalletMiner.Helpers
         {
             try
             {
-                // Daemon View
-                ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).NetHeight = GlobalData.NetworkStats.NetHeight.ToString();
-                ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).YourHeight = GlobalData.NetworkStats.YourHeight.ToString();
-                ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).NetHash = GlobalData.NetworkStats.NetHashString;
-                ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).RunTime = GlobalData.NetworkStats.RunTime;
+                DaemonViewModel vm = (DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon];
 
-                ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).MinerMessage = GlobalData.NetworkStats.MinerStatus;
-                ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).YourHash = GlobalData.NetworkStats.YourHash;
-                ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).BlockTime = GlobalData.NetworkStats.BlockTime;
-                ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).MiningAddress = GlobalData.NetworkStats.MiningAddress;
-
-
-                if (((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).Connections.Count == 0)
+                // All updates on the UI thread so PropertyChanged events are coalesced into one render pass
+                Dispatcher.UIThread.Invoke(() =>
                 {
-                    ObservableCollection<Connection> initialConnections = [.. GlobalData.NetworkStats.Connections.Values];
+                    vm.NetHeight = GlobalData.NetworkStats.NetHeight.ToString();
+                    vm.YourHeight = GlobalData.NetworkStats.YourHeight.ToString();
+                    vm.NetHash = GlobalData.NetworkStats.NetHashString;
+                    vm.RunTime = GlobalData.NetworkStats.RunTime;
+                    vm.MinerMessage = GlobalData.NetworkStats.MinerStatus;
+                    vm.YourHash = GlobalData.NetworkStats.YourHash;
+                    vm.BlockTime = GlobalData.NetworkStats.BlockTime;
+                    vm.MiningAddress = GlobalData.NetworkStats.MiningAddress;
 
-                    if (initialConnections.Count > 0)
+                    if (GlobalData.NetworkStats.MinerStatus.Equals(StatusMiner.Mining))
                     {
-                        Dispatcher.UIThread.Invoke(() =>
+                        if (vm.StartStopMining.Equals(StatusMiner.StartMining))
                         {
-                            ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).Connections = [.. initialConnections];
-                        });
-                    }
-                }
-                else
-                {
-                // Trying to avoid loop within a loop
-                List<Connection> deleteConnections = [];
-                HashSet<string> checkedAddresses = [];
-
-
-                    foreach (Connection connection in ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).Connections)
-                    {
-                        string connectionsKey = connection.Address + connection.IsIncoming;
-                        checkedAddresses.Add(connectionsKey);
-
-                        if (GlobalData.NetworkStats.Connections.ContainsKey(connectionsKey))
-                        {
-                            // Update, only if value changed
-                            if (!connection.Height.Equals(GlobalData.NetworkStats.Connections[connectionsKey].Height))
-                            {
-                                connection.Height = GlobalData.NetworkStats.Connections[connectionsKey].Height;
-                            }
-                            if (!connection.LiveTime.Equals(GlobalData.NetworkStats.Connections[connectionsKey].LiveTime))
-                            {
-                                connection.LiveTime = GlobalData.NetworkStats.Connections[connectionsKey].LiveTime;
-                            }
-                            if (!connection.State.Equals(GlobalData.NetworkStats.Connections[connectionsKey].State))
-                            {
-                                connection.State = GlobalData.NetworkStats.Connections[connectionsKey].State;
-                            }
+                            vm.StartStopMining = StatusMiner.StopMining;
                         }
-                        else
+                        if (vm.IsNumThreadsEnabled)
                         {
-                            // Connections to remove
-                            deleteConnections.Add(connection);
+                            vm.IsNumThreadsEnabled = false;
+                        }
+                    }
+                    else
+                    {
+                        if (vm.StartStopMining.Equals(StatusMiner.StopMining))
+                        {
+                            vm.StartStopMining = StatusMiner.StartMining;
+                        }
+                        if (!vm.IsNumThreadsEnabled)
+                        {
+                            vm.IsNumThreadsEnabled = true;
                         }
                     }
 
-                    foreach (Connection connection in deleteConnections)
+                    if (vm.Connections.Count == 0)
                     {
-                        Dispatcher.UIThread.Invoke(() =>
+                        if (GlobalData.NetworkStats.Connections.Count > 0)
                         {
-                            ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).Connections.Remove(connection);
-                        });
-                    }
-
-                    foreach (string key in GlobalData.NetworkStats.Connections.Keys)
-                    {
-                        if (!checkedAddresses.Contains(key))
-                        {
-                            // Need to add new wallet
-                            Dispatcher.UIThread.Invoke(() =>
-                            {
-                                ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).Connections.Add(GlobalData.NetworkStats.Connections[key]);
-                            });
+                            vm.Connections = [.. GlobalData.NetworkStats.Connections.Values];
                         }
                     }
-                }
+                    else
+                    {
+                        List<Connection> deleteConnections = [];
+                        List<Connection> addConnections = [];
+                        HashSet<string> checkedAddresses = [];
 
-                if (GlobalData.NetworkStats.MinerStatus.Equals(StatusMiner.Mining))
-                {
-                    // Mining so disable number of threads and show Stop Mining
-                    if (((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).StartStopMining.Equals(StatusMiner.StartMining))
-                    {
-                        ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).StartStopMining = StatusMiner.StopMining;
+                        foreach (Connection connection in vm.Connections)
+                        {
+                            string connectionsKey = connection.Address + connection.IsIncoming;
+                            checkedAddresses.Add(connectionsKey);
+
+                            if (GlobalData.NetworkStats.Connections.ContainsKey(connectionsKey))
+                            {
+                                // Update, only if value changed
+                                if (!connection.Height.Equals(GlobalData.NetworkStats.Connections[connectionsKey].Height))
+                                {
+                                    connection.Height = GlobalData.NetworkStats.Connections[connectionsKey].Height;
+                                }
+                                if (!connection.LiveTime.Equals(GlobalData.NetworkStats.Connections[connectionsKey].LiveTime))
+                                {
+                                    connection.LiveTime = GlobalData.NetworkStats.Connections[connectionsKey].LiveTime;
+                                }
+                                if (!connection.State.Equals(GlobalData.NetworkStats.Connections[connectionsKey].State))
+                                {
+                                    connection.State = GlobalData.NetworkStats.Connections[connectionsKey].State;
+                                }
+                            }
+                            else
+                            {
+                                deleteConnections.Add(connection);
+                            }
+                        }
+
+                        foreach (string key in GlobalData.NetworkStats.Connections.Keys)
+                        {
+                            if (!checkedAddresses.Contains(key))
+                            {
+                                addConnections.Add(GlobalData.NetworkStats.Connections[key]);
+                            }
+                        }
+
+                        foreach (Connection connection in deleteConnections)
+                        {
+                            vm.Connections.Remove(connection);
+                        }
+                        foreach (Connection connection in addConnections)
+                        {
+                            vm.Connections.Add(connection);
+                        }
                     }
-                    if (((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).IsNumThreadsEnabled)
-                    {
-                        ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).IsNumThreadsEnabled = false;
-                    }
-                }
-                else
-                {
-                    // Not mining so enable number of threads and set Start Mining
-                    if (((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).StartStopMining.Equals(StatusMiner.StopMining))
-                    {
-                        ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).StartStopMining = StatusMiner.StartMining;
-                    }
-                    if (!((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).IsNumThreadsEnabled)
-                    {
-                        ((DaemonViewModel)GlobalData.ViewModelPages[SplitViewPages.Daemon]).IsNumThreadsEnabled = true;
-                    }
-                }
+                });
             }
             catch (Exception ex)
             {
                 Logger.LogException("UIM.UPDV", ex);
-            }          
+            }
         }
 
         public static void UpdateStatusBar()
