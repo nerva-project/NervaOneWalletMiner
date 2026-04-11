@@ -145,7 +145,14 @@ namespace NervaOneWalletMiner.Helpers
                 }
 
 
-                if (!_isInBackgroundMode)
+                if(_isInBackgroundMode)
+                {
+                    if(!_killMasterProcess && !GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly && _masterTimerCount % 50 == 0)
+                    {
+                        UIManager.GetAndSetDaemonData();
+                    }                    
+                }
+                else
                 {
                     // Get Daemon data
                     if (!GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
@@ -258,8 +265,8 @@ namespace NervaOneWalletMiner.Helpers
                 {
                     // Daemon not responding. Kill and restart
                     forceRestart = true;
-                    GlobalData.LastDaemonResponseTime = DateTime.Now;
                     Logger.LogDebug("MSP.KDNR", "No response from daemon since: " + GlobalData.LastDaemonResponseTime.ToLongTimeString() + " . Forcing restart...");
+                    GlobalData.LastDaemonResponseTime = DateTime.Now;
                 }
 
                 if (!ProcessManager.IsRunning(GlobalData.DaemonProcessName) || forceRestart)
