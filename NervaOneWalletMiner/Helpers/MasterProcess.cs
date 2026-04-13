@@ -1,4 +1,4 @@
-﻿using NervaOneWalletMiner.Objects.Constants;
+using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.ViewModels;
 using System;
 
@@ -10,15 +10,24 @@ namespace NervaOneWalletMiner.Helpers
         public static readonly int _masterTimerInterval = GlobalMethods.IsAndroid() ? 2000 : 1000;
         public static DateTime _cliToolsRunningLastCheck = DateTime.MinValue;
         public static bool _killMasterProcess = false;
-        public static int _masterTimerCount = 0;
 
-        // When the Android activity is paused (screen off / app in background), skip all UI
-        // updates and RPC calls — only keep-alive checks still run.
+        // Per-operation timestamps. It used to be _masterTimerCount but it's unreliable on Android as it gets throttled in the background
+        public static DateTime _lastDaemonDataFetch = DateTime.MinValue;
+        public static DateTime _lastWalletDataFetch = DateTime.MinValue;
+        public static DateTime _lastWalletSave = DateTime.MinValue;
+
+        // 5 sec on Desktop, 10 sec on Android
+        public static readonly int _daemonFetchSeconds = (_masterTimerInterval / 1000) * GlobalData.AppSettings.TimerIntervalMultiplier;
+        public static readonly int _walletFetchSeconds = _daemonFetchSeconds * 2;
+        public static readonly int _backgroundFetchSeconds = 60;
+        public static readonly int _cliToolsHealthCheckSeconds = 60;
+        public static readonly int _walletSaveSeconds = 300;
+        public static readonly int _daemonResponseRestartSeconds = 300;
+
+        // Skip all UI updates when the Android activity is paused (screen off / app in background)        
         public static volatile bool _isInBackgroundMode = false;
 
-        // Set by GetAndSetDaemonData when fresh data arrives; cleared after UpdateDaemonView runs.
-        // Prevents UpdateDaemonView from firing every timer tick when data only changes every
-        // TimerIntervalMultiplier ticks.
+        // Only fire UpdateDaemonView when fresh data arrives
         public static volatile bool _isDaemonDataFresh = false;
 
         public static void EnterBackgroundMode()
@@ -29,9 +38,12 @@ namespace NervaOneWalletMiner.Helpers
         public static void ExitBackgroundMode()
         {
             _isInBackgroundMode = false;
-            _masterTimerCount = 0;
+
+            // Reset all fetch timestamps so data is fetched immediately on the next tick
+            _lastDaemonDataFetch = DateTime.MinValue;
+            _lastWalletDataFetch = DateTime.MinValue;
         }
-        
+
 
         public static void StartMasterUpdateProcess()
         {
@@ -53,7 +65,7 @@ namespace NervaOneWalletMiner.Helpers
                         ProcessManager.Kill(GlobalData.WalletProcessName);
                     }
 
-                    Logger.LogDebug("MSP.SMUP", "Master timer running every " + _masterTimerInterval / 1000 + " seconds. Update every " + (_masterTimerInterval / 1000) * GlobalData.AppSettings.TimerIntervalMultiplier + " seconds");
+                    Logger.LogDebug("MSP.SMUP", "Master timer running every " + _masterTimerInterval / 1000 + " seconds. Daemon update every " + _daemonFetchSeconds + " seconds. Wallet update every " + _walletFetchSeconds + " seconds");
                 }
             }
             catch (Exception ex)
@@ -71,15 +83,17 @@ namespace NervaOneWalletMiner.Helpers
                     _masterUpdateTimer.Stop();
                 }
 
+
                 // If kill master process is issued at any point, skip everything else and do not restart master timer
-                if (_cliToolsRunningLastCheck.AddSeconds(30) < DateTime.Now)
+                if (_cliToolsRunningLastCheck.AddSeconds(_cliToolsHealthCheckSeconds) < DateTime.Now)
                 {
+                    //Logger.LogDebug("MSP.MUPS", "_cliToolsRunningLastCheck: " + _cliToolsRunningLastCheck.ToLongDateString() + ", IsGetAndSetDaemonDataComplete: " + GlobalData.IsGetAndSetDaemonDataComplete + ", LastDaemonResponseTime: " + GlobalData.LastDaemonResponseTime.ToLongDateString());
                     _cliToolsRunningLastCheck = DateTime.Now;
 
                     if (!GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
                     {
                         if (!_killMasterProcess)
-                        {
+                        {                            
                             KeepDaemonRunning();
 
                             // Auto start mining if setting enabled
@@ -145,27 +159,30 @@ namespace NervaOneWalletMiner.Helpers
                 }
 
 
-                if(_isInBackgroundMode)
+                if (_isInBackgroundMode)
                 {
-                    if(!_killMasterProcess && !GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly && _masterTimerCount % 50 == 0)
+                    if (!_killMasterProcess
+                        && !GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly
+                        && _lastDaemonDataFetch.AddSeconds(_backgroundFetchSeconds) < DateTime.Now)
                     {
+                        //Logger.LogDebug("MSP.MUPS", "_lastDaemonDataFetch: " + _lastDaemonDataFetch.ToLongDateString() + ", IsGetAndSetDaemonDataComplete: " + GlobalData.IsGetAndSetDaemonDataComplete + ", LastDaemonResponseTime: " + GlobalData.LastDaemonResponseTime.ToLongDateString());
+                        _lastDaemonDataFetch = DateTime.Now;
                         UIManager.GetAndSetDaemonData();
-                    }                    
+                    }
                 }
                 else
                 {
                     // Get Daemon data
                     if (!GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
                     {
-                        if (!_killMasterProcess && _masterTimerCount % GlobalData.AppSettings.TimerIntervalMultiplier == 0)
+                        if (!_killMasterProcess && _lastDaemonDataFetch.AddSeconds(_daemonFetchSeconds) < DateTime.Now)
                         {
+                            _lastDaemonDataFetch = DateTime.Now;
                             UIManager.HandleNetworkStats();
                             UIManager.GetAndSetDaemonData();
                         }
 
-                        // Actual Daemon UI update — only run when GetAndSetDaemonData just produced
-                        // fresh data, not on every timer tick. _isDaemonDataFresh is set by
-                        // GetAndSetDaemonData and cleared here after the view is updated.
+                        // Actual Daemon UI update — only run when GetAndSetDaemonData just produced fresh data
                         if (_isDaemonDataFresh && GlobalData.IsGetAndSetDaemonDataComplete)
                         {
                             _isDaemonDataFresh = false;
@@ -184,8 +201,9 @@ namespace NervaOneWalletMiner.Helpers
                         && (GlobalData.IsInitialDaemonConnectionSuccess || GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
                         && GlobalData.IsWalletOpen)
                     {
-                        if (GlobalData.IsWalletJustOpened || (_masterTimerCount % (GlobalData.AppSettings.TimerIntervalMultiplier * 2) == 0))
+                        if (GlobalData.IsWalletJustOpened || _lastWalletDataFetch.AddSeconds(_walletFetchSeconds) < DateTime.Now)
                         {
+                            _lastWalletDataFetch = DateTime.Now;
                             UIManager.CallWalletDataMethodsInSync();
                         }
                     }
@@ -206,11 +224,12 @@ namespace NervaOneWalletMiner.Helpers
                         GlobalData.IsWalletJustOpened = false;
                     }
 
-                    if (GlobalData.IsWalletOpen & _masterTimerCount % 300 == 0)
+                    if (GlobalData.IsWalletOpen && _lastWalletSave.AddSeconds(_walletSaveSeconds) < DateTime.Now)
                     {
                         if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsSavingWalletSupported)
                         {
                             // Auto save wallet every 5 min
+                            _lastWalletSave = DateTime.Now;
                             Logger.LogDebug("MSP.MUPS", "Auto saving wallet: " + GlobalData.OpenedWalletName);
 
                             GlobalMethods.SaveWallet();
@@ -250,7 +269,6 @@ namespace NervaOneWalletMiner.Helpers
 
                 if (!_killMasterProcess)
                 {
-                    _masterTimerCount++;
                     _masterUpdateTimer.Start();
                 }
             }
@@ -261,23 +279,32 @@ namespace NervaOneWalletMiner.Helpers
             try
             {
                 bool forceRestart = false;
-                if (GlobalData.LastDaemonResponseTime.AddSeconds(300) < DateTime.Now)
+                DateTime daemonRestartTime = GlobalData.LastDaemonResponseTime.AddSeconds(_daemonResponseRestartSeconds);
+                if (_isInBackgroundMode)
+                {
+                    // Double the restart time when in background mode
+                    daemonRestartTime = daemonRestartTime.AddSeconds(_daemonResponseRestartSeconds);
+                }
+
+                if (daemonRestartTime < DateTime.Now)
                 {
                     // Daemon not responding. Kill and restart
                     forceRestart = true;
-                    Logger.LogDebug("MSP.KDNR", "No response from daemon since: " + GlobalData.LastDaemonResponseTime.ToLongTimeString() + " . Forcing restart...");
+                    Logger.LogDebug("MSP.KDNR", "No response from daemon since: " + GlobalData.LastDaemonResponseTime.ToLongTimeString() + ". Forcing restart...");
                     GlobalData.LastDaemonResponseTime = DateTime.Now;
                 }
 
-                if (!ProcessManager.IsRunning(GlobalData.DaemonProcessName) || forceRestart)
+                bool isDaemonRunning = ProcessManager.IsRunning(GlobalData.DaemonProcessName);
+                if (!isDaemonRunning || forceRestart)
                 {
-                    if (GlobalData.LastDaemonRestartAttempt.AddSeconds(300) < DateTime.Now)
+                    if (GlobalData.LastDaemonRestartAttempt.AddSeconds(_daemonResponseRestartSeconds) < DateTime.Now)
                     {
                         if (!GlobalData.IsCliToolsDownloading && GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
                         {
-                            Logger.LogDebug("MSP.KDNR", "Restarting daemon process because it's not running");
+                            Logger.LogDebug("MSP.KDNR", "Issues with Daemon process. isDaemonRunning: " + isDaemonRunning + ", forceRestart: " + forceRestart + ". Restarting...");
+
                             GlobalData.LastDaemonRestartAttempt = DateTime.Now;
-                            ProcessManager.Kill(GlobalData.DaemonProcessName);                            
+                            ProcessManager.Kill(GlobalData.DaemonProcessName);
                             ProcessManager.StartExternalProcess(GlobalMethods.GetDaemonProcess(), GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].GenerateDaemonOptions(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]));
                             GlobalData.IsInitialDaemonConnectionSuccess = false;
                             GlobalData.IsCliToolsFound = true;
@@ -341,7 +368,7 @@ namespace NervaOneWalletMiner.Helpers
                     {
                         restartOptions = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPoppingBlocksSupported ? GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].GeneratePopBlocksOption(GlobalData.ConnectGuardBlocksToPop) : string.Empty;
                     }
-                    
+
                     ProcessManager.Kill(GlobalData.WalletProcessName);
                     GlobalMethods.StopAndCloseDaemon();
                     GlobalData.IsDaemonRestarting = true;
@@ -364,7 +391,7 @@ namespace NervaOneWalletMiner.Helpers
                 {
                     int hashRateKH = (int)(GlobalData.NetworkStats.NetHashRate / 1000.0d);
                     int stopThreshold = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopMiningThreshold;
-                      
+
                     if(GlobalData.NetworkStats.MinerStatus == StatusMiner.Mining && hashRateKH > stopThreshold)
                     {
                         Logger.LogDebug("MSP.HMSS", "Hash rate " + hashRateKH.ToString("F1") + " KH/s above threshold " + stopThreshold + " KH/s, pausing mining");

@@ -229,7 +229,7 @@ namespace NervaOneWalletMiner.Views
                 var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
                 {
                     Title = "Save Log File",
-                    SuggestedFileName = Path.GetFileName(_currentFilePath),
+                    SuggestedFileName = Path.GetFileNameWithoutExtension(_currentFilePath),
                     DefaultExtension = string.IsNullOrEmpty(ext) ? "log" : ext
                 });
 

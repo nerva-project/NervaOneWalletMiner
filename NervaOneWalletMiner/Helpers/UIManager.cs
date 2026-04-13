@@ -718,8 +718,12 @@ namespace NervaOneWalletMiner.Helpers
                     GlobalData.IsGetAndSetDaemonDataComplete = false;
 
                     GetInfoResponse infoRes = await GlobalData.DaemonService.GetInfo(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new GetInfoRequest());
-
-                    if (!infoRes.Error.IsError)
+                    
+                    if(infoRes.Error.IsError)
+                    {
+                        Logger.LogError("UIM.GSDD", "GetInfo Error | Code: " + infoRes.Error.Code + " | Message: " + infoRes.Error.Message + " | Content: " + infoRes.Error.Content);
+                    }
+                    else
                     {
                         GlobalData.LastDaemonResponseTime = DateTime.Now;
                         if (GlobalData.IsInitialDaemonConnectionSuccess == false)
@@ -843,7 +847,12 @@ namespace NervaOneWalletMiner.Helpers
 
 
                         GetConnectionsResponse connectResp = await GlobalData.DaemonService.GetConnections(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new GetConnectionsRequest());
-                        if (!connectResp.Error.IsError)
+                        
+                        if (connectResp.Error.IsError)
+                        {
+                            Logger.LogError("UIM.GSDD", "GetConnections Error | Code: " + connectResp.Error.Code + " | Message: " + connectResp.Error.Message + " | Content: " + connectResp.Error.Content);
+                        }
+                        else
                         {
                             GlobalData.NetworkStats.Connections = [];
 
@@ -967,6 +976,7 @@ namespace NervaOneWalletMiner.Helpers
                     reqTransfers.IsAllAccounts = true;
 
                     GetTransfersResponse response = await GlobalData.WalletService.GetTransfers(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, reqTransfers);
+                    
                     if (response.Error.IsError)
                     {
                         Logger.LogError("UIM.GSTD", "GetTransfers Error | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);

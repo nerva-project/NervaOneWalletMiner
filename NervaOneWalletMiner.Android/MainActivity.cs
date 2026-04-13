@@ -49,6 +49,7 @@ public class MainActivity : AvaloniaMainActivity<App>
             // Activity is no longer visible (screen off, app switched, etc.).
             // Skip all UI updates and RPC calls until the user returns — only
             // daemon keep-alive checks continue to run in the background.
+            Logger.LogDebug("MNA.ONPS", "Entering background mode.");
             MasterProcess.EnterBackgroundMode();
         }
         catch (Exception ex)
@@ -63,6 +64,7 @@ public class MainActivity : AvaloniaMainActivity<App>
 
         try
         {
+            Logger.LogDebug("MNA.ONRS", "Exiting background mode.");
             MasterProcess.ExitBackgroundMode();
         }
         catch (Exception ex)

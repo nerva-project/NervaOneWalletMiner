@@ -385,7 +385,7 @@ namespace NervaOneWalletMiner.Views
                 else
                 {
                     isSuccess = true;
-                    Logger.LogDebug("WAL.CLUW", "Wallet " + GlobalData.OpenedWalletName + " closed successfully");
+                    Logger.LogDebug("WAL.CLUW", "Wallet closed successfully");
 
                     if (isUiThread)
                     {
