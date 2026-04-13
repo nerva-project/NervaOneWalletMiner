@@ -85,6 +85,13 @@ namespace NervaOneWalletMiner.ViewModels
             set => this.RaiseAndSetIfChanged(ref _MinerMessage, value);
         }
 
+        private bool _IsMiningActive = false;
+        public bool IsMiningActive
+        {
+            get => _IsMiningActive;
+            set => this.RaiseAndSetIfChanged(ref _IsMiningActive, value);
+        }
+
         private string _YourHash = "0";
         public string YourHash
         {

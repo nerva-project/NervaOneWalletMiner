@@ -87,7 +87,7 @@ namespace NervaOneWalletMiner.Helpers
                 // If kill master process is issued at any point, skip everything else and do not restart master timer
                 if (_cliToolsRunningLastCheck.AddSeconds(_cliToolsHealthCheckSeconds) < DateTime.Now)
                 {
-                    //Logger.LogDebug("MSP.MUPS", "_cliToolsRunningLastCheck: " + _cliToolsRunningLastCheck.ToLongDateString() + ", IsGetAndSetDaemonDataComplete: " + GlobalData.IsGetAndSetDaemonDataComplete + ", LastDaemonResponseTime: " + GlobalData.LastDaemonResponseTime.ToLongDateString());
+                    //Logger.LogDebug("MSP.MUPS", "_cliToolsRunningLastCheck: " + _cliToolsRunningLastCheck.ToLongTimeString() + ", IsGetAndSetDaemonDataComplete: " + GlobalData.IsGetAndSetDaemonDataComplete + ", LastDaemonResponseTime: " + GlobalData.LastDaemonResponseTime.ToLongTimeString());
                     _cliToolsRunningLastCheck = DateTime.Now;
 
                     if (!GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
@@ -165,7 +165,7 @@ namespace NervaOneWalletMiner.Helpers
                         && !GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly
                         && _lastDaemonDataFetch.AddSeconds(_backgroundFetchSeconds) < DateTime.Now)
                     {
-                        //Logger.LogDebug("MSP.MUPS", "_lastDaemonDataFetch: " + _lastDaemonDataFetch.ToLongDateString() + ", IsGetAndSetDaemonDataComplete: " + GlobalData.IsGetAndSetDaemonDataComplete + ", LastDaemonResponseTime: " + GlobalData.LastDaemonResponseTime.ToLongDateString());
+                        //Logger.LogDebug("MSP.MUPS", "_lastDaemonDataFetch: " + _lastDaemonDataFetch.ToLongTimeString() + ", IsGetAndSetDaemonDataComplete: " + GlobalData.IsGetAndSetDaemonDataComplete + ", LastDaemonResponseTime: " + GlobalData.LastDaemonResponseTime.ToLongTimeString());
                         _lastDaemonDataFetch = DateTime.Now;
                         UIManager.GetAndSetDaemonData();
                     }

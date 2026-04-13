@@ -41,8 +41,9 @@
 			Click="OpenGitHub_Clicked"/>
 
 		<TextBlock TextWrapping="Wrap" Margin="0,10,0,0">
-			NervaOne is non-custodial application that uses core software from your device 
-			to manage miner and provide wallet functionality.
+			NervaOne is a non-custodial application that runs as a full node by executing
+			the coin's CLI tools directly on your device, or as wallet-only by connecting
+			to a remote node.
 		</TextBlock>
 
 		<TextBlock TextWrapping="Wrap" Margin="0,10,0,0">
@@ -53,7 +54,7 @@
 		</TextBlock>
 
 		<TextBlock TextWrapping="Wrap" Margin="0,10,0,0">
-			The software has modern design that's relatively easy to use for new users
+			The software has modern design that's easy to use for new users
 			but also gives advanced users ability to customize.
 		</TextBlock>
 

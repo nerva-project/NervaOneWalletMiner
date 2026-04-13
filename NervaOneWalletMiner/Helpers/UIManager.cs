@@ -308,6 +308,10 @@ namespace NervaOneWalletMiner.Helpers
                         {
                             vm.IsNumThreadsEnabled = false;
                         }
+                        if (!vm.IsMiningActive)
+                        {
+                            vm.IsMiningActive = true;
+                        }
                     }
                     else
                     {
@@ -318,6 +322,10 @@ namespace NervaOneWalletMiner.Helpers
                         if (!vm.IsNumThreadsEnabled)
                         {
                             vm.IsNumThreadsEnabled = true;
+                        }
+                        if (vm.IsMiningActive)
+                        {
+                            vm.IsMiningActive = false;
                         }
                     }
 
