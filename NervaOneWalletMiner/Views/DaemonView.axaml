@@ -63,10 +63,10 @@
 						  ColumnDefinitions="100,100"						  
 						  Margin="0,10,5,0">
 						<Grid.RowDefinitions>
-							<RowDefinition Height="26"/>
-							<RowDefinition Height="26"/>
-							<RowDefinition Height="26"/>
-							<RowDefinition Height="26"/>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="Auto"/>
 						</Grid.RowDefinitions>
 
 						<Label Grid.Row="0" Grid.Column="0"
@@ -101,20 +101,41 @@
 						  ColumnDefinitions="100,100"
 						  Margin="0,10,5,0">
 						<Grid.RowDefinitions>
-							<RowDefinition Height="26"/>
-							<RowDefinition Height="26"/>
-							<RowDefinition Height="26"/>
-							<RowDefinition Height="26"/>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="Auto"/>
 						</Grid.RowDefinitions>
 
-						<Label Grid.Row="0" Grid.Column="0" Content="Miner:"/>
-						<Label Grid.Row="0" Grid.Column="1" Content="{Binding MinerMessage}" Width="150" HorizontalAlignment="Left"/>
-						<Label Grid.Row="1" Grid.Column="0" Content="Hash Rate:"/>
-						<Label Grid.Row="1" Grid.Column="1" Content="{Binding YourHash}" Width="150" HorizontalAlignment="Left"/>
-						<Label Grid.Row="2" Grid.Column="0" Content="Block Time:"/>
-						<Label Grid.Row="2" Grid.Column="1" Content="{Binding BlockTime}" Width="150" HorizontalAlignment="Left"/>
-						<Label Grid.Row="3" Grid.Column="0" Content="Address:"/>
-						<Label Grid.Row="3" Grid.Column="1" Content="{Binding MiningAddress}" Width="150" HorizontalAlignment="Left"/>
+						<Label Grid.Row="0" Grid.Column="0"
+							   Content="Miner:"/>
+						<Label Grid.Row="0" Grid.Column="1" 
+							   Content="{Binding MinerMessage}"
+							   Width="150"
+							   HorizontalAlignment="Left"/>
+						<Label Grid.Row="1" Grid.Column="0"
+							   Content="Hash Rate:"
+							   IsVisible="{Binding IsMiningActive}"/>
+						<Label Grid.Row="1" Grid.Column="1"
+							   Content="{Binding YourHash}"
+							   Width="150"
+							   HorizontalAlignment="Left"
+							   IsVisible="{Binding IsMiningActive}"/>
+						<Label Grid.Row="2" Grid.Column="0"
+							   Content="Block Time:"
+							   IsVisible="{Binding IsMiningActive}"/>
+						<Label Grid.Row="2" Grid.Column="1"
+							   Content="{Binding BlockTime}"
+							   Width="150"
+							   HorizontalAlignment="Left"
+							   IsVisible="{Binding IsMiningActive}"/>
+						<Label Grid.Row="3" Grid.Column="0"
+							   Content="Address:"
+							   IsVisible="{Binding IsMiningActive}"/>
+						<Label Grid.Row="3" Grid.Column="1"
+							   Content="{Binding MiningAddress}"
+							   Width="150" HorizontalAlignment="Left"
+							   IsVisible="{Binding IsMiningActive}"/>
 					</Grid>
 				</Grid>
 

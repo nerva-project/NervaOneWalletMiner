@@ -12,6 +12,7 @@ namespace NervaOneWalletMiner.Helpers
         private static List<int> GetAndroidPidsByName(string processName)
         {
             List<int> pids = [];
+            bool hadExceptions = false;
             try
             {
                 foreach (string pidDir in Directory.GetDirectories("/proc"))
@@ -33,13 +34,22 @@ namespace NervaOneWalletMiner.Helpers
                     catch (Exception)
                     {
                         // /proc entries can vanish or be unreadable - ignore
+                        hadExceptions = true;
                     }
                 }
             }
             catch (Exception ex)
             {
                 Logger.LogException("PRM.GAPN", ex);
+                hadExceptions = true;
             }
+
+            // Return a sentinel value so the caller knows the scan had errors
+            if (hadExceptions && pids.Count == 0)
+            {
+                pids.Add(-1);
+            }
+
             return pids;
         }
 
@@ -51,9 +61,12 @@ namespace NervaOneWalletMiner.Helpers
                 {
                     string name = ExeNameToProcessName(processName);
                     List<int> pids = GetAndroidPidsByName(name);
+
+                    // Filter out the sentinel (-1) before killing
+                    pids.RemoveAll(p => p < 0);
                     if (pids.Count == 0)
                     {
-                        Logger.LogDebug("PRM.KILL", "Android: No instances of " + name + " to kill on");
+                        Logger.LogDebug("PRM.KILL", "Android: No instance of " + name + " to kill");
                     }
                     else
                     {
@@ -79,7 +92,7 @@ namespace NervaOneWalletMiner.Helpers
 
                 if (processList.Count == 0)
                 {
-                    Logger.LogDebug("PRM.KILL", "No instances of " + processName + " to kill");
+                    Logger.LogDebug("PRM.KILL", "No instance of " + processName + " to kill");
                     return;
                 }
 
@@ -114,7 +127,27 @@ namespace NervaOneWalletMiner.Helpers
                 if (GlobalMethods.IsAndroid())
                 {
                     string name = ExeNameToProcessName(processName);
-                    return GetAndroidPidsByName(name).Count > 0;
+                    List<int> pids = GetAndroidPidsByName(name);
+
+                    bool hadExceptions = pids.Contains(-1);
+                    pids.RemoveAll(p => p < 0);
+
+                    if (pids.Count > 0)
+                    {
+                        // Found real PIDs — process is running
+                        return true;
+                    }
+                    else if (hadExceptions)
+                    {
+                        // Scan had /proc read errors but found no PIDs — assume still running to avoid false kill
+                        Logger.LogDebug("PRM.ISRN", "Android: /proc scan had errors for " + name + ". Assuming running.");
+                        return true;
+                    }
+                    else
+                    {
+                        // Clean scan, no PIDs found — process is not running
+                        return false;
+                    }
                 }
 
                 //Logger.LogDebug("PM.IR", "Exe: " + processName);
@@ -192,26 +225,32 @@ namespace NervaOneWalletMiner.Helpers
 
         public static void StartExternalProcess(string exePath, string args)
         {
-            Logger.LogDebug("PRM.STEP", "Starting process: " + ExeNameToProcessName(exePath) + " with args: " + args);
-
-            string fileName = exePath;
-            string arguments = args;
-
-            if (GlobalMethods.IsAndroid())
+            try
             {
-                fileName = "/system/bin/linker64";
-                arguments = exePath + " " + args;
+                Logger.LogDebug("PRM.STEP", "Starting process: " + ExeNameToProcessName(exePath) + " with args: " + args);
+
+                string fileName = exePath;
+                string arguments = args;
+
+                if (GlobalMethods.IsAndroid())
+                {
+                    fileName = "/system/bin/linker64";
+                    arguments = exePath + " " + args;
+                }
+
+                Process? process = Process.Start(new ProcessStartInfo(fileName, arguments)
+                {
+                    UseShellExecute = false,
+                    RedirectStandardError = true,
+                    RedirectStandardOutput = true,
+                    CreateNoWindow = true,
+                    WorkingDirectory = GlobalData.CliToolsDir
+                });
             }
-
-            Process? process = Process.Start(new ProcessStartInfo(fileName, arguments)
+            catch (Exception ex)
             {
-                UseShellExecute = false,
-                RedirectStandardError = true,
-                RedirectStandardOutput = true,
-                CreateNoWindow = true,
-                WorkingDirectory = GlobalData.CliToolsDir
-            });
-
+                Logger.LogException("PRM.STEP", ex);
+            }
         }
     }
 }

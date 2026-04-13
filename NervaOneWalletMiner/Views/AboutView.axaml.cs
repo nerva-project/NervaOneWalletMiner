@@ -1,7 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using NervaOneWalletMiner.Helpers;
-using System.Diagnostics;
 using System;
 
 namespace NervaOneWalletMiner.Views
@@ -16,16 +15,11 @@ namespace NervaOneWalletMiner.Views
             tbkVersion.Text = "Version " + GlobalData.Version + " running on " + Environment.OSVersion.Platform + " " + Environment.OSVersion.Version + " with " + Environment.ProcessorCount + " CPU threads.";
         }
 
-        public void OpenGitHub_Clicked(object sender, RoutedEventArgs args)
+        public async void OpenGitHub_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
-                ProcessStartInfo psi = new ProcessStartInfo
-                {
-                    FileName = GlobalData.NervaOneGitHubLink,
-                    UseShellExecute = true
-                };
-                Process.Start(psi);
+                await TopLevel.GetTopLevel(this)!.Launcher.LaunchUriAsync(new Uri(GlobalData.NervaOneGitHubLink));
             }
             catch (Exception ex)
             {
@@ -33,16 +27,11 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
-        public void OpenDiscord_Clicked(object sender, RoutedEventArgs args)
+        public async void OpenDiscord_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
-                ProcessStartInfo psi = new ProcessStartInfo
-                {
-                    FileName = GlobalData.NervaDiscordLink,
-                    UseShellExecute = true
-                };
-                Process.Start(psi);
+                await TopLevel.GetTopLevel(this)!.Launcher.LaunchUriAsync(new Uri(GlobalData.NervaDiscordLink));
             }
             catch (Exception ex)
             {
@@ -50,16 +39,11 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
-        public void OpenTelegram_Clicked(object sender, RoutedEventArgs args)
+        public async void OpenTelegram_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
-                ProcessStartInfo psi = new ProcessStartInfo
-                {
-                    FileName = GlobalData.NervaTelegramLink,
-                    UseShellExecute = true
-                };
-                Process.Start(psi);
+                await TopLevel.GetTopLevel(this)!.Launcher.LaunchUriAsync(new Uri(GlobalData.NervaTelegramLink));
             }
             catch (Exception ex)
             {
