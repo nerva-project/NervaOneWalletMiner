@@ -98,6 +98,8 @@
 					 Text="{Binding UnlockMinutes, Mode=TwoWay}"
 					 Watermark="Number - minutes to keep wallet unlocked before password is required"/>
 			
+			<Separator Margin="0,20,0,0"/>
+
 			<Button Name="btnSaveSettings"
 					Content="Save Settings"
 					Click="SaveSettings_Clicked"

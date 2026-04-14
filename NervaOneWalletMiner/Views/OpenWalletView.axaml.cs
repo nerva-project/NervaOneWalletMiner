@@ -32,6 +32,8 @@ namespace NervaOneWalletMiner.Views
 
                 cbxWalletName.ItemsSource = GetWalletFileNames();
                 cbxWalletName.SelectedIndex = 0;
+
+                Loaded += (_, _) => cbxWalletName.Focus();
             }
             catch (Exception ex)
             {
@@ -127,7 +129,7 @@ namespace NervaOneWalletMiner.Views
                     {
                         await DialogService.ShowAsync(new MessageBoxView("Open Wallet", "Error opening " + walletName + " wallet\r\n" + response.Error.Message, true));
                     });
-                    btnOk.Content = "OK";
+                    btnOk.Content = "Open";
                     btnOk.IsEnabled = true;
                     btnCancel.IsEnabled = true;
                     cbxWalletName.IsEnabled = true;

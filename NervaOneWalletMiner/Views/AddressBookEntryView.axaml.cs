@@ -21,6 +21,7 @@ namespace NervaOneWalletMiner.Views
                 InitializeComponent();
                 imgCoinIcon.Source = GlobalMethods.GetLogo();
                 Initialized += AddressBookEntryView_Initialized;
+                Loaded += (_, _) => tbxName.Focus();
             }
             catch (Exception ex)
             {

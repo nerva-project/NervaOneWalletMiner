@@ -27,6 +27,7 @@ namespace NervaOneWalletMiner.Views
                 InitializeComponent();
                 imgCoinIcon.Source = GlobalMethods.GetLogo();
                 Initialized += TransferFundsView_Initialized;
+                Loaded += (_, _) => tbxSendTo.Focus();
             }
             catch (Exception ex)
             {
@@ -151,7 +152,7 @@ namespace NervaOneWalletMiner.Views
 
                 if (DateTime.Now > GlobalData.WalletPassProvidedTime.AddMinutes(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].UnlockMinutes))
                 {
-                    TextBoxView textWindow = new("Provide Wallet Password", "Please provide wallet password", string.Empty, "Required - Wallet password", true, true);
+                    TextBoxView textWindow = new(title: "Provide Wallet Password", labelValue: "Please provide wallet password", textValue: string.Empty, textWatermark: "Required - Wallet password", isTextRequired: true, isTextPassword: true, okButtonText: "Submit");
                     DialogResult? passRes = await DialogService.ShowAsync<DialogResult>(textWindow);
 
                     if (passRes != null && passRes.IsOk)

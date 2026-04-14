@@ -17,7 +17,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
             InitializeComponent();
         }
 
-        public TextBoxView(string title, string labelValue, string textValue, string textWatermark, bool isTextRequired = true, bool isTextPassword = false)
+        public TextBoxView(string title, string labelValue, string textValue, string textWatermark, bool isTextRequired = true, bool isTextPassword = false, string okButtonText = "OK")
         {
             try
             {
@@ -30,11 +30,14 @@ namespace NervaOneWalletMiner.ViewsDialogs
                 lblValue.Content = labelValue;
                 tbxValue.Text = textValue;
                 tbxValue.Watermark = textWatermark;
+                btnOk.Content = okButtonText;
 
                 if (isTextPassword)
                 {
                     tbxValue.PasswordChar = '*';
                 }
+
+                Loaded += (_, _) => tbxValue.Focus();
             }
             catch (Exception ex)
             {

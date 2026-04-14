@@ -187,7 +187,7 @@ namespace NervaOneWalletMiner.Views
         {
             try
             {
-                var window = new TextBoxView("Create Account", "Account Label", string.Empty, "Enter new account label", false);
+                var window = new TextBoxView(title: "Create Account", labelValue: "Account Label", textValue: string.Empty, textWatermark: "Enter new account label", isTextRequired: false, okButtonText: "Create");
                 DialogResult? result = await DialogService.ShowAsync<DialogResult>(window);
                 if (result != null && result.IsOk)
                 {
@@ -235,7 +235,7 @@ namespace NervaOneWalletMiner.Views
                 if (dtgAccounts.SelectedItem != null)
                 {
                     Account selectedItem = (Account)dtgAccounts.SelectedItem;
-                    var window = new TextBoxView("Change Account Label", "Account Label", selectedItem.Label, string.Empty, false);
+                    var window = new TextBoxView(title: "Change Account Label", labelValue: "Account Label", textValue: selectedItem.Label, textWatermark: string.Empty, isTextRequired: false, okButtonText: "Save");
                     DialogResult? result = await DialogService.ShowAsync<DialogResult>(window);
                     if (result != null && result.IsOk)
                     {
@@ -461,7 +461,7 @@ namespace NervaOneWalletMiner.Views
                     }
                     else
                     {
-                        await DialogService.ShowAsync(new TextBoxView("Export Selected", "Transactions have been exported to below file", exportFile, string.Empty));
+                        await DialogService.ShowAsync(new TextBoxView(title: "Export Selected", labelValue: "Transactions have been exported to below file", textValue: exportFile, textWatermark: string.Empty));
                     }
                 }
                 else
@@ -497,7 +497,7 @@ namespace NervaOneWalletMiner.Views
                     }
                     else
                     {
-                        await DialogService.ShowAsync(new TextBoxView("Export All", "Transactions have been exported to below file", exportFile, string.Empty));
+                        await DialogService.ShowAsync(new TextBoxView(title: "Export All", labelValue: "Transactions have been exported to below file", textValue: exportFile, textWatermark: string.Empty));
                     }
                 }
                 else

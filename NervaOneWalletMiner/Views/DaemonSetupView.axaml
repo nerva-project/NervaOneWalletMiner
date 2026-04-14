@@ -168,6 +168,7 @@
 							   Margin="30,10,0,0"
 							   IsEnabled="{Binding ThresholdEnabled}"/>
 			</StackPanel>
+
 			<Separator Margin="0,20,0,0"/>
 
 			<Button Name="btnSaveSettings"

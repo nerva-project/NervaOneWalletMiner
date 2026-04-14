@@ -24,7 +24,7 @@
 		</TextBlock>
 
 		<TextBlock TextWrapping="WrapWithOverflow">
-			To get started please pick a coin and press OK.
+			To get started please pick a coin and press Continue.
 		</TextBlock>
 		
 		<ComboBox Name="cbxCoin">
@@ -96,7 +96,7 @@
 		<DockPanel Margin="0,15,0,0">
 			<Button Name="btnOk"
 					FontSize="18"
-					Content="OK"
+					Content="Continue"
 					Click="OkButton_Clicked"
 					IsDefault="True"/>
 

@@ -108,7 +108,7 @@ namespace NervaOneWalletMiner.Views
                     }
                     else
                     {
-                        await DialogService.ShowAsync(new TextBoxView("Export All", "Transactions have been exported to below file", exportFile, string.Empty));
+                        await DialogService.ShowAsync(new TextBoxView(title: "Export All", labelValue: "Transactions have been exported to below file", textValue: exportFile, textWatermark: string.Empty));
                     }
                 }
                 else

@@ -123,7 +123,7 @@ namespace NervaOneWalletMiner.Views
                 string cliToolsLink = GetVm().GetCliToolsDownloadLink();
                 Logger.LogDebug("DMS.UCTC", "Updating client tools");
 
-                var window = new TextBoxView("Update Client Tools", "Client Tools Download Link", cliToolsLink, string.Empty);
+                var window = new TextBoxView(title: "Update Client Tools", labelValue: "Client Tools Download Link", textValue: cliToolsLink, textWatermark: string.Empty, okButtonText: "Update");
                 DialogResult? result = await DialogService.ShowAsync<DialogResult>(window);
                 if (result != null && result.IsOk && !string.IsNullOrEmpty(result.TextBoxValue))
                 {
@@ -142,11 +142,11 @@ namespace NervaOneWalletMiner.Views
         {
             try
             {
-                var window = new RestartWithCommandView();
+                var window = new TextBoxView(title: "Restart With Command", labelValue: "Additional Restart Options", textValue: string.Empty, textWatermark: "Ex: --pop-blocks 1000", isTextRequired: false, okButtonText: "Restart");
                 DialogResult? result = await DialogService.ShowAsync<DialogResult>(window);
                 if (result != null && result.IsOk)
                 {
-                    GetVm().RestartWithCommand(result.RestartOptions);
+                    GetVm().RestartWithCommand(result.TextBoxValue);
                 }
             }
             catch (Exception ex)

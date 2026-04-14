@@ -20,6 +20,8 @@ namespace NervaOneWalletMiner.Views
                 imgCoinIcon.Source = GlobalMethods.GetLogo();
                 cbxLanguage.ItemsSource = GlobalMethods.GetSupportedLanguages();
                 cbxLanguage.SelectedIndex = 0;
+
+                Loaded += (_, _) => tbxWalletName.Focus();
             }
             catch (Exception ex)
             {
@@ -69,7 +71,7 @@ namespace NervaOneWalletMiner.Views
                     GlobalMethods.WalletClosedOrErrored();
                     Logger.LogError("CWV.OKBC", "Failed to create wallet " + walletName + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
                     await DialogService.ShowAsync(new MessageBoxView("Create Wallet", "Error creating " + walletName + " wallet\r\n" + response.Error.Message, true));
-                    btnOk.Content = "OK";
+                    btnOk.Content = "Create";
                     btnOk.IsEnabled = true;
                     btnCancel.IsEnabled = true;
                     tbxWalletName.IsEnabled = true;
