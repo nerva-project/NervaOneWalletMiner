@@ -14,7 +14,7 @@ namespace NervaOneWalletMiner.Helpers
         // Per-operation timestamps. It used to be _masterTimerCount but it's unreliable on Android as it gets throttled in the background
         public static DateTime _lastDaemonDataFetch = DateTime.MinValue;
         public static DateTime _lastWalletDataFetch = DateTime.MinValue;
-        public static DateTime _lastWalletSave = DateTime.MinValue;
+        public static DateTime _lastWalletSave = DateTime.Now;
 
         // 5 sec on Desktop, 10 sec on Android
         public static readonly int _daemonFetchSeconds = (_masterTimerInterval / 1000) * GlobalData.AppSettings.TimerIntervalMultiplier;
@@ -65,7 +65,7 @@ namespace NervaOneWalletMiner.Helpers
                         ProcessManager.Kill(GlobalData.WalletProcessName);
                     }
 
-                    Logger.LogDebug("MSP.SMUP", "Master timer running every " + _masterTimerInterval / 1000 + " seconds. Daemon update every " + _daemonFetchSeconds + " seconds. Wallet update every " + _walletFetchSeconds + " seconds");
+                    Logger.LogDebug("MSP.SMUP", "Master timer running every " + _masterTimerInterval / 1000 + " seconds. Daemon updates every " + _daemonFetchSeconds + " seconds. Wallet updates every " + _walletFetchSeconds + " seconds");
                 }
             }
             catch (Exception ex)
@@ -220,8 +220,9 @@ namespace NervaOneWalletMiner.Helpers
 
                     if (GlobalData.IsWalletJustOpened)
                     {
-                        // Will use this to auto-save wallet so need to reset it at the end
+                        // Will use this to auto-save wallet so need to reset it when wallet opens
                         GlobalData.IsWalletJustOpened = false;
+                        _lastWalletSave = DateTime.Now;
                     }
 
                     if (GlobalData.IsWalletOpen && _lastWalletSave.AddSeconds(_walletSaveSeconds) < DateTime.Now)
@@ -328,6 +329,7 @@ namespace NervaOneWalletMiner.Helpers
             {
                 if (!GlobalData.IsCliToolsDownloading && GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir) && !GlobalData.IsCliToolsFound)
                 {
+                    // Client tools downloaded and found
                     Logger.LogDebug("MSP.KWPR", "Client tools found.");
                     GlobalData.IsCliToolsFound = true;
                 }
@@ -338,7 +340,7 @@ namespace NervaOneWalletMiner.Helpers
                     {
                         if (GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
                         {
-                            Logger.LogDebug("MSP.KWPR", "Calling Wallet ForceClose");
+                            Logger.LogDebug("MSP.KWPR", "Killing wallet process if it's running.");
                             ProcessManager.Kill(GlobalData.WalletProcessName);
                             Logger.LogDebug("MSP.KWPR", "Starting wallet process");
                             ProcessManager.StartExternalProcess(GlobalMethods.GetRpcWalletProcess(), GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].GenerateWalletOptions(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin], GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]));

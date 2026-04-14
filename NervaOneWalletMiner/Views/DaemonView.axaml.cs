@@ -169,7 +169,7 @@ namespace NervaOneWalletMiner.Views
                     {
                         // Get and save Mining Address
                         Logger.LogDebug("DMN.SSMC", "Mining address missing. Asking user to provide it");
-                        var window = new TextBoxView("Start Mining", "Please provide mining address", string.Empty, "Required - Mining Address");
+                        var window = new TextBoxView(title: "Start Mining", labelValue: "Please provide mining address", textValue: string.Empty, textWatermark: "Required - Mining Address", okButtonText: "Start");
                         DialogResult? dialogRes = await DialogService.ShowAsync<DialogResult>(window);
 
                         if (dialogRes != null && dialogRes.IsOk)

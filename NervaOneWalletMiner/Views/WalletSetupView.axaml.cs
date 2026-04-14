@@ -224,7 +224,7 @@ namespace NervaOneWalletMiner.Views
                 }
                 else
                 {
-                    TextBoxView textWindow = new("Provide Wallet Password", "Please provide wallet password", string.Empty, "Required - Wallet password", true, true);
+                    TextBoxView textWindow = new(title: "Provide Wallet Password", labelValue: "Please provide wallet password", textValue: string.Empty, textWatermark: "Required - Wallet password", isTextRequired: true, isTextPassword: true, okButtonText: "Submit");
                     DialogResult? passRes = await DialogService.ShowAsync<DialogResult>(textWindow);
 
                     if (passRes == null || !passRes.IsOk)
@@ -265,7 +265,7 @@ namespace NervaOneWalletMiner.Views
                     var (isSuccess, dumpPath) = await vm.DumpKeysToFile();
                     if (isSuccess)
                     {
-                        await DialogService.ShowAsync(new TextBoxView("View Private Keys", "Keys have been exported to below file", dumpPath, string.Empty));
+                        await DialogService.ShowAsync(new TextBoxView(title: "View Private Keys", labelValue: "Keys have been exported to below file", textValue: dumpPath, textWatermark: string.Empty));
                     }
                 }
                 else

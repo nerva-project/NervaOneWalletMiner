@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:views="clr-namespace:NervaOneWalletMiner.Views"
 		Width="800"
-		Height="660"
+		Height="650"
         mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="550"
         x:Class="NervaOneWalletMiner.Views.MainWindow"
         Icon="/Assets/nervaone-logo.ico"

@@ -66,7 +66,7 @@
 
 			<StackPanel Orientation="Horizontal" Spacing="10" Margin="0,25,0,0">
 				<Button Name="btnOK"
-						Content="OK"
+						Content="Setup"
 						Click="OkButton_Clicked"/>
 				<Button Name="btnCancel"
 						Content="Cancel"

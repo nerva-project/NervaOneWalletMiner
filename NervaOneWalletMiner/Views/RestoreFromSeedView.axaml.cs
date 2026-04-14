@@ -19,6 +19,8 @@ namespace NervaOneWalletMiner.Views
                 imgCoinIcon.Source = GlobalMethods.GetLogo();
                 cbxLanguage.ItemsSource = GlobalMethods.GetSupportedLanguages();
                 cbxLanguage.SelectedIndex = 0;
+
+                Loaded += (_, _) => tbxSeedPhrase.Focus();
             }
             catch (Exception ex)
             {

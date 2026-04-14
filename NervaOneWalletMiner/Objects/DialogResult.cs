@@ -33,9 +33,6 @@ namespace NervaOneWalletMiner.Objects
         public char[] ViewKey { get; set; } = [];
         public char[] SpendKey {  get; set; } = [];
 
-        // Restart with commands
-        public string RestartOptions { get; set; } = string.Empty;
-
         // TextBox
         public string TextBoxValue { get; set; } = string.Empty;
 

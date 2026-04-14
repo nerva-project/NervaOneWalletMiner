@@ -19,6 +19,8 @@ namespace NervaOneWalletMiner.Views
                 imgCoinIcon.Source = GlobalMethods.GetLogo();
                 cbxLanguage.ItemsSource = GlobalMethods.GetSupportedLanguages();
                 cbxLanguage.SelectedIndex = 0;
+
+                Loaded += (_, _) => tbxWalletAddress.Focus();
             }
             catch (Exception ex)
             {
@@ -87,7 +89,7 @@ namespace NervaOneWalletMiner.Views
                     GlobalMethods.WalletClosedOrErrored();
                     Logger.LogError("RFK.OKBC", "Failed to restore wallet " + walletName + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
                     await DialogService.ShowAsync(new MessageBoxView("Restore From Keys", "Error restoring " + walletName + " wallet\r\n" + response.Error.Message, true));
-                    btnOk.Content = "OK";
+                    btnOk.Content = "Restore";
                     btnOk.IsEnabled = true;
                     btnCancel.IsEnabled = true;
                     tbxWalletAddress.IsEnabled = true;
