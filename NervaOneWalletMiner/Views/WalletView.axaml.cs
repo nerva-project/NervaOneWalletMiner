@@ -1,7 +1,8 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.Threading;
 using Avalonia.Layout;
+using Avalonia.Threading;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects;
 using NervaOneWalletMiner.Objects.Constants;
@@ -62,6 +63,7 @@ namespace NervaOneWalletMiner.Views
                     grdHeader.ColumnDefinitions = ColumnDefinitions.Parse("Auto,*");
                     Grid.SetRow(btnOpenCloseWallet, 1);
                     Grid.SetColumn(btnOpenCloseWallet, 0);
+                    btnOpenCloseWallet.Margin = new Thickness(0, 10, 5, 0);
 
                     // Narrow: Transfer/Address buttons below balances
                     grdStats.ColumnDefinitions = ColumnDefinitions.Parse("200,Auto");
@@ -69,7 +71,7 @@ namespace NervaOneWalletMiner.Views
                     Grid.SetColumn(grdWalletButtons, 0);
                     Grid.SetRow(grdWalletButtons, 1);
                     grdWalletButtons.HorizontalAlignment = HorizontalAlignment.Left;
-
+                    
                     // Narrow: icon + Label + Balance
                     if (_colId != null) { _colId.IsVisible = false; }
                     if (_colAddress != null) { _colAddress.IsVisible = false; }
@@ -81,6 +83,7 @@ namespace NervaOneWalletMiner.Views
                     grdHeader.ColumnDefinitions = ColumnDefinitions.Parse("Auto,*,Auto");
                     Grid.SetRow(btnOpenCloseWallet, 0);
                     Grid.SetColumn(btnOpenCloseWallet, 2);
+                    btnOpenCloseWallet.Margin = new Thickness(0, 0, 5, 0);
 
                     // Medium: Transfer/Address buttons on the right
                     grdStats.ColumnDefinitions = ColumnDefinitions.Parse("200,*,200");
@@ -88,7 +91,7 @@ namespace NervaOneWalletMiner.Views
                     Grid.SetColumn(grdWalletButtons, 2);
                     Grid.SetRow(grdWalletButtons, 0);
                     grdWalletButtons.HorizontalAlignment = HorizontalAlignment.Right;
-
+                    
                     // Medium: icon + Label + Address + Balance
                     if (_colId != null) { _colId.IsVisible = false; }
                     if (_colAddress != null) { _colAddress.IsVisible = true; }
@@ -100,6 +103,7 @@ namespace NervaOneWalletMiner.Views
                     grdHeader.ColumnDefinitions = ColumnDefinitions.Parse("Auto,*,Auto");
                     Grid.SetRow(btnOpenCloseWallet, 0);
                     Grid.SetColumn(btnOpenCloseWallet, 2);
+                    btnOpenCloseWallet.Margin = new Thickness(0, 0, 5, 0);
 
                     // Wide: Transfer/Address buttons on the right
                     grdStats.ColumnDefinitions = ColumnDefinitions.Parse("200,*,200");
@@ -107,7 +111,7 @@ namespace NervaOneWalletMiner.Views
                     Grid.SetColumn(grdWalletButtons, 2);
                     Grid.SetRow(grdWalletButtons, 0);
                     grdWalletButtons.HorizontalAlignment = HorizontalAlignment.Right;
-
+                    
                     // Wide: all columns
                     if (_colId != null) { _colId.IsVisible = true; }
                     if (_colAddress != null) { _colAddress.IsVisible = true; }

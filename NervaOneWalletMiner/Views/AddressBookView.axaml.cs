@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using NervaOneWalletMiner.Helpers;
@@ -49,6 +50,7 @@ namespace NervaOneWalletMiner.Views
                     grdHeader.ColumnDefinitions = ColumnDefinitions.Parse("Auto,*");
                     Grid.SetRow(spHeaderButtons, 1);
                     Grid.SetColumn(spHeaderButtons, 0);
+                    spHeaderButtons.Margin = new Thickness(0, 10, 5, 0);
 
                     // Narrow: Name + Address
                     if (_colDescription != null) { _colDescription.IsVisible = false; }
@@ -60,6 +62,7 @@ namespace NervaOneWalletMiner.Views
                     grdHeader.ColumnDefinitions = ColumnDefinitions.Parse("Auto,*,Auto");
                     Grid.SetRow(spHeaderButtons, 0);
                     Grid.SetColumn(spHeaderButtons, 2);
+                    spHeaderButtons.Margin = new Thickness(0, 0, 5, 0);
 
                     // Medium: Name + Description + Address
                     if (_colDescription != null) { _colDescription.IsVisible = true; }
@@ -71,6 +74,7 @@ namespace NervaOneWalletMiner.Views
                     grdHeader.ColumnDefinitions = ColumnDefinitions.Parse("Auto,*,Auto");
                     Grid.SetRow(spHeaderButtons, 0);
                     Grid.SetColumn(spHeaderButtons, 2);
+                    spHeaderButtons.Margin = new Thickness(0, 0, 5, 0);
 
                     // Wide: all columns
                     if (_colDescription != null) { _colDescription.IsVisible = true; }

@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
@@ -48,6 +49,7 @@ namespace NervaOneWalletMiner.Views
                     grdHeader.ColumnDefinitions = ColumnDefinitions.Parse("Auto,*");
                     Grid.SetRow(btnTransactionDetails, 1);
                     Grid.SetColumn(btnTransactionDetails, 0);
+                    btnTransactionDetails.Margin = new Thickness(0, 10, 5, 0);
 
                     // Narrow: icon + Time + Amount
                     if (_colHeight != null) { _colHeight.IsVisible = false; }
@@ -59,6 +61,7 @@ namespace NervaOneWalletMiner.Views
                     grdHeader.ColumnDefinitions = ColumnDefinitions.Parse("Auto,*,Auto");
                     Grid.SetRow(btnTransactionDetails, 0);
                     Grid.SetColumn(btnTransactionDetails, 2);
+                    btnTransactionDetails.Margin = new Thickness(0, 0, 5, 0);
 
                     // Medium: icon + Height + Time + Amount
                     if (_colHeight != null) { _colHeight.IsVisible = true; }
@@ -70,6 +73,7 @@ namespace NervaOneWalletMiner.Views
                     grdHeader.ColumnDefinitions = ColumnDefinitions.Parse("Auto,*,Auto");
                     Grid.SetRow(btnTransactionDetails, 0);
                     Grid.SetColumn(btnTransactionDetails, 2);
+                    btnTransactionDetails.Margin = new Thickness(0, 0, 5, 0);
 
                     // Wide: all columns
                     if (_colHeight != null) { _colHeight.IsVisible = true; }
