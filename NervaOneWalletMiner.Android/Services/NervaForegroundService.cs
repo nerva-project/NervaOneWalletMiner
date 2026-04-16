@@ -5,7 +5,7 @@ using Android.OS;
 
 namespace NervaOneWalletMiner.Android.Services;
 
-[Service(ForegroundServiceType = ForegroundService.TypeDataSync, Exported = false)]
+[Service(ForegroundServiceType = ForegroundService.TypeSpecialUse, Exported = false)]
 public class NervaForegroundService : Service
 {
     private const string ChannelId = "nervaone_sync";
@@ -24,7 +24,7 @@ public class NervaForegroundService : Service
             .SetOngoing(true)
             .Build()!;
 
-        StartForeground(NotificationId, notification, ForegroundService.TypeDataSync);
+        StartForeground(NotificationId, notification, ForegroundService.TypeSpecialUse);
         return StartCommandResult.Sticky;
     }
 

@@ -5,8 +5,8 @@
     <SupportedOSPlatformVersion>34</SupportedOSPlatformVersion>
     <Nullable>enable</Nullable>
     <ApplicationId>one.nerva.mobile</ApplicationId>
-    <ApplicationVersion>25</ApplicationVersion>
-    <ApplicationDisplayVersion>1.0.25</ApplicationDisplayVersion>
+    <ApplicationVersion>26</ApplicationVersion>
+    <ApplicationDisplayVersion>1.0.26</ApplicationDisplayVersion>
     <AndroidPackageFormat>apk</AndroidPackageFormat>
     <AndroidEnableProfiledAot>False</AndroidEnableProfiledAot>
     <RuntimeIdentifier>android-arm64</RuntimeIdentifier>

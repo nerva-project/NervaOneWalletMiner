@@ -165,7 +165,7 @@ namespace NervaOneWalletMiner.Helpers
                         && !GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly
                         && _lastDaemonDataFetch.AddSeconds(_backgroundFetchSeconds) < DateTime.Now)
                     {
-                        //Logger.LogDebug("MSP.MUPS", "_lastDaemonDataFetch: " + _lastDaemonDataFetch.ToLongTimeString() + ", IsGetAndSetDaemonDataComplete: " + GlobalData.IsGetAndSetDaemonDataComplete + ", LastDaemonResponseTime: " + GlobalData.LastDaemonResponseTime.ToLongTimeString());
+                        //Logger.LogDebug("MSP.MUPS", "IsGASDDC: " + GlobalData.IsGetAndSetDaemonDataComplete + ", LDRT: " + GlobalData.LastDaemonResponseTime.ToLongTimeString() + ", _lDDF: " + _lastDaemonDataFetch.ToLongTimeString()  + "_cTRLC: " + _cliToolsRunningLastCheck.ToLongTimeString());
                         _lastDaemonDataFetch = DateTime.Now;
                         UIManager.GetAndSetDaemonData();
                     }

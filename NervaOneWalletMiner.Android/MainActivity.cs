@@ -25,7 +25,6 @@ public class MainActivity : AvaloniaMainActivity<App>
     {
         base.OnCreate(savedInstanceState);
         StartForegroundService(new Intent(this, typeof(NervaForegroundService)));
-        RequestIgnoreBatteryOptimizations();
     }
 
     private void RequestIgnoreBatteryOptimizations()
@@ -86,6 +85,7 @@ public class MainActivity : AvaloniaMainActivity<App>
         {
             Logger.LogDebug("MNA.ONRS", "Exiting background mode.");
             MasterProcess.ExitBackgroundMode();
+            RequestIgnoreBatteryOptimizations();
         }
         catch (Exception ex)
         {
