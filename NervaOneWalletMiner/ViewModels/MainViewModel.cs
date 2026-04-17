@@ -14,21 +14,21 @@ public class MainViewModel : ViewModelBase
     public event CheckAndGetCliAction? CheckAndGetCliEvent;
     public void CheckAndGetCliTools()
     {
-        CheckAndGetCliEvent!.Invoke();
+        CheckAndGetCliEvent?.Invoke();
     }
 
     public delegate void ShowDaemonTabAction(bool isVisible);
     public event ShowDaemonTabAction? ShowDaemonTabEvent;
     public void ShowDaemonTab(bool isVisible)
     {
-        ShowDaemonTabEvent!.Invoke(isVisible);
+        ShowDaemonTabEvent?.Invoke(isVisible);
     }
 
     public delegate void SyncWithQuickSyncAction(double percentSynced);
     public event SyncWithQuickSyncAction? SyncWithQuickSyncEvent;
     public void AskIfSyncWithQuickSync(double percentSynced)
     {
-        SyncWithQuickSyncEvent!.Invoke(percentSynced);
+        SyncWithQuickSyncEvent?.Invoke(percentSynced);
     }
 
 
