@@ -645,7 +645,13 @@ namespace NervaOneWalletMiner.Helpers
                 if (isSuccess)
                 {
                     Logger.LogDebug("GLM.SUCT", "Extracting CLI tools after download: " + destFileWithPath);
-                    ExtractFile(cliToolsPath, destFileWithPath);
+                    bool extractSuccess = ExtractFile(cliToolsPath, destFileWithPath);
+
+                    if (extractSuccess)
+                    {
+                        Logger.LogDebug("GLM.SUCT", "Deleting compressed file: " + destFileWithPath);
+                        File.Delete(destFileWithPath);
+                    }
                 }
             }
             catch (Exception ex)
@@ -693,7 +699,7 @@ namespace NervaOneWalletMiner.Helpers
             return isSuccess;
         }
 
-        private static void ExtractFile(string destDir, string compressedFile)
+        private static bool ExtractFile(string destDir, string compressedFile)
         {
             try
             {
@@ -715,7 +721,7 @@ namespace NervaOneWalletMiner.Helpers
                     {
                         GZip.Decompress(originalFileStream, decompressedFileStream, true);
                     }
-         
+
                     // Now decompress .tar
                     ExtractTar(destDir, newCompressedFile);
                 }
@@ -758,10 +764,13 @@ namespace NervaOneWalletMiner.Helpers
                         }
                     }
                 }
+
+                return true;
             }
             catch (Exception ex)
             {
                 Logger.LogException("GLM.EXFL", ex);
+                return false;
             }
         }
 
