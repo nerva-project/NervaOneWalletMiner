@@ -2,6 +2,7 @@ using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
+using Android.Provider;
 
 using Avalonia;
 using Avalonia.Android;
@@ -24,6 +25,24 @@ public class MainActivity : AvaloniaMainActivity<App>
     {
         base.OnCreate(savedInstanceState);
         StartForegroundService(new Intent(this, typeof(NervaForegroundService)));
+    }
+
+    private void RequestIgnoreBatteryOptimizations()
+    {
+        try
+        {
+            PowerManager? powerManager = (PowerManager?)GetSystemService(PowerService);
+            if (powerManager != null && !powerManager.IsIgnoringBatteryOptimizations(PackageName))
+            {
+                Intent intent = new(Settings.ActionRequestIgnoreBatteryOptimizations);
+                intent.SetData(global::Android.Net.Uri.Parse("package:" + PackageName));
+                StartActivity(intent);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException("MNA.RIBO", ex);
+        }
     }
 
     protected override AppBuilder CustomizeAppBuilder(AppBuilder builder)
@@ -66,6 +85,7 @@ public class MainActivity : AvaloniaMainActivity<App>
         {
             Logger.LogDebug("MNA.ONRS", "Exiting background mode.");
             MasterProcess.ExitBackgroundMode();
+            RequestIgnoreBatteryOptimizations();
         }
         catch (Exception ex)
         {

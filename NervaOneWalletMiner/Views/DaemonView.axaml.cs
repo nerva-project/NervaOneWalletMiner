@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
@@ -63,6 +64,7 @@ namespace NervaOneWalletMiner.Views
                     grdHeader.ColumnDefinitions = ColumnDefinitions.Parse("Auto,*");
                     Grid.SetRow(spThreadsAndButton, 1);
                     Grid.SetColumn(spThreadsAndButton, 0);
+                    spThreadsAndButton.Margin = new Thickness(0, 10, 5, 0);
 
                     // Narrow: miner stats below daemon stats
                     grdStats.ColumnDefinitions = ColumnDefinitions.Parse("200,Auto");
@@ -79,6 +81,7 @@ namespace NervaOneWalletMiner.Views
                     grdHeader.ColumnDefinitions = ColumnDefinitions.Parse("Auto,*,Auto");
                     Grid.SetRow(spThreadsAndButton, 0);
                     Grid.SetColumn(spThreadsAndButton, 2);
+                    spThreadsAndButton.Margin = new Thickness(0, 0, 5, 0);
 
                     // Medium: miner stats on the right
                     grdStats.ColumnDefinitions = ColumnDefinitions.Parse("200,*,200");
@@ -95,6 +98,7 @@ namespace NervaOneWalletMiner.Views
                     grdHeader.ColumnDefinitions = ColumnDefinitions.Parse("Auto,*,Auto");
                     Grid.SetRow(spThreadsAndButton, 0);
                     Grid.SetColumn(spThreadsAndButton, 2);
+                    spThreadsAndButton.Margin = new Thickness(0, 0, 5, 0);
 
                     // Wide: miner stats on the right
                     grdStats.ColumnDefinitions = ColumnDefinitions.Parse("200,*,200");
