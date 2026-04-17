@@ -40,7 +40,13 @@
 				<Label Name="lblUnlocked" Content="0"/>
 			</DockPanel>
 
-			<Label Content="Send To" Margin="0,15,0,0"/>
+			<DockPanel Margin="0,15,0,0">
+				<Button Name="btnPickAddress"						
+						Content="Address Book"
+						DockPanel.Dock="Right"
+						Click="PickAddress_Clicked"/>
+				<Label Content="Send To"/>
+			</DockPanel>
 			<TextBox Name="tbxSendTo"
 					 Watermark="Required - recipient wallet address"/>
 

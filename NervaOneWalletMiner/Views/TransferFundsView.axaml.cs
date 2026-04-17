@@ -213,7 +213,7 @@ namespace NervaOneWalletMiner.Views
                     await MakeTransfer(fromAccountIndex, sendToAddress, amount, sendPaymentId, priority);
                 }
 
-                UIManager.NavigateToPage(SplitViewPages.Wallet);
+                UIManager.NavigateToPage(_returnPage);
             }
             catch (Exception ex)
             {
@@ -231,6 +231,24 @@ namespace NervaOneWalletMiner.Views
             catch (Exception ex)
             {
                 Logger.LogException("TFV.CNCL", ex);
+            }
+        }
+
+        public async void PickAddress_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                DialogResult? res = await DialogService.ShowAsync<DialogResult>(new AddressPickerView("Pick Address"));
+
+                if (res != null && res.IsOk)
+                {
+                    tbxSendTo.Text = res.SendToAddress;
+                    tbxPaymentId.Text = res.SendPaymentId;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("TFV.PABC", ex);
             }
         }
 
