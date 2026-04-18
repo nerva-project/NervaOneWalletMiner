@@ -639,13 +639,30 @@ namespace NervaOneWalletMiner.Helpers
                 // It used to check if already downloaded and try extracting existing file but if we're here again it means the process got interapted so re-download
                 string destFileWithPath = Path.Combine(cliToolsPath, Path.GetFileName(downloadUrl));
 
+                UIManager.UpdateDaemonStatus("Client tools downloading...");
                 Logger.LogDebug("GLM.SUCT", "Downloading CLI tools. URL: " + downloadUrl);
                 bool isSuccess = await DownloadFileToFolder(downloadUrl, cliToolsPath);
 
                 if (isSuccess)
                 {
+                    UIManager.UpdateDaemonStatus("Client tools extracting...");
                     Logger.LogDebug("GLM.SUCT", "Extracting CLI tools after download: " + destFileWithPath);
-                    ExtractFile(cliToolsPath, destFileWithPath);
+                    bool extractSuccess = ExtractFile(cliToolsPath, destFileWithPath);
+
+                    if (extractSuccess)
+                    {
+                        Logger.LogDebug("GLM.SUCT", "Deleting compressed file: " + destFileWithPath);
+                        File.Delete(destFileWithPath);
+                        UIManager.UpdateDaemonStatus("Client tools download complete");
+                    }
+                    else
+                    {
+                        UIManager.UpdateDaemonStatus("Client tools extraction failed");
+                    }
+                }
+                else
+                {
+                    UIManager.UpdateDaemonStatus("Client tools download failed");
                 }
             }
             catch (Exception ex)
@@ -658,7 +675,56 @@ namespace NervaOneWalletMiner.Helpers
             }
         }
 
-        public static async Task<bool> DownloadFileToFolder(string downloadUrl, string destinationDir)
+        public static async void DownloadBlockchainDb(string downloadUrl, string dataDir, string dbSubfolder)
+        {
+            try
+            {
+                string destFileWithPath = Path.Combine(dataDir, Path.GetFileName(downloadUrl));
+                string lmdbDir = string.IsNullOrEmpty(dbSubfolder) ? dataDir : Path.Combine(dataDir, dbSubfolder);
+
+                UIManager.UpdateDaemonStatus("Blockchain database downloading...");
+                Logger.LogDebug("GLM.DBCD", "Downloading blockchain database. URL: " + downloadUrl);
+                bool isSuccess = await DownloadFileToFolder(downloadUrl, dataDir,
+                    progress => UIManager.UpdateDaemonStatus("Blockchain database downloading... " + progress.ToString("P0")));
+
+                if (isSuccess)
+                {
+                    if (!Directory.Exists(lmdbDir))
+                    {
+                        Directory.CreateDirectory(lmdbDir);
+                    }
+
+                    UIManager.UpdateDaemonStatus("Blockchain database extracting...");
+                    Logger.LogDebug("GLM.DBCD", "Extracting blockchain database after download: " + destFileWithPath);
+                    bool extractSuccess = ExtractFile(lmdbDir, destFileWithPath);
+
+                    if (extractSuccess)
+                    {
+                        Logger.LogDebug("GLM.DBCD", "Deleting compressed file: " + destFileWithPath);
+                        File.Delete(destFileWithPath);
+                        UIManager.UpdateDaemonStatus("Blockchain database download complete");
+                    }
+                    else
+                    {
+                        UIManager.UpdateDaemonStatus("Blockchain database extraction failed");
+                    }
+                }
+                else
+                {
+                    UIManager.UpdateDaemonStatus("Blockchain database download failed");
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("GLM.DBCD", ex);
+            }
+            finally
+            {
+                GlobalData.IsBlockchainDbDownloading = false;
+            }
+        }
+
+        public static async Task<bool> DownloadFileToFolder(string downloadUrl, string destinationDir, Action<double>? onProgress = null)
         {
             bool isSuccess = false;
 
@@ -674,11 +740,28 @@ namespace NervaOneWalletMiner.Helpers
                 Logger.LogDebug("GLM.DFTF", "Downloading file: " + downloadUrl + " to: " + destFile);
                 using (HttpClient client = new())
                 {
-                    using (var clientStream = await client.GetStreamAsync(downloadUrl))
+                    using var response = await client.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead);
+                    long? totalBytes = response.Content.Headers.ContentLength;
+
+                    using (var contentStream = await response.Content.ReadAsStreamAsync())
                     {
                         using (var fileStream = new FileStream(destFile, FileMode.Create))
                         {
-                            await clientStream.CopyToAsync(fileStream);
+                            byte[] buffer = new byte[81920];
+                            long totalRead = 0;
+                            int bytesRead;
+
+                            while ((bytesRead = await contentStream.ReadAsync(buffer)) > 0)
+                            {
+                                await fileStream.WriteAsync(buffer.AsMemory(0, bytesRead));
+                                totalRead += bytesRead;
+
+                                if (onProgress != null && totalBytes > 0)
+                                {
+                                    onProgress((double)totalRead / totalBytes.Value);
+                                }
+                            }
+
                             Logger.LogDebug("GLM.DFTF", "Setting success for: " + downloadUrl);
                             isSuccess = true;
                         }
@@ -693,11 +776,11 @@ namespace NervaOneWalletMiner.Helpers
             return isSuccess;
         }
 
-        private static void ExtractFile(string destDir, string compressedFile)
+        private static bool ExtractFile(string destDir, string compressedFile)
         {
             try
             {
-                Logger.LogDebug("GLM.EXFL", "Extracting CLI tools");
+                Logger.LogDebug("GLM.EXFL", "Starting extraction");
 
                 if(compressedFile.EndsWith(".tar.gz"))
                 {
@@ -715,7 +798,7 @@ namespace NervaOneWalletMiner.Helpers
                     {
                         GZip.Decompress(originalFileStream, decompressedFileStream, true);
                     }
-         
+
                     // Now decompress .tar
                     ExtractTar(destDir, newCompressedFile);
                 }
@@ -758,10 +841,13 @@ namespace NervaOneWalletMiner.Helpers
                         }
                     }
                 }
+
+                return true;
             }
             catch (Exception ex)
             {
                 Logger.LogException("GLM.EXFL", ex);
+                return false;
             }
         }
 
@@ -1251,6 +1337,7 @@ namespace NervaOneWalletMiner.Helpers
 
             GlobalData.IsCliToolsFound = true;
             GlobalData.IsCliToolsDownloading = false;
+            GlobalData.IsBlockchainDbDownloading = false;
             GlobalData.ConnectGuardLastGoodTime = DateTime.Now;
             GlobalData.ConnectGuardRestartCount = 1;
 

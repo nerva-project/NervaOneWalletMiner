@@ -11,6 +11,8 @@ namespace NervaOneWalletMiner.Helpers
         public static DateTime _cliToolsRunningLastCheck = DateTime.MinValue;
         public static bool _killMasterProcess = false;
 
+        private static bool IsCliToolsSuspended => GlobalData.IsCliToolsDownloading || GlobalData.IsBlockchainDbDownloading;
+
         // Per-operation timestamps. It used to be _masterTimerCount but it's unreliable on Android as it gets throttled in the background
         public static DateTime _lastDaemonDataFetch = DateTime.MinValue;
         public static DateTime _lastWalletDataFetch = DateTime.MinValue;
@@ -83,6 +85,12 @@ namespace NervaOneWalletMiner.Helpers
                     _masterUpdateTimer.Stop();
                 }
 
+                if (!GlobalData.IsCliToolsDownloading && GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir) && !GlobalData.IsCliToolsFound)
+                {
+                    // Client tools downloaded and found
+                    Logger.LogDebug("MSP.MUPS", "Client tools found.");
+                    GlobalData.IsCliToolsFound = true;
+                }
 
                 // If kill master process is issued at any point, skip everything else and do not restart master timer
                 if (_cliToolsRunningLastCheck.AddSeconds(_cliToolsHealthCheckSeconds) < DateTime.Now)
@@ -162,6 +170,7 @@ namespace NervaOneWalletMiner.Helpers
                 if (_isInBackgroundMode)
                 {
                     if (!_killMasterProcess
+                        && !IsCliToolsSuspended
                         && !GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly
                         && _lastDaemonDataFetch.AddSeconds(_backgroundFetchSeconds) < DateTime.Now)
                     {
@@ -177,15 +186,25 @@ namespace NervaOneWalletMiner.Helpers
                     {
                         if (!_killMasterProcess && _lastDaemonDataFetch.AddSeconds(_daemonFetchSeconds) < DateTime.Now)
                         {
-                            _lastDaemonDataFetch = DateTime.Now;
                             UIManager.HandleNetworkStats();
-                            UIManager.GetAndSetDaemonData();
-                        }
 
+                            if (!IsCliToolsSuspended)
+                            {
+                                _lastDaemonDataFetch = DateTime.Now;
+                                UIManager.GetAndSetDaemonData();
+                            }                                                                                  
+                        }
+                        
                         // Actual Daemon UI update — only run when GetAndSetDaemonData just produced fresh data
                         if (_isDaemonDataFresh && GlobalData.IsGetAndSetDaemonDataComplete)
                         {
                             _isDaemonDataFresh = false;
+                            UIManager.UpdateDaemonView();
+                            UIManager.UpdateStatusBar();
+                        }
+                        else if (IsCliToolsSuspended)
+                        {
+                            // Want to update when downloading
                             UIManager.UpdateDaemonView();
                             UIManager.UpdateStatusBar();
                         }
@@ -279,40 +298,43 @@ namespace NervaOneWalletMiner.Helpers
         {
             try
             {
-                bool forceRestart = false;
-                DateTime daemonRestartTime = GlobalData.LastDaemonResponseTime.AddSeconds(_daemonResponseRestartSeconds);
-                if (_isInBackgroundMode)
+                if (!IsCliToolsSuspended)
                 {
-                    // Double the restart time when in background mode
-                    daemonRestartTime = daemonRestartTime.AddSeconds(_daemonResponseRestartSeconds);
-                }
-
-                if (daemonRestartTime < DateTime.Now)
-                {
-                    // Daemon not responding. Kill and restart
-                    forceRestart = true;
-                    Logger.LogDebug("MSP.KDNR", "No response from daemon since: " + GlobalData.LastDaemonResponseTime.ToLongTimeString() + ". Forcing restart...");
-                    GlobalData.LastDaemonResponseTime = DateTime.Now;
-                }
-
-                bool isDaemonRunning = ProcessManager.IsRunning(GlobalData.DaemonProcessName);
-                if (!isDaemonRunning || forceRestart)
-                {
-                    if (GlobalData.LastDaemonRestartAttempt.AddSeconds(_daemonResponseRestartSeconds) < DateTime.Now)
+                    bool forceRestart = false;
+                    DateTime daemonRestartTime = GlobalData.LastDaemonResponseTime.AddSeconds(_daemonResponseRestartSeconds);
+                    if (_isInBackgroundMode)
                     {
-                        if (!GlobalData.IsCliToolsDownloading && GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
-                        {
-                            Logger.LogDebug("MSP.KDNR", "Issues with Daemon process. isDaemonRunning: " + isDaemonRunning + ", forceRestart: " + forceRestart + ". Restarting...");
+                        // Double the restart time when in background mode
+                        daemonRestartTime = daemonRestartTime.AddSeconds(_daemonResponseRestartSeconds);
+                    }
 
-                            GlobalData.LastDaemonRestartAttempt = DateTime.Now;
-                            ProcessManager.Kill(GlobalData.DaemonProcessName);
-                            ProcessManager.StartExternalProcess(GlobalMethods.GetDaemonProcess(), GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].GenerateDaemonOptions(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]));
-                            GlobalData.IsInitialDaemonConnectionSuccess = false;
-                            GlobalData.IsCliToolsFound = true;
-                        }
-                        else
+                    if (daemonRestartTime < DateTime.Now)
+                    {
+                        // Daemon not responding. Kill and restart
+                        forceRestart = true;
+                        Logger.LogDebug("MSP.KDNR", "No response from daemon since: " + GlobalData.LastDaemonResponseTime.ToLongTimeString() + ". Forcing restart...");
+                        GlobalData.LastDaemonResponseTime = DateTime.Now;
+                    }
+                
+                    bool isDaemonRunning = ProcessManager.IsRunning(GlobalData.DaemonProcessName);
+                    if (!isDaemonRunning || forceRestart)
+                    {
+                        if (GlobalData.LastDaemonRestartAttempt.AddSeconds(_daemonResponseRestartSeconds) < DateTime.Now)
                         {
-                            Logger.LogInfo("MSP.KDNR", "CLI tools not found");
+                            if (GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
+                            {
+                                Logger.LogDebug("MSP.KDNR", "Issues with Daemon process. isDaemonRunning: " + isDaemonRunning + ", forceRestart: " + forceRestart + ". Restarting...");
+
+                                GlobalData.LastDaemonRestartAttempt = DateTime.Now;
+                                ProcessManager.Kill(GlobalData.DaemonProcessName);
+                                ProcessManager.StartExternalProcess(GlobalMethods.GetDaemonProcess(), GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].GenerateDaemonOptions(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]));
+                                GlobalData.IsInitialDaemonConnectionSuccess = false;
+                                GlobalData.IsCliToolsFound = true;
+                            }
+                            else
+                            {
+                                Logger.LogInfo("MSP.KDNR", "CLI tools not found");
+                            }
                         }
                     }
                 }
@@ -327,27 +349,23 @@ namespace NervaOneWalletMiner.Helpers
         {
             try
             {
-                if (!GlobalData.IsCliToolsDownloading && GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir) && !GlobalData.IsCliToolsFound)
+                if (!IsCliToolsSuspended)
                 {
-                    // Client tools downloaded and found
-                    Logger.LogDebug("MSP.KWPR", "Client tools found.");
-                    GlobalData.IsCliToolsFound = true;
-                }
-
-                if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsDaemonWalletSeparateApp)
-                {
-                    if (!GlobalData.IsCliToolsDownloading && !ProcessManager.IsRunning(GlobalData.WalletProcessName))
+                    if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsDaemonWalletSeparateApp)
                     {
-                        if (GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
+                        if (!ProcessManager.IsRunning(GlobalData.WalletProcessName))
                         {
-                            Logger.LogDebug("MSP.KWPR", "Killing wallet process if it's running.");
-                            ProcessManager.Kill(GlobalData.WalletProcessName);
-                            Logger.LogDebug("MSP.KWPR", "Starting wallet process");
-                            ProcessManager.StartExternalProcess(GlobalMethods.GetRpcWalletProcess(), GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].GenerateWalletOptions(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin], GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]));
-                        }
-                        else
-                        {
-                            Logger.LogDebug("MSP.KWPR", "CLI tools not found");
+                            if (GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
+                            {
+                                Logger.LogDebug("MSP.KWPR", "Killing wallet process if it's running.");
+                                ProcessManager.Kill(GlobalData.WalletProcessName);
+                                Logger.LogDebug("MSP.KWPR", "Starting wallet process");
+                                ProcessManager.StartExternalProcess(GlobalMethods.GetRpcWalletProcess(), GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].GenerateWalletOptions(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin], GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]));
+                            }
+                            else
+                            {
+                                Logger.LogDebug("MSP.KWPR", "CLI tools not found");
+                            }
                         }
                     }
                 }

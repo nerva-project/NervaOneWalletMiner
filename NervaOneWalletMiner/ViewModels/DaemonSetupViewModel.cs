@@ -361,5 +361,49 @@ namespace NervaOneWalletMiner.ViewModels
                 Logger.LogException("DSM.PCTU", ex);
             }
         }
+
+        public string GetBlockchainDbDownloadLink()
+        {
+            try
+            {
+                return GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].BlockchainDbUrl;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DSM.GBDL", ex);
+                return string.Empty;
+            }
+        }
+
+        public async Task PerformBlockchainDbDownload(string downloadLink)
+        {
+            try
+            {
+                GlobalData.IsBlockchainDbDownloading = true;
+
+                if (GlobalData.IsWalletOpen)
+                {
+                    Logger.LogDebug("DSM.PBDD", "Closing wallet: " + GlobalData.OpenedWalletName);
+                    await ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).CloseWalletNonUi();
+                }
+
+                if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsDaemonWalletSeparateApp)
+                {
+                    Logger.LogDebug("DSM.PBDD", "Calling wallet ForceClose...");
+                    ProcessManager.Kill(GlobalData.WalletProcessName);
+                }
+
+                Logger.LogDebug("DSM.PBDD", "Stopping daemon...");
+                GlobalMethods.StopAndCloseDaemon();
+
+                string dataDir = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].DataDir;
+                string dbSubfolder = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].BlockchainDbSubfolder;
+                GlobalMethods.DownloadBlockchainDb(downloadLink, dataDir, dbSubfolder);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DSM.PBDD", ex);
+            }
+        }
     }
 }

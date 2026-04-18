@@ -398,6 +398,12 @@ namespace NervaOneWalletMiner.Helpers
         {
             try
             {
+                if (GlobalData.IsCliToolsDownloading || GlobalData.IsBlockchainDbDownloading)
+                {
+                    // Don't want to update
+                    return;
+                }
+
                 if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
                 {
                     string remoteStatus = "Remote" + (string.IsNullOrEmpty(GlobalData.NetworkStats.StatusSync) ? "" : " | " + GlobalData.NetworkStats.StatusSync);
@@ -670,11 +676,11 @@ namespace NervaOneWalletMiner.Helpers
         {
             try
             {
-                if (GlobalData.IsCliToolsDownloading)
+                if (GlobalData.IsCliToolsDownloading || GlobalData.IsBlockchainDbDownloading)
                 {
+                    // Status bar is updated directly when downloading/extracting; just keep NetworkStats neutral
                     GlobalData.NetworkStats = new()
                     {
-                        StatusSync = "Downloading client tools...",
                         Connections = []
                     };
                 }

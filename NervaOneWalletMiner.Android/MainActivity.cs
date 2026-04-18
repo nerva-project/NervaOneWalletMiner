@@ -16,7 +16,7 @@ namespace NervaOneWalletMiner.Android;
 [Activity(
     Label = "NervaOneWalletMiner.Android",
     Theme = "@style/MyTheme.NoActionBar",
-    Icon = "@drawable/icon",
+    Icon = "@mipmap/Icon",
     MainLauncher = true,
     ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize | ConfigChanges.UiMode)]
 public class MainActivity : AvaloniaMainActivity<App>

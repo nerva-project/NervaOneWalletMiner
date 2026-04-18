@@ -21,7 +21,7 @@ public class NervaForegroundService : Service
         Notification notification = new Notification.Builder(this, ChannelId)
             .SetContentTitle("NervaOne")
             .SetContentText("Blockchain sync running")
-            .SetSmallIcon(Resource.Drawable.Icon)
+            .SetSmallIcon(Resource.Drawable.ic_notification)
             .SetOngoing(true)
             .Build()!;
 

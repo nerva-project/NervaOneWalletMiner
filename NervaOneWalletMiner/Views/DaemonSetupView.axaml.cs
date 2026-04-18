@@ -137,6 +137,28 @@ namespace NervaOneWalletMiner.Views
         }
         #endregion // Update Client Tools
 
+        #region Download Blockchain Db
+        public async void DownloadBlockchainDb_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                string blockchainDbLink = GetVm().GetBlockchainDbDownloadLink();
+                Logger.LogDebug("DMS.DBDC", "Downloading blockchain database");
+
+                var window = new TextBoxView(title: "Download Blockchain Db", labelValue: "Blockchain Db Download Link", textValue: blockchainDbLink, textWatermark: string.Empty, okButtonText: "Download");
+                DialogResult? result = await DialogService.ShowAsync<DialogResult>(window);
+                if (result != null && result.IsOk && !string.IsNullOrEmpty(result.TextBoxValue))
+                {
+                    await GetVm().PerformBlockchainDbDownload(result.TextBoxValue);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("DMS.DBDC", ex);
+            }
+        }
+        #endregion // Download Blockchain Db
+
         #region Restart with Command
         public async void RestartWithCommand_Clicked(object sender, RoutedEventArgs args)
         {

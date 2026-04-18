@@ -40,6 +40,8 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private string _DataDirMac = Path.Combine(GlobalMethods.GetDataDir(), "DashCore");
 
         private string _QuickSyncUrl = string.Empty;
+        private string _BlockchainDbUrl = string.Empty;
+        private string _BlockchainDbSubfolder = string.Empty;
         #endregion // Private Default Variables
 
 
@@ -76,7 +78,9 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public string DataDirLinux { get => _DataDirLinux; set => _DataDirLinux = value; }
         public string DataDirMac { get => _DataDirMac; set => _DataDirMac = value; }
 
-        public string QuickSyncUrl { get => _QuickSyncUrl; set => _QuickSyncUrl = value; }        
+        public string QuickSyncUrl { get => _QuickSyncUrl; set => _QuickSyncUrl = value; }
+        public string BlockchainDbUrl { get => _BlockchainDbUrl; set => _BlockchainDbUrl = value; }
+        public string BlockchainDbSubfolder { get => _BlockchainDbSubfolder; set => _BlockchainDbSubfolder = value; }
         #endregion // Interface Variables
 
         #region Interface Methods
