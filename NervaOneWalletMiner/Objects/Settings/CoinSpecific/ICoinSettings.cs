@@ -37,7 +37,8 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         string DataDirMac { get; set; }
 
         string QuickSyncUrl { get; set; }
-        
+        string BlockchainDbUrl { get; set; }
+        string BlockchainDbSubfolder { get; set; }
 
         string GenerateWalletOptions(SettingsWallet walletSettings, SettingsDaemon daemonSettings);
         string GenerateDaemonOptions(SettingsDaemon daemonSettings);

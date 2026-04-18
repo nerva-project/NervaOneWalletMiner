@@ -87,6 +87,12 @@
 						Margin="0,10,0,0"
 						Click="PublicNodeSetup_Clicked"/>
 
+				<Button Name="btnDownloadBlockchainDb"
+						Content="Download Blockchain Db"
+						DockPanel.Dock="Right"
+						Margin="0,10,0,0"
+						Click="DownloadBlockchainDb_Clicked"/>
+
 				<Separator Margin="0,20,0,0"/>
 
 				<Label Content="Mining Address" Margin="0,10,0,0"/>
