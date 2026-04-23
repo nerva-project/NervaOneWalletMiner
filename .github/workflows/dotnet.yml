@@ -215,12 +215,11 @@ jobs:
             id: select_apk
             shell: bash
             run: |
-                PUBLISH=./NervaOneWalletMiner.Android/bin/Release/net10.0-android/android-arm64/publish
-                if ls $PUBLISH/*-Signed.apk 1>/dev/null 2>&1; then
-                    echo "apk_path=$PUBLISH/*-Signed.apk" >> $GITHUB_OUTPUT
-                else
-                    echo "apk_path=$PUBLISH/*.apk" >> $GITHUB_OUTPUT
+                APK=$(find ./NervaOneWalletMiner.Android/bin/Release -name "*-Signed.apk" | head -1)
+                if [ -z "$APK" ]; then
+                    APK=$(find ./NervaOneWalletMiner.Android/bin/Release -name "*.apk" | head -1)
                 fi
+                echo "apk_path=$APK" >> $GITHUB_OUTPUT
 
           - name: Upload Android Artifacts
             uses: actions/upload-artifact@v6

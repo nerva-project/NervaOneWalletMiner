@@ -4,8 +4,10 @@ using Avalonia.Interactivity;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Objects.DataGrid;
+using NervaOneWalletMiner.ViewModels;
 using NervaOneWalletMiner.ViewsDialogs;
 using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace NervaOneWalletMiner.Views
@@ -32,12 +34,17 @@ namespace NervaOneWalletMiner.Views
                     (object? sender, RequestBringIntoViewEventArgs e) => { e.Handled = true; },
                     RoutingStrategies.Bubble);
 
-                PopulateAddressBookGrid();
             }
             catch (Exception ex)
             {
                 Logger.LogException("ADB.CONS", ex);
             }
+        }
+
+        protected override void OnDataContextChanged(EventArgs e)
+        {
+            base.OnDataContextChanged(e);
+            PopulateAddressBookGrid();
         }
 
         private void AddressBookView_SizeChanged(object? sender, SizeChangedEventArgs e)
@@ -90,7 +97,11 @@ namespace NervaOneWalletMiner.Views
         private void PopulateAddressBookGrid()
         {
             GlobalMethods.LoadAddressBook();
-            dtgAddressBook.ItemsSource = GlobalData.AddressBook.List.Where(a => !string.IsNullOrEmpty(a.Address)).ToList();
+            if (DataContext is AddressBookViewModel vm)
+            {
+                vm.Addresses = new ObservableCollection<AddressInfo>(
+                    GlobalData.AddressBook.List.Where(a => !string.IsNullOrEmpty(a.Address)));
+            }
         }
 
         private void AddressBook_DoubleTapped(object? sender, Avalonia.Input.TappedEventArgs e)
