@@ -93,14 +93,14 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
-        private async void CopyAddress_Clicked(object sender, RoutedEventArgs args)
+        private void CopyAddress_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
                 string address = GetVm().NodeAddress;
                 if (!string.IsNullOrEmpty(address))
                 {
-                    await TopLevel.GetTopLevel(this)!.Clipboard!.SetTextAsync(address);
+                    GlobalMethods.CopyToClipboard(this, address);
                     Logger.LogDebug("PNV.CPYC", "Copied node address: " + address);
                 }
             }

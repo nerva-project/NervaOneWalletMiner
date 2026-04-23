@@ -211,8 +211,19 @@ jobs:
                   -p:ApplicationDisplayVersion=${{ needs.setup.outputs.version }} \
                   -p:RunAOTCompilation=false
 
+          - name: Select APK
+            id: select_apk
+            shell: bash
+            run: |
+                PUBLISH=./NervaOneWalletMiner.Android/bin/Release/net10.0-android/android-arm64/publish
+                if ls $PUBLISH/*-Signed.apk 1>/dev/null 2>&1; then
+                    echo "apk_path=$PUBLISH/*-Signed.apk" >> $GITHUB_OUTPUT
+                else
+                    echo "apk_path=$PUBLISH/*.apk" >> $GITHUB_OUTPUT
+                fi
+
           - name: Upload Android Artifacts
             uses: actions/upload-artifact@v6
             with:
                 name: nervaone-mobile-v${{ needs.setup.outputs.version }}-android
-                path: ./NervaOneWalletMiner.Android/bin/Release/net10.0-android/android-arm64/publish/*-Signed.apk
+                path: ${{ steps.select_apk.outputs.apk_path }}

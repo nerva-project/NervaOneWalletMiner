@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:vm="clr-namespace:NervaOneWalletMiner.ViewModels"
              mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="550"
+             x:DataType="vm:AddressBookViewModel"
              x:Class="NervaOneWalletMiner.Views.AddressBookView"
              SizeChanged="AddressBookView_SizeChanged">
 
@@ -73,17 +74,17 @@
 				<DataGrid.Columns>
 					<DataGridTextColumn Header="Name"
 										Width="*"
-										Binding="{Binding Name}"/>
+										Binding="{ReflectionBinding Name, Mode=OneWay}"/>
 					<DataGridTextColumn Header="Description"
 										Width="*"
-										Binding="{Binding Description}"/>
+										Binding="{ReflectionBinding Description, Mode=OneWay}"/>
 					<DataGridTextColumn Header="Address"
 										MinWidth="120"
 										Width="*"
-										Binding="{Binding Address}"/>
+										Binding="{ReflectionBinding Address, Mode=OneWay}"/>
 					<DataGridTextColumn Header="Payment Id"
 										Width="*"
-										Binding="{Binding PaymentId}"/>
+										Binding="{ReflectionBinding PaymentId, Mode=OneWay}"/>
 				</DataGrid.Columns>
 				<DataGrid.ContextMenu>
 					<ContextMenu>

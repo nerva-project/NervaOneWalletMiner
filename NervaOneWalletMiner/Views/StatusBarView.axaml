@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:vm="clr-namespace:NervaOneWalletMiner.ViewModels"
              mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="50"
-			 x:DataType="vm:StatusBarViewModel"
+			 x:DataType="vm:MainViewModel"
              x:Class="NervaOneWalletMiner.Views.StatusBarView">
 
 	<Design.DataContext>

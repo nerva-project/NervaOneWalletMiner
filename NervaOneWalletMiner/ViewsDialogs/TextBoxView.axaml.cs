@@ -29,7 +29,7 @@ namespace NervaOneWalletMiner.ViewsDialogs
                 tbkTitle.Text = title;
                 lblValue.Content = labelValue;
                 tbxValue.Text = textValue;
-                tbxValue.Watermark = textWatermark;
+                tbxValue.PlaceholderText = textWatermark;
                 btnOk.Content = okButtonText;
 
                 if (isTextPassword)

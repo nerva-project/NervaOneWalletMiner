@@ -14,7 +14,7 @@
         <Separator/>
         <StackPanel Spacing="5" Margin="10">
             <Label Name="lblValue" Content="Text Box"/>
-            <TextBox Name="tbxValue" Watermark="Watermark"/>
+            <TextBox Name="tbxValue" PlaceholderText="Watermark"/>
 
             <DockPanel Margin="0,15,0,0">
                 <Button Name="btnOk"

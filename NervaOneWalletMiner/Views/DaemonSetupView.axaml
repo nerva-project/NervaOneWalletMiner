@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:vm="clr-namespace:NervaOneWalletMiner.ViewModels"
              mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="550"
+             x:DataType="vm:DaemonSetupViewModel"
              x:Class="NervaOneWalletMiner.Views.DaemonSetupView">
 
 	<Design.DataContext>
@@ -98,7 +99,7 @@
 				<Label Content="Mining Address" Margin="0,10,0,0"/>
 				<TextBox Name="tbxMiningAddress"
 						 Text="{Binding MiningAddress, Mode=TwoWay}"
-						 Watermark="Address that will receive mining rewards"/>
+						 PlaceholderText="Address that will receive mining rewards"/>
 
 				<Label Content="Data Directory" Margin="0,10,0,0"/>
 				<Grid ColumnDefinitions="*,80">
@@ -106,7 +107,7 @@
 							 Grid.Column="0"
 							 Name="tbxDaemonDataDir"
 							 Text="{Binding DataDir, Mode=TwoWay}"
-							 Watermark="Blockchain database directory"/>
+							 PlaceholderText="Blockchain database directory"/>
 
 					<Button Grid.Row="0"
 							Grid.Column="1"
@@ -119,17 +120,17 @@
 				<Label Content="Additional Startup Arguments" Margin="0,10,0,0"/>
 				<TextBox Name="tbxAdditionalArguments"
 						 Text="{Binding AdditionalArguments, Mode=TwoWay}"
-						 Watermark="Additional arguments that will be sent to daemon when it starts"/>
+						 PlaceholderText="Additional arguments that will be sent to daemon when it starts"/>
 
 				<Label Content="Port Number" Margin="0,10,0,0"/>
 				<TextBox Name="tbxPortNumber"
 						 Text="{Binding PortNumber, Mode=TwoWay}"
-						 Watermark="Number - port that daemon will use to listen on"/>
+						 PlaceholderText="Number - port that daemon will use to listen on"/>
 
 				<Label Content="Log Level" Margin="0,10,0,0"/>
 				<TextBox Name="tbxLogLevel"
 						 Text="{Binding LogLevel, Mode=TwoWay}"
-						 Watermark="Number - level at which daemon will write to log files"/>
+						 PlaceholderText="Number - level at which daemon will write to log files"/>
 
 				<CheckBox Name="cbxAutoStartMining"
 						  Content="Auto start mining"

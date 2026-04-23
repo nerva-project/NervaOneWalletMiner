@@ -48,7 +48,7 @@
 				<Label Content="Send To"/>
 			</DockPanel>
 			<TextBox Name="tbxSendTo"
-					 Watermark="Required - recipient wallet address"/>
+					 PlaceholderText="Required - recipient wallet address"/>
 
 			<Label Content="Amount" Margin="0,15,0,0"/>
 			<DockPanel>
@@ -56,7 +56,7 @@
 						  DockPanel.Dock="Right"
 						  Margin="10,0,0,0"/>
 				<TextBox Name="tbxAmount"
-						 Watermark="Required - amount to send"/>
+						 PlaceholderText="Required - amount to send"/>
 			</DockPanel>
 
 			<Label Content="Payment Id" Margin="0,15,0,0"/>
@@ -67,7 +67,7 @@
 						Margin="10,0,0,0"
 						Click="GeneratePaymentId_Clicked"/>
 				<TextBox Name="tbxPaymentId"
-						 Watermark="Optional - payment Id"/>
+						 PlaceholderText="Optional - payment Id"/>
 			</DockPanel>
 
 			<CheckBox Name="cbxSplitTransfer"
