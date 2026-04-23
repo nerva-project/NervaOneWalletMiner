@@ -28,7 +28,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private string _CliUrlWindows32 = "https://downloads.getmonero.org/cli/monero-win-x86-v0.18.4.6.zip";
         private string _CliUrlLinux64 = "https://downloads.getmonero.org/cli/monero-linux-x64-v0.18.4.6.tar.bz2";
         private string _CliUrlLinux32 = "https://downloads.getmonero.org/cli/monero-linux-x86-v0.18.4.6.tar.bz2";
-        private string _CliUrlLinuxArm = "https://downloads.getmonero.org/cli/monero-linux-armv7-v0.18.4.6.tar.bz2";
+        private string _CliUrlLinuxArm = "https://downloads.getmonero.org/cli/monero-linux-armv8-v0.18.4.6.tar.bz2";
         private string _CliUrlMacIntel = "https://downloads.getmonero.org/cli/monero-mac-x64-v0.18.4.6.tar.bz2";
         private string _CliUrlMacArm = "https://downloads.getmonero.org/cli/monero-mac-armv8-v0.18.4.6.tar.bz2";
         private string _CliUrlAndroid = "https://downloads.getmonero.org/cli/monero-android-armv8-v0.18.4.6.tar.bz2";
