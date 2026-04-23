@@ -32,14 +32,14 @@ NervaOne Desktop currently supports below cryptocurrencies:
 We encourage you to build the project yourself but if you do not feel comfortable doing that, see [Releases][releases-link]
 
 
-To compile yourself, you'll need DOTNET SDK 8. You can install it for your operating system from Microsoft:
+To compile yourself, you'll need DOTNET SDK 10. You can install it for your operating system from Microsoft:
 
-[DOTNET SDK 8][dotnet-sdk-8]
+[DOTNET SDK 10][dotnet-sdk]
 
 
 or by issuing command such as this:
 ```
- sudo apt-get install dotnet-sdk-8.0
+ sudo apt-get install dotnet-sdk-10.0
 ```
  
  ---
@@ -84,8 +84,8 @@ Here is full list: [.NET RID Catalog][rid-catalog]
 
 ---
 
-## 🏃 Running Using Visual Studio 2022 Community (Windows)
-You can Run/Debug the NervaOne using free [Visual Studio 2022 Community Edition][visual-studio]
+## 🏃 Running Using Visual Studio 2026 Community (Windows)
+You can Run/Debug the NervaOne using free [Visual Studio 2026 Community Edition][visual-studio]
 
 
 Pick below workloads when installing VS:
@@ -148,10 +148,10 @@ This project is licensed under the terms of the [MIT License](https://github.com
 
 
 <!-- Reference links -->
-[dotnet-sdk-8]: https://dotnet.microsoft.com/en-us/download/dotnet/8.0
+[dotnet-sdk]: https://dotnet.microsoft.com/en-us/download/dotnet/10.0
 [releases-link]: https://github.com/nerva-project/NervaOneWalletMiner/releases
 [rid-catalog]: https://learn.microsoft.com/en-us/dotnet/core/rid-catalog
-[visual-studio]: https://visualstudio.microsoft.com/
+[visual-studio]: https://visualstudio.microsoft.com/free-developer-offers/
 [contributors]: https://github.com/nerva-project/NervaOneWalletMiner/graphs/contributors
 [license]: https://github.com/nerva-project/NervaOneWalletMiner?tab=MIT-1-ov-file
 [issues]: https://github.com/nerva-project/NervaOneWalletMiner/issues

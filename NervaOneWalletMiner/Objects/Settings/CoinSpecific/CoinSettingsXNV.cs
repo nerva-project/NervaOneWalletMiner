@@ -24,16 +24,14 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private int _LogLevelWallet = 1;
 
         // https://github.com/nerva-project/nerva/releases
-        private string _CliUrlWindows64 = "https://github.com/nerva-project/nerva/releases/download/v0.2.0.0/nerva-windows-x64-v0.2.0.0.zip";
-        private string _CliUrlWindows32 = "https://github.com/nerva-project/nerva/releases/download/v0.2.0.0/nerva-windows-x32-v0.2.0.0.zip";
-        private string _CliUrlLinux64 = "https://github.com/nerva-project/nerva/releases/download/v0.2.0.0/nerva-linux-x86_64-v0.2.0.0.tar.bz2";
-        private string _CliUrlLinux32 = "https://github.com/nerva-project/nerva/releases/download/v0.2.0.0/nerva-linux-i686-v0.2.0.0.tar.bz2";
-        private string _CliUrlLinuxArm = "https://github.com/nerva-project/nerva/releases/download/v0.2.0.0/nerva-linux-armv7-v0.2.0.0.tar.bz2";
-        private string _CliUrlMacIntel = "https://github.com/nerva-project/nerva/releases/download/v0.2.0.0/nerva-macos-x64-v0.2.0.0.tar.bz2";
-        private string _CliUrlMacArm = "https://github.com/nerva-project/nerva/releases/download/v0.2.0.0/nerva-macos-armv8-v0.2.0.0.tar.bz2";
-
-        // TODO: For testing purposes only. Change before release
-        private string _CliUrlAndroid = "https://nerva.one/quicksync/nerva-android-armv8.zip";
+        private string _CliUrlWindows64 = "https://github.com/nerva-project/nerva/releases/download/v0.2.1.0/nerva-windows-x64-v0.2.1.0.zip";
+        private string _CliUrlWindows32 = "https://github.com/nerva-project/nerva/releases/download/v0.2.1.0/nerva-windows-x32-v0.2.1.0.zip";
+        private string _CliUrlLinux64 = "https://github.com/nerva-project/nerva/releases/download/v0.2.1.0/nerva-linux-x86_64-v0.2.1.0.tar.bz2";
+        private string _CliUrlLinux32 = "https://github.com/nerva-project/nerva/releases/download/v0.2.1.0/nerva-linux-i686-v0.2.1.0.tar.bz2";
+        private string _CliUrlLinuxArm = "https://github.com/nerva-project/nerva/releases/download/v0.2.1.0/nerva-linux-armv8-v0.2.1.0.tar.bz2";
+        private string _CliUrlMacIntel = "https://github.com/nerva-project/nerva/releases/download/v0.2.1.0/nerva-macos-x64-v0.2.1.0.tar.bz2";
+        private string _CliUrlMacArm = "https://github.com/nerva-project/nerva/releases/download/v0.2.1.0/nerva-macos-armv8-v0.2.1.0.tar.bz2";
+        private string _CliUrlAndroid = "https://github.com/nerva-project/nerva/releases/download/v0.2.1.0/nerva-android-armv8-v0.2.1.0.tar.bz2";
 
         private string _RemotePublicNodeUrlDefault = "node.nerva.one:17566";
         private string _LocalPublicNodeArgumentsDefault = "--rpc-bind-ip 0.0.0.0 --confirm-external-bind";
