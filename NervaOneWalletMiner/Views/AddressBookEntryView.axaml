@@ -24,16 +24,16 @@
 			</Grid>
 
 			<Label Content="Name" Margin="0,10,0,0"/>
-			<TextBox Name="tbxName" Watermark="Optional - display name"/>
+			<TextBox Name="tbxName" PlaceholderText="Optional - display name"/>
 
 			<Label Content="Description" Margin="0,10,0,0"/>
-			<TextBox Name="tbxDescription" Watermark="Optional - description"/>
+			<TextBox Name="tbxDescription" PlaceholderText="Optional - description"/>
 
 			<Label Content="Address" Margin="0,10,0,0"/>
-			<TextBox Name="tbxAddress" Watermark="Required - wallet address"/>
+			<TextBox Name="tbxAddress" PlaceholderText="Required - wallet address"/>
 
 			<Label Content="Payment Id" Margin="0,10,0,0"/>
-			<TextBox Name="tbxPaymentId" Watermark="Optional - payment Id"/>
+			<TextBox Name="tbxPaymentId" PlaceholderText="Optional - payment Id"/>
 
 			<StackPanel Orientation="Horizontal" Spacing="10" Margin="0,20,0,0">
 				<Button Name="btnOk"

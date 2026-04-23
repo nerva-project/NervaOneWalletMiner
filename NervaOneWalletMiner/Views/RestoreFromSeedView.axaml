@@ -28,18 +28,18 @@
 
 			<Label Content="Seed Phrase" Margin="0,10,0,0"/>
 			<TextBox Name="tbxSeedPhrase"
-					 Watermark="Required - seed phrase from the wallet you want to restore"
+					 PlaceholderText="Required - seed phrase from the wallet you want to restore"
 					 AcceptsReturn="True"
 					 TextWrapping="Wrap"
 					 Height="100"/>
 
 			<Label Content="Seed Offset" Margin="0,10,0,0"/>
 			<TextBox Name="tbxSeedOffset"
-					 Watermark="Optional - seed phrase offset"/>
+					 PlaceholderText="Optional - seed phrase offset"/>
 
 			<Label Content="New Wallet Name" Margin="0,10,0,0"/>
 			<TextBox Name="tbxWalletName"
-					 Watermark="Required - name of the new wallet"/>
+					 PlaceholderText="Required - name of the new wallet"/>
 
 			<Label Content="New Wallet Password" Margin="0,10,0,0"/>
 			<DockPanel>
@@ -50,7 +50,7 @@
 						IsTabStop="False"
 						Click="ShowHidePassword_Clicked"/>
 				<TextBox Name="tbxPassword"
-						 Watermark="Required - new wallet password"
+						 PlaceholderText="Required - new wallet password"
 						 PasswordChar="*"
 						 RevealPassword="False"/>
 			</DockPanel>
