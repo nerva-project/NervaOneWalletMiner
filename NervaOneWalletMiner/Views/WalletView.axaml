@@ -13,11 +13,9 @@
 		<vm:WalletViewModel/>
 	</Design.DataContext>
 
-	<ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
-	<Grid RowDefinitions="Auto,Auto">
-		<Grid Grid.Row="0">
-			<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch"
-						Spacing="5" Margin="10" MaxWidth="650">
+	<Grid RowDefinitions="Auto,*">
+		<StackPanel Grid.Row="0" Orientation="Vertical" HorizontalAlignment="Stretch"
+					Spacing="5" Margin="10" MaxWidth="650">
 
 				<Grid Name="grdHeader" ColumnDefinitions="Auto,*,Auto">
 					<Grid.RowDefinitions>
@@ -100,11 +98,9 @@
 					</Grid>
 				</Grid>
 
-			</StackPanel>
-		</Grid>
+		</StackPanel>
 
-		<Grid Grid.Row="1">
-			<DataGrid Name="dtgAccounts"
+		<DataGrid Grid.Row="1" Name="dtgAccounts"
 					  ItemsSource="{Binding WalletAddresses, Mode=OneWay}"
 					  GridLinesVisibility="Horizontal"
 					  AutoGenerateColumns="False"
@@ -157,9 +153,7 @@
 									  Click="ExportAll_Clicked"/>
 						</ContextMenu>
 					</DataGrid.ContextMenu>
-			</DataGrid>
-		</Grid>
+		</DataGrid>
 	</Grid>
-	</ScrollViewer>
 
 </UserControl>

@@ -13,38 +13,34 @@
 		<vm:TransfersViewModel/>
 	</Design.DataContext>
 
-	<ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
-	<Grid RowDefinitions="Auto, Auto">
-		<Grid Grid.Row="0">
-			<StackPanel Orientation="Vertical"  HorizontalAlignment="Stretch"
-						Spacing="5" Margin="10" MaxWidth="650">
+	<Grid RowDefinitions="Auto, *">
+		<StackPanel Grid.Row="0" Orientation="Vertical" HorizontalAlignment="Stretch"
+					Spacing="5" Margin="10" MaxWidth="650">
 
-				<Grid Name="grdHeader" ColumnDefinitions="Auto,*,Auto">
-					<Grid.RowDefinitions>
-						<RowDefinition Height="Auto"/>
-						<RowDefinition Height="Auto"/>
-					</Grid.RowDefinitions>
+			<Grid Name="grdHeader" ColumnDefinitions="Auto,*,Auto">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+				</Grid.RowDefinitions>
 
-					<Grid Grid.Row="0" Grid.Column="0"
-						  ColumnDefinitions="32,Auto"
-						  VerticalAlignment="Center"
-						  Margin="0,0,5,0">
-						<Image Grid.Column="0" Name="imgCoinIcon"/>
-						<Label Grid.Column="1" Content="Transfers"
-							   Height="24" Margin="5,0,0,0"/>
-					</Grid>
-
-					<Button Grid.Row="0" Grid.Column="2"
-							Name="btnTransactionDetails"
-							Content="Transaction Details"
-							Margin="0,0,5,0"
-							Click="TransactionDetails_Clicked"/>
+				<Grid Grid.Row="0" Grid.Column="0"
+					  ColumnDefinitions="32,Auto"
+					  VerticalAlignment="Center"
+					  Margin="0,0,5,0">
+					<Image Grid.Column="0" Name="imgCoinIcon"/>
+					<Label Grid.Column="1" Content="Transfers"
+						   Height="24" Margin="5,0,0,0"/>
 				</Grid>
-			</StackPanel>
-		</Grid>
 
-		<Grid Grid.Row="1">
-			<DataGrid ItemsSource="{Binding Transactions}"
+				<Button Grid.Row="0" Grid.Column="2"
+						Name="btnTransactionDetails"
+						Content="Transaction Details"
+						Margin="0,0,5,0"
+						Click="TransactionDetails_Clicked"/>
+			</Grid>
+		</StackPanel>
+
+		<DataGrid Grid.Row="1" ItemsSource="{Binding Transactions}"
 					  Name="dtgTransactions"
 					  AutoGenerateColumns="False"
 					  GridLinesVisibility="Horizontal"
@@ -83,9 +79,7 @@
 								  Click="ExportAll_Clicked"/>
 					</ContextMenu>
 				</DataGrid.ContextMenu>
-			</DataGrid>
-		</Grid>
+		</DataGrid>
 	</Grid>
-	</ScrollViewer>
 
 </UserControl>

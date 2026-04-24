@@ -11,11 +11,9 @@
 		<vm:DaemonViewModel/>
 	</Design.DataContext>
 
-	<ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
-	<Grid RowDefinitions="Auto,Auto">
-		<Grid Grid.Row="0">
-			<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch"
-						Spacing="5" Margin="10" MaxWidth="650">
+	<Grid RowDefinitions="Auto,*">
+		<StackPanel Grid.Row="0" Orientation="Vertical" HorizontalAlignment="Stretch"
+					Spacing="5" Margin="10" MaxWidth="650">
 
 				<Grid Name="grdHeader" ColumnDefinitions="Auto,*,Auto">
 					<Grid.RowDefinitions>
@@ -139,11 +137,9 @@
 					</Grid>
 				</Grid>
 
-			</StackPanel>
-		</Grid>
+		</StackPanel>
 
-		<Grid Grid.Row="1">
-			<DataGrid Name="dgConnections"
+		<DataGrid Grid.Row="1" Name="dgConnections"
 					  ItemsSource="{Binding Connections}"
 					  AutoGenerateColumns="False"
 					  GridLinesVisibility="Horizontal"
@@ -174,9 +170,7 @@
 					<DataGridTextColumn Header="State"
 										Binding="{Binding State}"/>
 				</DataGrid.Columns>
-			</DataGrid>
-		</Grid>
+		</DataGrid>
 	</Grid>
-	</ScrollViewer>
 
 </UserControl>
