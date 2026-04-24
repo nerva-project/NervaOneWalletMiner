@@ -99,7 +99,7 @@
 				<Label Content="Mining Address" Margin="0,10,0,0"/>
 				<TextBox Name="tbxMiningAddress"
 						 Text="{Binding MiningAddress, Mode=TwoWay}"
-						 PlaceholderText="Address that will receive mining rewards"/>
+						 Watermark="Address that will receive mining rewards"/>
 
 				<Label Content="Data Directory" Margin="0,10,0,0"/>
 				<Grid ColumnDefinitions="*,80">
@@ -107,7 +107,7 @@
 							 Grid.Column="0"
 							 Name="tbxDaemonDataDir"
 							 Text="{Binding DataDir, Mode=TwoWay}"
-							 PlaceholderText="Blockchain database directory"/>
+							 Watermark="Blockchain database directory"/>
 
 					<Button Grid.Row="0"
 							Grid.Column="1"
@@ -120,17 +120,17 @@
 				<Label Content="Additional Startup Arguments" Margin="0,10,0,0"/>
 				<TextBox Name="tbxAdditionalArguments"
 						 Text="{Binding AdditionalArguments, Mode=TwoWay}"
-						 PlaceholderText="Additional arguments that will be sent to daemon when it starts"/>
+						 Watermark="Additional arguments that will be sent to daemon when it starts"/>
 
 				<Label Content="Port Number" Margin="0,10,0,0"/>
 				<TextBox Name="tbxPortNumber"
 						 Text="{Binding PortNumber, Mode=TwoWay}"
-						 PlaceholderText="Number - port that daemon will use to listen on"/>
+						 Watermark="Number - port that daemon will use to listen on"/>
 
 				<Label Content="Log Level" Margin="0,10,0,0"/>
 				<TextBox Name="tbxLogLevel"
 						 Text="{Binding LogLevel, Mode=TwoWay}"
-						 PlaceholderText="Number - level at which daemon will write to log files"/>
+						 Watermark="Number - level at which daemon will write to log files"/>
 
 				<CheckBox Name="cbxAutoStartMining"
 						  Content="Auto start mining"
