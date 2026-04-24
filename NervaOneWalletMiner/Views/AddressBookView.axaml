@@ -12,11 +12,9 @@
 		<vm:AddressBookViewModel/>
 	</Design.DataContext>
 
-	<ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
-	<Grid RowDefinitions="Auto, Auto">
-		<Grid Grid.Row="0">
-			<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch"
-						Spacing="5" Margin="10" MaxWidth="650">
+	<Grid RowDefinitions="Auto,*">
+		<StackPanel Grid.Row="0" Orientation="Vertical" HorizontalAlignment="Stretch"
+					Spacing="5" Margin="10" MaxWidth="650">
 
 				<Grid Name="grdHeader" ColumnDefinitions="Auto,*,Auto">
 					<Grid.RowDefinitions>
@@ -55,11 +53,9 @@
 					</StackPanel>
 				</Grid>
 
-			</StackPanel>
-		</Grid>
+		</StackPanel>
 
-		<Grid Grid.Row="1">
-			<DataGrid Name="dtgAddressBook"
+		<DataGrid Grid.Row="1" Name="dtgAddressBook"
 					  AutoGenerateColumns="False"
 					  GridLinesVisibility="Horizontal"
 					  IsReadOnly="True"
@@ -98,9 +94,7 @@
 								  Click="Delete_Clicked"/>
 					</ContextMenu>
 				</DataGrid.ContextMenu>
-			</DataGrid>
-		</Grid>
+		</DataGrid>
 	</Grid>
-	</ScrollViewer>
 
 </UserControl>

@@ -27,7 +27,7 @@ namespace NervaOneWalletMiner.Views
                 _colHeight = (DataGridTextColumn)dtgTransactions.Columns[1];
                 _colAddress = (DataGridTextColumn)dtgTransactions.Columns[4];
 
-                // Prevent row selection from scrolling the outer ScrollViewer
+                // Prevent row selection from triggering RequestBringIntoView
                 dtgTransactions.AddHandler(
                     RequestBringIntoViewEvent,
                     (object? sender, RequestBringIntoViewEventArgs e) => { e.Handled = true; },
