@@ -23,7 +23,7 @@ class Program
             .UsePlatformDetect()
             .WithInterFont()
             .LogToTrace()
-            .UseReactiveUI(_ => { });
+            .UseReactiveUI();
 
         // Avalonia 11.1+ defaults to WinUIComposition → DirectComposition, both of which
         // run a continuous compositor loop even when the UI is idle. On low-end or older

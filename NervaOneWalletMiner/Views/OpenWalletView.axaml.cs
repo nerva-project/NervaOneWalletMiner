@@ -26,7 +26,7 @@ namespace NervaOneWalletMiner.Views
                 if (!GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPassRequiredToOpenWallet)
                 {
                     tbxPassword.IsEnabled = false;
-                    tbxPassword.PlaceholderText = "Password not required to open wallet";
+                    tbxPassword.Watermark = "Password not required to open wallet";
                     btnShowHidePassword.IsEnabled = false;
                 }
 

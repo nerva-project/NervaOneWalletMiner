@@ -28,7 +28,7 @@
 
 			<Label Content="Wallet Name" Margin="0,10,0,0"/>
 			<TextBox Name="tbxWalletName"
-					 PlaceholderText="Enter wallet name"/>
+					 Watermark="Enter wallet name"/>
 
 			<Label Content="Password" Margin="0,15,0,0"/>
 			<DockPanel>
@@ -39,7 +39,7 @@
 						IsTabStop="False"
 						Click="ShowHidePassword_Clicked"/>
 				<TextBox Name="tbxPassword"
-						 PlaceholderText="Enter wallet password"
+						 Watermark="Enter wallet password"
 						 PasswordChar="*"
 						 RevealPassword="False"/>
 			</DockPanel>

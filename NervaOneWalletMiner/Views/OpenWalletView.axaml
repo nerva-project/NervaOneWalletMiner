@@ -38,7 +38,7 @@
 						IsTabStop="False"
 						Click="ShowHidePassword_Clicked"/>
 				<TextBox Name="tbxPassword"
-						 PlaceholderText="Enter wallet password"
+						 Watermark="Enter wallet password"
 						 PasswordChar="*"
 						 RevealPassword="False"
 						 KeyDown="Password_KeyDown"/>

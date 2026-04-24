@@ -40,7 +40,7 @@
 				<TextBox Grid.Column="0"
 						 Name="tbxPublicIp"
 						 Text="{Binding PublicIp, Mode=TwoWay}"
-						 PlaceholderText="Not detected — enter your IP manually"/>
+						 Watermark="Not detected — enter your IP manually"/>
 				<Button Grid.Column="1"
 						Name="btnDetectIp"
 						Content="Detect"
@@ -61,7 +61,7 @@
 						 Name="tbxNodeAddress"
 						 Text="{Binding NodeAddress}"
 						 IsReadOnly="True"
-						 PlaceholderText="IP:Port will appear here once IP is set"/>
+						 Watermark="IP:Port will appear here once IP is set"/>
 				<Button Grid.Column="1"
 						Name="btnCopyAddress"
 						Content="Copy"
@@ -73,7 +73,7 @@
 			<Label Content="Public Node Startup Arguments" Margin="0,10,0,0"/>
 			<TextBox Name="tbxPublicNodeArguments"
 					 Text="{Binding PublicNodeArguments, Mode=TwoWay}"
-					 PlaceholderText="--rpc-bind-ip 0.0.0.0 --confirm-external-bind"/>
+					 Watermark="--rpc-bind-ip 0.0.0.0 --confirm-external-bind"/>
 
 			<!-- Firewall warning -->
 			<Border Background="#33FF8C00"

@@ -4,9 +4,11 @@ using Android.Content.PM;
 using Android.OS;
 using Android.Provider;
 
+using Avalonia;
 using Avalonia.Android;
 using NervaOneWalletMiner.Android.Services;
 using NervaOneWalletMiner.Helpers;
+using ReactiveUI.Avalonia;
 using System;
 
 namespace NervaOneWalletMiner.Android;
@@ -17,7 +19,7 @@ namespace NervaOneWalletMiner.Android;
     Icon = "@mipmap/Icon",
     MainLauncher = true,
     ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize | ConfigChanges.UiMode)]
-public class MainActivity : AvaloniaMainActivity
+public class MainActivity : AvaloniaMainActivity<App>
 {
     protected override void OnCreate(Bundle? savedInstanceState)
     {
@@ -43,6 +45,19 @@ public class MainActivity : AvaloniaMainActivity
         }
     }
 
+    protected override AppBuilder CustomizeAppBuilder(AppBuilder builder)
+    {
+        return base.CustomizeAppBuilder(builder)
+            .WithInterFont()
+            .UseReactiveUI()
+            // EGL (GPU) mode renders at the display refresh rate via Choreographer even when
+            // the UI is idle, causing constant background CPU/battery drain. Software mode
+            // renders only on dirty regions, matching the idle behavior of Avalonia 11.0.x.
+            .With(new AndroidPlatformOptions
+            {
+                RenderingMode = [AndroidRenderingMode.Software]
+            });
+    }
 
     protected override void OnPause()
     {
