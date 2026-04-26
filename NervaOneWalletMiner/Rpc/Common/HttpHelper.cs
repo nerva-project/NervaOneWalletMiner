@@ -84,7 +84,7 @@ namespace NervaOneWalletMiner.Rpc.Common
             return response;
         }
 
-        public static ServiceError GetHttpError(string source, HttpResponseMessage httpResponse)
+        public static async Task<ServiceError> GetHttpError(string source, HttpResponseMessage httpResponse)
         {
             ServiceError httpError = new();
 
@@ -93,7 +93,7 @@ namespace NervaOneWalletMiner.Rpc.Common
                 httpError.IsError = true;
                 httpError.Code = httpResponse.StatusCode.ToString();
                 httpError.Message = httpResponse.ReasonPhrase;
-                httpError.Content = httpResponse.Content.ReadAsStringAsync().Result;
+                httpError.Content = await httpResponse.Content.ReadAsStringAsync();
 
                 Logger.LogError("HTTP.GHE", source + " - response failed. Code: " + httpResponse.StatusCode + ", Phrase: " + httpResponse.ReasonPhrase);
             }
