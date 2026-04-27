@@ -41,7 +41,8 @@
 				<TextBox Name="tbxPassword"
 						 Watermark="Enter wallet password"
 						 PasswordChar="*"
-						 RevealPassword="False"/>
+						 RevealPassword="False"
+						 KeyDown="Password_KeyDown"/>
 			</DockPanel>
 
 			<Label Content="Language" Margin="0,15,0,0"/>

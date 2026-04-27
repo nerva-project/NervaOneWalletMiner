@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects.Constants;
@@ -28,19 +29,33 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
+        public void Password_KeyDown(object sender, KeyEventArgs args)
+        {
+            if (args.Key == Key.Enter)
+            {
+                OkButton_Clicked(sender, args);
+            }
+        }
+
         public async void OkButton_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
+                string walletName = tbxWalletName.Text == null ? string.Empty : tbxWalletName.Text;
+
                 if (string.IsNullOrEmpty(tbxSeedPhrase.Text)
-                    || string.IsNullOrEmpty(tbxWalletName.Text)
+                    || string.IsNullOrEmpty(walletName)
                     || string.IsNullOrEmpty(tbxPassword.Text))
                 {
                     await DialogService.ShowAsync(new MessageBoxView("Restore From Seed", "Seed Phrase, Wallet Name and Password are all required.", true));
                     return;
                 }
+                else if (walletName.Contains('/') || walletName.Contains('\\') || walletName.Contains(".."))
+                {
+                    await DialogService.ShowAsync(new MessageBoxView("Restore From Seed", "Wallet Name cannot contain path characters.", true));
+                    return;
+                }
 
-                string walletName = tbxWalletName.Text;
                 char[] seed = tbxSeedPhrase.Text.ToCharArray();
                 string seedOffset = tbxSeedOffset.Text ?? string.Empty;
                 char[] walletPassword = tbxPassword.Text.ToCharArray();
