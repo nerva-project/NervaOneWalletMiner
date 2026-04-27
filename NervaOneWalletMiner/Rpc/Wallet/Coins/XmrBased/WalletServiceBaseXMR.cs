@@ -20,12 +20,13 @@ namespace NervaOneWalletMiner.Rpc.Wallet
     public abstract class WalletServiceBaseXMR : IWalletService
     {
         protected abstract string CoinPrefix { get; }
+        protected virtual decimal CoinAtomicUnits => 1_000_000_000_000m;
 
-        protected virtual decimal AmountFromAtomicUnits(ulong value, int decimalPlaces) =>
-            Math.Round(Convert.ToDecimal(value / 1000000000000.0), decimalPlaces);
+        protected decimal AmountFromAtomicUnits(ulong value, int decimalPlaces) =>
+            Math.Round(Convert.ToDecimal(value / (double)CoinAtomicUnits), decimalPlaces);
 
-        protected virtual ulong AtomicUnitsFromAmount(decimal amount) =>
-            (ulong)(amount * Convert.ToDecimal(1000000000000.0));
+        protected ulong AtomicUnitsFromAmount(decimal amount) =>
+            (ulong)(amount * CoinAtomicUnits);
 
         protected static string GetCallerName([CallerMemberName] string name = "") => name;
 
