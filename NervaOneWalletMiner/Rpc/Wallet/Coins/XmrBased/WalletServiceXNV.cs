@@ -56,7 +56,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    JObject jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+                    JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
 
                     var error = jsonObject["error"];
                     if (error != null)
@@ -66,19 +66,28 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     }
                     else
                     {
-                        ResRestoreFromSeed createWalletResponse = JsonConvert.DeserializeObject<ResRestoreFromSeed>(jsonObject.SelectToken("result")!.ToString())!;
-                        responseObj.Address = createWalletResponse.address;
-                        responseObj.Seed = createWalletResponse.seed;
-                        responseObj.Info = createWalletResponse.info;
-                        responseObj.WasDeprecated = createWalletResponse.was_deprecated;
+                        var resultToken = jsonObject.SelectToken("result");
+                        if (resultToken == null)
+                        {
+                            responseObj.Error.IsError = true;
+                            responseObj.Error.Message = "Response missing 'result' field";
+                        }
+                        else
+                        {
+                            ResRestoreFromSeed createWalletResponse = JsonConvert.DeserializeObject<ResRestoreFromSeed>(resultToken.ToString())!;
+                            responseObj.Address = createWalletResponse.address;
+                            responseObj.Seed = createWalletResponse.seed;
+                            responseObj.Info = createWalletResponse.info;
+                            responseObj.WasDeprecated = createWalletResponse.was_deprecated;
 
-                        responseObj.Error.IsError = false;
+                            responseObj.Error.IsError = false;
+                        }
                     }
                 }
                 else
                 {
                     // Set HTTP error
-                    responseObj.Error = HttpHelper.GetHttpError(nameof(RestoreFromSeed), httpResponse);
+                    responseObj.Error = await HttpHelper.GetHttpError(nameof(RestoreFromSeed), httpResponse);
                 }
             }
             catch (Exception ex)
@@ -140,7 +149,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    JObject jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+                    JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
 
                     var error = jsonObject["error"];
                     if (error != null)
@@ -150,17 +159,26 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     }
                     else
                     {
-                        ResRestoreFromKeys createWalletResponse = JsonConvert.DeserializeObject<ResRestoreFromKeys>(jsonObject.SelectToken("result")!.ToString())!;
-                        responseObj.Address = createWalletResponse.address;
-                        responseObj.Info = createWalletResponse.info;
+                        var resultToken = jsonObject.SelectToken("result");
+                        if (resultToken == null)
+                        {
+                            responseObj.Error.IsError = true;
+                            responseObj.Error.Message = "Response missing 'result' field";
+                        }
+                        else
+                        {
+                            ResRestoreFromKeys createWalletResponse = JsonConvert.DeserializeObject<ResRestoreFromKeys>(resultToken.ToString())!;
+                            responseObj.Address = createWalletResponse.address;
+                            responseObj.Info = createWalletResponse.info;
 
-                        responseObj.Error.IsError = false;
+                            responseObj.Error.IsError = false;
+                        }
                     }
                 }
                 else
                 {
                     // Set HTTP error
-                    responseObj.Error = HttpHelper.GetHttpError(nameof(RestoreFromKeys), httpResponse);
+                    responseObj.Error = await HttpHelper.GetHttpError(nameof(RestoreFromKeys), httpResponse);
                 }
             }
             catch (Exception ex)
@@ -218,7 +236,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    JObject jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+                    JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
 
                     var error = jsonObject["error"];
                     if (error != null)
@@ -228,20 +246,29 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     }
                     else
                     {
-                        ResQueryKey queryKeyResponse = JsonConvert.DeserializeObject<ResQueryKey>(jsonObject.SelectToken("result")!.ToString())!;
-                        responseObj.PublicViewKey = queryKeyResponse.public_view_key;
-                        responseObj.PrivateViewKey = queryKeyResponse.private_view_key.ToCharArray();
-                        responseObj.PublicSpendKey = queryKeyResponse.public_spend_key;
-                        responseObj.PrivateSpendKey = queryKeyResponse.private_spend_key.ToCharArray();
-                        responseObj.Mnemonic = queryKeyResponse.mnemonic.ToCharArray();
+                        var resultToken = jsonObject.SelectToken("result");
+                        if (resultToken == null)
+                        {
+                            responseObj.Error.IsError = true;
+                            responseObj.Error.Message = "Response missing 'result' field";
+                        }
+                        else
+                        {
+                            ResQueryKey queryKeyResponse = JsonConvert.DeserializeObject<ResQueryKey>(resultToken.ToString())!;
+                            responseObj.PublicViewKey = queryKeyResponse.public_view_key;
+                            responseObj.PrivateViewKey = queryKeyResponse.private_view_key.ToCharArray();
+                            responseObj.PublicSpendKey = queryKeyResponse.public_spend_key;
+                            responseObj.PrivateSpendKey = queryKeyResponse.private_spend_key.ToCharArray();
+                            responseObj.Mnemonic = queryKeyResponse.mnemonic.ToCharArray();
 
-                        responseObj.Error.IsError = false;
+                            responseObj.Error.IsError = false;
+                        }
                     }
                 }
                 else
                 {
                     // Set HTTP error
-                    responseObj.Error = HttpHelper.GetHttpError(nameof(GetPrivateKeys), httpResponse);
+                    responseObj.Error = await HttpHelper.GetHttpError(nameof(GetPrivateKeys), httpResponse);
                 }
             }
             catch (Exception ex)

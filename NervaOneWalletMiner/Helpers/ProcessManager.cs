@@ -241,8 +241,6 @@ namespace NervaOneWalletMiner.Helpers
                 Process? process = Process.Start(new ProcessStartInfo(fileName, arguments)
                 {
                     UseShellExecute = false,
-                    RedirectStandardError = true,
-                    RedirectStandardOutput = true,
                     CreateNoWindow = true,
                     WorkingDirectory = GlobalData.CliToolsDir
                 });

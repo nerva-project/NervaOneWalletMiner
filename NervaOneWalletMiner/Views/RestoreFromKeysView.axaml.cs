@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects.Constants;
@@ -28,22 +29,37 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
+        public void Password_KeyDown(object sender, KeyEventArgs args)
+        {
+            if (args.Key == Key.Enter)
+            {
+                OkButton_Clicked(sender, args);
+            }
+        }
+
         public async void OkButton_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
+                string walletName = tbxWalletName.Text == null ? string.Empty : tbxWalletName.Text;
+
                 if (string.IsNullOrEmpty(tbxWalletAddress.Text)
                     || string.IsNullOrEmpty(tbxViewKey.Text)
                     || string.IsNullOrEmpty(tbxSpendKey.Text)
-                    || string.IsNullOrEmpty(tbxWalletName.Text)
+                    || string.IsNullOrEmpty(walletName)
                     || string.IsNullOrEmpty(tbxPassword.Text))
                 {
                     await DialogService.ShowAsync(new MessageBoxView("Restore From Keys", "Wallet Address, View Key, Spend Key, Wallet Name and Password are all required.", true));
                     return;
                 }
+                else if (walletName.Contains('/') || walletName.Contains('\\') || walletName.Contains(".."))
+                {
+                    await DialogService.ShowAsync(new MessageBoxView("Restore From Keys", "Wallet Name cannot contain path characters.", true));
+                    return;
+                }
 
                 string walletAddress = tbxWalletAddress.Text;
-                string walletName = tbxWalletName.Text;
+
                 char[] viewKey = tbxViewKey.Text.ToCharArray();
                 char[] spendKey = tbxSpendKey.Text.ToCharArray();
                 char[] walletPassword = tbxPassword.Text.ToCharArray();

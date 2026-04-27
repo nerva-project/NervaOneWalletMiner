@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects.Constants;
@@ -29,17 +30,31 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
+        public void Password_KeyDown(object sender, KeyEventArgs args)
+        {
+            if (args.Key == Key.Enter)
+            {
+                OkButton_Clicked(sender, args);
+            }
+        }
+
         public async void OkButton_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
-                if (string.IsNullOrEmpty(tbxWalletName.Text) || string.IsNullOrEmpty(tbxPassword.Text))
+                string walletName = tbxWalletName.Text == null ? string.Empty : tbxWalletName.Text;
+
+                if (string.IsNullOrEmpty(walletName) || string.IsNullOrEmpty(tbxPassword.Text))
                 {
                     await DialogService.ShowAsync(new MessageBoxView("Create Wallet", "Wallet Name and Password are required.", true));
                     return;
                 }
+                else if (walletName.Contains('/') || walletName.Contains('\\') || walletName.Contains(".."))
+                {
+                    await DialogService.ShowAsync(new MessageBoxView("Create Wallet", "Wallet Name cannot contain path characters.", true));
+                    return;
+                }
 
-                string walletName = tbxWalletName.Text;
                 char[] walletPassword = tbxPassword.Text.ToCharArray();
                 string walletLanguage = cbxLanguage.SelectedValue == null ? Language.English : cbxLanguage.SelectedValue.ToString()!;
 

@@ -62,7 +62,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "start_mining"), requestJson.ToString());
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    JObject jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+                    JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
 
                     var error = jsonObject["error"];
                     if (error != null)
@@ -84,7 +84,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 else
                 {
                     // Set HTTP error
-                    responseObj.Error = HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
                 }
             }
             catch (Exception ex)
@@ -110,7 +110,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "stop_mining"), requestJson.ToString());
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    JObject jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+                    JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
 
                     var error = jsonObject["error"];
                     if (error != null)
@@ -132,7 +132,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 else
                 {
                     // Set HTTP error
-                    responseObj.Error = HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
                 }
             }
             catch (Exception ex)
@@ -158,7 +158,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "stop_daemon"), requestJson.ToString());
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    JObject jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+                    JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
 
                     var error = jsonObject["error"];
                     if (error != null)
@@ -177,7 +177,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 else
                 {
                     // Set HTTP error
-                    responseObj.Error = HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
                 }
             }
             catch (Exception ex)
@@ -208,13 +208,14 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    if (string.IsNullOrEmpty(httpResponse.Content.ReadAsStringAsync().Result))
+                    string responseContent = await httpResponse.Content.ReadAsStringAsync();
+                    if (string.IsNullOrEmpty(responseContent))
                     {
                         Logger.LogInfo(CoinPrefix + ".DGTI", "Response Content is empty");
                     }
                     else
                     {
-                        JObject jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+                        JObject jsonObject = JObject.Parse(responseContent);
 
                         var error = jsonObject["error"];
                         if (error != null)
@@ -223,27 +224,35 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                             responseObj.Error = GetServiceError(GetCallerName(), error);
                         }
                         else
-                        {
-                            // Set successful response
-                            ResGetInfo getInfoResponse = JsonConvert.DeserializeObject<ResGetInfo>(jsonObject.SelectToken("result")!.ToString())!;
+                        {                            
+                            var resultToken = jsonObject.SelectToken("result");
+                            if (resultToken == null)
+                            {
+                                responseObj.Error.IsError = true;
+                                responseObj.Error.Message = "Response missing 'result' field";
+                            }
+                            else
+                            {
+                                // Set successful response
+                                ResGetInfo getInfoResponse = JsonConvert.DeserializeObject<ResGetInfo>(resultToken.ToString())!;
+                                responseObj.Height = getInfoResponse.height;
+                                responseObj.TargetHeight = getInfoResponse.target_height;
+                                responseObj.NetworkHashRate = (ulong)(getInfoResponse.difficulty / BlockSeconds);
+                                responseObj.ConnectionCountOut = getInfoResponse.outgoing_connections_count;
+                                responseObj.ConnectionCountIn = getInfoResponse.incoming_connections_count;
+                                responseObj.StartTime = GlobalMethods.UnixTimeStampToDateTime(getInfoResponse.start_time);
+                                responseObj.Version = getInfoResponse.version;
+                                responseObj.Status = getInfoResponse.status;
 
-                            responseObj.Height = getInfoResponse.height;
-                            responseObj.TargetHeight = getInfoResponse.target_height;
-                            responseObj.NetworkHashRate = (ulong)(getInfoResponse.difficulty / BlockSeconds);
-                            responseObj.ConnectionCountOut = getInfoResponse.outgoing_connections_count;
-                            responseObj.ConnectionCountIn = getInfoResponse.incoming_connections_count;
-                            responseObj.StartTime = GlobalMethods.UnixTimeStampToDateTime(getInfoResponse.start_time);
-                            responseObj.Version = getInfoResponse.version;
-                            responseObj.Status = getInfoResponse.status;
-
-                            responseObj.Error.IsError = false;
+                                responseObj.Error.IsError = false;
+                            }
                         }
                     }
                 }
                 else
                 {
                     // Set HTTP error
-                    responseObj.Error = HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
                 }
             }
             catch (Exception ex)
@@ -322,13 +331,14 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    if (string.IsNullOrEmpty(httpResponse.Content.ReadAsStringAsync().Result))
+                    string responseContent = await httpResponse.Content.ReadAsStringAsync();
+                    if (string.IsNullOrEmpty(responseContent))
                     {
                         Logger.LogInfo(CoinPrefix + ".DGTC", "Response Content is empty");
                     }
                     else
                     {
-                        JObject jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+                        JObject jsonObject = JObject.Parse(responseContent);
 
                         var error = jsonObject["error"];
                         if (error != null)
@@ -338,10 +348,11 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                         }
                         else
                         {
-                            if (jsonObject.SelectToken("result.connections") != null)
+                            var connectionsToken = jsonObject.SelectToken("result.connections");
+                            if (connectionsToken != null)
                             {
                                 // Set successful response
-                                List<ResGetConnections> getConnectionsResponse = JsonConvert.DeserializeObject<List<ResGetConnections>>(jsonObject.SelectToken("result.connections")!.ToString())!;
+                                List<ResGetConnections> getConnectionsResponse = JsonConvert.DeserializeObject<List<ResGetConnections>>(connectionsToken.ToString())!;
 
                                 foreach (ResGetConnections connection in getConnectionsResponse)
                                 {
@@ -357,7 +368,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                             }
                             else
                             {
-                                Logger.LogInfo(CoinPrefix + ".DGTC", "Connections missing: " + GlobalMethods.RemoveLineBreaksAndSpaces(httpResponse.Content.ReadAsStringAsync().Result));
+                                Logger.LogInfo(CoinPrefix + ".DGTC", "Connections missing: " + GlobalMethods.RemoveLineBreaksAndSpaces(responseContent));
                             }
 
                             responseObj.Error.IsError = false;
@@ -367,7 +378,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 else
                 {
                     // Set HTTP error
-                    responseObj.Error = HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
                 }
             }
             catch (Exception ex)
@@ -423,13 +434,14 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "mining_status"), requestJson.ToString());
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    if (string.IsNullOrEmpty(httpResponse.Content.ReadAsStringAsync().Result))
+                    string responseContent = await httpResponse.Content.ReadAsStringAsync();
+                    if (string.IsNullOrEmpty(responseContent))
                     {
                         Logger.LogInfo(CoinPrefix + ".DMSS", "Response Content is empty");
                     }
                     else
                     {
-                        JObject jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+                        JObject jsonObject = JObject.Parse(responseContent);
 
                         var error = jsonObject["error"];
                         if (error != null)
@@ -453,7 +465,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 else
                 {
                     // Set HTTP error
-                    responseObj.Error = HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
                 }
             }
             catch (Exception ex)

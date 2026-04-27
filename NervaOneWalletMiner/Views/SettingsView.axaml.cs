@@ -6,6 +6,7 @@ using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.ViewModels;
 using System;
+using System.Threading.Tasks;
 
 namespace NervaOneWalletMiner.Views
 {
@@ -98,7 +99,7 @@ namespace NervaOneWalletMiner.Views
                         if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].StopOnExit)
                         {
                             Logger.LogDebug("SET.SSCL", "Stopping daemon because switching coin and StopOnExit is set");
-                            GlobalMethods.StopAndCloseDaemon();
+                            await Task.Run(() => GlobalMethods.StopAndCloseDaemon());
                         }
                     }
 

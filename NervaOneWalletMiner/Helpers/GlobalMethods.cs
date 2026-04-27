@@ -1149,7 +1149,7 @@ namespace NervaOneWalletMiner.Helpers
                     Logger.LogDebug("GLM.RSQS", "Restarting CLI with QuickSync");
                     ProcessManager.Kill(GlobalData.WalletProcessName);
 
-                    StopAndCloseDaemon();
+                    await Task.Run(() => StopAndCloseDaemon());
 
                     GlobalData.IsDaemonRestarting = true;
                     string quickSyncFile = Path.Combine(GlobalData.CliToolsDir, Path.GetFileName(GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].QuickSyncUrl));
@@ -1326,6 +1326,7 @@ namespace NervaOneWalletMiner.Helpers
             GlobalData.NewestTransactionHeight = 0;
             GlobalData.WalletStats = new();
             GlobalData.WalletPassProvidedTime = DateTime.MinValue;
+            GlobalData.WalletPasswordHash = string.Empty;
         }
 
         public static void CoinChanged()

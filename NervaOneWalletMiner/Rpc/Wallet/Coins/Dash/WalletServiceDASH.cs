@@ -94,7 +94,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    JObject jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+                    JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
 
                     var error = jsonObject["error"];
                     if (error != null)
@@ -111,7 +111,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 else
                 {
                     // Set HTTP error
-                    responseObj.Error = HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
                 }
             }
             catch (Exception ex)
@@ -149,7 +149,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    JObject jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+                    JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
 
                     var error = jsonObject["error"];
                     if (error != null)
@@ -166,7 +166,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 else
                 {
                     // Set HTTP error
-                    responseObj.Error = HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
                 }
             }
             catch (Exception ex)
@@ -209,7 +209,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    JObject jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+                    JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
 
                     var error = jsonObject["error"];
                     if (error != null)
@@ -226,7 +226,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 else
                 {
                     // Set HTTP error
-                    responseObj.Error = HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
                 }
             }
             catch (Exception ex)
@@ -264,7 +264,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    JObject jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+                    JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
 
                     var error = jsonObject["error"];
                     if (error != null)
@@ -280,7 +280,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 else
                 {
                     // Set HTTP error
-                    responseObj.Error = HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
                 }
             }
             catch (Exception ex)
@@ -321,7 +321,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    JObject jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+                    JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
 
                     var error = jsonObject["error"];
                     if (error != null)
@@ -337,7 +337,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 else
                 {
                     // Set HTTP error
-                    responseObj.Error = HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
                 }
             }
             catch (Exception ex)
@@ -397,7 +397,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    JObject jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+                    JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
 
                     var error = jsonObject["error"];
                     if (error != null)
@@ -416,7 +416,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 else
                 {
                     // Set HTTP error
-                    responseObj.Error = HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
                 }
             }
             catch (Exception ex)
@@ -473,7 +473,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    JObject jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+                    JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
 
                     var error = jsonObject["error"];
                     if (error != null)
@@ -483,28 +483,36 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     }
                     else
                     {                        
-                        List<WalletAccount> getAccountsResponse = JsonConvert.DeserializeObject<List<WalletAccount>>(jsonObject.SelectToken("result")!.ToString())!;
-                                               
-                        foreach (WalletAccount account in getAccountsResponse)
-                        {
-                            Account newAccount = new()
-                            {
-                                Index = index++,
-                                AddressFull = account.address,
-                                AddressShort = GlobalMethods.GetShorterString(account.address, 12),
-                                Label = account.label
-                            };
-
-                            accountsDictionary.Add(newAccount.AddressFull, newAccount);
+                        var resultToken = jsonObject.SelectToken("result");
+                        if (resultToken == null)
+                        {                            
+                            responseObj.Error.IsError = true;
+                            responseObj.Error.Message = "Response missing 'result' field";
                         }
+                        else
+                        {
+                            List<WalletAccount> getAccountsResponse = JsonConvert.DeserializeObject<List<WalletAccount>>(resultToken.ToString())!;
+                            foreach (WalletAccount account in getAccountsResponse)
+                            {
+                                Account newAccount = new()
+                                {
+                                    Index = index++,
+                                    AddressFull = account.address,
+                                    AddressShort = GlobalMethods.GetShorterString(account.address, 12),
+                                    Label = account.label
+                                };
 
-                        isSuccess = true;
+                                accountsDictionary.Add(newAccount.AddressFull, newAccount);
+                            }
+
+                            isSuccess = true;
+                        }
                     }
                 }
                 else
                 {
                     // Set HTTP error
-                    responseObj.Error = HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
                 }
 
                 if (isSuccess)
@@ -522,7 +530,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
                     if (httpResponse.IsSuccessStatusCode)
                     {
-                        JObject jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+                        JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
 
                         var error = jsonObject["error"];
                         if (error != null)
@@ -532,47 +540,55 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                         }
                         else
                         {
-                            List<WalletAccount> getAccountsResponse = JsonConvert.DeserializeObject<List<WalletAccount>>(jsonObject.SelectToken("result")!.ToString())!;
-
-                            foreach (WalletAccount account in getAccountsResponse)
+                            var resultToken = jsonObject.SelectToken("result");
+                            if (resultToken == null)
                             {
-                                if(accountsDictionary.ContainsKey(account.address))
+                                responseObj.Error.IsError = true;
+                                responseObj.Error.Message = "Response missing 'result' field";
+                            }
+                            else
+                            {
+                                List<WalletAccount> getAccountsResponse = JsonConvert.DeserializeObject<List<WalletAccount>>(resultToken.ToString())!;
+                                foreach (WalletAccount account in getAccountsResponse)
                                 {
-                                    accountsDictionary[account.address].BalanceTotal = account.amount;
-                                    accountsDictionary[account.address].BalanceUnlocked = account.amount;                                    
-                                }
-                                else
-                                {
-                                    Account newAccount = new()
+                                    if(accountsDictionary.ContainsKey(account.address))
                                     {
-                                        Index = index++,
-                                        AddressFull = account.address,
-                                        AddressShort = GlobalMethods.GetShorterString(account.address, 12),
-                                        BalanceTotal = account.amount,
-                                        BalanceUnlocked = account.amount,                                        
-                                        Label = account.label
-                                    };
+                                        accountsDictionary[account.address].BalanceTotal = account.amount;
+                                        accountsDictionary[account.address].BalanceUnlocked = account.amount;
+                                    }
+                                    else
+                                    {
+                                        Account newAccount = new()
+                                        {
+                                            Index = index++,
+                                            AddressFull = account.address,
+                                            AddressShort = GlobalMethods.GetShorterString(account.address, 12),
+                                            BalanceTotal = account.amount,
+                                            BalanceUnlocked = account.amount,
+                                            Label = account.label
+                                        };
 
-                                    accountsDictionary.Add(newAccount.AddressFull, newAccount);
+                                        accountsDictionary.Add(newAccount.AddressFull, newAccount);
+                                    }
                                 }
+
+                                responseObj.SubAccounts = accountsDictionary.Values.ToList();
+
+                                // Add up total balances
+                                foreach(Account account in responseObj.SubAccounts)
+                                {
+                                    responseObj.BalanceTotal += account.BalanceTotal;
+                                    responseObj.BalanceUnlocked += account.BalanceUnlocked;
+                                }
+
+                                responseObj.Error.IsError = false;
                             }
-
-                            responseObj.SubAccounts = accountsDictionary.Values.ToList();
-
-                            // Add up total balances
-                            foreach(Account account in responseObj.SubAccounts)
-                            {
-                                responseObj.BalanceTotal += account.BalanceTotal;
-                                responseObj.BalanceUnlocked += account.BalanceUnlocked;
-                            }
-
-                            responseObj.Error.IsError = false;
                         }
                     }
                     else
                     {
                         // Set HTTP error
-                        responseObj.Error = HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                        responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
                     }
                 }
             }
@@ -620,7 +636,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    JObject jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+                    JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
 
                     var error = jsonObject["error"];
                     if (error != null)
@@ -629,32 +645,41 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                         responseObj.Error = GetServiceError(GetCallerName(), error);
                     }
                     else
-                    {
-                        // Create success response object
-                        List<TransferEntry> getTransfersResponse = JsonConvert.DeserializeObject<List<TransferEntry>>(jsonObject.SelectToken("result.transactions")!.ToString())!;
-                        foreach (TransferEntry entry in getTransfersResponse)
+                    {                        
+                        var resultToken = jsonObject.SelectToken("result.transactions");
+                        if (resultToken == null)
                         {
-                            Transfer newTransfer = new()
-                            {
-                                AccountIndex = -1,
-                                TransactionId = entry.txid,
-                                AddressShort = GlobalMethods.GetShorterString(entry.address, 12),
-                                Height = string.IsNullOrEmpty(entry.blockheight) ? 0 : Convert.ToUInt32(entry.blockheight),
-                                Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timereceived).ToLocalTime(),
-                                Amount = Convert.ToDecimal(entry.amount),
-                                Type = GetTransactionType(entry.category)
-                            };
-
-                            responseObj.Transfers.Add(newTransfer);
+                            responseObj.Error.IsError = true;
+                            responseObj.Error.Message = "Response missing 'result.transactions' field";
                         }
+                        else
+                        {
+                            // Create success response object
+                            List<TransferEntry> getTransfersResponse = JsonConvert.DeserializeObject<List<TransferEntry>>(resultToken.ToString())!;
+                            foreach (TransferEntry entry in getTransfersResponse)
+                            {
+                                Transfer newTransfer = new()
+                                {
+                                    AccountIndex = -1,
+                                    TransactionId = entry.txid,
+                                    AddressShort = GlobalMethods.GetShorterString(entry.address, 12),
+                                    Height = string.IsNullOrEmpty(entry.blockheight) ? 0 : Convert.ToUInt32(entry.blockheight),
+                                    Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timereceived).ToLocalTime(),
+                                    Amount = Convert.ToDecimal(entry.amount),
+                                    Type = GetTransactionType(entry.category)
+                                };
 
-                        responseObj.Error.IsError = false;
+                                responseObj.Transfers.Add(newTransfer);
+                            }
+
+                            responseObj.Error.IsError = false;
+                        }
                     }
                 }
                 else
                 {
                     // Set HTTP error
-                    responseObj.Error = HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
                 }
             }
             catch (Exception ex)
@@ -693,7 +718,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    JObject jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+                    JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
 
                     var error = jsonObject["error"];
                     if (error != null)
@@ -702,38 +727,46 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                         responseObj.Error = GetServiceError(GetCallerName(), error);
                     }
                     else
-                    {
-                        // Create success response object
-                        TransferEntry getTransfByTxIdResponse = JsonConvert.DeserializeObject<TransferEntry>(jsonObject.SelectToken("result")!.ToString())!;
-                        
-                        responseObj.TransactionId = getTransfByTxIdResponse.txid;                        
-                        responseObj.Height = string.IsNullOrEmpty(getTransfByTxIdResponse.blockheight)? 0 : Convert.ToUInt32(getTransfByTxIdResponse.blockheight);
-                        responseObj.Timestamp = GlobalMethods.UnixTimeStampToDateTime(getTransfByTxIdResponse.timereceived).ToLocalTime();
-                        responseObj.Confirmations = getTransfByTxIdResponse.confirmations;
-                        responseObj.Note = getTransfByTxIdResponse.comment;
-
-                        foreach(TransferDetails details in getTransfByTxIdResponse.Details)
+                    {                        
+                        var resultToken = jsonObject.SelectToken("result");
+                        if (resultToken == null)
                         {
-                            if(decimal.Parse(details.amount, NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign) == requestObj.Amount)
-                            {
-                                responseObj.Address = details.address;
-                                responseObj.Type = details.category;
-                                responseObj.Amount = string.IsNullOrEmpty(details.amount) ? 0 : decimal.Parse(details.amount, NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign);
-                                responseObj.Fee = string.IsNullOrEmpty(details.fee) ? 0 : decimal.Parse(details.fee, NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign);
-                                break;
-                            }
+                            responseObj.Error.IsError = true;
+                            responseObj.Error.Message = "Response missing 'result' field";
                         }
+                        else
+                        {
+                            // Create success response object
+                            TransferEntry getTransfByTxIdResponse = JsonConvert.DeserializeObject<TransferEntry>(resultToken.ToString())!;
+                            responseObj.TransactionId = getTransfByTxIdResponse.txid;
+                            responseObj.Height = string.IsNullOrEmpty(getTransfByTxIdResponse.blockheight) ? 0 : Convert.ToUInt32(getTransfByTxIdResponse.blockheight);
+                            responseObj.Timestamp = GlobalMethods.UnixTimeStampToDateTime(getTransfByTxIdResponse.timereceived).ToLocalTime();
+                            responseObj.Confirmations = getTransfByTxIdResponse.confirmations;
+                            responseObj.Note = getTransfByTxIdResponse.comment;
 
-                        // TODO: If you want responseObj.Destinations, need to send true for ["verbose"] and try to pick it up that way
-                        //responseObj.Destinations.Add(destination.address + " | " + destination.amount);
+                            foreach(TransferDetails details in getTransfByTxIdResponse.Details)
+                            {
+                                if(decimal.Parse(details.amount, NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign) == requestObj.Amount)
+                                {
+                                    responseObj.Address = details.address;
+                                    responseObj.Type = details.category;
+                                    responseObj.Amount = string.IsNullOrEmpty(details.amount) ? 0 : decimal.Parse(details.amount, NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign);
+                                    responseObj.Fee = string.IsNullOrEmpty(details.fee) ? 0 : decimal.Parse(details.fee, NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign);
+                                    break;
+                                }
+                            }
 
-                        responseObj.Error.IsError = false;
+                            // TODO: If you want responseObj.Destinations, need to send true for ["verbose"] and try to pick it up that way
+                            //responseObj.Destinations.Add(destination.address + " | " + destination.amount);
+
+                            responseObj.Error.IsError = false;
+                        }
                     }
                 }
                 else
                 {
                     // Set HTTP error
-                    responseObj.Error = HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
                 }
             }
             catch (Exception ex)
@@ -776,7 +809,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    JObject jsonObject = JObject.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+                    JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
 
                     var error = jsonObject["error"];
                     if (error != null)
@@ -793,7 +826,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 else
                 {
                     // Set HTTP error
-                    responseObj.Error = HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
                 }
             }
             catch (Exception ex)
