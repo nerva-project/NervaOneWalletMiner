@@ -1326,6 +1326,7 @@ namespace NervaOneWalletMiner.Helpers
             GlobalData.NewestTransactionHeight = 0;
             GlobalData.WalletStats = new();
             GlobalData.WalletPassProvidedTime = DateTime.MinValue;
+            GlobalData.WalletPasswordHash = string.Empty;
         }
 
         public static void CoinChanged()
