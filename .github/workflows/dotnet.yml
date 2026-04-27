@@ -64,6 +64,7 @@ jobs:
                 path: |
                     ./NervaOneWalletMiner.Desktop/bin/release/net10.0/${{ matrix.rid }}/publish/*
                     !./NervaOneWalletMiner.Desktop/bin/release/net10.0/${{ matrix.rid }}/publish/*.pdb
+                overwrite: true
 
 # ================================
 #              Linux
@@ -121,6 +122,7 @@ jobs:
             with:
                 name: nervaone-desktop-v${{ needs.setup.outputs.version }}-${{ matrix.rid }}
                 path: ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop/*
+                overwrite: true
 
 # ================================
 #              macOS
@@ -175,6 +177,7 @@ jobs:
                 path: |
                   ./NervaOneWalletMiner.Desktop/bin/*
                   !./NervaOneWalletMiner.Desktop/bin/release/
+                overwrite: true
 
 
 # ================================
@@ -226,3 +229,4 @@ jobs:
             with:
                 name: nervaone-mobile-v${{ needs.setup.outputs.version }}-android
                 path: ${{ steps.select_apk.outputs.apk_path }}
+                overwrite: true
