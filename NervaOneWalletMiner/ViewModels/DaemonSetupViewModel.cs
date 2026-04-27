@@ -279,13 +279,13 @@ namespace NervaOneWalletMiner.ViewModels
             }
         }
 
-        public void RestartWithCommand(string restartOptions)
+        public async void RestartWithCommand(string restartOptions)
         {
             try
             {
                 Logger.LogDebug("DSM.RWCM", "Restarting with command");
                 ProcessManager.Kill(GlobalData.WalletProcessName);
-                GlobalMethods.StopAndCloseDaemon();
+                await Task.Run(() => GlobalMethods.StopAndCloseDaemon());
 
                 if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
                 {
@@ -352,7 +352,7 @@ namespace NervaOneWalletMiner.ViewModels
                 }
 
                 Logger.LogDebug("DSM.PCTU", "Stopping daemon...");
-                GlobalMethods.StopAndCloseDaemon();
+                await Task.Run(() => GlobalMethods.StopAndCloseDaemon());
 
                 GlobalMethods.SetUpCliTools(downloadLink, GlobalData.CliToolsDir);
             }
@@ -394,7 +394,7 @@ namespace NervaOneWalletMiner.ViewModels
                 }
 
                 Logger.LogDebug("DSM.PBDD", "Stopping daemon...");
-                GlobalMethods.StopAndCloseDaemon();
+                await Task.Run(() => GlobalMethods.StopAndCloseDaemon());
 
                 string dataDir = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].DataDir;
                 string dbSubfolder = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].BlockchainDbSubfolder;
