@@ -4,7 +4,7 @@
     <TargetFramework>net10.0-android</TargetFramework>
     <SupportedOSPlatformVersion>26</SupportedOSPlatformVersion>
     <Nullable>enable</Nullable>
-    <ApplicationId>one.nerva.mobile</ApplicationId>
+    <ApplicationId>one.nerva.android</ApplicationId>
     <ApplicationVersion>43</ApplicationVersion>
     <ApplicationDisplayVersion>1.0.43</ApplicationDisplayVersion>
     <AndroidPackageFormat>apk</AndroidPackageFormat>
