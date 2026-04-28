@@ -647,7 +647,7 @@ namespace NervaOneWalletMiner.Helpers
                 {
                     UIManager.UpdateDaemonStatus("Client tools extracting...");
                     Logger.LogDebug("GLM.SUCT", "Extracting CLI tools after download: " + destFileWithPath);
-                    bool extractSuccess = ExtractFile(cliToolsPath, destFileWithPath);
+                    bool extractSuccess = await Task.Run(() => ExtractFile(cliToolsPath, destFileWithPath));
 
                     if (extractSuccess)
                     {
@@ -696,7 +696,7 @@ namespace NervaOneWalletMiner.Helpers
 
                     UIManager.UpdateDaemonStatus("Blockchain database extracting...");
                     Logger.LogDebug("GLM.DBCD", "Extracting blockchain database after download: " + destFileWithPath);
-                    bool extractSuccess = ExtractFile(lmdbDir, destFileWithPath);
+                    bool extractSuccess = await Task.Run(() => ExtractFile(lmdbDir, destFileWithPath));
 
                     if (extractSuccess)
                     {
