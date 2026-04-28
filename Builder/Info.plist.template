@@ -23,6 +23,6 @@
     <key>CFBundleName</key>
     <string>NervaOne</string>
     <key>CFBundleExecutable</key>
-    <string>NervaOneDesktop</string>
+    <string>NervaOne</string>
 </dict>
 </plist>

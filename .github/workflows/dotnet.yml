@@ -60,7 +60,7 @@ jobs:
           - name: Upload Windows Artifacts
             uses: actions/upload-artifact@v6
             with:
-                name: nervaone-desktop-v${{ needs.setup.outputs.version }}-${{ matrix.rid }}
+                name: nervaone-v${{ needs.setup.outputs.version }}-${{ matrix.rid }}
                 path: |
                     ./NervaOneWalletMiner.Desktop/bin/release/net10.0/${{ matrix.rid }}/publish/*
                     !./NervaOneWalletMiner.Desktop/bin/release/net10.0/${{ matrix.rid }}/publish/*.pdb
@@ -106,22 +106,22 @@ jobs:
           - name: Create Artifact Directories
             shell: bash
             run: |
-              mkdir -p ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop/Contents
-              mkdir -p ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop/Resources
+              mkdir -p ./NervaOneWalletMiner.Desktop/bin/NervaOne/Contents
+              mkdir -p ./NervaOneWalletMiner.Desktop/bin/NervaOne/Resources
 
           - name: Copy Icons and Files
             run: |              
-              cp ./Builder/logos/nerva-logo-color.png ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop/Resources/nerva-logo-color.png
-              cp ./Builder/logos/nerva-logo-color-2.png ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop/Resources/nerva-logo-color-2.png
-              cp ./NervaOneWalletMiner.Desktop/bin/release/net10.0/${{ matrix.rid }}/publish/* ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop/Contents/
-              cp ./Builder/install ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop/install
-              chmod +x ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop/install
+              cp ./Builder/logos/nerva-logo-color.png ./NervaOneWalletMiner.Desktop/bin/NervaOne/Resources/nerva-logo-color.png
+              cp ./Builder/logos/nerva-logo-color-2.png ./NervaOneWalletMiner.Desktop/bin/NervaOne/Resources/nerva-logo-color-2.png
+              cp ./NervaOneWalletMiner.Desktop/bin/release/net10.0/${{ matrix.rid }}/publish/* ./NervaOneWalletMiner.Desktop/bin/NervaOne/Contents/
+              cp ./Builder/install ./NervaOneWalletMiner.Desktop/bin/NervaOne/install
+              chmod +x ./NervaOneWalletMiner.Desktop/bin/NervaOne/install
 
           - name: Upload Artifacts
             uses: actions/upload-artifact@v6
             with:
-                name: nervaone-desktop-v${{ needs.setup.outputs.version }}-${{ matrix.rid }}
-                path: ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop/*
+                name: nervaone-v${{ needs.setup.outputs.version }}-${{ matrix.rid }}
+                path: ./NervaOneWalletMiner.Desktop/bin/NervaOne/*
                 overwrite: true
 
 # ================================
@@ -133,6 +133,11 @@ jobs:
         strategy:
             matrix:
                 rid: ["osx-x64", "osx-arm64"]
+                include:
+                    - rid: osx-x64
+                      artifact_rid: macos-x64
+                    - rid: osx-arm64
+                      artifact_rid: macos-arm64
 
         steps:
           - name: Checkout Repository
@@ -155,25 +160,25 @@ jobs:
 
           - name: Create Artifact Directories
             run: |
-              mkdir -p ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop.app/Contents
-              mkdir -p ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop.app/Contents/MacOS
-              mkdir -p ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop.app/Contents/Resources
+              mkdir -p ./NervaOneWalletMiner.Desktop/bin/NervaOne.app/Contents
+              mkdir -p ./NervaOneWalletMiner.Desktop/bin/NervaOne.app/Contents/MacOS
+              mkdir -p ./NervaOneWalletMiner.Desktop/bin/NervaOne.app/Contents/Resources
 
           - name: Generate Plist
             run: |
               plist=$(sed -e "s/{APP_VERSION}/${{ needs.setup.outputs.version }}/" ./Builder/Info.plist.template)
-              echo "$plist" > ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop.app/Contents/Info.plist
+              echo "$plist" > ./NervaOneWalletMiner.Desktop/bin/NervaOne.app/Contents/Info.plist
 
           - name: Copy Icons and Launcher
             run: |
-              cp ./Builder/logos/nerva-logo-color.icns ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop.app/Contents/Resources/nerva-logo-color.icns
-              cp ./Builder/logos/nerva-logo-color-2.icns ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop.app/Contents/Resources/nerva-logo-color-2.icns
-              cp -R ./NervaOneWalletMiner.Desktop/bin/release/net10.0/${{ matrix.rid }}/publish/* ./NervaOneWalletMiner.Desktop/bin/NervaOneDesktop.app/Contents/MacOS/
+              cp ./Builder/logos/nerva-logo-color.icns ./NervaOneWalletMiner.Desktop/bin/NervaOne.app/Contents/Resources/nerva-logo-color.icns
+              cp ./Builder/logos/nerva-logo-color-2.icns ./NervaOneWalletMiner.Desktop/bin/NervaOne.app/Contents/Resources/nerva-logo-color-2.icns
+              cp -R ./NervaOneWalletMiner.Desktop/bin/release/net10.0/${{ matrix.rid }}/publish/* ./NervaOneWalletMiner.Desktop/bin/NervaOne.app/Contents/MacOS/
 
           - name: Upload Artifacts
             uses: actions/upload-artifact@v6
             with:
-                name: nervaone-desktop-v${{ needs.setup.outputs.version }}-${{ matrix.rid }}
+                name: nervaone-v${{ needs.setup.outputs.version }}-${{ matrix.artifact_rid }}
                 path: |
                   ./NervaOneWalletMiner.Desktop/bin/*
                   !./NervaOneWalletMiner.Desktop/bin/release/
@@ -227,6 +232,6 @@ jobs:
           - name: Upload Android Artifacts
             uses: actions/upload-artifact@v6
             with:
-                name: nervaone-mobile-v${{ needs.setup.outputs.version }}-android
+                name: nervaone-v${{ needs.setup.outputs.version }}-android-arm64
                 path: ${{ steps.select_apk.outputs.apk_path }}
                 overwrite: true

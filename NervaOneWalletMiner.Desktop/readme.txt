@@ -4,13 +4,13 @@ It runs on your desktop device and allows you to control daemon/wallet using mod
 
 Windows
 -------
-Run NervaOneDesktop.exe
+Run NervaOne.exe
 
 
 Linux
 -----
 To install NervaOne Desktop, run included install script. It should add NervaOne to your Applications.
-Alternatively, you can go to: NervaOneDesktop/Contents in Terminal and run: ./NervaOneDesktop
+Alternatively, you can go to: NervaOne/Contents in Terminal and run: ./NervaOne
 
 If NervaOne does not appear in Applications after running the install script, or if a previously installed
 version launches instead of the new one, first verify the installation was updated:
@@ -26,13 +26,13 @@ Then log out and log back in, or restart your application launcher.
 
 macOS
 -----
-Run NervaOneDesktop
-Alternatively, you can go to NervaOneDesktop.app/Contents/MacOS and run ./NervaOneDesktop
+Run NervaOne
+Alternatively, you can go to NervaOne.app/Contents/MacOS and run ./NervaOne
 
 Newer versions of macOS make running apps that are not published to Apple Store difficult.
-If you get NervaOneDesktop is damaged and can't be opened error, try this:
+If you get NervaOne is damaged and can't be opened error, try this:
 
-1. Open New Terminal at Folder where NervaOneDesktop is located
+1. Open New Terminal at Folder where NervaOne is located
 2. Issue command:
-	xattr -d com.apple.quarantine ./NervaOneDesktop.app
-3. Try running NervaOneDesktop now
+	xattr -d com.apple.quarantine ./NervaOne.app
+3. Try running NervaOne now

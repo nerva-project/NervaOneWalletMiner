@@ -8,7 +8,7 @@
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
 	<ApplicationIcon>nervaone-logo.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <AssemblyName>NervaOneDesktop</AssemblyName>
+    <AssemblyName>NervaOne</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
