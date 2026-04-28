@@ -804,7 +804,7 @@ namespace NervaOneWalletMiner.Helpers
                                 _askedToQuickSync = true;
                                 double percentSynced = infoRes.Height / Convert.ToDouble(infoRes.TargetHeight);
 
-                                if (percentSynced < 0.8)
+                                if (percentSynced < 0.9)
                                 {
                                     ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).AskIfSyncWithQuickSync(percentSynced);
                                 }

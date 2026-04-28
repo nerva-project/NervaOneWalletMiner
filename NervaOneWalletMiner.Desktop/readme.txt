@@ -12,6 +12,17 @@ Linux
 To install NervaOne Desktop, run included install script. It should add NervaOne to your Applications.
 Alternatively, you can go to: NervaOneDesktop/Contents in Terminal and run: ./NervaOneDesktop
 
+If NervaOne does not appear in Applications after running the install script, or if a previously installed
+version launches instead of the new one, first verify the installation was updated:
+
+	cat ~/.local/share/applications/nervaone.desktop
+
+The Exec= line should point to the current version's directory. If it does, refresh the desktop database:
+
+	update-desktop-database ~/.local/share/applications/
+
+Then log out and log back in, or restart your application launcher.
+
 
 macOS
 -----

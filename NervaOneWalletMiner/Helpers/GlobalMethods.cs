@@ -1139,7 +1139,7 @@ namespace NervaOneWalletMiner.Helpers
             }
         }        
        
-        public static async void RestartWithQuickSync()
+        public static async Task<bool> RestartWithQuickSync()
         {
             try
             {
@@ -1154,15 +1154,18 @@ namespace NervaOneWalletMiner.Helpers
                     GlobalData.IsDaemonRestarting = true;
                     string quickSyncFile = Path.Combine(GlobalData.CliToolsDir, Path.GetFileName(GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].QuickSyncUrl));
                     ProcessManager.StartExternalProcess(GetDaemonProcess(), GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].GenerateDaemonOptions(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]) + " --quicksync \"" + quickSyncFile + "\"");
+                    return true;
                 }
                 else
                 {
                     Logger.LogError("GLM.RSQS", "Failed to download file: " + GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].QuickSyncUrl + " to " + GlobalData.CliToolsDir);
+                    return false;
                 }
             }
             catch (Exception ex)
             {
                 Logger.LogException("GLM.RSQS", ex);
+                return false;
             }
         }
 

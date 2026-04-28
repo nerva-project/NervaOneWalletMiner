@@ -71,7 +71,7 @@ public partial class MainView : UserControl
                 DialogResult? result = await DialogService.ShowAsync<DialogResult>(window);
                 if (result != null && result.IsOk)
                 {
-                    GlobalMethods.RestartWithQuickSync();
+                    await GlobalMethods.RestartWithQuickSync();
                 }
             });
         }
