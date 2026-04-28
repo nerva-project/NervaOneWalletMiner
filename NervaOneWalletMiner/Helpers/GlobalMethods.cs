@@ -1075,7 +1075,7 @@ namespace NervaOneWalletMiner.Helpers
         {
             try
             {
-                string addressBookFile = Path.Combine(GlobalData.WalletDir, GlobalData.AddressBookFileName);
+                string addressBookFile = Path.Combine(GlobalData.AppDataDir, GlobalData.MainCoinsDirName, GlobalData.CoinDirName, GlobalData.AddressBookFileName);
                 if (File.Exists(addressBookFile))
                 {
                     using (TextReader reader = new StreamReader(addressBookFile))
@@ -1103,7 +1103,7 @@ namespace NervaOneWalletMiner.Helpers
         {
             try
             {
-                string addressBookFile = Path.Combine(GlobalData.WalletDir, GlobalData.AddressBookFileName);
+                string addressBookFile = Path.Combine(GlobalData.AppDataDir, GlobalData.MainCoinsDirName, GlobalData.CoinDirName, GlobalData.AddressBookFileName);
                 var contentsToWriteToFile = Newtonsoft.Json.JsonConvert.SerializeObject(GlobalData.AddressBook);
                 using (TextWriter writer = new StreamWriter(addressBookFile))
                 {
