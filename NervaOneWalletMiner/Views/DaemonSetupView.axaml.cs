@@ -91,7 +91,15 @@ namespace NervaOneWalletMiner.Views
                 }
                 else
                 {
-                    GlobalMethods.RestartWithQuickSync();
+                    bool isSuccess = await GlobalMethods.RestartWithQuickSync();
+                    if (isSuccess)
+                    {
+                        await DialogService.ShowAsync(new MessageBoxView("Restart with QuickSync", "Daemon restarted with QuickSync.", true));
+                    }
+                    else
+                    {
+                        await DialogService.ShowAsync(new MessageBoxView("Restart with QuickSync", "Failed to restart daemon with QuickSync. Please check logs for details.", true));
+                    }
                 }
             }
             catch (Exception ex)

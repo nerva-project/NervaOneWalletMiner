@@ -74,7 +74,7 @@ namespace NervaOneWalletMiner.Helpers
 
             try
             {
-                appDataDir = Path.Combine(GetDataDir(), GlobalData.AppNameDesktop);
+                appDataDir = Path.Combine(GetDataDir(), GlobalData.AppNameMain);
 
                 // Create data directory if it does not exist
                 if (!Directory.Exists(appDataDir))
@@ -495,22 +495,22 @@ namespace NervaOneWalletMiner.Helpers
             {
                 if (!logoDictionary.ContainsKey(Coin.XNV))
                 {
-                    logoDictionary.Add(Coin.XNV, new Bitmap(AssetLoader.Open(new Uri("avares://" + GlobalData.AppNameMain + "/Assets/xnv/logo.png"))));
+                    logoDictionary.Add(Coin.XNV, new Bitmap(AssetLoader.Open(new Uri("avares://" + GlobalData.AppAssemblyName + "/Assets/xnv/logo.png"))));
                 }
 
                 if (!logoDictionary.ContainsKey(Coin.XMR))
                 {
-                    logoDictionary.Add(Coin.XMR, new Bitmap(AssetLoader.Open(new Uri("avares://" + GlobalData.AppNameMain + "/Assets/xmr/logo.png"))));
+                    logoDictionary.Add(Coin.XMR, new Bitmap(AssetLoader.Open(new Uri("avares://" + GlobalData.AppAssemblyName + "/Assets/xmr/logo.png"))));
                 }
 
                 if (!logoDictionary.ContainsKey(Coin.WOW))
                 {
-                    logoDictionary.Add(Coin.WOW, new Bitmap(AssetLoader.Open(new Uri("avares://" + GlobalData.AppNameMain + "/Assets/wow/logo.png"))));
+                    logoDictionary.Add(Coin.WOW, new Bitmap(AssetLoader.Open(new Uri("avares://" + GlobalData.AppAssemblyName + "/Assets/wow/logo.png"))));
                 }
 
                 if (!logoDictionary.ContainsKey(Coin.DASH))
                 {
-                    logoDictionary.Add(Coin.DASH, new Bitmap(AssetLoader.Open(new Uri("avares://" + GlobalData.AppNameMain + "/Assets/dash/logo.png"))));
+                    logoDictionary.Add(Coin.DASH, new Bitmap(AssetLoader.Open(new Uri("avares://" + GlobalData.AppAssemblyName + "/Assets/dash/logo.png"))));
                 }
             }
             catch (Exception ex)
@@ -529,22 +529,22 @@ namespace NervaOneWalletMiner.Helpers
             {
                 if (!iconDictionary.ContainsKey(Coin.XNV))
                 {
-                    iconDictionary.Add(Coin.XNV, new WindowIcon(AssetLoader.Open(new Uri("avares://" + GlobalData.AppNameMain + "/Assets/xnv/logo.png"))));
+                    iconDictionary.Add(Coin.XNV, new WindowIcon(AssetLoader.Open(new Uri("avares://" + GlobalData.AppAssemblyName + "/Assets/xnv/logo.png"))));
                 }
 
                 if (!iconDictionary.ContainsKey(Coin.XMR))
                 {
-                    iconDictionary.Add(Coin.XMR, new WindowIcon(AssetLoader.Open(new Uri("avares://" + GlobalData.AppNameMain + "/Assets/xmr/logo.png"))));
+                    iconDictionary.Add(Coin.XMR, new WindowIcon(AssetLoader.Open(new Uri("avares://" + GlobalData.AppAssemblyName + "/Assets/xmr/logo.png"))));
                 }
 
                 if (!iconDictionary.ContainsKey(Coin.WOW))
                 {
-                    iconDictionary.Add(Coin.WOW, new WindowIcon(AssetLoader.Open(new Uri("avares://" + GlobalData.AppNameMain + "/Assets/wow/logo.png"))));
+                    iconDictionary.Add(Coin.WOW, new WindowIcon(AssetLoader.Open(new Uri("avares://" + GlobalData.AppAssemblyName + "/Assets/wow/logo.png"))));
                 }
 
                 if (!iconDictionary.ContainsKey(Coin.DASH))
                 {
-                    iconDictionary.Add(Coin.DASH, new WindowIcon(AssetLoader.Open(new Uri("avares://" + GlobalData.AppNameMain + "/Assets/dash/logo.png"))));
+                    iconDictionary.Add(Coin.DASH, new WindowIcon(AssetLoader.Open(new Uri("avares://" + GlobalData.AppAssemblyName + "/Assets/dash/logo.png"))));
                 }
             }
             catch (Exception ex)
@@ -647,7 +647,7 @@ namespace NervaOneWalletMiner.Helpers
                 {
                     UIManager.UpdateDaemonStatus("Client tools extracting...");
                     Logger.LogDebug("GLM.SUCT", "Extracting CLI tools after download: " + destFileWithPath);
-                    bool extractSuccess = ExtractFile(cliToolsPath, destFileWithPath);
+                    bool extractSuccess = await Task.Run(() => ExtractFile(cliToolsPath, destFileWithPath));
 
                     if (extractSuccess)
                     {
@@ -696,7 +696,7 @@ namespace NervaOneWalletMiner.Helpers
 
                     UIManager.UpdateDaemonStatus("Blockchain database extracting...");
                     Logger.LogDebug("GLM.DBCD", "Extracting blockchain database after download: " + destFileWithPath);
-                    bool extractSuccess = ExtractFile(lmdbDir, destFileWithPath);
+                    bool extractSuccess = await Task.Run(() => ExtractFile(lmdbDir, destFileWithPath));
 
                     if (extractSuccess)
                     {
@@ -1075,7 +1075,7 @@ namespace NervaOneWalletMiner.Helpers
         {
             try
             {
-                string addressBookFile = Path.Combine(GlobalData.WalletDir, GlobalData.AddressBookFileName);
+                string addressBookFile = Path.Combine(GlobalData.AppDataDir, GlobalData.MainCoinsDirName, GlobalData.CoinDirName, GlobalData.AddressBookFileName);
                 if (File.Exists(addressBookFile))
                 {
                     using (TextReader reader = new StreamReader(addressBookFile))
@@ -1103,7 +1103,7 @@ namespace NervaOneWalletMiner.Helpers
         {
             try
             {
-                string addressBookFile = Path.Combine(GlobalData.WalletDir, GlobalData.AddressBookFileName);
+                string addressBookFile = Path.Combine(GlobalData.AppDataDir, GlobalData.MainCoinsDirName, GlobalData.CoinDirName, GlobalData.AddressBookFileName);
                 var contentsToWriteToFile = Newtonsoft.Json.JsonConvert.SerializeObject(GlobalData.AddressBook);
                 using (TextWriter writer = new StreamWriter(addressBookFile))
                 {
@@ -1139,7 +1139,7 @@ namespace NervaOneWalletMiner.Helpers
             }
         }        
        
-        public static async void RestartWithQuickSync()
+        public static async Task<bool> RestartWithQuickSync()
         {
             try
             {
@@ -1154,15 +1154,18 @@ namespace NervaOneWalletMiner.Helpers
                     GlobalData.IsDaemonRestarting = true;
                     string quickSyncFile = Path.Combine(GlobalData.CliToolsDir, Path.GetFileName(GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].QuickSyncUrl));
                     ProcessManager.StartExternalProcess(GetDaemonProcess(), GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].GenerateDaemonOptions(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]) + " --quicksync \"" + quickSyncFile + "\"");
+                    return true;
                 }
                 else
                 {
                     Logger.LogError("GLM.RSQS", "Failed to download file: " + GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].QuickSyncUrl + " to " + GlobalData.CliToolsDir);
+                    return false;
                 }
             }
             catch (Exception ex)
             {
                 Logger.LogException("GLM.RSQS", ex);
+                return false;
             }
         }
 

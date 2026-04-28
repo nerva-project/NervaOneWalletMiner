@@ -10,7 +10,7 @@ echo "[Desktop Entry]" > ${dd}
 echo "Type=Application" >> ${dd}
 echo "Name=NervaOne" >> ${dd}
 echo "Comment=NervaOne Desktop" >> ${dd}
-echo "Exec=${dir}/Contents/NervaOneDesktop" >> ${dd}
+echo "Exec=${dir}/Contents/NervaOne" >> ${dd}
 echo "Icon=${dir}/Resources/nerva-logo-color.png" >> ${dd}
 echo "Terminal=false" >> ${dd}
 

@@ -18,12 +18,12 @@ function publish()
     echo Building $1
     dotnet restore ${ROOT_DIR}/NervaOneWalletMiner.Desktop/NervaOneWalletMiner.Desktop.csproj -r $1
 
-    targetFramework=net8.0
+    targetFramework=net10.0
 
     dotnet publish ${ROOT_DIR}/NervaOneWalletMiner.Desktop/NervaOneWalletMiner.Desktop.csproj -c release -r $1 -f ${targetFramework} -p:publishsinglefile=true
 
     if [ "$1" == "osx-x64" ] || [ "$1" == "osx-arm64" ]; then
-        bundle=${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/NervaOneDesktop.app
+        bundle=${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/NervaOne.app
         mkdir -p ${bundle}/Contents
         mkdir -p ${bundle}/Contents/MacOS
         mkdir -p ${bundle}/Contents/Resources
@@ -40,9 +40,9 @@ function publish()
         cp -R ${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/release/${targetFramework}/$1/publish/* ${bundle}/Contents/MacOS/
 
         cd ${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin
-        zip -r ${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/nervaone-desktop-v${APP_VERSION}_$1.zip ./NervaOneDesktop.app
+        zip -r ${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/nervaone-desktop-v${APP_VERSION}_$1.zip ./NervaOne.app
     elif [ "$1" == "linux-x64" ] || [ "$1" == "linux-arm64" ]; then
-        bundle=${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/NervaOneDesktop
+        bundle=${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/NervaOne
         mkdir -p ${bundle}/Contents
         mkdir -p ${bundle}/Resources
 
@@ -54,7 +54,7 @@ function publish()
         chmod +x ${bundle}/install
 
         cd ${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin
-        zip -r ${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/nervaone-desktop-v${APP_VERSION}_$1.zip ./NervaOneDesktop
+        zip -r ${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/nervaone-desktop-v${APP_VERSION}_$1.zip ./NervaOne
     # else
         # cd ${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin
         # zip -j ${ROOT_DIR}/NervaOneWalletMiner.Desktop/bin/nervaone-desktop-v${APP_VERSION}_$1.zip ./release/${targetFramework}/$1/publish/*
