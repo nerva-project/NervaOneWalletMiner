@@ -15,11 +15,13 @@
 
 ## ⓘ About NervaOne
 
-**NervaOne** is an open-source, non-custodial Wallet and CPU Miner. It runs on your desktop device and allows you to control daemon/wallet using modern graphical user interface.
+**NervaOne** is an open-source, non-custodial Wallet and CPU Miner. It runs on your desktop and Android devices and allows you to control daemon/wallet using modern graphical user interface.
 
-Now it can also be used as Wallet Only by connecting to remote node.
+It can also be used as Wallet Only by connecting to remote node.
 
-NervaOne Desktop currently supports below cryptocurrencies:
+NervaOne runs on Windows, Linux, macOS, and Android.
+
+NervaOne currently supports below cryptocurrencies:
 
 - Nerva (XNV)
 - Monero (XMR)
@@ -50,7 +52,7 @@ Go to directory where you want to create NervaOneWalletMiner folder and run thes
 ```
 rm -rf ./NervaOneWalletMiner/
 ```
-You do not need the "rm -rf"" the first time you build.
+You do not need the "rm -rf" the first time you build.
 
 ```
 git clone https://github.com/nerva-project/NervaOneWalletMiner.git
@@ -75,12 +77,30 @@ Instead of dotnet run, you can build using command such as this:
 dotnet publish .\NervaOneWalletMiner.Desktop.csproj -r osx-x64 -c Release -p:publishsinglefile=true
 ```
 
-Compiled files will be inside:  ...\NervaOneWalletMiner\NervaOneWalletMiner.Desktop\bin\Release\net8.0\osx-x64\publish\
+Compiled files will be inside:  ...\NervaOneWalletMiner\NervaOneWalletMiner.Desktop\bin\Release\net10.0\osx-x64\publish\
 
 You'll need to replace "osx-x64" with your operating system. Other common values: 
 win-x64, win-x86, linux-x64, linux-arm, osx-x64,osx-arm64
 
 Here is full list: [.NET RID Catalog][rid-catalog]
+
+---
+
+## 🤖 Building for Android
+
+To build and deploy the Android APK, you'll need the Android SDK and a device or emulator configured. In Visual Studio, set `NervaOneWalletMiner.Android` as the startup project, select your target device, and run.
+
+From the command line:
+
+```
+cd NervaOneWalletMiner/NervaOneWalletMiner.Android
+```
+
+```
+dotnet build -c Release -f net10.0-android
+```
+
+The signed APK will be in:  ...\NervaOneWalletMiner\NervaOneWalletMiner.Android\bin\Release\net10.0-android\
 
 ---
 
@@ -97,7 +117,7 @@ Pick below workloads when installing VS:
 
 Clone this repository (https://github.com/nerva-project/NervaOneWalletMiner.git)
 
-Unload .Android, .Browser and .iOS projects
+Unload .Browser and .iOS projects (keep .Android loaded if building for Android)
 
 Set NervaOneWalletMiner.Desktop project as startup project
 
@@ -131,12 +151,6 @@ dotnet build
 ```
 dotnet run 
 ```
-
----
-
-## 📆 Future Plans
-
-Make it work on mobile devices
 
 ---
 
