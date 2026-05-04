@@ -6,5 +6,6 @@
         public const string XMR = "xmr";
         public const string WOW = "wow";
         public const string DASH = "dash";
+        public const string BTC = "btc";
     }
 }

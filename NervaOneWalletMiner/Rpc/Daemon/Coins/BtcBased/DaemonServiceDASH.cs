@@ -1,12 +1,10 @@
-﻿using NervaOneWalletMiner.Helpers;
-using NervaOneWalletMiner.Objects.DataGrid;
+using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Rpc.Common;
 using NervaOneWalletMiner.Rpc.Daemon.Requests;
 using NervaOneWalletMiner.Rpc.Daemon.Responses;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -14,88 +12,13 @@ namespace NervaOneWalletMiner.Rpc.Daemon
 {
     // Dash implementation as of 6/18/24: https://github.com/dashpay/dash
 
-    internal class DaemonServiceDASH : IDaemonService
+    internal class DaemonServiceDASH : DaemonServiceBaseBTC
     {
-        private const double _blockSeconds = 150.0;
-
-        private static string GetCallerName([System.Runtime.CompilerServices.CallerMemberName] string name = "") => name;
-
-        protected ServiceError GetServiceError(string source, JToken error)
-        {
-            ServiceError serviceError = new();
-
-            try
-            {
-                serviceError.IsError = true;
-                serviceError.Code = error["code"]?.ToString() ?? string.Empty;
-                serviceError.Message = error["message"]?.ToString() ?? string.Empty;
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException("DAS.CGSE", ex);
-            }
-
-            return serviceError;
-        }
-
-        #region Stop Daemon
-        public async Task<StopDaemonResponse> StopDaemon(RpcBase rpc, StopDaemonRequest requestObj)
-        {
-            StopDaemonResponse responseObj = new();
-
-            try
-            {
-                // Build request content json
-                var requestJson = new JObject
-                {
-                    ["method"] = "stop",
-                    ["id"] = "0",
-                    ["params"] = new JObject()
-                };
-
-                // Call service and process response
-                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
-                if (httpResponse.IsSuccessStatusCode)
-                {
-                    string responseContent = await httpResponse.Content.ReadAsStringAsync();
-                    if (string.IsNullOrEmpty(responseContent))
-                    {
-                        Logger.LogInfo("DAS.DSPD", "Response Content is empty");
-                    }
-                    else
-                    {
-                        JObject jsonObject = JObject.Parse(responseContent);
-
-                        var error = jsonObject["error"];
-                        if (error != null)
-                        {
-                            // Set Service error
-                            responseObj.Error = GetServiceError(GetCallerName(), error);
-                        }
-                        else
-                        {
-                            // Set successful response
-                            responseObj.Error.IsError = false;
-                        }
-                    }
-                }
-                else
-                {
-                    // Set HTTP error
-                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException("DAS.DSPD", ex);
-            }
-
-            return responseObj;
-        }
-        #endregion // Stop Daemon        
+        protected override string CoinPrefix => "DAS";
+        protected override double BlockSeconds => 150.0;
 
         #region Get Info
-        public async Task<GetInfoResponse> GetInfo(RpcBase rpc, GetInfoRequest requestObj)
+        public override async Task<GetInfoResponse> GetInfo(RpcBase rpc, GetInfoRequest requestObj)
         {
             GetInfoResponse responseObj = new();
 
@@ -125,7 +48,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                         JObject jsonObject = JObject.Parse(responseContent);
 
                         var error = jsonObject["error"];
-                        if (error != null)
+                        if (error != null && error.Type != JTokenType.Null)
                         {
                             // Set Service error
                             responseObj.Error = GetServiceError(GetCallerName(), error);
@@ -186,13 +109,13 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                             JObject jsonObject = JObject.Parse(responseContent);
 
                             var error = jsonObject["error"];
-                            if (error != null)
+                            if (error != null && error.Type != JTokenType.Null)
                             {
                                 // Set Service error
                                 responseObj.Error = GetServiceError(GetCallerName(), error);
                             }
                             else
-                            {                                
+                            {
                                 var resultToken = jsonObject.SelectToken("result");
                                 if (resultToken == null)
                                 {
@@ -248,7 +171,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                             JObject jsonObject = JObject.Parse(responseContent);
 
                             var error = jsonObject["error"];
-                            if (error != null)
+                            if (error != null && error.Type != JTokenType.Null)
                             {
                                 // Set Service error
                                 responseObj.Error = GetServiceError(GetCallerName(), error);
@@ -288,110 +211,6 @@ namespace NervaOneWalletMiner.Rpc.Daemon
             public ulong blocks { get; set; }
             public ulong difficulty { get; set; }
         }
-        #endregion // Get Info        
-
-        #region Get Connections
-        public async Task<GetConnectionsResponse> GetConnections(RpcBase rpc, GetConnectionsRequest requestObj)
-        {
-            GetConnectionsResponse responseObj = new();
-
-            try
-            {
-                // Build request content json
-                var requestJson = new JObject
-                {
-                    ["method"] = "getpeerinfo",
-                    ["id"] = "0",
-                    ["params"] = new JObject()
-                };
-
-                // Call service and process response
-                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
-                if (httpResponse.IsSuccessStatusCode)
-                {
-                    string responseContent = await httpResponse.Content.ReadAsStringAsync();
-                    if (string.IsNullOrEmpty(responseContent))
-                    {
-                        Logger.LogInfo("DAS.DGTC", "Response Content is empty");
-                    }
-                    else
-                    {
-                        JObject jsonObject = JObject.Parse(responseContent);
-
-                        var error = jsonObject["error"];
-                        if (error != null)
-                        {
-                            // Set Service error
-                            responseObj.Error = GetServiceError(GetCallerName(), error);
-                        }
-                        else
-                        {
-                            var resultToken = jsonObject.SelectToken("result");
-                            if (resultToken != null)
-                            {
-                                // Set successful response
-                                List<ResGetConnections> getConnectionsResponse = JsonConvert.DeserializeObject<List<ResGetConnections>>(resultToken.ToString())!;
-
-                                foreach (ResGetConnections connection in getConnectionsResponse)
-                                {
-                                    responseObj.Connections.Add(new Connection
-                                    {
-                                        Address = connection.addr,
-                                        Height = connection.startingheight,
-                                        LiveTime = (DateTime.Now - DateTime.UnixEpoch.AddSeconds(connection.conntime).ToLocalTime()).ToString(@"%d\.hh\:mm"),
-                                        State = connection.connection_type,
-                                        IsIncoming = connection.inbound
-                                    });
-                                }
-                            }
-                            else
-                            {
-                                Logger.LogInfo("DAS.DGTC", "Result missing: " + GlobalMethods.RemoveLineBreaksAndSpaces(responseContent));
-                            }
-
-                            responseObj.Error.IsError = false;
-                        }
-                    }
-                }
-                else
-                {
-                    // Set HTTP error
-                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException("DAS.DGTC", ex);
-            }
-
-            return responseObj;
-        }
-
-        private class ResGetConnections
-        {
-            public string addr { get; set; } = string.Empty;
-            public long startingheight { get; set; }
-            public ulong conntime { get; set; }
-            public string connection_type { get; set; } = string.Empty;
-            public bool inbound { get; set; }
-        }
-        #endregion // Get Connections
-
-        #region Unsupported Methods
-        public Task<MiningStatusResponse> GetMiningStatus(RpcBase rpc, MiningStatusRequest requestObj)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<StartMiningResponse> StartMining(RpcBase rpc, StartMiningRequest requestObj)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<StopMiningResponse> StopMining(RpcBase rpc, StopMiningRequest requestObj)
-        {
-            throw new NotImplementedException();
-        }
-        #endregion // Unsupported Methods
+        #endregion // Get Info
     }
 }

@@ -62,6 +62,16 @@
 				</Grid>
 			</ComboBoxItem>
 			
+			<ComboBoxItem Name="btc">
+				<Grid ColumnDefinitions="24,*">
+					<Image Grid.Row="0" Grid.Column="0"
+						   Height="32" Source="avares://NervaOneWalletMiner/Assets/btc/logo.png"/>
+					<TextBlock Grid.Row="0" Grid.Column="1"
+							Padding="5,7,0,0"
+							Text="Bitcoin (BTC)"/>
+				</Grid>
+			</ComboBoxItem>
+
 			<ComboBoxItem Name="xmr">
 				<Grid ColumnDefinitions="24,*">
 					<Image Grid.Row="0" Grid.Column="0"

@@ -755,7 +755,11 @@ namespace NervaOneWalletMiner.Helpers
                         GlobalData.NetworkStats.YourHeight = infoRes.Height;
                         GlobalData.NetworkStats.NetHashRate = infoRes.NetworkHashRate;
 
-                        if ((infoRes.NetworkHashRate / 1000000000000000.0d) > 1)
+                        if ((infoRes.NetworkHashRate / 1000000000000000000.0d) > 1)
+                        {
+                            GlobalData.NetworkStats.NetHashString = Math.Round((infoRes.NetworkHashRate / 1000000000000000000.0d), 2) + " EH/s";
+                        }
+                        else if ((infoRes.NetworkHashRate / 1000000000000000.0d) > 1)
                         {
                             GlobalData.NetworkStats.NetHashString = Math.Round((infoRes.NetworkHashRate / 1000000000000000.0d), 2) + " PH/s";
                         }

@@ -1,4 +1,4 @@
-﻿using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Objects.DataGrid;
 using NervaOneWalletMiner.Rpc.Common;
@@ -15,8 +15,10 @@ using System.Threading.Tasks;
 
 namespace NervaOneWalletMiner.Rpc.Wallet
 {
-    internal class WalletServiceDASH : IWalletService
+    public abstract class WalletServiceBaseBTC : IWalletService
     {
+        protected abstract string CoinPrefix { get; }
+
         private static int _id = 0;
 
         private static string GetCallerName([System.Runtime.CompilerServices.CallerMemberName] string name = "") => name;
@@ -28,12 +30,19 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             try
             {
                 serviceError.IsError = true;
-                serviceError.Code = error["code"]?.ToString() ?? string.Empty;
-                serviceError.Message = error["message"]?.ToString() ?? string.Empty;
+                if (error is JObject errorObj)
+                {
+                    serviceError.Code = errorObj["code"]?.ToString() ?? string.Empty;
+                    serviceError.Message = errorObj["message"]?.ToString() ?? string.Empty;
+                }
+                else
+                {
+                    serviceError.Message = error.ToString();
+                }
             }
             catch (Exception ex)
             {
-                Logger.LogException("DAS.CGSE", ex);
+                Logger.LogException(CoinPrefix + ".CGSE", ex);
             }
 
             return serviceError;
@@ -97,7 +106,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
 
                     var error = jsonObject["error"];
-                    if (error != null)
+                    if (error != null && error.Type != JTokenType.Null)
                     {
                         // Set Service error
                         responseObj.Error = GetServiceError(GetCallerName(), error);
@@ -116,7 +125,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("DAS.WOPW", ex);
+                Logger.LogException(CoinPrefix + ".WOPW", ex);
             }
 
             return responseObj;
@@ -152,7 +161,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
 
                     var error = jsonObject["error"];
-                    if (error != null)
+                    if (error != null && error.Type != JTokenType.Null)
                     {
                         // Set Service error
                         responseObj.Error = GetServiceError(GetCallerName(), error);
@@ -171,7 +180,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("DAS.WOPW", ex);
+                Logger.LogException(CoinPrefix + ".WOPW", ex);
             }
             finally
             {
@@ -180,7 +189,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
 
             return responseObj;
         }
-        #endregion // Unlock wiht Passphrase
+        #endregion // Unlock with Passphrase
 
         #region Close Wallet
         public async Task<CloseWalletResponse> CloseWallet(RpcBase rpc, CloseWalletRequest requestObj)
@@ -212,7 +221,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
 
                     var error = jsonObject["error"];
-                    if (error != null)
+                    if (error != null && error.Type != JTokenType.Null)
                     {
                         // Set Service error
                         responseObj.Error = GetServiceError(GetCallerName(), error);
@@ -231,7 +240,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("DAS.WCLW", ex);
+                Logger.LogException(CoinPrefix + ".WCLW", ex);
             }
 
             return responseObj;
@@ -267,7 +276,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
 
                     var error = jsonObject["error"];
-                    if (error != null)
+                    if (error != null && error.Type != JTokenType.Null)
                     {
                         // Set Service error
                         responseObj.Error = GetServiceError(GetCallerName(), error);
@@ -285,7 +294,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("DAS.WCRW", ex);
+                Logger.LogException(CoinPrefix + ".WCRW", ex);
             }
             finally
             {
@@ -324,7 +333,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
 
                     var error = jsonObject["error"];
-                    if (error != null)
+                    if (error != null && error.Type != JTokenType.Null)
                     {
                         // Set Service error
                         responseObj.Error = GetServiceError(GetCallerName(), error);
@@ -342,7 +351,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("DAS.WCRA", ex);
+                Logger.LogException(CoinPrefix + ".WCRA", ex);
             }
 
             return responseObj;
@@ -364,7 +373,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         public Task<RestoreFromKeysResponse> RestoreFromKeys(RpcBase rpc, RestoreFromKeysRequest requestObj)
         {
             // TODO: importelectrumwallet
-            // importwalle
+            // importwallet
             throw new NotImplementedException();
         }
 
@@ -400,7 +409,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
 
                     var error = jsonObject["error"];
-                    if (error != null)
+                    if (error != null && error.Type != JTokenType.Null)
                     {
                         // Set Service error
                         responseObj.Error = GetServiceError(GetCallerName(), error);
@@ -421,7 +430,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("DAS.WTRA", ex);
+                Logger.LogException(CoinPrefix + ".WTRA", ex);
             }
 
             return responseObj;
@@ -443,7 +452,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         #region Get Accounts
         public async Task<GetAccountsResponse> GetAccounts(RpcBase rpc, GetAccountsRequest requestObj)
         {
-            // TODO: This is not really DASH way of doing things but should work for now.
+            // TODO: This is not really DASH/BTC way of doing things but should work for now.
             // Do not need to show 0 balance addresses and can generate new address each time user wants to receive funds
             GetAccountsResponse responseObj = new();
 
@@ -476,16 +485,16 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
 
                     var error = jsonObject["error"];
-                    if (error != null)
+                    if (error != null && error.Type != JTokenType.Null)
                     {
                         // Set Service error
                         responseObj.Error = GetServiceError(GetCallerName(), error);
                     }
                     else
-                    {                        
+                    {
                         var resultToken = jsonObject.SelectToken("result");
                         if (resultToken == null)
-                        {                            
+                        {
                             responseObj.Error.IsError = true;
                             responseObj.Error.Message = "Response missing 'result' field";
                         }
@@ -533,7 +542,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                         JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
 
                         var error = jsonObject["error"];
-                        if (error != null)
+                        if (error != null && error.Type != JTokenType.Null)
                         {
                             // Set Service error
                             responseObj.Error = GetServiceError(GetCallerName(), error);
@@ -594,7 +603,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("DAS.WGTA", ex);
+                Logger.LogException(CoinPrefix + ".WGTA", ex);
             }
 
             return responseObj;
@@ -639,13 +648,13 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
 
                     var error = jsonObject["error"];
-                    if (error != null)
+                    if (error != null && error.Type != JTokenType.Null)
                     {
                         // Set Service error
                         responseObj.Error = GetServiceError(GetCallerName(), error);
                     }
                     else
-                    {                        
+                    {
                         var resultToken = jsonObject.SelectToken("result.transactions");
                         if (resultToken == null)
                         {
@@ -684,7 +693,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("DAS.WGTF", ex);
+                Logger.LogException(CoinPrefix + ".WGTF", ex);
             }
 
             return responseObj;
@@ -721,13 +730,13 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
 
                     var error = jsonObject["error"];
-                    if (error != null)
+                    if (error != null && error.Type != JTokenType.Null)
                     {
                         // Set Service error
                         responseObj.Error = GetServiceError(GetCallerName(), error);
                     }
                     else
-                    {                        
+                    {
                         var resultToken = jsonObject.SelectToken("result");
                         if (resultToken == null)
                         {
@@ -771,7 +780,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("DAS.WGTI", ex);
+                Logger.LogException(CoinPrefix + ".WGTI", ex);
             }
 
             return responseObj;
@@ -812,14 +821,13 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
 
                     var error = jsonObject["error"];
-                    if (error != null)
+                    if (error != null && error.Type != JTokenType.Null)
                     {
                         // Set Service error
                         responseObj.Error = GetServiceError(GetCallerName(), error);
                     }
                     else
                     {
-
                         responseObj.Error.IsError = false;
                     }
                 }
@@ -831,7 +839,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
             catch (Exception ex)
             {
-                Logger.LogException("DAS.WGPK", ex);
+                Logger.LogException(CoinPrefix + ".WGPK", ex);
             }
 
             return responseObj;

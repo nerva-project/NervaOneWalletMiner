@@ -44,6 +44,22 @@
 			</ComboBoxItem>
 			<!-- Nerva Ends -->
 
+			<!-- Bitcoin Begins -->
+			<ComboBoxItem Name="btc">
+				<Grid ColumnDefinitions="38,*">
+					<Image Grid.Row="0"
+						   Grid.Column="0"
+						   Height="42"
+						   Source="avares://NervaOneWalletMiner/Assets/btc/logo.png"/>
+					<TextBlock Grid.Row="0"
+							   Grid.Column="1"
+							   FontSize="27"
+							   Padding="15,5,0,0"
+							   Text="Bitcoin (BTC)"/>
+				</Grid>
+			</ComboBoxItem>
+			<!-- Bitcoin Ends -->
+
 			<!-- Monero Begins -->
 			<ComboBoxItem Name="xmr">
 				<Grid ColumnDefinitions="38,*">
