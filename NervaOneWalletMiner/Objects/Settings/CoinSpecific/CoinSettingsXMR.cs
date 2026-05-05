@@ -13,6 +13,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private string _WalletExtension = ".";
 
         private bool _IsCpuMiningSupported = true;
+        private bool _IsPruningSupported = true;
         private bool _IsDaemonWalletSeparateApp = true;
         private bool _IsSavingWalletSupported = true;
         private bool _IsWalletHeightSupported = true;
@@ -54,6 +55,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public string WalletExtension { get => _WalletExtension; set => _WalletExtension = value; }
 
         public bool IsCpuMiningSupported { get => _IsCpuMiningSupported; set => _IsCpuMiningSupported = value; }
+        public bool IsPruningSupported { get => _IsPruningSupported; set => _IsPruningSupported = value; }
         public bool IsDaemonWalletSeparateApp { get => _IsDaemonWalletSeparateApp; set => _IsDaemonWalletSeparateApp = value; }
         public bool IsSavingWalletSupported { get => _IsSavingWalletSupported; set => _IsSavingWalletSupported = value; }
         public bool IsWalletHeightSupported { get => _IsWalletHeightSupported; set => _IsWalletHeightSupported = value; }
@@ -123,6 +125,11 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
             if (daemonSettings.IsPublicNode && !string.IsNullOrEmpty(daemonSettings.PublicNodeArguments))
             {
                 daemonCommand += " " + daemonSettings.PublicNodeArguments;
+            }
+
+            if (daemonSettings.NodeType == Objects.Constants.NodeType.PrunedNode)
+            {
+                daemonCommand += " --prune-blockchain";
             }
 
             if (!string.IsNullOrEmpty(daemonSettings.AdditionalArguments))

@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.ViewsDialogs;
 using System;
 
@@ -17,6 +18,7 @@ namespace NervaOneWalletMiner.Views
                 imgCoinIcon.Source = GlobalMethods.GetLogo();
                 tbxCliDownloadUrl.Text = GlobalMethods.GetCliToolsDownloadLink(GlobalData.AppSettings.ActiveCoin);
                 tbxRemoteNode.Text = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].RemotePublicNodeUrlDefault;
+                PrunedNode.IsVisible = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPruningSupported;
 
                 Loaded += (_, _) => tbxCliDownloadUrl.Focus();
             }
@@ -30,23 +32,9 @@ namespace NervaOneWalletMiner.Views
         {
             try
             {
-                if (sender is RadioButton radioButton)
+                if (sender is RadioButton { IsChecked: true } radioButton)
                 {
-                    switch (radioButton.Name)
-                    {
-                        case "FullNode":
-                            if (radioButton.IsChecked!.Value)
-                            {
-                                spRemoteNode.IsVisible = false;
-                            }
-                            break;
-                        case "RemoteNode":
-                            if (radioButton.IsChecked!.Value)
-                            {
-                                spRemoteNode.IsVisible = true;
-                            }
-                            break;
-                    }
+                    spRemoteNode.IsVisible = radioButton.Name == NodeType.WalletOnly;
                 }
             }
             catch (Exception ex)
@@ -65,14 +53,18 @@ namespace NervaOneWalletMiner.Views
                     return;
                 }
 
-                if ((bool)RemoteNode.IsChecked! && string.IsNullOrEmpty(tbxRemoteNode.Text))
+                if (WalletOnly.IsChecked == true && string.IsNullOrEmpty(tbxRemoteNode.Text))
                 {
                     await DialogService.ShowAsync(new MessageBoxView("Coin Setup", "Remote Node is required.", true));
                     return;
                 }
 
+                string nodeType = PrunedNode.IsChecked == true ? NodeType.PrunedNode
+                    : WalletOnly.IsChecked == true ? NodeType.WalletOnly
+                    : NodeType.FullNode;
+
                 GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].PublicNodeAddress = tbxRemoteNode.Text!.Trim();
-                GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly = (bool)RemoteNode.IsChecked!;
+                GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].NodeType = nodeType;
                 GlobalMethods.SaveConfig();
                 GlobalMethods.ShowHideDaemonTab();
 

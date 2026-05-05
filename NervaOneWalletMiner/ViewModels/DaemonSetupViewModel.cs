@@ -96,12 +96,21 @@ namespace NervaOneWalletMiner.ViewModels
             set => this.RaiseAndSetIfChanged(ref _hashThreshold, value);
         }
 
-        private bool _isWalletOnly;
-        public bool IsWalletOnly
+        private string _selectedNodeType = NodeType.FullNode;
+        public string SelectedNodeType
         {
-            get => _isWalletOnly;
-            set => this.RaiseAndSetIfChanged(ref _isWalletOnly, value);
+            get => _selectedNodeType;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _selectedNodeType, value);
+                this.RaisePropertyChanged(nameof(IsWalletOnly));
+                this.RaisePropertyChanged(nameof(IsLocalNode));
+            }
         }
+
+        public bool IsWalletOnly => _selectedNodeType == NodeType.WalletOnly;
+        public bool IsLocalNode => _selectedNodeType != NodeType.WalletOnly;
+        public bool IsPruningSupported => GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPruningSupported;
 
         private string _remoteNodeAddress = string.Empty;
         public string RemoteNodeAddress
@@ -131,7 +140,7 @@ namespace NervaOneWalletMiner.ViewModels
                 UseNoDnsFlag = daemonSettings.UseNoDnsFlag;
                 ThresholdEnabled = daemonSettings.EnableMiningThreshold;
                 HashThreshold = daemonSettings.StopMiningThreshold;
-                IsWalletOnly = daemonSettings.IsWalletOnly;
+                SelectedNodeType = daemonSettings.NodeType;
                 RemoteNodeAddress = string.IsNullOrEmpty(walletSettings.PublicNodeAddress)
                     ? GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].RemotePublicNodeUrlDefault
                     : walletSettings.PublicNodeAddress;
@@ -153,30 +162,18 @@ namespace NervaOneWalletMiner.ViewModels
                 var daemonSettings = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin];
                 var walletSettings = GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin];
 
-                if (IsWalletOnly)
+                if (SelectedNodeType != daemonSettings.NodeType)
                 {
-                    if (!daemonSettings.IsWalletOnly)
-                    {
-                        daemonSettings.IsWalletOnly = true;
-                        Logger.LogDebug("DSM.APST", "Switching to Wallet Only");
-                        isSaveSettingsNeeded = isLocalRemoteNodeChange = true;
-                    }
-
-                    if (walletSettings.PublicNodeAddress != RemoteNodeAddress.Trim())
-                    {
-                        walletSettings.PublicNodeAddress = RemoteNodeAddress.Trim();
-                        Logger.LogDebug("DSM.APST", "New Public Node: " + walletSettings.PublicNodeAddress);
-                        isSaveSettingsNeeded = isLocalRemoteNodeChange = true;
-                    }
+                    daemonSettings.NodeType = SelectedNodeType;
+                    Logger.LogDebug("DSM.APST", "Switching to " + SelectedNodeType);
+                    isSaveSettingsNeeded = isLocalRemoteNodeChange = true;
                 }
-                else
+
+                if (IsWalletOnly && walletSettings.PublicNodeAddress != RemoteNodeAddress.Trim())
                 {
-                    if (daemonSettings.IsWalletOnly)
-                    {
-                        daemonSettings.IsWalletOnly = false;
-                        Logger.LogDebug("DSM.APST", "Switching to Full Node");
-                        isSaveSettingsNeeded = isLocalRemoteNodeChange = true;
-                    }
+                    walletSettings.PublicNodeAddress = RemoteNodeAddress.Trim();
+                    Logger.LogDebug("DSM.APST", "New Public Node: " + walletSettings.PublicNodeAddress);
+                    isSaveSettingsNeeded = isLocalRemoteNodeChange = true;
                 }
 
                 if (daemonSettings.MiningAddress != MiningAddress)

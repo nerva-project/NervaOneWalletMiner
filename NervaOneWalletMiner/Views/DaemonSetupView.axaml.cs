@@ -23,10 +23,28 @@ namespace NervaOneWalletMiner.Views
                 InitializeComponent();
                 imgCoinIcon.Source = GlobalMethods.GetLogo();
                 btnOpenCliToolsFolder.IsVisible = !GlobalMethods.IsAndroid();
+                this.Loaded += DaemonSetupView_Loaded;
             }
             catch (Exception ex)
             {
                 Logger.LogException("DMS.CONS", ex);
+            }
+        }
+
+        private void DaemonSetupView_Loaded(object? sender, RoutedEventArgs e)
+        {
+            string nodeType = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].NodeType;
+            switch (nodeType)
+            {
+                case NervaOneWalletMiner.Objects.Constants.NodeType.PrunedNode:
+                    PrunedNode.IsChecked = true;
+                    break;
+                case NervaOneWalletMiner.Objects.Constants.NodeType.WalletOnly:
+                    WalletOnly.IsChecked = true;
+                    break;
+                default:
+                    FullNode.IsChecked = true;
+                    break;
             }
         }
 
@@ -263,25 +281,9 @@ namespace NervaOneWalletMiner.Views
         {
             try
             {
-                if (sender is RadioButton radioButton)
+                if (sender is RadioButton { IsChecked: true } radioButton)
                 {
-                    switch (radioButton.Name)
-                    {
-                        case "FullNode":
-                            if (radioButton.IsChecked!.Value)
-                            {
-                                spFullNode.IsVisible = true;
-                                spWalletOnly.IsVisible = false;
-                            }
-                            break;
-                        case "RemoteNode":
-                            if (radioButton.IsChecked!.Value)
-                            {
-                                spWalletOnly.IsVisible = true;
-                                spFullNode.IsVisible = false;
-                            }
-                            break;
-                    }
+                    GetVm().SelectedNodeType = radioButton.Name!;
                 }
             }
             catch (Exception ex)

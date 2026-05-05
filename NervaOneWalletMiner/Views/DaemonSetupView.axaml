@@ -45,15 +45,21 @@
 			<RadioButton GroupName="NodeType"
 					Name="FullNode"
 					Margin="0,20,0,0"
-					IsChecked="{Binding !IsWalletOnly}"
 					IsCheckedChanged="NodeType_IsCheckedChanged">
 				<TextBlock Text="Full Node: Blockchain runs on your device" TextWrapping="Wrap"/>
 			</RadioButton>
 
 			<RadioButton GroupName="NodeType"
-					Name="RemoteNode"
+					Name="PrunedNode"
 					Margin="0,0,0,0"
-					IsChecked="{Binding IsWalletOnly}"
+					IsVisible="{Binding IsPruningSupported}"
+					IsCheckedChanged="NodeType_IsCheckedChanged">
+				<TextBlock Text="Pruned Node: Blockchain runs on your device with pruning to save disk space" TextWrapping="Wrap"/>
+			</RadioButton>
+
+			<RadioButton GroupName="NodeType"
+					Name="WalletOnly"
+					Margin="0,0,0,0"
 					IsCheckedChanged="NodeType_IsCheckedChanged">
 				<TextBlock Text="Wallet Only: Connect to remote node and get wallet functionality only" TextWrapping="Wrap"/>
 			</RadioButton>
@@ -69,7 +75,7 @@
 						 Text="{Binding RemoteNodeAddress, Mode=TwoWay}"/>
 			</StackPanel>
 
-			<StackPanel Name="spFullNode" IsVisible="{Binding !IsWalletOnly}">
+			<StackPanel Name="spFullNode" IsVisible="{Binding IsLocalNode}">
 				<Button Name="btnRestartWithCommand"
 						Content="Restart with Optional Command"
 						DockPanel.Dock="Right"

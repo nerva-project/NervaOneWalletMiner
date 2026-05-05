@@ -1,4 +1,5 @@
 using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Objects.Constants;
 using System;
 using System.IO;
 
@@ -13,6 +14,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private string _WalletExtension = "directory";
 
         private bool _IsCpuMiningSupported = false;
+        private bool _IsPruningSupported = true;
         private bool _IsDaemonWalletSeparateApp = false;
         private bool _IsSavingWalletSupported = false;
         private bool _IsWalletHeightSupported = false;
@@ -53,6 +55,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public string WalletExtension { get => _WalletExtension; set => _WalletExtension = value; }
 
         public bool IsCpuMiningSupported { get => _IsCpuMiningSupported; set => _IsCpuMiningSupported = value; }
+        public bool IsPruningSupported { get => _IsPruningSupported; set => _IsPruningSupported = value; }
         public bool IsDaemonWalletSeparateApp { get => _IsDaemonWalletSeparateApp; set => _IsDaemonWalletSeparateApp = value; }
         public bool IsSavingWalletSupported { get => _IsSavingWalletSupported; set => _IsSavingWalletSupported = value; }
         public bool IsWalletHeightSupported { get => _IsWalletHeightSupported; set => _IsWalletHeightSupported = value; }
@@ -108,6 +111,11 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
 
             daemonCommand += " -rpcuser=" + daemonSettings.Rpc.UserName + " -rpcpassword=" + daemonSettings.Rpc.Password;
             daemonCommand += " -walletdir=\"" + GlobalData.WalletDir + "\"";
+
+            if (daemonSettings.NodeType == NodeType.PrunedNode)
+            {
+                daemonCommand += " -prune=550";
+            }
 
             if (!string.IsNullOrEmpty(daemonSettings.AdditionalArguments))
             {
