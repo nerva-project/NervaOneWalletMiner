@@ -103,7 +103,7 @@ namespace NervaOneWalletMiner.Views
         {
             try
             {
-                if (!GetVm().IsQuickSyncSupported())
+                if (!GetVm().IsQuickSyncSupportedCheck())
                 {
                     await DialogService.ShowAsync(new MessageBoxView("Restart with QuickSync", "Error, " + GlobalData.AppSettings.ActiveCoin.ToUpper() + " does not support QuickSync.", true));
                 }

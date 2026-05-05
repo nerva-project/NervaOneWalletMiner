@@ -745,7 +745,12 @@ namespace NervaOneWalletMiner.Helpers
 
                     GetInfoResponse infoRes = await GlobalData.DaemonService.GetInfo(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new GetInfoRequest());
                     
-                    if(infoRes.Error.IsError)
+                    if(infoRes.Status == StatusDaemon.WarmingUp)
+                    {
+                        GlobalData.LastDaemonResponseTime = DateTime.Now;
+                        GlobalData.NetworkStats.StatusSync = "Loading...";
+                    }
+                    else if(infoRes.Error.IsError)
                     {
                         Logger.LogError("UIM.GSDD", "GetInfo Error | Code: " + infoRes.Error.Code + " | Message: " + infoRes.Error.Message + " | Content: " + infoRes.Error.Content);
                     }

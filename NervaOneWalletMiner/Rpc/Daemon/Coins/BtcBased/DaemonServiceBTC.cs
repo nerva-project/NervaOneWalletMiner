@@ -1,4 +1,5 @@
 using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Rpc.Common;
 using NervaOneWalletMiner.Rpc.Daemon.Requests;
 using NervaOneWalletMiner.Rpc.Daemon.Responses;
@@ -52,7 +53,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                         {
                             // Set Service error
                             responseObj.Error = GetServiceError(GetCallerName(), error);
-                            responseObj.Status = "ERROR";
+                            responseObj.Status = StatusDaemon.Error;
                         }
                         else
                         {
@@ -71,7 +72,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                                 responseObj.ConnectionCountOut = getInfoResponse.connections_out;
                                 responseObj.ConnectionCountIn = getInfoResponse.connections_in;
                                 responseObj.Version = getInfoResponse.subversion;
-                                responseObj.Status = "OK";
+                                responseObj.Status = StatusDaemon.Ok;
 
                                 responseObj.Error.IsError = false;
                             }
@@ -80,9 +81,21 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 }
                 else
                 {
-                    // Set HTTP error
-                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
-                    responseObj.Status = "ERROR";
+                    string errorContent = await httpResponse.Content.ReadAsStringAsync();
+                    JObject? errorJson = null;
+                    try { errorJson = JObject.Parse(errorContent); } catch { }
+
+                    string? errorCode = errorJson?.SelectToken("error.code")?.ToString();
+                    if (errorCode == "-28")
+                    {
+                        Logger.LogDebug("BTC.DGTI", "Daemon warming up: " + errorJson?.SelectToken("error.message")?.ToString());
+                        responseObj.Status = StatusDaemon.WarmingUp;
+                    }
+                    else
+                    {
+                        responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                        responseObj.Status = StatusDaemon.Error;
+                    }
                 }
 
                 if(isNetInfoSuccess)

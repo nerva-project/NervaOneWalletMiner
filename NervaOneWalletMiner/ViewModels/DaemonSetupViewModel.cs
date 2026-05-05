@@ -111,6 +111,10 @@ namespace NervaOneWalletMiner.ViewModels
         public bool IsWalletOnly => _selectedNodeType == NodeType.WalletOnly;
         public bool IsLocalNode => _selectedNodeType != NodeType.WalletOnly;
         public bool IsPruningSupported => GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPruningSupported;
+        public bool IsCpuMiningSupported => GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsCpuMiningSupported;
+        public bool IsQuickSyncSupported => GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsQuickSyncSupported;
+        public bool IsPublicNodeSupported => GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPublicNodeSupported;
+        public bool IsAnalyticsFlagSupported => GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsAnalyticsFlagSupported;
 
         private string _remoteNodeAddress = string.Empty;
         public string RemoteNodeAddress
@@ -303,11 +307,11 @@ namespace NervaOneWalletMiner.ViewModels
             }
         }
 
-        public bool IsQuickSyncSupported()
+        public bool IsQuickSyncSupportedCheck()
         {
             try
             {
-                return !string.IsNullOrEmpty(GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].QuickSyncUrl);
+                return GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsQuickSyncSupported;
             }
             catch (Exception ex)
             {

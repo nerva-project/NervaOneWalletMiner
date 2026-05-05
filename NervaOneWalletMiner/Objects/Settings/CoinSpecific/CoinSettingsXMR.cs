@@ -14,6 +14,9 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
 
         private bool _IsCpuMiningSupported = true;
         private bool _IsPruningSupported = true;
+        private bool _IsQuickSyncSupported = false;
+        private bool _IsPublicNodeSupported = true;
+        private bool _IsAnalyticsFlagSupported = false;
         private bool _IsDaemonWalletSeparateApp = true;
         private bool _IsSavingWalletSupported = true;
         private bool _IsWalletHeightSupported = true;
@@ -56,6 +59,9 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
 
         public bool IsCpuMiningSupported { get => _IsCpuMiningSupported; set => _IsCpuMiningSupported = value; }
         public bool IsPruningSupported { get => _IsPruningSupported; set => _IsPruningSupported = value; }
+        public bool IsQuickSyncSupported { get => _IsQuickSyncSupported; set => _IsQuickSyncSupported = value; }
+        public bool IsPublicNodeSupported { get => _IsPublicNodeSupported; set => _IsPublicNodeSupported = value; }
+        public bool IsAnalyticsFlagSupported { get => _IsAnalyticsFlagSupported; set => _IsAnalyticsFlagSupported = value; }
         public bool IsDaemonWalletSeparateApp { get => _IsDaemonWalletSeparateApp; set => _IsDaemonWalletSeparateApp = value; }
         public bool IsSavingWalletSupported { get => _IsSavingWalletSupported; set => _IsSavingWalletSupported = value; }
         public bool IsWalletHeightSupported { get => _IsWalletHeightSupported; set => _IsWalletHeightSupported = value; }

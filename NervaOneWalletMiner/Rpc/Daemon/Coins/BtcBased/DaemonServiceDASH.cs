@@ -1,4 +1,5 @@
 using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Rpc.Common;
 using NervaOneWalletMiner.Rpc.Daemon.Requests;
 using NervaOneWalletMiner.Rpc.Daemon.Responses;
@@ -52,7 +53,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                         {
                             // Set Service error
                             responseObj.Error = GetServiceError(GetCallerName(), error);
-                            responseObj.Status = "ERROR";
+                            responseObj.Status = StatusDaemon.Error;
                         }
                         else
                         {
@@ -71,7 +72,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                                 responseObj.ConnectionCountOut = getInfoResponse.outboundconnections;
                                 responseObj.ConnectionCountIn = getInfoResponse.inboundmnconnections;
                                 responseObj.Version = getInfoResponse.buildversion;
-                                responseObj.Status = "OK";
+                                responseObj.Status = StatusDaemon.Ok;
 
                                 responseObj.Error.IsError = false;
                             }
@@ -82,7 +83,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 {
                     // Set HTTP error
                     responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
-                    responseObj.Status = "ERROR";
+                    responseObj.Status = StatusDaemon.Error;
                 }
 
                 if(isNetInfoSuccess)
