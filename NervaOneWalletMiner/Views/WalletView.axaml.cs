@@ -151,12 +151,12 @@ namespace NervaOneWalletMiner.Views
 
                 if (btnOpenCloseWallet.Content!.ToString()!.Equals(StatusWallet.OpenWallet))
                 {
-                    if (!GlobalData.IsCliToolsFound)
+                    if (GlobalData.DaemonState == DaemonState.CliToolsMissing || GlobalData.DaemonState == DaemonState.Downloading)
                     {
                         Logger.LogDebug("WAL.OCWC", "Trying to open wallet but CLI tools not found");
                         await DialogService.ShowAsync(new MessageBoxView("Open Wallet", "Client tools missing. Cannot open wallet until client tools are downloaded and running", true));
                     }
-                    else if (!GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly && !GlobalData.IsInitialDaemonConnectionSuccess)
+                    else if (!GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly && GlobalData.DaemonState != DaemonState.Running)
                     {
                         Logger.LogDebug("WAL.OCWC", "Trying to open wallet but daemon not running");
                         await DialogService.ShowAsync(new MessageBoxView("Open Wallet", "Daemon not running. Cannot open wallet until connection is established", true));

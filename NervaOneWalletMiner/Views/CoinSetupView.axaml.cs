@@ -69,7 +69,7 @@ namespace NervaOneWalletMiner.Views
                 GlobalMethods.ShowHideDaemonTab();
 
                 Logger.LogDebug("CSV.OKBC", "Attempting to download CLI tools from: " + tbxCliDownloadUrl.Text);
-                GlobalData.IsCliToolsDownloading = true;
+                GlobalData.DaemonState = DaemonState.Downloading;
                 GlobalMethods.SetUpCliTools(tbxCliDownloadUrl.Text!, GlobalData.CliToolsDir);
 
                 UIManager.NavigateToDefaultPage();
@@ -85,7 +85,7 @@ namespace NervaOneWalletMiner.Views
             try
             {
                 Logger.LogDebug("CSV.CNCL", "Coin Setup cancelled.");
-                GlobalData.IsCliToolsDownloading = false;
+                GlobalData.DaemonState = DaemonState.CliToolsMissing;
 
                 await DialogService.ShowAsync(new MessageBoxView("Client Tools Missing",
                     "NervaOne cannot run without client tools. Switch coin or restart to download client tools. "

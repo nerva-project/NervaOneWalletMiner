@@ -61,8 +61,7 @@ namespace NervaOneWalletMiner.Helpers
         public static readonly string ExportsDir = GlobalMethods.GetExportsDir();
         public static readonly string ConfigFileNameWithPath = GlobalMethods.GetConfigFileNameWithPath();
 
-        public static volatile bool IsDaemonRestarting = false;
-        public static volatile bool IsInitialDaemonConnectionSuccess = false;
+        public static volatile DaemonState DaemonState = DaemonState.Connecting;
         public static DateTime LastDaemonResponseTime = DateTime.MinValue;
         public static DateTime LastDaemonRestartAttempt = DateTime.MinValue;
 
@@ -89,9 +88,6 @@ namespace NervaOneWalletMiner.Helpers
         public static volatile bool IsGetAndSetWalletDataComplete = true;
         public static volatile bool IsGetAndSetDaemonDataComplete = true;
 
-        public static volatile bool IsCliToolsFound = true;
-        public static volatile bool IsCliToolsDownloading = false;
-        public static volatile bool IsBlockchainDbDownloading = false;
 
         // Connections Guard
         public static DateTime ConnectGuardLastGoodTime = DateTime.Now;

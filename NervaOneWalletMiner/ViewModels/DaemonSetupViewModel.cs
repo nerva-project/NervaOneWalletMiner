@@ -295,7 +295,7 @@ namespace NervaOneWalletMiner.ViewModels
                 else
                 {
                     Logger.LogDebug("DSM.RWCM", "Running as Full Node");
-                    GlobalData.IsDaemonRestarting = true;
+                    GlobalData.DaemonState = DaemonState.Restarting;
                     ProcessManager.StartExternalProcess(
                         GlobalMethods.GetDaemonProcess(),
                         GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].GenerateDaemonOptions(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]) + " " + restartOptions);
@@ -338,7 +338,7 @@ namespace NervaOneWalletMiner.ViewModels
             try
             {
                 // We'll be downloading new client tools so clean up
-                GlobalData.IsCliToolsDownloading = true;
+                GlobalData.DaemonState = DaemonState.Downloading;
 
                 if (GlobalData.IsWalletOpen)
                 {
@@ -380,7 +380,7 @@ namespace NervaOneWalletMiner.ViewModels
         {
             try
             {
-                GlobalData.IsBlockchainDbDownloading = true;
+                GlobalData.DaemonState = DaemonState.Downloading;
 
                 if (GlobalData.IsWalletOpen)
                 {

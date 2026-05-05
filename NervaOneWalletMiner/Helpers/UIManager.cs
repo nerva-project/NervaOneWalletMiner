@@ -398,7 +398,7 @@ namespace NervaOneWalletMiner.Helpers
         {
             try
             {
-                if (GlobalData.IsCliToolsDownloading || GlobalData.IsBlockchainDbDownloading)
+                if (GlobalData.DaemonState == DaemonState.Downloading)
                 {
                     // Don't want to update
                     return;
@@ -688,45 +688,34 @@ namespace NervaOneWalletMiner.Helpers
         {
             try
             {
-                if (GlobalData.IsCliToolsDownloading || GlobalData.IsBlockchainDbDownloading)
-                {
-                    // Status bar is updated directly when downloading/extracting; just keep NetworkStats neutral
-                    GlobalData.NetworkStats = new()
-                    {
-                        Connections = []
-                    };
-                }
-                else if (!GlobalData.IsCliToolsFound)
-                {
-                    GlobalData.NetworkStats = new()
-                    {
-                        StatusSync = "Client tools missing.",
-                        Connections = []
-                    };
-                }
-                else if(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
+                if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
                 {
                     GlobalData.NetworkStats = new()
                     {
                         StatusSync = GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].PublicNodeAddress,
                         Connections = []
                     };
+                    return;
                 }
-                else if (GlobalData.IsDaemonRestarting)
+
+                switch (GlobalData.DaemonState)
                 {
-                    GlobalData.NetworkStats = new()
-                    {
-                        StatusSync = "Restarting daemon...",
-                        Connections = []
-                    };
-                }
-                else if (!GlobalData.IsInitialDaemonConnectionSuccess)
-                {
-                    GlobalData.NetworkStats = new()
-                    {
-                        StatusSync = "Connecting to daemon...",
-                        Connections = []
-                    };
+                    case DaemonState.Downloading:
+                        // Status bar is updated directly when downloading/extracting; just keep NetworkStats neutral
+                        GlobalData.NetworkStats = new() { Connections = [] };
+                        break;
+                    case DaemonState.CliToolsMissing:
+                        GlobalData.NetworkStats = new() { StatusSync = "Client tools missing.", Connections = [] };
+                        break;
+                    case DaemonState.Restarting:
+                        GlobalData.NetworkStats = new() { StatusSync = "Restarting daemon...", Connections = [] };
+                        break;
+                    case DaemonState.WarmingUp:
+                        GlobalData.NetworkStats = new() { StatusSync = "Loading...", Connections = [] };
+                        break;
+                    case DaemonState.Connecting:
+                        GlobalData.NetworkStats = new() { StatusSync = "Connecting to daemon...", Connections = [] };
+                        break;
                 }
             }
             catch (Exception ex)
@@ -748,7 +737,7 @@ namespace NervaOneWalletMiner.Helpers
                     if(infoRes.Status == StatusDaemon.WarmingUp)
                     {
                         GlobalData.LastDaemonResponseTime = DateTime.Now;
-                        GlobalData.NetworkStats.StatusSync = "Loading...";
+                        GlobalData.DaemonState = DaemonState.WarmingUp;
                     }
                     else if(infoRes.Error.IsError)
                     {
@@ -757,16 +746,8 @@ namespace NervaOneWalletMiner.Helpers
                     else
                     {
                         GlobalData.LastDaemonResponseTime = DateTime.Now;
-                        if (GlobalData.IsInitialDaemonConnectionSuccess == false)
-                        {
-                            // This will be used to get rid of establishing connection message and to StartWalletUiUpdate 
-                            GlobalData.IsInitialDaemonConnectionSuccess = true;
-                        }
-
-                        if (GlobalData.IsDaemonRestarting)
-                        {
-                            GlobalData.IsDaemonRestarting = false;
-                        }
+                        // This will be used to get rid of establishing connection message and to StartWalletUiUpdate
+                        GlobalData.DaemonState = DaemonState.Running;
 
                         GlobalData.NetworkStats.NetHeight = (infoRes.TargetHeight > infoRes.Height ? infoRes.TargetHeight : infoRes.Height);
                         GlobalData.NetworkStats.YourHeight = infoRes.Height;

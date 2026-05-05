@@ -1,4 +1,5 @@
 using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Rpc.Wallet.Requests;
 using NervaOneWalletMiner.Rpc.Wallet.Responses;
 using ReactiveUI;
@@ -50,12 +51,12 @@ namespace NervaOneWalletMiner.ViewModels
             {
                 WalletOperationResult result = new(true);
 
-                if (!GlobalData.IsCliToolsFound)
+                if (GlobalData.DaemonState == DaemonState.CliToolsMissing || GlobalData.DaemonState == DaemonState.Downloading)
                 {
                     Logger.LogDebug("WSM.CHKP", operationTitle + " but CLI tools not found");
                     result = new WalletOperationResult(false, operationTitle, "Client tools missing. Cannot perform operation until client tools are downloaded and running.");
                 }
-                else if (!GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly && !GlobalData.IsInitialDaemonConnectionSuccess)
+                else if (!GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly && GlobalData.DaemonState != DaemonState.Running)
                 {
                     Logger.LogDebug("WSM.CHKP", operationTitle + " but daemon not running");
                     result = new WalletOperationResult(false, operationTitle, "Daemon not running. Cannot perform operation until connection is established.");

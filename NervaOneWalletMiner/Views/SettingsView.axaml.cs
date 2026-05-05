@@ -100,7 +100,7 @@ namespace NervaOneWalletMiner.Views
                     if (!GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
                     {
                         // CLI tools missing. Navigate to Coin Setup page
-                        GlobalData.IsCliToolsFound = false;
+                        GlobalData.DaemonState = DaemonState.CliToolsMissing;
                         Logger.LogDebug("SET.SSCL", "CLI tools not found. Navigating to Coin Setup View.");
                         UIManager.NavigateToCoinSetup();
                     }

@@ -729,7 +729,7 @@ namespace NervaOneWalletMiner.Helpers
             }
             finally
             {
-                GlobalData.IsCliToolsDownloading = false;
+                GlobalData.DaemonState = DaemonState.CliToolsMissing;
             }
         }
 
@@ -778,7 +778,7 @@ namespace NervaOneWalletMiner.Helpers
             }
             finally
             {
-                GlobalData.IsBlockchainDbDownloading = false;
+                GlobalData.DaemonState = DaemonState.Connecting;
             }
         }
 
@@ -1209,7 +1209,7 @@ namespace NervaOneWalletMiner.Helpers
 
                     await Task.Run(() => StopAndCloseDaemon());
 
-                    GlobalData.IsDaemonRestarting = true;
+                    GlobalData.DaemonState = DaemonState.Restarting;
                     string quickSyncFile = Path.Combine(GlobalData.CliToolsDir, Path.GetFileName(GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].QuickSyncUrl));
                     ProcessManager.StartExternalProcess(GetDaemonProcess(), GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].GenerateDaemonOptions(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]) + " --quicksync \"" + quickSyncFile + "\"");
                     return true;
@@ -1397,9 +1397,7 @@ namespace NervaOneWalletMiner.Helpers
             GlobalData.IsNoConnectionsStoppedMining = false;
             GlobalData.IsHashRateMonitoringStoppedMining = false;
 
-            GlobalData.IsCliToolsFound = true;
-            GlobalData.IsCliToolsDownloading = false;
-            GlobalData.IsBlockchainDbDownloading = false;
+            GlobalData.DaemonState = DaemonState.Connecting;
             GlobalData.ConnectGuardLastGoodTime = DateTime.Now;
             GlobalData.ConnectGuardRestartCount = 1;
 

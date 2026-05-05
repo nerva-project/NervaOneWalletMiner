@@ -2,6 +2,7 @@
 using Avalonia.Threading;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects;
+using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.ViewModels;
 using NervaOneWalletMiner.ViewsDialogs;
 using System;
@@ -87,7 +88,7 @@ public partial class MainView : UserControl
         {
             if (GlobalData.IsConfigFound && !GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
             {
-                GlobalData.IsCliToolsFound = false;
+                GlobalData.DaemonState = DaemonState.CliToolsMissing;
                 Logger.LogDebug("MAV.CDCN", "CLI tools not found. Navigating to Coin Setup View.");
                 UIManager.NavigateToCoinSetup();
             }
