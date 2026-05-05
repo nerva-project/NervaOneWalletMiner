@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Styling;
 using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Objects;
 using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.ViewModels;
 using System;
@@ -30,17 +31,7 @@ namespace NervaOneWalletMiner.Views
                     }
                 };
 
-                // Name of coin as define in Settings axaml needs to equal to ActiveCoin
-                ComboBoxItem selectedCoin = (ComboBoxItem)cbxCoin.Items[0]!;
-                foreach (ComboBoxItem? coin in cbxCoin.Items)
-                {
-                    if (coin!.Name!.Equals(GlobalData.AppSettings.ActiveCoin))
-                    {
-                        selectedCoin = coin;
-                    }
-                }               
-
-                cbxCoin.SelectedValue = selectedCoin;
+                this.Loaded += SettingsView_Loaded;
             }
             catch (Exception ex)
             {
@@ -81,7 +72,7 @@ namespace NervaOneWalletMiner.Views
                     }
                 }
 
-                string selectedCoin = ((ComboBoxItem)cbxCoin.SelectedItem!).Name!;
+                string selectedCoin = ((CoinListItem)cbxCoin.SelectedItem!).Key;
                 if (!selectedCoin.Equals(GlobalData.AppSettings.ActiveCoin))
                 {
                     // We're switching to a different coin so need to clean up
@@ -128,6 +119,11 @@ namespace NervaOneWalletMiner.Views
             {
                 Logger.LogException("SET.SSCL", ex);
             }
+        }
+
+        private void SettingsView_Loaded(object? sender, RoutedEventArgs e)
+        {
+            cbxCoin.SelectedItem = GlobalData.CoinList.Find(c => c.Key.Equals(GlobalData.AppSettings.ActiveCoin));
         }
     }
 }

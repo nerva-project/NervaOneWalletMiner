@@ -411,7 +411,19 @@ namespace NervaOneWalletMiner.Helpers
                 }
                 else
                 {
-                    string rawVersion = GlobalData.NetworkStats.Version.ToLower().StartsWith("v") ? GlobalData.NetworkStats.Version : "v" + GlobalData.NetworkStats.Version;
+                    string rawVersion = GlobalData.NetworkStats.Version;
+
+                    // Handle Bitcoin's "/Satoshi:31.0.0/" format - extract part between ':' and trailing '/'
+                    int colonIndex = rawVersion.IndexOf(':');
+                    if (colonIndex >= 0)
+                    {
+                        rawVersion = rawVersion[(colonIndex + 1)..].TrimEnd('/');
+                    }
+
+                    if (!rawVersion.ToLower().StartsWith("v"))
+                    {
+                        rawVersion = "v" + rawVersion;
+                    }
 
                     // Keep only the numeric part: e.g. "v0.18.4.5-release" -> "v0.18.4.5"
                     int dashIndex = rawVersion.IndexOf('-');

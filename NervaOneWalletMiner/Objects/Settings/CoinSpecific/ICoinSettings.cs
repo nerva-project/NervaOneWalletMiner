@@ -5,6 +5,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
     public interface ICoinSettings
     {
         int DaemonPort { get; set; }
+        string DisplayName { get; set; }
         string DisplayUnits { get; set; }
         string WalletExtension { get; set; }
 

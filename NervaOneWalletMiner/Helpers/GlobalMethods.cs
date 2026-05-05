@@ -4,6 +4,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using ICSharpCode.SharpZipLib.BZip2;
 using ICSharpCode.SharpZipLib.GZip;
+using NervaOneWalletMiner.Objects;
 using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Objects.Settings;
 using NervaOneWalletMiner.Objects.Settings.CoinSpecific;
@@ -332,6 +333,26 @@ namespace NervaOneWalletMiner.Helpers
         #endregion // Directories, Paths and Names
 
         #region Coin Specific
+        public static List<CoinListItem> BuildCoinList()
+        {
+            List<CoinListItem> coinList = [];
+
+            try
+            {
+                foreach (var kvp in GlobalData.CoinSettings)
+                {
+                    GlobalData.CoinLogoDictionary.TryGetValue(kvp.Key, out Bitmap? logo);
+                    coinList.Add(new CoinListItem { Key = kvp.Key, DisplayName = kvp.Value.DisplayName, Logo = logo });
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("GLM.BCLS", ex);
+            }
+
+            return coinList;
+        }
+
         public static Dictionary<string, ICoinSettings> GetDefaultCoinSettings()
         {
             Dictionary<string, ICoinSettings> defaultSettings = [];
@@ -339,10 +360,10 @@ namespace NervaOneWalletMiner.Helpers
             try
             {
                 defaultSettings.Add(Coin.XNV, new CoinSettingsXNV());
+                defaultSettings.Add(Coin.BTC, new CoinSettingsBTC());
                 defaultSettings.Add(Coin.XMR, new CoinSettingsXMR());
                 defaultSettings.Add(Coin.WOW, new CoinSettingsWOW());
                 defaultSettings.Add(Coin.DASH, new CoinSettingsDASH());
-                defaultSettings.Add(Coin.BTC, new CoinSettingsBTC());
             }
             catch (Exception ex)
             {

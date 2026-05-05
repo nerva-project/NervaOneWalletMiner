@@ -8,6 +8,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
     {
         #region Private Default Variables
         private int _DaemonPort = 17566;
+        private string _DisplayName = "Nerva (XNV)";
         private string _DisplayUnits = "XNV";
         private string _WalletExtension = ".cache";
 
@@ -48,6 +49,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
 
         #region Interface Variables
         public int DaemonPort { get => _DaemonPort; set => _DaemonPort = value; }
+        public string DisplayName { get => _DisplayName; set => _DisplayName = value; }
         public string DisplayUnits { get => _DisplayUnits; set => _DisplayUnits = value; }
         public string WalletExtension { get => _WalletExtension; set => _WalletExtension = value; }
 

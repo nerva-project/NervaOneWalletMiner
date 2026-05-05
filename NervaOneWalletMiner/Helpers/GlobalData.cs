@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Media.Imaging;
+using NervaOneWalletMiner.Objects;
 using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Objects.Settings;
 using NervaOneWalletMiner.Objects.Settings.CoinSpecific;
@@ -16,7 +17,7 @@ namespace NervaOneWalletMiner.Helpers
     {
         public const string AppNameMain = "NervaOne";
         public const string AppAssemblyName = "NervaOneWalletMiner";
-        public const string Version = "1.0.0";
+        public const string Version = "1.0.1";
 
         public const string CliToolsDirName = "cli";
         public const string WalletDirName = "wallets";
@@ -51,6 +52,8 @@ namespace NervaOneWalletMiner.Helpers
         public static IWalletService WalletService = new WalletServiceXNV();
         public static IDaemonService DaemonService = new DaemonServiceXNV();
         public static Dictionary<string, ICoinSettings> CoinSettings = GlobalMethods.GetDefaultCoinSettings();
+
+        public static List<CoinListItem> CoinList = GlobalMethods.BuildCoinList();
 
         public static readonly string MainDataDir = GlobalMethods.GetDataDir();
         public static readonly string AppDataDir = GlobalMethods.GetAppDataDir();

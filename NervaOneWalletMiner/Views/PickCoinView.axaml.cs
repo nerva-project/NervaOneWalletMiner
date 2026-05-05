@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Objects;
 using System;
 
 namespace NervaOneWalletMiner.Views
@@ -18,7 +19,7 @@ namespace NervaOneWalletMiner.Views
         {
             try
             {
-                string selectedCoin = ((ComboBoxItem)cbxCoin.SelectedItem!).Name!;
+                string selectedCoin = ((CoinListItem)cbxCoin.SelectedItem!).Key;
                 GlobalMethods.SetCoin(selectedCoin);
                 GlobalMethods.SaveConfig();
 

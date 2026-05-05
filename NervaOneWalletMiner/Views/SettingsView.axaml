@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:vm="clr-namespace:NervaOneWalletMiner.ViewModels"
+			 xmlns:obj="clr-namespace:NervaOneWalletMiner.Objects"
              mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="550"
 			 x:DataType="vm:SettingsViewModel"
              x:Class="NervaOneWalletMiner.Views.SettingsView">
@@ -49,59 +50,19 @@
 		<Separator Margin="0,20,0,0"/>
 		
 		<Label Content="Active Coin" Margin="0,10,0,0"/>
-		<ComboBox Name="cbxCoin">
-			<!-- Define coins begins. Name needs to match ActiveCoin -->
-			<ComboBoxItem Name="xnv">
-				<Grid ColumnDefinitions="24,*">
-					<Image Grid.Row="0" Grid.Column="0" 
-						   Height="32"
-						   Source="avares://NervaOneWalletMiner/Assets/xnv/logo.png"/>
-					<TextBlock Grid.Row="0" Grid.Column="1"
-							Padding="5,7,0,0"
-							Text="Nerva (XNV)"/>
-				</Grid>
-			</ComboBoxItem>
-			
-			<ComboBoxItem Name="btc">
-				<Grid ColumnDefinitions="24,*">
-					<Image Grid.Row="0" Grid.Column="0"
-						   Height="32" Source="avares://NervaOneWalletMiner/Assets/btc/logo.png"/>
-					<TextBlock Grid.Row="0" Grid.Column="1"
-							Padding="5,7,0,0"
-							Text="Bitcoin (BTC)"/>
-				</Grid>
-			</ComboBoxItem>
-
-			<ComboBoxItem Name="xmr">
-				<Grid ColumnDefinitions="24,*">
-					<Image Grid.Row="0" Grid.Column="0"
-						   Height="32" Source="avares://NervaOneWalletMiner/Assets/xmr/logo.png"/>
-					<TextBlock Grid.Row="0" Grid.Column="1"
-							Padding="5,7,0,0"
-							Text="Monero (XMR)"/>
-				</Grid>
-			</ComboBoxItem>
-
-			<ComboBoxItem Name="wow">
-				<Grid ColumnDefinitions="24,*">
-					<Image Grid.Row="0" Grid.Column="0"
-						   Height="32" Source="avares://NervaOneWalletMiner/Assets/wow/logo.png"/>
-					<TextBlock Grid.Row="0" Grid.Column="1"
-							Padding="5,7,0,0"
-							Text="Wownero (WOW)"/>
-				</Grid>
-			</ComboBoxItem>
-
-			<ComboBoxItem Name="dash">
-				<Grid ColumnDefinitions="24,*">
-					<Image Grid.Row="0" Grid.Column="0"
-						   Height="32" Source="avares://NervaOneWalletMiner/Assets/dash/logo.png"/>
-					<TextBlock Grid.Row="0" Grid.Column="1"
-							Padding="5,7,0,0"
-							Text="Dash (DASH)"/>
-				</Grid>
-			</ComboBoxItem>
-			<!-- Define coins ends -->			
+		<ComboBox Name="cbxCoin" ItemsSource="{Binding CoinList}">
+			<ComboBox.ItemTemplate>
+				<DataTemplate x:DataType="obj:CoinListItem">
+					<Grid ColumnDefinitions="24,*">
+						<Image Grid.Column="0"
+							   Height="32"
+							   Source="{Binding Logo}"/>
+						<TextBlock Grid.Column="1"
+								   Padding="5,7,0,0"
+								   Text="{Binding DisplayName}"/>
+					</Grid>
+				</DataTemplate>
+			</ComboBox.ItemTemplate>
 		</ComboBox>	
 
 		<Label Content="Applicaiton Theme" Margin="0,10,0,0"/>
