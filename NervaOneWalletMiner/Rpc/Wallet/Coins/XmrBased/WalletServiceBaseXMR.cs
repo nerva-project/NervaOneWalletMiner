@@ -22,6 +22,9 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         protected abstract string CoinPrefix { get; }
         protected virtual decimal CoinAtomicUnits => 1_000_000_000_000m;
 
+        // sweep_all can be slow when there are many inputs to consolidate
+        private static readonly TimeSpan _sweepTimeout = TimeSpan.FromMinutes(60);
+
         protected decimal AmountFromAtomicUnits(ulong value, int decimalPlaces) =>
             Math.Round(Convert.ToDecimal(value / (double)CoinAtomicUnits), decimalPlaces);
 
@@ -1887,7 +1890,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 };
 
                 Logger.LogDebug(CoinPrefix + ".SWBL", "Calling sweep_all with below_amount: " + requestObj.Amount);
-                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString(), TimeSpan.FromMinutes(60));
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString(), _sweepTimeout);
                 Logger.LogDebug(CoinPrefix + ".SWBL", "sweep_all returned.");
                 if (httpResponse.IsSuccessStatusCode)
                 {

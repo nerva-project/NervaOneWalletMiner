@@ -60,7 +60,7 @@
 						</DataTemplate>
 					</DataGridTemplateColumn>				
 					<DataGridTextColumn Header="Height"
-										Binding="{Binding Height}"/>
+										Binding="{Binding HeightDisplay}"/>
 					<DataGridTextColumn Header="Time"
 										MinWidth="120"
 										Width="*"

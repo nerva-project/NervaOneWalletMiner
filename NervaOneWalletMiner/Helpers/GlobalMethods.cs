@@ -1400,6 +1400,7 @@ namespace NervaOneWalletMiner.Helpers
             GlobalData.DaemonState = DaemonState.Connecting;
             GlobalData.ConnectGuardLastGoodTime = DateTime.Now;
             GlobalData.ConnectGuardRestartCount = 1;
+            MasterProcess._cliToolsRunningLastCheck = DateTime.MinValue;
 
             if (GlobalData.ViewModelPages.ContainsKey(SplitViewPages.DaemonSetup))
             {

@@ -249,6 +249,15 @@ namespace NervaOneWalletMiner.Views
                     return;
                 }
 
+                if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletBtcStyle)
+                {
+                    DialogResult? confirmRes = await DialogService.ShowAsync<DialogResult>(new MessageBoxView("Rescan Blockchain", "Rescanning the blockchain can take a very long time depending on chain size. Wallet operations might be unresponsive until it completes.\r\n\r\nDo you want to continue?", false, true));
+                    if (confirmRes == null || !confirmRes.IsOk)
+                    {
+                        return;
+                    }
+                }
+
                 var opResult = await GetVm().RescanBlockchain();
                 await DialogService.ShowAsync(new MessageBoxView(opResult.Title, opResult.Message, true));
             }

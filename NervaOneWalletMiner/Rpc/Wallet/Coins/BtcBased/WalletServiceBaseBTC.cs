@@ -26,6 +26,12 @@ namespace NervaOneWalletMiner.Rpc.Wallet
 
         private static int _id = 0;
 
+        // importdescriptors/importwallet and rescanblockchain are synchronous and block until the chain scan completes
+        private static readonly TimeSpan _blockchainScanTimeout = TimeSpan.FromHours(2);
+        private static readonly int _blockchainScanTimeoutSeconds = (int)_blockchainScanTimeout.TotalSeconds;
+        // timestamp:"now" imports — no chain scan, just key loading
+        private const int _fastImportTimeoutSeconds = 300; 
+
         private static string GetCallerName([System.Runtime.CompilerServices.CallerMemberName] string name = "") => name;
 
 
@@ -472,7 +478,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                         ["params"] = new JObject
                         {
                             ["passphrase"] = new string(requestObj.Password),
-                            ["timeout"] = 300
+                            ["timeout"] = _fastImportTimeoutSeconds
                         }
                     };
 
@@ -710,7 +716,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 var unlockParams = new JObject
                 {
                     ["passphrase"] = new string(requestObj.Password),
-                    ["timeout"] = 7200
+                    ["timeout"] = _blockchainScanTimeoutSeconds
                 };
 
                 var unlockJson = new JObject
@@ -746,7 +752,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 ["params"] = new JObject { ["filename"] = requestObj.DumpFileWithPath }
             };
 
-            httpResponse = await HttpHelper.GetPostFromService(walletUrl, importJson.ToString(), rpc.UserName, rpc.Password, TimeSpan.FromMinutes(60));
+            httpResponse = await HttpHelper.GetPostFromService(walletUrl, importJson.ToString(), rpc.UserName, rpc.Password, _blockchainScanTimeout);
             if (httpResponse.IsSuccessStatusCode)
             {
                 string content = await httpResponse.Content.ReadAsStringAsync();
@@ -821,7 +827,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 var unlockParams = new JObject
                 {
                     ["passphrase"] = new string(requestObj.Password),
-                    ["timeout"] = 7200
+                    ["timeout"] = _blockchainScanTimeoutSeconds
                 };
 
                 var unlockJson = new JObject
@@ -883,7 +889,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 ["params"] = new JArray { descriptors }
             };
 
-            httpResponse = await HttpHelper.GetPostFromService(walletUrl, importJson.ToString(), rpc.UserName, rpc.Password, TimeSpan.FromMinutes(60));
+            httpResponse = await HttpHelper.GetPostFromService(walletUrl, importJson.ToString(), rpc.UserName, rpc.Password, _blockchainScanTimeout);
             if (httpResponse.IsSuccessStatusCode)
             {
                 string content = await httpResponse.Content.ReadAsStringAsync();
@@ -1051,7 +1057,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                         ["params"] = new JObject
                         {
                             ["passphrase"] = new string(requestObj.Password),
-                            ["timeout"] = 7200
+                            ["timeout"] = _blockchainScanTimeoutSeconds
                         }
                     };
 
@@ -1080,7 +1086,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     ["params"] = new JArray { importItems }
                 };
 
-                httpResponse = await HttpHelper.GetPostFromService(walletUrl, importJson.ToString(), rpc.UserName, rpc.Password, TimeSpan.FromMinutes(30));
+                httpResponse = await HttpHelper.GetPostFromService(walletUrl, importJson.ToString(), rpc.UserName, rpc.Password, _blockchainScanTimeout);
                 if (httpResponse.IsSuccessStatusCode)
                 {
                     string content = await httpResponse.Content.ReadAsStringAsync();
@@ -1406,6 +1412,51 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         }
         #endregion // Transfer
 
+        #region Rescan Blockchain        
+        public async Task<RescanBlockchainResponse> RescanBlockchain(RpcBase rpc, RescanBlockchainRequest requestObj)
+        {
+            RescanBlockchainResponse responseObj = new();
+
+            try
+            {
+                var requestJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = _id++,
+                    ["method"] = "rescanblockchain",
+                    ["params"] = new JArray()
+                };
+
+                // rescanblockchain is synchronous and can take a long time on large chains
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password, _blockchainScanTimeout);
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
+
+                    var error = jsonObject["error"];
+                    if (error != null && error.Type != JTokenType.Null)
+                    {
+                        responseObj.Error = GetServiceError(GetCallerName(), error);
+                    }
+                    else
+                    {
+                        responseObj.Error.IsError = false;
+                    }
+                }
+                else
+                {
+                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(CoinPrefix + ".WRSB", ex);
+            }
+
+            return responseObj;
+        }
+        #endregion // Rescan Blockchain
+
         #region Get Accounts
         public async Task<GetAccountsResponse> GetAccounts(RpcBase rpc, GetAccountsRequest requestObj)
         {
@@ -1660,7 +1711,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                     AddressShort = GlobalMethods.GetShorterString(entry.address, 12),
                                     Height = string.IsNullOrEmpty(entry.blockheight) ? 0 : Convert.ToUInt32(entry.blockheight),
                                     Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timereceived).ToLocalTime(),
-                                    Amount = Convert.ToDecimal(entry.amount),
+                                    Amount = Math.Abs(Convert.ToDecimal(entry.amount)),
                                     Type = GetTransactionType(entry.category)
                                 };
 
@@ -1739,20 +1790,28 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                             responseObj.Confirmations = getTransfByTxIdResponse.confirmations;
                             responseObj.Note = getTransfByTxIdResponse.comment;
 
-                            foreach(TransferDetails details in getTransfByTxIdResponse.Details)
+                            foreach (TransferDetails details in getTransfByTxIdResponse.Details)
                             {
-                                if(decimal.Parse(details.amount, NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign) == requestObj.Amount)
+                                decimal parsedAmount = string.IsNullOrEmpty(details.amount) ? 0 : decimal.Parse(details.amount, NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign);
+                                if (Math.Abs(parsedAmount) == requestObj.Amount)
                                 {
                                     responseObj.Address = details.address;
                                     responseObj.Type = details.category;
-                                    responseObj.Amount = string.IsNullOrEmpty(details.amount) ? 0 : decimal.Parse(details.amount, NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign);
-                                    responseObj.Fee = string.IsNullOrEmpty(details.fee) ? 0 : decimal.Parse(details.fee, NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign);
+                                    responseObj.Amount = Math.Abs(parsedAmount);
+                                    responseObj.Fee = string.IsNullOrEmpty(details.fee) ? 0 : Math.Abs(decimal.Parse(details.fee, NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign));
                                     break;
                                 }
                             }
 
-                            // TODO: If you want responseObj.Destinations, need to send true for ["verbose"] and try to pick it up that way
-                            //responseObj.Destinations.Add(destination.address + " | " + destination.amount);
+                            // Populate destinations from send-category detail entries (recipient addresses)
+                            foreach (TransferDetails details in getTransfByTxIdResponse.Details)
+                            {
+                                if (details.category == "send" && !string.IsNullOrEmpty(details.address))
+                                {
+                                    decimal detailAmount = Math.Abs(string.IsNullOrEmpty(details.amount) ? 0 : decimal.Parse(details.amount, NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign));
+                                    responseObj.Destinations.Add(details.address + " | " + detailAmount);
+                                }
+                            }
 
                             responseObj.Error.IsError = false;
                         }
@@ -1973,13 +2032,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         {
             // TODO: scantxoutset
             throw new NotImplementedException();
-        }
-
-        public Task<RescanBlockchainResponse> RescanBlockchain(RpcBase rpc, RescanBlockchainRequest requestObj)
-        {
-            // TODO: rescanblockchain
-            throw new NotImplementedException();
-        }
+        }        
         #endregion // Unsupported Methods
     }
 }

@@ -11,6 +11,7 @@ namespace NervaOneWalletMiner.Objects.DataGrid
         public string AddressShort { get; set; } = string.Empty;
         public string AddressLabel { get; set; } = string.Empty;
         public ulong Height { get; set; } = 0;
+        public string HeightDisplay { get; set; } = string.Empty;
         public DateTime Timestamp { get; set; } = DateTime.MinValue;
         public decimal Amount { get; set; } = 0;
         public string Type { get; set; } = string.Empty;

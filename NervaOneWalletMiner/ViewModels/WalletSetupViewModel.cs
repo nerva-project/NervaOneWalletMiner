@@ -109,6 +109,7 @@ namespace NervaOneWalletMiner.ViewModels
 
                 if (isChanged)
                 {
+                    Logger.LogDebug("WSM.VAPS", "Saving Settings");
                     GlobalMethods.SaveConfig();
                 }
 
@@ -135,6 +136,7 @@ namespace NervaOneWalletMiner.ViewModels
                     Language = walletLanguage
                 };
 
+                Logger.LogDebug("WSM.CNWL", "Calling Create Wallet");
                 CreateWalletResponse response = await GlobalData.WalletService.CreateWallet(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
                 request = new();
 
@@ -177,6 +179,7 @@ namespace NervaOneWalletMiner.ViewModels
                     Language = walletLanguage
                 };
 
+                Logger.LogDebug("WSM.RFSD", "Calling Restore from Seed");
                 RestoreFromSeedResponse response = await GlobalData.WalletService.RestoreFromSeed(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
 
                 if (response.Error.IsError)
@@ -220,6 +223,7 @@ namespace NervaOneWalletMiner.ViewModels
                     Language = walletLanguage
                 };
 
+                Logger.LogDebug("WSM.RFKY", "Calling Restore from Keys");
                 RestoreFromKeysResponse response = await GlobalData.WalletService.RestoreFromKeys(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
 
                 if (response.Error.IsError)
@@ -284,6 +288,7 @@ namespace NervaOneWalletMiner.ViewModels
 
             try
             {
+                Logger.LogDebug("WSM.RSPT", "Rescan Spent starting");
                 RescanSpentResponse response = await GlobalData.WalletService.RescanSpent(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new RescanSpentRequest());
 
                 if (response.Error.IsError)
@@ -308,6 +313,7 @@ namespace NervaOneWalletMiner.ViewModels
 
             try
             {
+                Logger.LogDebug("WSM.RSBC", "Rescan Blockchain starting");
                 RescanBlockchainResponse response = await GlobalData.WalletService.RescanBlockchain(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new RescanBlockchainRequest());
 
                 if (response.Error.IsError)
@@ -317,7 +323,9 @@ namespace NervaOneWalletMiner.ViewModels
                 }
 
                 Logger.LogDebug("WSM.RSBC", "Rescan Blockchain returned successfully");
-                return new WalletOperationResult(true, title, "Rescan Blockchain command submitted successfully.");
+                bool isBtcStyle = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletBtcStyle;
+                string successMessage = isBtcStyle ? "Rescan Blockchain completed successfully." : "Rescan Blockchain command submitted successfully.";
+                return new WalletOperationResult(true, title, successMessage);
             }
             catch (Exception ex)
             {

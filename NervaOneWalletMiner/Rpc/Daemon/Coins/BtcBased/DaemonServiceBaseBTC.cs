@@ -224,7 +224,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                                     ResGetBlockchainInfo chainInfo = JsonConvert.DeserializeObject<ResGetBlockchainInfo>(resultToken.ToString())!;
                                     responseObj.Height = chainInfo.blocks;
                                     responseObj.TargetHeight = chainInfo.headers;
-                                    responseObj.NetworkHashRate = (ulong)(chainInfo.difficulty * (MaxTargetConstant / GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].BlockSeconds));
+                                    responseObj.NetworkHashRate = chainInfo.difficulty * (MaxTargetConstant / GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].BlockSeconds);
                                 }
                             }
                         }

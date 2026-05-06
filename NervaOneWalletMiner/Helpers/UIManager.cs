@@ -1019,8 +1019,11 @@ namespace NervaOneWalletMiner.Helpers
                     }
                     else
                     {
+                        bool isBtcStyle = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletBtcStyle;
                         foreach (Transfer transfer in response.Transfers)
                         {
+                            transfer.HeightDisplay = isBtcStyle && transfer.Height == 0 ? "Pending" : transfer.Height.ToString();
+
                             if (!GlobalData.TransfersStats.Transactions.ContainsKey(transfer.TransactionId + transfer.Type))
                             {
                                 if (transfer.Type.Equals(TransferType.In))
