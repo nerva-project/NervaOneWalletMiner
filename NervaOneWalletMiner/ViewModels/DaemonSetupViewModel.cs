@@ -111,6 +111,7 @@ namespace NervaOneWalletMiner.ViewModels
         public bool IsWalletOnly => _selectedNodeType == NodeType.WalletOnly;
         public bool IsLocalNode => _selectedNodeType != NodeType.WalletOnly;
         public bool IsPruningSupported => GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPruningSupported;
+        public bool IsWalletOnlySupported => GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletOnlySupported;
         public bool IsCpuMiningSupported => GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsCpuMiningSupported;
         public bool IsQuickSyncSupported => GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsQuickSyncSupported;
         public bool IsPublicNodeSupported => GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPublicNodeSupported;

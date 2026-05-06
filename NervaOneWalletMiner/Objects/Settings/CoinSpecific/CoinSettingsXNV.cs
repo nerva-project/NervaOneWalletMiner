@@ -1,4 +1,4 @@
-﻿using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Helpers;
 using System;
 using System.IO;
 
@@ -6,115 +6,63 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
 {
     public class CoinSettingsXNV : ICoinSettings
     {
-        #region Private Default Variables
-        private int _DaemonPort = 17566;
-        private string _DisplayName = "Nerva (XNV)";
-        private string _DisplayUnits = "XNV";
-        private string _WalletExtension = ".cache";
+        public int DaemonPort { get; set; } = 17566;
+        public string DisplayName { get; set; } = "Nerva (XNV)";
+        public string DisplayUnits { get; set; } = "XNV";
+        public string WalletExtension { get; set; } = ".cache";
 
-        private bool _IsCpuMiningSupported = true;
-        private bool _IsPruningSupported = false;
-        private bool _IsQuickSyncSupported = true;
-        private bool _IsPublicNodeSupported = true;
-        private bool _IsAnalyticsFlagSupported = true;
-        private bool _IsDaemonWalletSeparateApp = true;
-        private bool _IsSavingWalletSupported = true;
-        private bool _IsWalletHeightSupported = true;
-        private bool _IsPassRequiredToOpenWallet = true;
-        private bool _AreIntegratedAddressesSupported = true;
-        private bool _AreKeysDumpedToFile = false;
-        private bool _IsDefaultAddressAutoCreated = false;
-        private bool _IsPaymentIdSupported = true;
-        private bool _IsSplitTransferSupported = true;
-        private bool _IsSendFromSupported = true;
-        private bool _IsPoppingBlocksSupported = true;
-        private bool _IsRestoreFromSeedSupported = true;
-        private bool _IsRestoreFromKeysSupported = true;
-        private bool _IsRestoreFromDumpFileSupported = false;
-        private bool _IsRescanSpentSupported = true;
-        private bool _IsSweepBelowSupported = true;
-        private bool _IsWalletBtcStyle = false;
-
-        private int _LogLevelDaemon = 1;
-        private int _LogLevelWallet = 1;
+        // URLs and paths
+        public string QuickSyncUrl { get; set; } = "https://nerva.one/quicksync/quicksync.raw";
+        public string BlockchainDbUrl { get; set; } = "https://nerva.one/database/nerva_blockchain_db.zip";
+        public string BlockchainDbSubfolder { get; set; } = "lmdb";
 
         // https://github.com/nerva-project/nerva/releases
-        private string _CliUrlWindows64 = "https://github.com/nerva-project/nerva/releases/download/v0.2.1.0/nerva-windows-x64-v0.2.1.0.zip";
-        private string _CliUrlWindows32 = "https://github.com/nerva-project/nerva/releases/download/v0.2.1.0/nerva-windows-x32-v0.2.1.0.zip";
-        private string _CliUrlLinux64 = "https://github.com/nerva-project/nerva/releases/download/v0.2.1.0/nerva-linux-x86_64-v0.2.1.0.tar.bz2";
-        private string _CliUrlLinux32 = "https://github.com/nerva-project/nerva/releases/download/v0.2.1.0/nerva-linux-i686-v0.2.1.0.tar.bz2";
-        private string _CliUrlLinuxArm = "https://github.com/nerva-project/nerva/releases/download/v0.2.1.0/nerva-linux-armv8-v0.2.1.0.tar.bz2";
-        private string _CliUrlMacIntel = "https://github.com/nerva-project/nerva/releases/download/v0.2.1.0/nerva-macos-x64-v0.2.1.0.tar.bz2";
-        private string _CliUrlMacArm = "https://github.com/nerva-project/nerva/releases/download/v0.2.1.0/nerva-macos-armv8-v0.2.1.0.tar.bz2";
-        private string _CliUrlAndroid = "https://github.com/nerva-project/nerva/releases/download/v0.2.1.0/nerva-android-armv8-v0.2.1.0.tar.bz2";
+        public string CliUrlWindows64 { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.2.1.0/nerva-windows-x64-v0.2.1.0.zip";
+        public string CliUrlWindows32 { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.2.1.0/nerva-windows-x32-v0.2.1.0.zip";
+        public string CliUrlLinux64 { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.2.1.0/nerva-linux-x86_64-v0.2.1.0.tar.bz2";
+        public string CliUrlLinux32 { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.2.1.0/nerva-linux-i686-v0.2.1.0.tar.bz2";
+        public string CliUrlLinuxArm { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.2.1.0/nerva-linux-armv8-v0.2.1.0.tar.bz2";
+        public string CliUrlMacIntel { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.2.1.0/nerva-macos-x64-v0.2.1.0.tar.bz2";
+        public string CliUrlMacArm { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.2.1.0/nerva-macos-armv8-v0.2.1.0.tar.bz2";
+        public string CliUrlAndroid { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.2.1.0/nerva-android-armv8-v0.2.1.0.tar.bz2";
 
-        private string _RemotePublicNodeUrlDefault = "node.nerva.one:17566";
-        private string _LocalPublicNodeArgumentsDefault = "--rpc-bind-ip 0.0.0.0 --confirm-external-bind";
+        public string RemotePublicNodeUrlDefault { get; set; } = "node.nerva.one:17566";
+        public string LocalPublicNodeArgumentsDefault { get; set; } = "--rpc-bind-ip 0.0.0.0 --confirm-external-bind";
 
-        private string _DataDirWindows = "C:/ProgramData/nerva";
-        private string _DataDirLinux = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nerva");
-        private string _DataDirMac = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nerva");
+        public string DataDirWindows { get; set; } = "C:/ProgramData/nerva";
+        public string DataDirLinux { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nerva");
+        public string DataDirMac { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nerva");
 
-        private string _QuickSyncUrl = "https://nerva.one/quicksync/quicksync.raw";
-        private string _BlockchainDbUrl = "https://nerva.one/database/nerva_blockchain_db.zip";
-        private string _BlockchainDbSubfolder = "lmdb";
-        #endregion // Private Default Variables
+        // Daemon specific settings
+        public int LogLevelDaemon { get; set; } = 1;
+        public bool IsCpuMiningSupported { get; set; } = true;
+        public bool IsPruningSupported { get; set; } = false;
+        public bool IsWalletOnlySupported { get; set; } = true;
+        public bool IsQuickSyncSupported { get; set; } = true;
+        public bool IsPublicNodeSupported { get; set; } = true;
+        public bool IsAnalyticsFlagSupported { get; set; } = true;
+        public bool IsDaemonWalletSeparateApp { get; set; } = true;
+
+        // Wallet specific settings
+        public int LogLevelWallet { get; set; } = 1;
+        public bool IsSavingWalletSupported { get; set; } = true;
+        public bool IsWalletHeightSupported { get; set; } = true;
+        public bool IsPassRequiredToOpenWallet { get; set; } = true;
+        public bool AreIntegratedAddressesSupported { get; set; } = true;
+        public bool AreKeysDumpedToFile { get; set; } = false;
+        public bool IsDefaultAddressAutoCreated { get; set; } = false;
+        public bool IsPaymentIdSupported { get; set; } = true;
+        public bool IsSplitTransferSupported { get; set; } = true;
+        public bool IsSendFromSupported { get; set; } = true;
+        public bool IsPoppingBlocksSupported { get; set; } = true;
+        public bool IsRestoreFromSeedSupported { get; set; } = true;
+        public bool IsRestoreFromKeysSupported { get; set; } = true;
+        public bool IsRestoreFromDumpFileSupported { get; set; } = false;
+        public bool IsRescanSpentSupported { get; set; } = true;
+        public bool IsSweepBelowSupported { get; set; } = true;
+        public bool IsWalletBtcStyle { get; set; } = false;        
 
 
-        #region Interface Variables
-        public int DaemonPort { get => _DaemonPort; set => _DaemonPort = value; }
-        public string DisplayName { get => _DisplayName; set => _DisplayName = value; }
-        public string DisplayUnits { get => _DisplayUnits; set => _DisplayUnits = value; }
-        public string WalletExtension { get => _WalletExtension; set => _WalletExtension = value; }
-
-        public bool IsCpuMiningSupported { get => _IsCpuMiningSupported; set => _IsCpuMiningSupported = value; }
-        public bool IsPruningSupported { get => _IsPruningSupported; set => _IsPruningSupported = value; }
-        public bool IsQuickSyncSupported { get => _IsQuickSyncSupported; set => _IsQuickSyncSupported = value; }
-        public bool IsPublicNodeSupported { get => _IsPublicNodeSupported; set => _IsPublicNodeSupported = value; }
-        public bool IsAnalyticsFlagSupported { get => _IsAnalyticsFlagSupported; set => _IsAnalyticsFlagSupported = value; }
-        public bool IsDaemonWalletSeparateApp { get => _IsDaemonWalletSeparateApp; set => _IsDaemonWalletSeparateApp = value; }
-        public bool IsSavingWalletSupported { get => _IsSavingWalletSupported; set => _IsSavingWalletSupported = value; }
-        public bool IsWalletHeightSupported { get => _IsWalletHeightSupported; set => _IsWalletHeightSupported = value; }
-        public bool IsPassRequiredToOpenWallet { get => _IsPassRequiredToOpenWallet; set => _IsPassRequiredToOpenWallet = value; }
-        public bool AreIntegratedAddressesSupported { get => _AreIntegratedAddressesSupported; set => _AreIntegratedAddressesSupported = value; }
-        public bool AreKeysDumpedToFile { get => _AreKeysDumpedToFile; set => _AreKeysDumpedToFile = value; }
-        public bool IsDefaultAddressAutoCreated { get => _IsDefaultAddressAutoCreated; set => _IsDefaultAddressAutoCreated = value; }
-        public bool IsPaymentIdSupported { get => _IsPaymentIdSupported; set => _IsPaymentIdSupported = value; }
-        public bool IsSplitTransferSupported { get => _IsSplitTransferSupported; set => _IsSplitTransferSupported = value; }
-        public bool IsSendFromSupported { get => _IsSendFromSupported; set => _IsSendFromSupported = value; }
-        public bool IsPoppingBlocksSupported { get => _IsPoppingBlocksSupported; set => _IsPoppingBlocksSupported = value; }
-        public bool IsRestoreFromSeedSupported { get => _IsRestoreFromSeedSupported; set => _IsRestoreFromSeedSupported = value; }
-        public bool IsRestoreFromKeysSupported { get => _IsRestoreFromKeysSupported; set => _IsRestoreFromKeysSupported = value; }
-        public bool IsRestoreFromDumpFileSupported { get => _IsRestoreFromDumpFileSupported; set => _IsRestoreFromDumpFileSupported = value; }
-        public bool IsRescanSpentSupported { get => _IsRescanSpentSupported; set => _IsRescanSpentSupported = value; }
-        public bool IsSweepBelowSupported { get => _IsSweepBelowSupported; set => _IsSweepBelowSupported = value; }
-        public bool IsWalletBtcStyle { get => _IsWalletBtcStyle; set => _IsWalletBtcStyle = value; }
-
-        public int LogLevelDaemon { get => _LogLevelDaemon; set => _LogLevelDaemon = value; }
-        public int LogLevelWallet { get => _LogLevelWallet; set => _LogLevelWallet = value; }
-
-        public string CliUrlWindows64 { get => _CliUrlWindows64; set => _CliUrlWindows64 = value; }
-        public string CliUrlWindows32 { get => _CliUrlWindows32; set => _CliUrlWindows32 = value; }
-        public string CliUrlLinux64 { get => _CliUrlLinux64; set => _CliUrlLinux64 = value; }
-        public string CliUrlLinux32 { get => _CliUrlLinux32; set => _CliUrlLinux32 = value; }
-        public string CliUrlLinuxArm { get => _CliUrlLinuxArm; set => _CliUrlLinuxArm = value; }
-        public string CliUrlMacIntel { get => _CliUrlMacIntel; set => _CliUrlMacIntel = value; }
-        public string CliUrlMacArm { get => _CliUrlMacArm; set => _CliUrlMacArm = value; }
-        public string CliUrlAndroid { get => _CliUrlAndroid; set => _CliUrlAndroid = value; }
-
-        public string RemotePublicNodeUrlDefault { get => _RemotePublicNodeUrlDefault; set => _RemotePublicNodeUrlDefault = value; }
-        public string LocalPublicNodeArgumentsDefault { get => _LocalPublicNodeArgumentsDefault; set => _LocalPublicNodeArgumentsDefault = value; }
-
-        public string DataDirWindows { get => _DataDirWindows; set => _DataDirWindows = value; }
-        public string DataDirLinux { get => _DataDirLinux; set => _DataDirLinux = value; }
-        public string DataDirMac { get => _DataDirMac; set => _DataDirMac = value; }
-
-        public string QuickSyncUrl { get => _QuickSyncUrl; set => _QuickSyncUrl = value; }
-        public string BlockchainDbUrl { get => _BlockchainDbUrl; set => _BlockchainDbUrl = value; }
-        public string BlockchainDbSubfolder { get => _BlockchainDbSubfolder; set => _BlockchainDbSubfolder = value; }
-        #endregion // Interface Variables
-
-        #region Interface Methods
         public string GenerateDaemonOptions(SettingsDaemon daemonSettings)
         {
             string daemonCommand = "--rpc-bind-port " + daemonSettings.Rpc.Port;
@@ -153,7 +101,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
                 daemonCommand += " " + daemonSettings.PublicNodeArguments;
             }
 
-            if(daemonSettings.UseNoAnalyticsFlag)
+            if (daemonSettings.UseNoAnalyticsFlag)
             {
                 daemonCommand += " --no-analytics";
             }
@@ -175,7 +123,6 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         {
             string appCommand = string.Empty;
 
-            // TODO: Might want to change this to just set host and port in daemonSettings
             if (daemonSettings.IsWalletOnly)
             {
                 appCommand = "--daemon-address " + walletSettings.PublicNodeAddress;
@@ -183,8 +130,8 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
             else
             {
                 appCommand = "--daemon-address " + daemonSettings.Rpc.Host + ":" + daemonSettings.Rpc.Port;
-            }                
-            
+            }
+
             appCommand += " --rpc-bind-port " + walletSettings.Rpc.Port;
             appCommand += " --disable-rpc-login";
             appCommand += " --wallet-dir \"" + GlobalData.WalletDir + "\"";
@@ -193,13 +140,9 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
 
             if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsTestnet)
             {
-                Logger.LogDebug("CGDO.CGWO", "Connecting to testnet...");
+                Logger.LogDebug("XNV.CGWO", "Connecting to testnet...");
                 appCommand += " --testnet";
             }
-
-            // TODO: Uncomment to enable rpc user:pass.
-            // string ip = d.IsPublic ? $" --rpc-bind-ip 0.0.0.0 --confirm-external-bind" : $" --rpc-bind-ip 127.0.0.1";
-            // appCommand += $"{ip} --rpc-login {d.Login}:{d.Pass}";
 
             return appCommand;
         }
@@ -208,6 +151,5 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         {
             return "--pop-blocks " + numberOfBlocks;
         }
-        #endregion // Interface Methods
     }
 }

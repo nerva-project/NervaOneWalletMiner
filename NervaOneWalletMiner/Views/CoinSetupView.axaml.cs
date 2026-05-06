@@ -19,6 +19,7 @@ namespace NervaOneWalletMiner.Views
                 tbxCliDownloadUrl.Text = GlobalMethods.GetCliToolsDownloadLink(GlobalData.AppSettings.ActiveCoin);
                 tbxRemoteNode.Text = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].RemotePublicNodeUrlDefault;
                 PrunedNode.IsVisible = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPruningSupported;
+                WalletOnly.IsVisible = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletOnlySupported;
 
                 Loaded += (_, _) => tbxCliDownloadUrl.Focus();
             }

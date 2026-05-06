@@ -1,4 +1,4 @@
-﻿using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Helpers;
 using System;
 using System.IO;
 
@@ -6,115 +6,63 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
 {
     public class CoinSettingsWOW : ICoinSettings
     {
-        #region Private Default Variables
-        private int _DaemonPort = 34568;
-        private string _DisplayName = "Wownero (WOW)";
-        private string _DisplayUnits = "WOW";
-        private string _WalletExtension = ".";
-
-        private bool _IsCpuMiningSupported = true;
-        private bool _IsPruningSupported = true;
-        private bool _IsQuickSyncSupported = false;
-        private bool _IsPublicNodeSupported = true;
-        private bool _IsAnalyticsFlagSupported = false;
-        private bool _IsDaemonWalletSeparateApp = true;
-        private bool _IsSavingWalletSupported = true;
-        private bool _IsWalletHeightSupported = true;
-        private bool _IsPassRequiredToOpenWallet = true;
-        private bool _AreIntegratedAddressesSupported = true;
-        private bool _AreKeysDumpedToFile = false;
-        private bool _IsDefaultAddressAutoCreated = false;
-        private bool _IsPaymentIdSupported = true;
-        private bool _IsSplitTransferSupported = true;
-        private bool _IsSendFromSupported = true;
-        private bool _IsPoppingBlocksSupported = true;
-        private bool _IsRestoreFromSeedSupported = true;
-        private bool _IsRestoreFromKeysSupported = true;
-        private bool _IsRestoreFromDumpFileSupported = false;
-        private bool _IsRescanSpentSupported = true;
-        private bool _IsSweepBelowSupported = true;
-        private bool _IsWalletBtcStyle = false;
-
-        private int _LogLevelDaemon = 0;
-        private int _LogLevelWallet = 0;
+        public int DaemonPort { get; set; } = 34568;
+        public string DisplayName { get; set; } = "Wownero (WOW)";
+        public string DisplayUnits { get; set; } = "WOW";
+        public string WalletExtension { get; set; } = ".";
+       
+        // URLs and paths
+        public string QuickSyncUrl { get; set; } = string.Empty;
+        public string BlockchainDbUrl { get; set; } = string.Empty;
+        public string BlockchainDbSubfolder { get; set; } = "lmdb";
 
         // https://codeberg.org/wownero/wownero/releases
-        private string _CliUrlWindows64 = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-x86_64-w64-mingw32-v0.11.3.0.zip";
-        private string _CliUrlWindows32 = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-i686-w64-mingw32-v0.11.3.0.zip";
-        private string _CliUrlLinux64 = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-x86_64-linux-gnu-v0.11.3.0.tar.bz2";
-        private string _CliUrlLinux32 = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-i686-linux-gnu-v0.11.3.0.tar.bz2";
-        private string _CliUrlLinuxArm = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-aarch64-linux-gnu-v0.11.3.0.tar.bz2";
-        private string _CliUrlMacIntel = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-x86_64-apple-darwin11-v0.11.3.0.tar.bz2";
-        private string _CliUrlMacArm = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-aarch64-apple-darwin11-v0.11.3.0.tar.bz2";
-        private string _CliUrlAndroid = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-aarch64-linux-android-v0.11.3.0.tar.bz2";
+        public string CliUrlWindows64 { get; set; } = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-x86_64-w64-mingw32-v0.11.3.0.zip";
+        public string CliUrlWindows32 { get; set; } = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-i686-w64-mingw32-v0.11.3.0.zip";
+        public string CliUrlLinux64 { get; set; } = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-x86_64-linux-gnu-v0.11.3.0.tar.bz2";
+        public string CliUrlLinux32 { get; set; } = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-i686-linux-gnu-v0.11.3.0.tar.bz2";
+        public string CliUrlLinuxArm { get; set; } = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-aarch64-linux-gnu-v0.11.3.0.tar.bz2";
+        public string CliUrlMacIntel { get; set; } = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-x86_64-apple-darwin11-v0.11.3.0.tar.bz2";
+        public string CliUrlMacArm { get; set; } = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-aarch64-apple-darwin11-v0.11.3.0.tar.bz2";
+        public string CliUrlAndroid { get; set; } = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-aarch64-linux-android-v0.11.3.0.tar.bz2";
 
-        private string _RemotePublicNodeUrlDefault = "node.monerodevs.org:34568";
-        private string _LocalPublicNodeArgumentsDefault = "--rpc-bind-ip 0.0.0.0 --confirm-external-bind --restricted-rpc";
+        public string RemotePublicNodeUrlDefault { get; set; } = "node.monerodevs.org:34568";
+        public string LocalPublicNodeArgumentsDefault { get; set; } = "--rpc-bind-ip 0.0.0.0 --confirm-external-bind --restricted-rpc";
 
-        private string _DataDirWindows = "C:/ProgramData/wownero";
-        private string _DataDirLinux = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".wownero");
-        private string _DataDirMac = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".wownero");
+        public string DataDirWindows { get; set; } = "C:/ProgramData/wownero";
+        public string DataDirLinux { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".wownero");
+        public string DataDirMac { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".wownero");
 
-        private string _QuickSyncUrl = string.Empty;
-        private string _BlockchainDbUrl = string.Empty;
-        private string _BlockchainDbSubfolder = "lmdb";
-        #endregion // Private Default Variables
+        // Daemon specific settings
+        public int LogLevelDaemon { get; set; } = 0;
+        public bool IsCpuMiningSupported { get; set; } = true;
+        public bool IsPruningSupported { get; set; } = true;
+        public bool IsWalletOnlySupported { get; set; } = true;
+        public bool IsQuickSyncSupported { get; set; } = false;
+        public bool IsPublicNodeSupported { get; set; } = true;
+        public bool IsAnalyticsFlagSupported { get; set; } = false;
+        public bool IsDaemonWalletSeparateApp { get; set; } = true;
+
+        // Wallet specific settings
+        public int LogLevelWallet { get; set; } = 0;
+        public bool IsSavingWalletSupported { get; set; } = true;
+        public bool IsWalletHeightSupported { get; set; } = true;
+        public bool IsPassRequiredToOpenWallet { get; set; } = true;
+        public bool AreIntegratedAddressesSupported { get; set; } = true;
+        public bool AreKeysDumpedToFile { get; set; } = false;
+        public bool IsDefaultAddressAutoCreated { get; set; } = false;
+        public bool IsPaymentIdSupported { get; set; } = true;
+        public bool IsSplitTransferSupported { get; set; } = true;
+        public bool IsSendFromSupported { get; set; } = true;
+        public bool IsPoppingBlocksSupported { get; set; } = true;
+        public bool IsRestoreFromSeedSupported { get; set; } = true;
+        public bool IsRestoreFromKeysSupported { get; set; } = true;
+        public bool IsRestoreFromDumpFileSupported { get; set; } = false;
+        public bool IsRescanSpentSupported { get; set; } = true;
+        public bool IsSweepBelowSupported { get; set; } = true;
+        public bool IsWalletBtcStyle { get; set; } = false;
 
 
-        #region Interface Variables
-        public int DaemonPort { get => _DaemonPort; set => _DaemonPort = value; }
-        public string DisplayName { get => _DisplayName; set => _DisplayName = value; }
-        public string DisplayUnits { get => _DisplayUnits; set => _DisplayUnits = value; }
-        public string WalletExtension { get => _WalletExtension; set => _WalletExtension = value; }
-
-        public bool IsCpuMiningSupported { get => _IsCpuMiningSupported; set => _IsCpuMiningSupported = value; }
-        public bool IsPruningSupported { get => _IsPruningSupported; set => _IsPruningSupported = value; }
-        public bool IsQuickSyncSupported { get => _IsQuickSyncSupported; set => _IsQuickSyncSupported = value; }
-        public bool IsPublicNodeSupported { get => _IsPublicNodeSupported; set => _IsPublicNodeSupported = value; }
-        public bool IsAnalyticsFlagSupported { get => _IsAnalyticsFlagSupported; set => _IsAnalyticsFlagSupported = value; }
-        public bool IsDaemonWalletSeparateApp { get => _IsDaemonWalletSeparateApp; set => _IsDaemonWalletSeparateApp = value; }
-        public bool IsSavingWalletSupported { get => _IsSavingWalletSupported; set => _IsSavingWalletSupported = value; }
-        public bool IsWalletHeightSupported { get => _IsWalletHeightSupported; set => _IsWalletHeightSupported = value; }
-        public bool IsPassRequiredToOpenWallet { get => _IsPassRequiredToOpenWallet; set => _IsPassRequiredToOpenWallet = value; }
-        public bool AreIntegratedAddressesSupported { get => _AreIntegratedAddressesSupported; set => _AreIntegratedAddressesSupported = value; }
-        public bool AreKeysDumpedToFile { get => _AreKeysDumpedToFile; set => _AreKeysDumpedToFile = value; }
-        public bool IsDefaultAddressAutoCreated { get => _IsDefaultAddressAutoCreated; set => _IsDefaultAddressAutoCreated = value; }
-        public bool IsPaymentIdSupported { get => _IsPaymentIdSupported; set => _IsPaymentIdSupported = value; }
-        public bool IsSplitTransferSupported { get => _IsSplitTransferSupported; set => _IsSplitTransferSupported = value; }
-        public bool IsSendFromSupported { get => _IsSendFromSupported; set => _IsSendFromSupported = value; }
-        public bool IsPoppingBlocksSupported { get => _IsPoppingBlocksSupported; set => _IsPoppingBlocksSupported = value; }
-        public bool IsRestoreFromSeedSupported { get => _IsRestoreFromSeedSupported; set => _IsRestoreFromSeedSupported = value; }
-        public bool IsRestoreFromKeysSupported { get => _IsRestoreFromKeysSupported; set => _IsRestoreFromKeysSupported = value; }
-        public bool IsRestoreFromDumpFileSupported { get => _IsRestoreFromDumpFileSupported; set => _IsRestoreFromDumpFileSupported = value; }
-        public bool IsRescanSpentSupported { get => _IsRescanSpentSupported; set => _IsRescanSpentSupported = value; }
-        public bool IsSweepBelowSupported { get => _IsSweepBelowSupported; set => _IsSweepBelowSupported = value; }
-        public bool IsWalletBtcStyle { get => _IsWalletBtcStyle; set => _IsWalletBtcStyle = value; }
-
-        public int LogLevelDaemon { get => _LogLevelDaemon; set => _LogLevelDaemon = value; }
-        public int LogLevelWallet { get => _LogLevelWallet; set => _LogLevelWallet = value; }
-
-        public string CliUrlWindows64 { get => _CliUrlWindows64; set => _CliUrlWindows64 = value; }
-        public string CliUrlWindows32 { get => _CliUrlWindows32; set => _CliUrlWindows32 = value; }
-        public string CliUrlLinux64 { get => _CliUrlLinux64; set => _CliUrlLinux64 = value; }
-        public string CliUrlLinux32 { get => _CliUrlLinux32; set => _CliUrlLinux32 = value; }
-        public string CliUrlLinuxArm { get => _CliUrlLinuxArm; set => _CliUrlLinuxArm = value; }
-        public string CliUrlMacIntel { get => _CliUrlMacIntel; set => _CliUrlMacIntel = value; }
-        public string CliUrlMacArm { get => _CliUrlMacArm; set => _CliUrlMacArm = value; }
-        public string CliUrlAndroid { get => _CliUrlAndroid; set => _CliUrlAndroid = value; }
-
-        public string RemotePublicNodeUrlDefault { get => _RemotePublicNodeUrlDefault; set => _RemotePublicNodeUrlDefault = value; }
-        public string LocalPublicNodeArgumentsDefault { get => _LocalPublicNodeArgumentsDefault; set => _LocalPublicNodeArgumentsDefault = value; }
-
-        public string DataDirWindows { get => _DataDirWindows; set => _DataDirWindows = value; }
-        public string DataDirLinux { get => _DataDirLinux; set => _DataDirLinux = value; }
-        public string DataDirMac { get => _DataDirMac; set => _DataDirMac = value; }
-
-        public string QuickSyncUrl { get => _QuickSyncUrl; set => _QuickSyncUrl = value; }
-        public string BlockchainDbUrl { get => _BlockchainDbUrl; set => _BlockchainDbUrl = value; }
-        public string BlockchainDbSubfolder { get => _BlockchainDbSubfolder; set => _BlockchainDbSubfolder = value; }
-        #endregion // Interface Variables
-
-        #region Interface Methods
         public string GenerateDaemonOptions(SettingsDaemon daemonSettings)
         {
             string daemonCommand = "--rpc-bind-port " + daemonSettings.Rpc.Port;
@@ -133,7 +81,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
             }
 
             if (daemonSettings.AutoStartMining && !string.IsNullOrEmpty(daemonSettings.MiningAddress))
-            {                
+            {
                 Logger.LogDebug("WOW.CGDO", "Enabling startup mining @ " + daemonSettings.MiningAddress);
                 daemonCommand += " --start-mining " + daemonSettings.MiningAddress + " --mining-threads " + daemonSettings.MiningThreads;
             }
@@ -178,7 +126,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
             {
                 appCommand = "--daemon-address " + daemonSettings.Rpc.Host + ":" + daemonSettings.Rpc.Port;
             }
-                
+
             appCommand += " --rpc-bind-port " + walletSettings.Rpc.Port;
             appCommand += " --disable-rpc-login";
             appCommand += " --wallet-dir \"" + GlobalData.WalletDir + "\"";
@@ -198,6 +146,5 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         {
             return "--pop-blocks " + numberOfBlocks;
         }
-        #endregion // Interface Methods
     }
 }

@@ -1,4 +1,4 @@
-﻿using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects.Constants;
 using System;
 using System.IO;
@@ -7,114 +7,63 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
 {
     internal class CoinSettingsDASH : ICoinSettings
     {
-        #region Private Default Variables
-        private int _DaemonPort = 9998;
-        private string _DisplayName = "Dash (DASH)";
-        private string _DisplayUnits = "DASH";
-        private string _WalletExtension = "directory";
+        public int DaemonPort { get; set; } = 9998;
+        public string DisplayName { get; set; } = "Dash (DASH)";
+        public string DisplayUnits { get; set; } = "DASH";
+        public string WalletExtension { get; set; } = "directory";        
 
-        private bool _IsCpuMiningSupported = false;
-        private bool _IsPruningSupported = true;
-        private bool _IsQuickSyncSupported = false;
-        private bool _IsPublicNodeSupported = false;
-        private bool _IsAnalyticsFlagSupported = false;
-        private bool _IsDaemonWalletSeparateApp = false;
-        private bool _IsSavingWalletSupported = false;
-        private bool _IsWalletHeightSupported = false;
-        private bool _IsPassRequiredToOpenWallet = false;
-        private bool _AreIntegratedAddressesSupported = false;
-        private bool _AreKeysDumpedToFile = true;
-        private bool _IsDefaultAddressAutoCreated = true;
-        private bool _IsPaymentIdSupported = false;
-        private bool _IsSplitTransferSupported = false;
-        private bool _IsSendFromSupported = false;
-        private bool _IsPoppingBlocksSupported = false;
-        private bool _IsRestoreFromSeedSupported = true;
-        private bool _IsRestoreFromKeysSupported = false;
-        private bool _IsRestoreFromDumpFileSupported = true;
-        private bool _IsRescanSpentSupported = false;
-        private bool _IsSweepBelowSupported = false;
-        private bool _IsWalletBtcStyle = true;
+        // URLs and paths
+        public string QuickSyncUrl { get; set; } = string.Empty;
+        public string BlockchainDbUrl { get; set; } = string.Empty;
+        public string BlockchainDbSubfolder { get; set; } = string.Empty;
 
-        private int _LogLevelDaemon = 0;
-        private int _LogLevelWallet = 0;
+        // https://github.com/dashpay/dash/releases
+        public string CliUrlWindows64 { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.2/dashcore-23.1.2-win64.zip";
+        public string CliUrlWindows32 { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.2/dashcore-23.1.2-win64.zip";
+        public string CliUrlLinux64 { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.2/dashcore-23.1.2-x86_64-linux-gnu.tar.gz";
+        public string CliUrlLinux32 { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.2/dashcore-23.1.2-x86_64-linux-gnu.tar.gz";
+        public string CliUrlLinuxArm { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.2/dashcore-23.1.2-aarch64-linux-gnu.tar.gz";
+        public string CliUrlMacIntel { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.2/dashcore-23.1.2-arm64-apple-darwin.tar.gz";
+        public string CliUrlMacArm { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.2/dashcore-23.1.2-arm64-apple-darwin.tar.gz";
+        public string CliUrlAndroid { get; set; } = string.Empty;
 
-        private string _CliUrlWindows64 = "https://github.com/dashpay/dash/releases/download/v23.1.2/dashcore-23.1.2-win64.zip";
-        private string _CliUrlWindows32 = "https://github.com/dashpay/dash/releases/download/v23.1.2/dashcore-23.1.2-win64.zip";
-        private string _CliUrlLinux64 = "https://github.com/dashpay/dash/releases/download/v23.1.2/dashcore-23.1.2-x86_64-linux-gnu.tar.gz";
-        private string _CliUrlLinux32 = "https://github.com/dashpay/dash/releases/download/v23.1.2/dashcore-23.1.2-x86_64-linux-gnu.tar.gz";
-        private string _CliUrlLinuxArm = "https://github.com/dashpay/dash/releases/download/v23.1.2/dashcore-23.1.2-aarch64-linux-gnu.tar.gz";
-        private string _CliUrlMacIntel = "https://github.com/dashpay/dash/releases/download/v23.1.2/dashcore-23.1.2-arm64-apple-darwin.tar.gz";
-        private string _CliUrlMacArm = "https://github.com/dashpay/dash/releases/download/v23.1.2/dashcore-23.1.2-arm64-apple-darwin.tar.gz";
-        private string _CliUrlAndroid = string.Empty;
+        public string RemotePublicNodeUrlDefault { get; set; } = string.Empty;
+        public string LocalPublicNodeArgumentsDefault { get; set; } = string.Empty;
 
-        private string _RemotePublicNodeUrlDefault = string.Empty;
-        private string _LocalPublicNodeArgumentsDefault = string.Empty;
+        public string DataDirWindows { get; set; } = Path.Combine(GlobalMethods.GetDataDir(), "DashCore");
+        public string DataDirLinux { get; set; } = Path.Combine(GlobalMethods.GetDataDir(), "DashCore");
+        public string DataDirMac { get; set; } = Path.Combine(GlobalMethods.GetDataDir(), "DashCore");
 
-        private string _DataDirWindows = Path.Combine(GlobalMethods.GetDataDir(), "DashCore");
-        private string _DataDirLinux = Path.Combine(GlobalMethods.GetDataDir(), "DashCore");
-        private string _DataDirMac = Path.Combine(GlobalMethods.GetDataDir(), "DashCore");
+        // Daemon specific settings
+        public int LogLevelDaemon { get; set; } = 0;
+        public bool IsCpuMiningSupported { get; set; } = false;
+        public bool IsPruningSupported { get; set; } = true;
+        public bool IsWalletOnlySupported { get; set; } = false;
+        public bool IsQuickSyncSupported { get; set; } = false;
+        public bool IsPublicNodeSupported { get; set; } = false;
+        public bool IsAnalyticsFlagSupported { get; set; } = false;
+        public bool IsDaemonWalletSeparateApp { get; set; } = false;
 
-        private string _QuickSyncUrl = string.Empty;
-        private string _BlockchainDbUrl = string.Empty;
-        private string _BlockchainDbSubfolder = string.Empty;
-        #endregion // Private Default Variables
+        // Wallet specific settings
+        public int LogLevelWallet { get; set; } = 0;
+        public bool IsSavingWalletSupported { get; set; } = false;
+        public bool IsWalletHeightSupported { get; set; } = false;
+        public bool IsPassRequiredToOpenWallet { get; set; } = false;
+        public bool AreIntegratedAddressesSupported { get; set; } = false;
+        public bool AreKeysDumpedToFile { get; set; } = true;
+        public bool IsDefaultAddressAutoCreated { get; set; } = true;
+        public bool IsPaymentIdSupported { get; set; } = false;
+        public bool IsSplitTransferSupported { get; set; } = false;
+        public bool IsSendFromSupported { get; set; } = false;
+        public bool IsPoppingBlocksSupported { get; set; } = false;
+        public bool IsRestoreFromSeedSupported { get; set; } = true;
+        public bool IsRestoreFromKeysSupported { get; set; } = false;
+        public bool IsRestoreFromDumpFileSupported { get; set; } = true;
+        public bool IsRescanSpentSupported { get; set; } = false;
+        public bool IsSweepBelowSupported { get; set; } = false;
+        public bool IsWalletBtcStyle { get; set; } = true;        
 
 
-        #region Interface Variables
-        public int DaemonPort { get => _DaemonPort; set => _DaemonPort = value; }
-        public string DisplayName { get => _DisplayName; set => _DisplayName = value; }
-        public string DisplayUnits { get => _DisplayUnits; set => _DisplayUnits = value; }
-        public string WalletExtension { get => _WalletExtension; set => _WalletExtension = value; }
-
-        public bool IsCpuMiningSupported { get => _IsCpuMiningSupported; set => _IsCpuMiningSupported = value; }
-        public bool IsPruningSupported { get => _IsPruningSupported; set => _IsPruningSupported = value; }
-        public bool IsQuickSyncSupported { get => _IsQuickSyncSupported; set => _IsQuickSyncSupported = value; }
-        public bool IsPublicNodeSupported { get => _IsPublicNodeSupported; set => _IsPublicNodeSupported = value; }
-        public bool IsAnalyticsFlagSupported { get => _IsAnalyticsFlagSupported; set => _IsAnalyticsFlagSupported = value; }
-        public bool IsDaemonWalletSeparateApp { get => _IsDaemonWalletSeparateApp; set => _IsDaemonWalletSeparateApp = value; }
-        public bool IsSavingWalletSupported { get => _IsSavingWalletSupported; set => _IsSavingWalletSupported = value; }
-        public bool IsWalletHeightSupported { get => _IsWalletHeightSupported; set => _IsWalletHeightSupported = value; }
-        public bool IsPassRequiredToOpenWallet { get => _IsPassRequiredToOpenWallet; set => _IsPassRequiredToOpenWallet = value; }
-        public bool AreIntegratedAddressesSupported { get => _AreIntegratedAddressesSupported; set => _AreIntegratedAddressesSupported = value; }
-        public bool AreKeysDumpedToFile { get => _AreKeysDumpedToFile; set => _AreKeysDumpedToFile = value; }
-        public bool IsDefaultAddressAutoCreated { get => _IsDefaultAddressAutoCreated; set => _IsDefaultAddressAutoCreated = value; }
-        public bool IsPaymentIdSupported { get => _IsPaymentIdSupported; set => _IsPaymentIdSupported = value; }
-        public bool IsSplitTransferSupported { get => _IsSplitTransferSupported; set => _IsSplitTransferSupported = value; }
-        public bool IsSendFromSupported { get => _IsSendFromSupported; set => _IsSendFromSupported = value; }
-        public bool IsPoppingBlocksSupported { get => _IsPoppingBlocksSupported; set => _IsPoppingBlocksSupported = value; }
-        public bool IsRestoreFromSeedSupported { get => _IsRestoreFromSeedSupported; set => _IsRestoreFromSeedSupported = value; }
-        public bool IsRestoreFromKeysSupported { get => _IsRestoreFromKeysSupported; set => _IsRestoreFromKeysSupported = value; }
-        public bool IsRestoreFromDumpFileSupported { get => _IsRestoreFromDumpFileSupported; set => _IsRestoreFromDumpFileSupported = value; }
-        public bool IsRescanSpentSupported { get => _IsRescanSpentSupported; set => _IsRescanSpentSupported = value; }
-        public bool IsSweepBelowSupported { get => _IsSweepBelowSupported; set => _IsSweepBelowSupported = value; }
-        public bool IsWalletBtcStyle { get => _IsWalletBtcStyle; set => _IsWalletBtcStyle = value; }
-
-        public int LogLevelDaemon { get => _LogLevelDaemon; set => _LogLevelDaemon = value; }
-        public int LogLevelWallet { get => _LogLevelWallet; set => _LogLevelWallet = value; }
-
-        public string CliUrlWindows64 { get => _CliUrlWindows64; set => _CliUrlWindows64 = value; }
-        public string CliUrlWindows32 { get => _CliUrlWindows32; set => _CliUrlWindows32 = value; }
-        public string CliUrlLinux64 { get => _CliUrlLinux64; set => _CliUrlLinux64 = value; }
-        public string CliUrlLinux32 { get => _CliUrlLinux32; set => _CliUrlLinux32 = value; }
-        public string CliUrlLinuxArm { get => _CliUrlLinuxArm; set => _CliUrlLinuxArm = value; }
-        public string CliUrlMacIntel { get => _CliUrlMacIntel; set => _CliUrlMacIntel = value; }
-        public string CliUrlMacArm { get => _CliUrlMacArm; set => _CliUrlMacArm = value; }
-        public string CliUrlAndroid { get => _CliUrlAndroid; set => _CliUrlAndroid = value; }
-
-        public string RemotePublicNodeUrlDefault { get => _RemotePublicNodeUrlDefault; set => _RemotePublicNodeUrlDefault = value; }
-        public string LocalPublicNodeArgumentsDefault { get => _LocalPublicNodeArgumentsDefault; set => _LocalPublicNodeArgumentsDefault = value; }
-
-        public string DataDirWindows { get => _DataDirWindows; set => _DataDirWindows = value; }
-        public string DataDirLinux { get => _DataDirLinux; set => _DataDirLinux = value; }
-        public string DataDirMac { get => _DataDirMac; set => _DataDirMac = value; }
-
-        public string QuickSyncUrl { get => _QuickSyncUrl; set => _QuickSyncUrl = value; }
-        public string BlockchainDbUrl { get => _BlockchainDbUrl; set => _BlockchainDbUrl = value; }
-        public string BlockchainDbSubfolder { get => _BlockchainDbSubfolder; set => _BlockchainDbSubfolder = value; }
-        #endregion // Interface Variables
-
-        #region Interface Methods
         public string GenerateDaemonOptions(SettingsDaemon daemonSettings)
         {
             string daemonCommand = "-rpcport=" + daemonSettings.Rpc.Port;
@@ -159,6 +108,5 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
             // Popping blocks is not supported
             throw new NotImplementedException();
         }
-        #endregion // Interface Methods
     }
 }
