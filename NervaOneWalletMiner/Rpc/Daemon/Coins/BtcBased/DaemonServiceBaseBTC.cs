@@ -150,7 +150,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                                     responseObj.Connections.Add(new Connection
                                     {
                                         Address = connection.addr,
-                                        Height = connection.startingheight,
+                                        Height = connection.synced_headers,
                                         LiveTime = (DateTime.Now - DateTime.UnixEpoch.AddSeconds(connection.conntime).ToLocalTime()).ToString(@"%d\.hh\:mm"),
                                         State = connection.connection_type,
                                         IsIncoming = connection.inbound
@@ -183,7 +183,8 @@ namespace NervaOneWalletMiner.Rpc.Daemon
         private class ResGetConnections
         {
             public string addr { get; set; } = string.Empty;
-            public long startingheight { get; set; }
+            public long synced_blocks { get; set; }
+            public long synced_headers { get; set; }
             public ulong conntime { get; set; }
             public string connection_type { get; set; } = string.Empty;
             public bool inbound { get; set; }

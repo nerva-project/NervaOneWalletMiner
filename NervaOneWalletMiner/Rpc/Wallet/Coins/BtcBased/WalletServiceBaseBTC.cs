@@ -9,6 +9,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -119,8 +120,21 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 }
                 else
                 {
-                    // Set HTTP error
-                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                    string errorContent = await httpResponse.Content.ReadAsStringAsync();
+                    JObject? errorJson = null;
+                    try { errorJson = JObject.Parse(errorContent); } catch { }
+
+                    string? errorCode = errorJson?.SelectToken("error.code")?.ToString();
+                    if (errorCode == "-35")
+                    {
+                        // Wallet was auto-loaded by daemon on startup — already in the desired state
+                        Logger.LogDebug(CoinPrefix + ".WOPW", "Wallet already loaded: " + requestObj.WalletName);
+                        responseObj.Error.IsError = false;
+                    }
+                    else
+                    {
+                        responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                    }
                 }
             }
             catch (Exception ex)
@@ -284,6 +298,31 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     else
                     {
                         responseObj.Error.IsError = false;
+
+                        // Generate the first address so GetAccounts has something to display immediately after wallet creation.
+                        // Bitcoin Core does not auto-create an address on createwallet; without this, listreceivedbyaddress returns empty.
+                        var firstAddrJson = new JObject
+                        {
+                            ["jsonrpc"] = "2.0",
+                            ["id"] = _id++,
+                            ["method"] = "getnewaddress",
+                            ["params"] = new JObject { ["label"] = "" }
+                        };
+
+                        HttpResponseMessage firstAddrResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), firstAddrJson.ToString(), rpc.UserName, rpc.Password);
+                        if (firstAddrResponse.IsSuccessStatusCode)
+                        {
+                            JObject firstAddrResult = JObject.Parse(await firstAddrResponse.Content.ReadAsStringAsync());
+                            var firstAddrError = firstAddrResult["error"];
+                            if (firstAddrError != null && firstAddrError.Type != JTokenType.Null)
+                            {
+                                Logger.LogError(CoinPrefix + ".WCRW", "Wallet created but failed to generate first address: " + firstAddrError.ToString());
+                            }
+                        }
+                        else
+                        {
+                            Logger.LogError(CoinPrefix + ".WCRW", "Wallet created but getnewaddress HTTP call failed");
+                        }
                     }
                 }
                 else
@@ -363,6 +402,312 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             // TODO: setlabel
             throw new NotImplementedException();
         }
+
+        #region Import Wallet
+        public async Task<ImportWalletResponse> ImportWallet(RpcBase rpc, ImportWalletRequest requestObj)
+        {
+            try
+            {
+                bool isDescriptorDump = IsDescriptorDumpFile(requestObj.DumpFileWithPath);
+                Logger.LogDebug(CoinPrefix + ".WIMW", "Restoring " + requestObj.WalletName + " from " + (isDescriptorDump ? "descriptor" : "legacy") + " dump");
+
+                if (isDescriptorDump)
+                {
+                    return await ImportDescriptorWallet(rpc, requestObj);
+                }
+                else
+                {
+                    return await ImportLegacyWallet(rpc, requestObj);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(CoinPrefix + ".WIMW", ex);
+            }
+            finally
+            {
+                if (requestObj.Password.Length > 0)
+                {
+                    Array.Clear(requestObj.Password, 0, requestObj.Password.Length);
+                }
+            }
+
+            return new ImportWalletResponse();
+        }
+
+        private static bool IsDescriptorDumpFile(string filePath)
+        {
+            try
+            {
+                using var reader = new StreamReader(filePath);
+                for (int i = 0; i < 10; i++)
+                {
+                    string? line = reader.ReadLine();
+                    if (line == null) { break; }
+                    if (line.Contains("importdescriptors")) { return true; }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("BTC.IDDF", ex);
+            }
+            return false;
+        }
+
+        private async Task<ImportWalletResponse> ImportLegacyWallet(RpcBase rpc, ImportWalletRequest requestObj)
+        {
+            ImportWalletResponse responseObj = new();
+
+            // Step 1: Create a new empty legacy wallet (descriptors:false required for importwallet)
+            var createParams = new JObject
+            {
+                ["wallet_name"] = requestObj.WalletName,
+                ["passphrase"] = requestObj.Password.Length > 0 ? new string(requestObj.Password) : string.Empty,
+                ["descriptors"] = false
+            };
+
+            var createJson = new JObject
+            {
+                ["jsonrpc"] = "2.0",
+                ["id"] = _id++,
+                ["method"] = "createwallet",
+                ["params"] = createParams
+            };
+
+            HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), createJson.ToString(), rpc.UserName, rpc.Password);
+            if (!httpResponse.IsSuccessStatusCode)
+            {
+                responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                return responseObj;
+            }
+
+            JObject createResult = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
+            var createError = createResult["error"];
+            if (createError != null && createError.Type != JTokenType.Null)
+            {
+                responseObj.Error = GetServiceError(GetCallerName(), createError);
+                return responseObj;
+            }
+
+            // Step 2: If password was set, unlock the wallet before importing
+            string walletUrl = HttpHelper.GetServiceUrl(rpc, "wallet/" + requestObj.WalletName);
+            if (requestObj.Password.Length > 0)
+            {
+                var unlockParams = new JObject
+                {
+                    ["passphrase"] = new string(requestObj.Password),
+                    ["timeout"] = 7200
+                };
+
+                var unlockJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = _id++,
+                    ["method"] = "walletpassphrase",
+                    ["params"] = unlockParams
+                };
+
+                HttpResponseMessage unlockResponse = await HttpHelper.GetPostFromService(walletUrl, unlockJson.ToString(), rpc.UserName, rpc.Password);
+                if (!unlockResponse.IsSuccessStatusCode)
+                {
+                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), unlockResponse);
+                    return responseObj;
+                }
+
+                JObject unlockResult = JObject.Parse(await unlockResponse.Content.ReadAsStringAsync());
+                var unlockError = unlockResult["error"];
+                if (unlockError != null && unlockError.Type != JTokenType.Null)
+                {
+                    responseObj.Error = GetServiceError(GetCallerName(), unlockError);
+                    return responseObj;
+                }
+            }
+
+            // Step 3: Import all keys. importwallet triggers a full blockchain rescan — use a long timeout.
+            var importJson = new JObject
+            {
+                ["jsonrpc"] = "2.0",
+                ["id"] = _id++,
+                ["method"] = "importwallet",
+                ["params"] = new JObject { ["filename"] = requestObj.DumpFileWithPath }
+            };
+
+            httpResponse = await HttpHelper.GetPostFromService(walletUrl, importJson.ToString(), rpc.UserName, rpc.Password, TimeSpan.FromMinutes(20));
+            if (httpResponse.IsSuccessStatusCode)
+            {
+                string content = await httpResponse.Content.ReadAsStringAsync();
+                if (string.IsNullOrWhiteSpace(content))
+                {
+                    responseObj.Error.IsError = true;
+                    responseObj.Error.Message = "Empty response from importwallet";
+                }
+                else
+                {
+                    JObject jsonObject = JObject.Parse(content);
+                    var error = jsonObject["error"];
+                    if (error != null && error.Type != JTokenType.Null)
+                    {
+                        responseObj.Error = GetServiceError(GetCallerName(), error);
+                    }
+                    else
+                    {
+                        responseObj.Error.IsError = false;
+                    }
+                }
+            }
+            else
+            {
+                responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+            }
+
+            return responseObj;
+        }
+
+        private async Task<ImportWalletResponse> ImportDescriptorWallet(RpcBase rpc, ImportWalletRequest requestObj)
+        {
+            ImportWalletResponse responseObj = new();
+
+            // Step 1: Create a new descriptor wallet (default — no descriptors:false)
+            var createParams = new JObject
+            {
+                ["wallet_name"] = requestObj.WalletName,
+                ["passphrase"] = requestObj.Password.Length > 0 ? new string(requestObj.Password) : string.Empty
+            };
+
+            var createJson = new JObject
+            {
+                ["jsonrpc"] = "2.0",
+                ["id"] = _id++,
+                ["method"] = "createwallet",
+                ["params"] = createParams
+            };
+
+            HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), createJson.ToString(), rpc.UserName, rpc.Password);
+            if (!httpResponse.IsSuccessStatusCode)
+            {
+                responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                return responseObj;
+            }
+
+            JObject createResult = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
+            var createError = createResult["error"];
+            if (createError != null && createError.Type != JTokenType.Null)
+            {
+                responseObj.Error = GetServiceError(GetCallerName(), createError);
+                return responseObj;
+            }
+
+            // Step 2: If password was set, unlock the wallet before importing
+            string walletUrl = HttpHelper.GetServiceUrl(rpc, "wallet/" + requestObj.WalletName);
+            if (requestObj.Password.Length > 0)
+            {
+                var unlockParams = new JObject
+                {
+                    ["passphrase"] = new string(requestObj.Password),
+                    ["timeout"] = 7200
+                };
+
+                var unlockJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = _id++,
+                    ["method"] = "walletpassphrase",
+                    ["params"] = unlockParams
+                };
+
+                HttpResponseMessage unlockResponse = await HttpHelper.GetPostFromService(walletUrl, unlockJson.ToString(), rpc.UserName, rpc.Password);
+                if (!unlockResponse.IsSuccessStatusCode)
+                {
+                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), unlockResponse);
+                    return responseObj;
+                }
+
+                JObject unlockResult = JObject.Parse(await unlockResponse.Content.ReadAsStringAsync());
+                var unlockError = unlockResult["error"];
+                if (unlockError != null && unlockError.Type != JTokenType.Null)
+                {
+                    responseObj.Error = GetServiceError(GetCallerName(), unlockError);
+                    return responseObj;
+                }
+            }
+
+            // Step 3: Parse descriptors from the dump file (skip comment lines, parse the JSON body)
+            string fileContent = File.ReadAllText(requestObj.DumpFileWithPath);
+            string jsonContent = string.Join("\n", fileContent.Split('\n')
+                .Where(l => !l.TrimStart().StartsWith("#") && !string.IsNullOrWhiteSpace(l)));
+
+            JObject dumpJson;
+            try
+            {
+                dumpJson = JObject.Parse(jsonContent);
+            }
+            catch (JsonReaderException)
+            {
+                responseObj.Error.IsError = true;
+                responseObj.Error.Message = "Failed to parse descriptor dump file — file may be corrupt or wrong format";
+                return responseObj;
+            }
+
+            JArray? descriptors = dumpJson["descriptors"] as JArray;
+            if (descriptors == null || descriptors.Count == 0)
+            {
+                responseObj.Error.IsError = true;
+                responseObj.Error.Message = "No descriptors found in dump file";
+                return responseObj;
+            }
+
+            // Step 4: Import descriptors. Timestamps in each descriptor tell Bitcoin Core how far back to scan,
+            // so this is much faster than importwallet's full rescan from genesis.
+            var importJson = new JObject
+            {
+                ["jsonrpc"] = "2.0",
+                ["id"] = _id++,
+                ["method"] = "importdescriptors",
+                ["params"] = new JArray { descriptors }
+            };
+
+            httpResponse = await HttpHelper.GetPostFromService(walletUrl, importJson.ToString(), rpc.UserName, rpc.Password, TimeSpan.FromMinutes(30));
+            if (httpResponse.IsSuccessStatusCode)
+            {
+                string content = await httpResponse.Content.ReadAsStringAsync();
+                if (string.IsNullOrWhiteSpace(content))
+                {
+                    responseObj.Error.IsError = true;
+                    responseObj.Error.Message = "Empty response from importdescriptors";
+                }
+                else
+                {
+                    JObject jsonObject = JObject.Parse(content);
+                    var topError = jsonObject["error"];
+                    if (topError != null && topError.Type != JTokenType.Null)
+                    {
+                        responseObj.Error = GetServiceError(GetCallerName(), topError);
+                    }
+                    else
+                    {
+                        // importdescriptors returns an array of per-descriptor results
+                        var results = jsonObject["result"] as JArray;
+                        var failed = results?.FirstOrDefault(r => r["success"]?.Value<bool>() == false);
+                        if (failed != null)
+                        {
+                            responseObj.Error.IsError = true;
+                            responseObj.Error.Message = "Failed to import one or more descriptors: " + (failed["error"]?["message"]?.ToString() ?? "Unknown error");
+                        }
+                        else
+                        {
+                            responseObj.Error.IsError = false;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+            }
+
+            return responseObj;
+        }
+        #endregion // Import Wallet
 
         public Task<RestoreFromSeedResponse> RestoreFromSeed(RpcBase rpc, RestoreFromSeedRequest requestObj)
         {
@@ -465,7 +810,6 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 // Build request content json
                 var requestParams = new JObject
                 {
-                    ["addlocked"] = true,
                     ["include_empty"] = true,
                     ["include_watchonly"] = true,
                 };
@@ -560,13 +904,15 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                 List<WalletAccount> getAccountsResponse = JsonConvert.DeserializeObject<List<WalletAccount>>(resultToken.ToString())!;
                                 foreach (WalletAccount account in getAccountsResponse)
                                 {
-                                    if(accountsDictionary.ContainsKey(account.address))
+                                    if (accountsDictionary.TryGetValue(account.address, out Account? existing))
                                     {
-                                        accountsDictionary[account.address].BalanceTotal = account.amount;
-                                        accountsDictionary[account.address].BalanceUnlocked = account.amount;
+                                        // Accumulate UTXOs — an address can have multiple unspent outputs
+                                        existing.BalanceTotal += account.amount;
+                                        existing.BalanceUnlocked += account.amount;
                                     }
                                     else
                                     {
+                                        // Change address not in listreceivedbyaddress — add it
                                         Account newAccount = new()
                                         {
                                             Index = index++,
@@ -793,28 +1139,22 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         }
         #endregion // Get Transfer By TxId
 
+        #region Query Keys        
         public async Task<GetPrivateKeysResponse> GetPrivateKeys(RpcBase rpc, GetPrivateKeysRequest requestObj)
         {
-            // TODO: DumpWallet
             GetPrivateKeysResponse responseObj = new();
 
             try
             {
-                // Build request content json
-                var requestParams = new JObject
-                {
-                    ["filename"] = requestObj.DumpFileWithPath
-                };
-
+                // listdescriptors replaces dumpwallet for descriptor wallets (Bitcoin Core 22+)
                 var requestJson = new JObject
                 {
                     ["jsonrpc"] = "2.0",
                     ["id"] = _id++,
-                    ["method"] = "dumpwallet",
-                    ["params"] = requestParams
+                    ["method"] = "listdescriptors",
+                    ["params"] = new JObject { ["private"] = true }
                 };
 
-                // Call service and process response
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
                 if (httpResponse.IsSuccessStatusCode)
                 {
@@ -823,17 +1163,43 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     var error = jsonObject["error"];
                     if (error != null && error.Type != JTokenType.Null)
                     {
-                        // Set Service error
                         responseObj.Error = GetServiceError(GetCallerName(), error);
                     }
                     else
                     {
-                        responseObj.Error.IsError = false;
+                        var resultToken = jsonObject.SelectToken("result");
+                        if (resultToken == null)
+                        {
+                            responseObj.Error.IsError = true;
+                            responseObj.Error.Message = "Response missing 'result' field";
+                        }
+                        else
+                        {
+                            string fileContent =
+                                "# Bitcoin Wallet Descriptor Export\r\n" +
+                                "# Wallet: " + GlobalData.OpenedWalletName + "\r\n" +
+                                "# Exported: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "\r\n" +
+                                "# WARNING: Keep this file secure. Anyone with access can steal your funds.\r\n" +
+                                "# To restore: use Bitcoin Core importdescriptors with the descriptors below.\r\n\r\n" +
+                                resultToken.ToString(Formatting.Indented);
+
+                            File.WriteAllText(requestObj.DumpFileWithPath, fileContent);
+                            responseObj.Error.IsError = false;
+                        }
                     }
                 }
                 else
                 {
-                    // Set HTTP error
+                    string errorContent = await httpResponse.Content.ReadAsStringAsync();
+                    JObject? errorJson = null;
+                    try { errorJson = JObject.Parse(errorContent); } catch { }
+
+                    if (errorJson?.SelectToken("error.code")?.ToString() == "-4")
+                    {
+                        Logger.LogDebug(CoinPrefix + ".WGPK", "listdescriptors not available, falling back to dumpwallet for legacy wallet");
+                        return await DumpLegacyWallet(rpc, requestObj);
+                    }
+
                     responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
                 }
             }
@@ -844,11 +1210,49 @@ namespace NervaOneWalletMiner.Rpc.Wallet
 
             return responseObj;
         }
-
-        public Task<GetTransfersExportResponse> GetTransfersExport(RpcBase rpc, GetTransfersExportRequest requestObj)
+        
+        private async Task<GetPrivateKeysResponse> DumpLegacyWallet(RpcBase rpc, GetPrivateKeysRequest requestObj)
         {
-            throw new NotImplementedException();
+            GetPrivateKeysResponse responseObj = new();
+
+            try
+            {
+                var requestJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = _id++,
+                    ["method"] = "dumpwallet",
+                    ["params"] = new JObject { ["filename"] = requestObj.DumpFileWithPath }
+                };
+
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
+
+                    var error = jsonObject["error"];
+                    if (error != null && error.Type != JTokenType.Null)
+                    {
+                        responseObj.Error = GetServiceError(GetCallerName(), error);
+                    }
+                    else
+                    {
+                        responseObj.Error.IsError = false;
+                    }
+                }
+                else
+                {
+                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(CoinPrefix + ".WDLW", ex);
+            }
+
+            return responseObj;
         }
+        #endregion // Query Keys
 
         #region Common Internal Helper Objects
         private class TransferEntry
@@ -893,6 +1297,11 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         public Task<MakeIntegratedAddressResponse> MakeIntegratedAddress(RpcBase rpc, MakeIntegratedAddressRequest requestObj)
         {
             // Not used. ICoinSettings.AreIntegratedAddressesSupported
+            throw new NotImplementedException();
+        }
+
+        public Task<GetTransfersExportResponse> GetTransfersExport(RpcBase rpc, GetTransfersExportRequest requestObj)
+        {
             throw new NotImplementedException();
         }
 

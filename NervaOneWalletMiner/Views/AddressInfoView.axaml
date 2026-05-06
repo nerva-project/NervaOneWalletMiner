@@ -52,32 +52,34 @@
 				<TextBox Name="tbxWalletLabel"/>
 			</DockPanel>
 
-			<Separator Margin="0,20,0,0"/>
+			<StackPanel Name="pnlIntegratedAddress" Spacing="5">
+				<Separator Margin="0,20,0,0"/>
 
-			<Button Name="btnMakeIntegratedAddress"
-					Content="Make Integrated Address"
-					Click="MakeIntegratedAddress_Clicked"
-					Margin="0,15,0,0"/>
+				<Button Name="btnMakeIntegratedAddress"
+						Content="Make Integrated Address"
+						Click="MakeIntegratedAddress_Clicked"
+						Margin="0,15,0,0"/>
 
-			<Label Content="Integrated Address" Margin="0,15,0,0"/>
-			<DockPanel>
-				<Button Name="btnCopyIntegratedAddressToClipboard"
-						DockPanel.Dock="Right"
-						Content="Copy"
-						Margin="10,0,0,0"
-						Click="CopyIntegratedAddressToClipboard_Clicked"/>
-				<TextBox Name="tbxIntegratedAddress"/>
-			</DockPanel>
+				<Label Content="Integrated Address" Margin="0,15,0,0"/>
+				<DockPanel>
+					<Button Name="btnCopyIntegratedAddressToClipboard"
+							DockPanel.Dock="Right"
+							Content="Copy"
+							Margin="10,0,0,0"
+							Click="CopyIntegratedAddressToClipboard_Clicked"/>
+					<TextBox Name="tbxIntegratedAddress"/>
+				</DockPanel>
 
-			<Label Content="Payment Id" Margin="0,15,0,0"/>
-			<DockPanel>
-				<Button Name="btnCopyPaymentIdToClipboard"
-						DockPanel.Dock="Right"
-						Content="Copy"
-						Margin="10,0,0,0"
-						Click="CopyPaymentIdToClipboard_Clicked"/>
-				<TextBox Name="tbxPaymentId"/>
-			</DockPanel>
+				<Label Content="Payment Id" Margin="0,15,0,0"/>
+				<DockPanel>
+					<Button Name="btnCopyPaymentIdToClipboard"
+							DockPanel.Dock="Right"
+							Content="Copy"
+							Margin="10,0,0,0"
+							Click="CopyPaymentIdToClipboard_Clicked"/>
+					<TextBox Name="tbxPaymentId"/>
+				</DockPanel>
+			</StackPanel>
 
 			<Button Name="btnBack"
 					Content="Back"

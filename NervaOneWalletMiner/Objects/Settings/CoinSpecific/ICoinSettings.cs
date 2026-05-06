@@ -20,7 +20,17 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         bool IsPassRequiredToOpenWallet { get; set; }
         bool AreIntegratedAddressesSupported { get; set; }
         bool AreKeysDumpedToFile {  get; set; }
+        bool IsDefaultAddressAutoCreated { get; set; }
+        bool IsPaymentIdSupported { get; set; }
+        bool IsSplitTransferSupported { get; set; }
+        bool IsSendFromSupported { get; set; }
         bool IsPoppingBlocksSupported { get; set; }
+        bool IsRestoreFromSeedSupported { get; set; }
+        bool IsRestoreFromKeysSupported { get; set; }
+        bool IsRestoreFromDumpFileSupported { get; set; }
+        bool IsRescanSpentSupported { get; set; }
+        bool IsSweepBelowSupported { get; set; }
+        bool IsWalletLanguageSupported { get; set; }
 
         int LogLevelDaemon { get; set; }
         int LogLevelWallet { get; set; }

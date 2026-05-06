@@ -23,7 +23,17 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private bool _IsPassRequiredToOpenWallet = true;
         private bool _AreIntegratedAddressesSupported = true;
         private bool _AreKeysDumpedToFile = false;
+        private bool _IsDefaultAddressAutoCreated = false;
+        private bool _IsPaymentIdSupported = true;
+        private bool _IsSplitTransferSupported = true;
+        private bool _IsSendFromSupported = true;
         private bool _IsPoppingBlocksSupported = true;
+        private bool _IsRestoreFromSeedSupported = true;
+        private bool _IsRestoreFromKeysSupported = true;
+        private bool _IsRestoreFromDumpFileSupported = false;
+        private bool _IsRescanSpentSupported = true;
+        private bool _IsSweepBelowSupported = true;
+        private bool _IsWalletLanguageSupported = true;
 
         private int _LogLevelDaemon = 1;
         private int _LogLevelWallet = 1;
@@ -68,7 +78,17 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public bool IsPassRequiredToOpenWallet { get => _IsPassRequiredToOpenWallet; set => _IsPassRequiredToOpenWallet = value; }
         public bool AreIntegratedAddressesSupported { get => _AreIntegratedAddressesSupported; set => _AreIntegratedAddressesSupported = value; }
         public bool AreKeysDumpedToFile { get => _AreKeysDumpedToFile; set => _AreKeysDumpedToFile = value; }
+        public bool IsDefaultAddressAutoCreated { get => _IsDefaultAddressAutoCreated; set => _IsDefaultAddressAutoCreated = value; }
+        public bool IsPaymentIdSupported { get => _IsPaymentIdSupported; set => _IsPaymentIdSupported = value; }
+        public bool IsSplitTransferSupported { get => _IsSplitTransferSupported; set => _IsSplitTransferSupported = value; }
+        public bool IsSendFromSupported { get => _IsSendFromSupported; set => _IsSendFromSupported = value; }
         public bool IsPoppingBlocksSupported { get => _IsPoppingBlocksSupported; set => _IsPoppingBlocksSupported = value; }
+        public bool IsRestoreFromSeedSupported { get => _IsRestoreFromSeedSupported; set => _IsRestoreFromSeedSupported = value; }
+        public bool IsRestoreFromKeysSupported { get => _IsRestoreFromKeysSupported; set => _IsRestoreFromKeysSupported = value; }
+        public bool IsRestoreFromDumpFileSupported { get => _IsRestoreFromDumpFileSupported; set => _IsRestoreFromDumpFileSupported = value; }
+        public bool IsRescanSpentSupported { get => _IsRescanSpentSupported; set => _IsRescanSpentSupported = value; }
+        public bool IsSweepBelowSupported { get => _IsSweepBelowSupported; set => _IsSweepBelowSupported = value; }
+        public bool IsWalletLanguageSupported { get => _IsWalletLanguageSupported; set => _IsWalletLanguageSupported = value; }
 
         public int LogLevelDaemon { get => _LogLevelDaemon; set => _LogLevelDaemon = value; }
         public int LogLevelWallet { get => _LogLevelWallet; set => _LogLevelWallet = value; }

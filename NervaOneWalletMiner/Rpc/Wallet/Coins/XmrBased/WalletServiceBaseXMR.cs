@@ -1835,6 +1835,12 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         {
             throw new NotImplementedException();
         }
+
+        public Task<ImportWalletResponse> ImportWallet(RpcBase rpc, ImportWalletRequest requestObj)
+        {
+            // Not used. ICoinSettings.IsRestoreFromDumpFileSupported
+            throw new NotImplementedException();
+        }
         #endregion // Unsupported Methods
     }
 }

@@ -44,16 +44,33 @@ namespace NervaOneWalletMiner.Views
                 string paymentId = DataContext is TransferFundsViewModel vm3 ? vm3.PaymentId : string.Empty;
                 _returnPage = DataContext is TransferFundsViewModel vm4 ? vm4.ReturnPage : SplitViewPages.Wallet;
 
-                foreach (Account account in GlobalData.WalletStats.Subaddresses.Values)
+                if (!GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPaymentIdSupported)
                 {
-                    if (!_accounts.ContainsKey(account.Index))
-                    {
-                        _accounts.Add(account.Index, string.IsNullOrEmpty(account.Label) ? "No label" + " (" + account.AddressShort + ")" : account.Label + " (" + account.AddressShort + ")");
-                    }
+                    pnlPaymentId.IsVisible = false;
                 }
 
-                cbxSendFrom.ItemsSource = _accounts.Values;
-                cbxSendFrom.SelectedIndex = (int)selectedAccountIndex;
+                if (!GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsSplitTransferSupported)
+                {
+                    cbxSplitTransfer.IsVisible = false;
+                }
+
+                if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsSendFromSupported)
+                {
+                    foreach (Account account in GlobalData.WalletStats.Subaddresses.Values)
+                    {
+                        if (!_accounts.ContainsKey(account.Index))
+                        {
+                            _accounts.Add(account.Index, string.IsNullOrEmpty(account.Label) ? "No label" + " (" + account.AddressShort + ")" : account.Label + " (" + account.AddressShort + ")");
+                        }
+                    }
+
+                    cbxSendFrom.ItemsSource = _accounts.Values;
+                    cbxSendFrom.SelectedIndex = (int)selectedAccountIndex;
+                }
+                else
+                {
+                    pnlSendFrom.IsVisible = false;
+                }
 
                 if (!string.IsNullOrEmpty(toAddress))
                 {
@@ -86,21 +103,33 @@ namespace NervaOneWalletMiner.Views
 
         private void UpdateBalanceLabels(uint accountIndex)
         {
-            decimal balanceTotal = 0;
-            decimal balanceUnlocked = 0;
+            decimal balanceTotal;
+            decimal balanceUnlocked;
+            string units = GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
 
-            foreach (Account account in GlobalData.WalletStats.Subaddresses.Values)
+            if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsSendFromSupported)
             {
-                if (account.Index == accountIndex)
+                balanceTotal = 0;
+                balanceUnlocked = 0;
+
+                foreach (Account account in GlobalData.WalletStats.Subaddresses.Values)
                 {
-                    balanceTotal = account.BalanceTotal;
-                    balanceUnlocked = account.BalanceUnlocked;
-                    break;
+                    if (account.Index == accountIndex)
+                    {
+                        balanceTotal = account.BalanceTotal;
+                        balanceUnlocked = account.BalanceUnlocked;
+                        break;
+                    }
                 }
             }
+            else
+            {
+                balanceTotal = GlobalData.WalletStats.BalanceTotal;
+                balanceUnlocked = GlobalData.WalletStats.BalanceUnlocked;
+            }
 
-            lblBalance.Content = balanceTotal + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
-            lblUnlocked.Content = balanceUnlocked + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
+            lblBalance.Content = balanceTotal + " " + units;
+            lblUnlocked.Content = balanceUnlocked + " " + units;
         }
 
         private void Account_SelectionChanged(object sender, SelectionChangedEventArgs e)

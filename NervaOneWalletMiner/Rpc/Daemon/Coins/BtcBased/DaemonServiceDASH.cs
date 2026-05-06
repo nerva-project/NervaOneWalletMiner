@@ -69,8 +69,8 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                             else
                             {
                                 ResGetNetInfo getInfoResponse = JsonConvert.DeserializeObject<ResGetNetInfo>(resultToken.ToString())!;
-                                responseObj.ConnectionCountOut = getInfoResponse.outboundconnections;
-                                responseObj.ConnectionCountIn = getInfoResponse.inboundmnconnections;
+                                responseObj.ConnectionCountOut = getInfoResponse.connections_out;
+                                responseObj.ConnectionCountIn = getInfoResponse.connections_in;
                                 responseObj.Version = getInfoResponse.buildversion;
                                 responseObj.Status = StatusDaemon.Ok;
 
@@ -81,9 +81,21 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 }
                 else
                 {
-                    // Set HTTP error
-                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
-                    responseObj.Status = StatusDaemon.Error;
+                    string errorContent = await httpResponse.Content.ReadAsStringAsync();
+                    JObject? errorJson = null;
+                    try { errorJson = JObject.Parse(errorContent); } catch { }
+
+                    string? errorCode = errorJson?.SelectToken("error.code")?.ToString();
+                    if (errorCode == "-28")
+                    {
+                        Logger.LogDebug("DAS.DGTI", "Daemon warming up: " + errorJson?.SelectToken("error.message")?.ToString());
+                        responseObj.Status = StatusDaemon.WarmingUp;
+                    }
+                    else
+                    {
+                        responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                        responseObj.Status = StatusDaemon.Error;
+                    }
                 }
 
                 if(isNetInfoSuccess)
@@ -202,8 +214,8 @@ namespace NervaOneWalletMiner.Rpc.Daemon
         private class ResGetNetInfo
         {
             public string buildversion { get; set; } = string.Empty;
-            public ulong outboundconnections { get; set; }
-            public ulong inboundmnconnections { get; set; }
+            public ulong connections_in { get; set; }
+            public ulong connections_out { get; set; }
         }
 
         private class ResGetMiningInfo

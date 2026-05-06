@@ -24,18 +24,28 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private bool _IsPassRequiredToOpenWallet = false;
         private bool _AreIntegratedAddressesSupported = false;
         private bool _AreKeysDumpedToFile = true;
+        private bool _IsDefaultAddressAutoCreated = true;
+        private bool _IsPaymentIdSupported = false;
+        private bool _IsSplitTransferSupported = false;
+        private bool _IsSendFromSupported = false;
         private bool _IsPoppingBlocksSupported = false;
+        private bool _IsRestoreFromSeedSupported = false;
+        private bool _IsRestoreFromKeysSupported = false;
+        private bool _IsRestoreFromDumpFileSupported = true;
+        private bool _IsRescanSpentSupported = false;
+        private bool _IsSweepBelowSupported = false;
+        private bool _IsWalletLanguageSupported = false;
 
         private int _LogLevelDaemon = 0;
         private int _LogLevelWallet = 0;
 
-        private string _CliUrlWindows64 = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-win64.zip";
-        private string _CliUrlWindows32 = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-win64.zip";
-        private string _CliUrlLinux64 = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-x86_64-linux-gnu.tar.gz";
-        private string _CliUrlLinux32 = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-x86_64-linux-gnu.tar.gz";
-        private string _CliUrlLinuxArm = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-arm-linux-gnueabihf.tar.gz";
-        private string _CliUrlMacIntel = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-x86_64-apple-darwin.tar.gz";
-        private string _CliUrlMacArm = "https://github.com/dashpay/dash/releases/download/v20.1.1/dashcore-20.1.1-arm64-apple-darwin.tar.gz";
+        private string _CliUrlWindows64 = "https://github.com/dashpay/dash/releases/download/v23.1.2/dashcore-23.1.2-win64.zip";
+        private string _CliUrlWindows32 = "https://github.com/dashpay/dash/releases/download/v23.1.2/dashcore-23.1.2-win64.zip";
+        private string _CliUrlLinux64 = "https://github.com/dashpay/dash/releases/download/v23.1.2/dashcore-23.1.2-x86_64-linux-gnu.tar.gz";
+        private string _CliUrlLinux32 = "https://github.com/dashpay/dash/releases/download/v23.1.2/dashcore-23.1.2-x86_64-linux-gnu.tar.gz";
+        private string _CliUrlLinuxArm = "https://github.com/dashpay/dash/releases/download/v23.1.2/dashcore-23.1.2-aarch64-linux-gnu.tar.gz";
+        private string _CliUrlMacIntel = "https://github.com/dashpay/dash/releases/download/v23.1.2/dashcore-23.1.2-arm64-apple-darwin.tar.gz";
+        private string _CliUrlMacArm = "https://github.com/dashpay/dash/releases/download/v23.1.2/dashcore-23.1.2-arm64-apple-darwin.tar.gz";
         private string _CliUrlAndroid = string.Empty;
 
         private string _RemotePublicNodeUrlDefault = string.Empty;
@@ -68,7 +78,17 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public bool IsPassRequiredToOpenWallet { get => _IsPassRequiredToOpenWallet; set => _IsPassRequiredToOpenWallet = value; }
         public bool AreIntegratedAddressesSupported { get => _AreIntegratedAddressesSupported; set => _AreIntegratedAddressesSupported = value; }
         public bool AreKeysDumpedToFile { get => _AreKeysDumpedToFile; set => _AreKeysDumpedToFile = value; }
+        public bool IsDefaultAddressAutoCreated { get => _IsDefaultAddressAutoCreated; set => _IsDefaultAddressAutoCreated = value; }
+        public bool IsPaymentIdSupported { get => _IsPaymentIdSupported; set => _IsPaymentIdSupported = value; }
+        public bool IsSplitTransferSupported { get => _IsSplitTransferSupported; set => _IsSplitTransferSupported = value; }
+        public bool IsSendFromSupported { get => _IsSendFromSupported; set => _IsSendFromSupported = value; }
         public bool IsPoppingBlocksSupported { get => _IsPoppingBlocksSupported; set => _IsPoppingBlocksSupported = value; }
+        public bool IsRestoreFromSeedSupported { get => _IsRestoreFromSeedSupported; set => _IsRestoreFromSeedSupported = value; }
+        public bool IsRestoreFromKeysSupported { get => _IsRestoreFromKeysSupported; set => _IsRestoreFromKeysSupported = value; }
+        public bool IsRestoreFromDumpFileSupported { get => _IsRestoreFromDumpFileSupported; set => _IsRestoreFromDumpFileSupported = value; }
+        public bool IsRescanSpentSupported { get => _IsRescanSpentSupported; set => _IsRescanSpentSupported = value; }
+        public bool IsSweepBelowSupported { get => _IsSweepBelowSupported; set => _IsSweepBelowSupported = value; }
+        public bool IsWalletLanguageSupported { get => _IsWalletLanguageSupported; set => _IsWalletLanguageSupported = value; }
 
         public int LogLevelDaemon { get => _LogLevelDaemon; set => _LogLevelDaemon = value; }
         public int LogLevelWallet { get => _LogLevelWallet; set => _LogLevelWallet = value; }

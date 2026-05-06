@@ -32,11 +32,7 @@ namespace NervaOneWalletMiner.Views
 
                 if (!GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].AreIntegratedAddressesSupported)
                 {
-                    btnMakeIntegratedAddress.IsEnabled = false;
-                    tbxIntegratedAddress.IsEnabled = false;
-                    btnCopyIntegratedAddressToClipboard.IsEnabled = false;
-                    tbxPaymentId.IsEnabled = false;
-                    btnCopyPaymentIdToClipboard.IsEnabled = false;
+                    pnlIntegratedAddress.IsVisible = false;
                 }
 
                 foreach (Account account in GlobalData.WalletStats.Subaddresses.Values)

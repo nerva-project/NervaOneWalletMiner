@@ -365,18 +365,20 @@ namespace NervaOneWalletMiner.Views
 
             try
             {
+                // Capture name before WalletClosedOrErrored clears it — needed for coins like BTC that pass the name to the RPC
+                string walletToClose = GlobalData.OpenedWalletName;
                 GlobalMethods.WalletClosedOrErrored();
 
                 CloseWalletRequest request = new CloseWalletRequest
                 {
-                    WalletName = GlobalData.OpenedWalletName
+                    WalletName = walletToClose
                 };
 
                 CloseWalletResponse response = await GlobalData.WalletService.CloseWallet(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
 
                 if (response.Error.IsError)
                 {
-                    Logger.LogError("WAL.CLUW", "Error closing wallet " + GlobalData.OpenedWalletName + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
+                    Logger.LogError("WAL.CLUW", "Error closing wallet " + walletToClose + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
 
                     if (isUiThread)
                     {

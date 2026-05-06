@@ -60,6 +60,7 @@ namespace NervaOneWalletMiner.Helpers
                 { SplitViewPages.AddressBookEntry, new AddressBookEntryViewModel() },
                 { SplitViewPages.RestoreFromKeys, new RestoreFromKeysViewModel() },
                 { SplitViewPages.RestoreFromSeed, new RestoreFromSeedViewModel() },
+                { SplitViewPages.RestoreFromDumpFile, new RestoreFromDumpFileViewModel() },
                 { SplitViewPages.SweepBelow, new SweepBelowViewModel() },
                 { SplitViewPages.DisplayKeysSeed, new DisplayKeysSeedViewModel() },
                 { SplitViewPages.ViewLogs, new ViewLogsViewModel() },
@@ -93,6 +94,7 @@ namespace NervaOneWalletMiner.Helpers
                 { SplitViewPages.AddressBookEntry, new AddressBookEntryViewModel() },
                 { SplitViewPages.RestoreFromKeys, new RestoreFromKeysViewModel() },
                 { SplitViewPages.RestoreFromSeed, new RestoreFromSeedViewModel() },
+                { SplitViewPages.RestoreFromDumpFile, new RestoreFromDumpFileViewModel() },
                 { SplitViewPages.SweepBelow, new SweepBelowViewModel() },
                 { SplitViewPages.DisplayKeysSeed, new DisplayKeysSeedViewModel() },
                 { SplitViewPages.ViewLogs, new ViewLogsViewModel() },
@@ -206,6 +208,12 @@ namespace NervaOneWalletMiner.Helpers
         {
             GlobalData.ViewModelPages[SplitViewPages.RestoreFromSeed] = new RestoreFromSeedViewModel();
             ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.RestoreFromSeed];
+        }
+
+        public static void NavigateToRestoreFromDumpFile()
+        {
+            GlobalData.ViewModelPages[SplitViewPages.RestoreFromDumpFile] = new RestoreFromDumpFileViewModel();
+            ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.RestoreFromDumpFile];
         }
 
         public static void NavigateToSweepBelow()
@@ -955,6 +963,12 @@ namespace NervaOneWalletMiner.Helpers
                                 account.WalletIcon = _walletImage;
                                 GlobalData.WalletStats.Subaddresses.Add(account.Index, account);
                             }
+                        }
+
+                        if (response.SubAccounts.Count == 0 && GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsDefaultAddressAutoCreated)
+                        {
+                            Logger.LogDebug("UIM.GSWD", "Wallet has no addresses — generating default address");
+                            await GlobalData.WalletService.CreateAccount(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new CreateAccountRequest { Label = string.Empty });
                         }
                     }
 

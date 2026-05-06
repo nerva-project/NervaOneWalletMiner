@@ -22,6 +22,11 @@ namespace NervaOneWalletMiner.Views
                 cbxLanguage.ItemsSource = GlobalMethods.GetSupportedLanguages();
                 cbxLanguage.SelectedIndex = 0;
 
+                if (!GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletLanguageSupported)
+                {
+                    pnlLanguage.IsVisible = false;
+                }
+
                 Loaded += (_, _) => tbxWalletName.Focus();
             }
             catch (Exception ex)
