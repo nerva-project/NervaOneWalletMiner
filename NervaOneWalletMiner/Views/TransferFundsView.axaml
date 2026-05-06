@@ -37,7 +37,7 @@
 				<Label Content="Balance:" Width="100"/>
 				<Label Name="lblBalance" Content="0"/>
 			</DockPanel>
-			<DockPanel>
+			<DockPanel Name="pnlUnlocked">
 				<Label Content="Unlocked:" Width="100"/>
 				<Label Name="lblUnlocked" Content="0"/>
 			</DockPanel>
@@ -60,6 +60,11 @@
 				<TextBox Name="tbxAmount"
 						 Watermark="Required - amount to send"/>
 			</DockPanel>
+			<TextBlock Text="Fee will be calculated before confirming the transfer"
+					   Foreground="Orange"
+					   FontSize="12"
+					   Margin="0,4,0,0"
+					   TextWrapping="Wrap"/>
 
 			<StackPanel Name="pnlPaymentId" Spacing="5">
 				<Label Content="Payment Id" Margin="0,15,0,0"/>

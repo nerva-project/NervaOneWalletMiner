@@ -10,6 +10,9 @@ namespace NervaOneWalletMiner.Rpc.Wallet.Responses
 
         public decimal BalanceUnlocked { get; set; }
         public decimal BalanceTotal { get; set; }
+
+        // Used for BTC based coins
+        public decimal BalancePending { get; set; }
         public List<Account> SubAccounts { get; set; } = [];
     }
 }

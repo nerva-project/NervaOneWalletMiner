@@ -112,10 +112,10 @@ namespace NervaOneWalletMiner.Views
                     Grid.SetRow(grdWalletButtons, 0);
                     grdWalletButtons.HorizontalAlignment = HorizontalAlignment.Right;
                     
-                    // Wide: all columns
+                    // Wide: all columns (Unlocked hidden for BTC-style coins — per-address value equals Balance)
                     if (_colId != null) { _colId.IsVisible = true; }
                     if (_colAddress != null) { _colAddress.IsVisible = true; }
-                    if (_colUnlocked != null) { _colUnlocked.IsVisible = true; }
+                    if (_colUnlocked != null) { _colUnlocked.IsVisible = !GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletBtcStyle; }
                 }
             }
             catch (Exception ex)

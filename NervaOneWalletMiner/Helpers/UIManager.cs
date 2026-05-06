@@ -485,9 +485,11 @@ namespace NervaOneWalletMiner.Helpers
                         }
                     }
 
-                    string totalLockedLabel = "Total " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits + ":";
-                    string totalUnlockedLabel = "Unlocked " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits + ":";
-                    string statusBarMessage = GlobalData.OpenedWalletName + " | " + GlobalData.WalletStats.BalanceTotal.ToString("F2") + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits + (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletHeightSupported ? " | H: " + GlobalData.WalletHeight : string.Empty);
+                    bool isBtcStyle = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletBtcStyle;
+                    string units = GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
+                    string totalLockedLabel = "Total " + units + ":";
+                    string totalUnlockedLabel = (isBtcStyle ? "Pending " : "Unlocked ") + units + ":";
+                    string statusBarMessage = GlobalData.OpenedWalletName + " | " + GlobalData.WalletStats.BalanceTotal.ToString("F2") + " " + units + (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletHeightSupported ? " | H: " + GlobalData.WalletHeight : string.Empty);
 
                     Dispatcher.UIThread.Invoke(() =>
                     {
@@ -495,9 +497,11 @@ namespace NervaOneWalletMiner.Helpers
                         {
                             walletVm.TotalCoins = GlobalData.WalletStats.BalanceTotal.ToString();
                         }
-                        if (!walletVm.UnlockedCoins.Equals(GlobalData.WalletStats.BalanceUnlocked.ToString()))
+
+                        string secondBalance = isBtcStyle ? GlobalData.WalletStats.BalancePending.ToString() : GlobalData.WalletStats.BalanceUnlocked.ToString();
+                        if (!walletVm.UnlockedCoins.Equals(secondBalance))
                         {
-                            walletVm.UnlockedCoins = GlobalData.WalletStats.BalanceUnlocked.ToString();
+                            walletVm.UnlockedCoins = secondBalance;
                         }
                         if (!walletVm.TotalLockedLabel.Equals(totalLockedLabel))
                         {
@@ -954,6 +958,7 @@ namespace NervaOneWalletMiner.Helpers
                     {
                         GlobalData.WalletStats.BalanceTotal = response.BalanceTotal;
                         GlobalData.WalletStats.BalanceUnlocked = response.BalanceUnlocked;
+                        GlobalData.WalletStats.BalancePending = response.BalancePending;
 
                         GlobalData.WalletStats.Subaddresses = [];
 

@@ -2,6 +2,7 @@
 {
     public interface ICoinSettings
     {
+        double BlockSeconds { get; set; }
         int DaemonPort { get; set; }
         string DisplayName { get; set; }
         string DisplayUnits { get; set; }

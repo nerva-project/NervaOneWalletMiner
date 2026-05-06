@@ -16,7 +16,6 @@ namespace NervaOneWalletMiner.Rpc.Daemon
     public abstract class DaemonServiceBaseXMR : IDaemonService
     {
         protected abstract string CoinPrefix { get; }
-        protected abstract double BlockSeconds { get; }
 
         protected static string GetCallerName([CallerMemberName] string name = "") => name;
 
@@ -237,7 +236,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                                 ResGetInfo getInfoResponse = JsonConvert.DeserializeObject<ResGetInfo>(resultToken.ToString())!;
                                 responseObj.Height = getInfoResponse.height;
                                 responseObj.TargetHeight = getInfoResponse.target_height;
-                                responseObj.NetworkHashRate = (ulong)(getInfoResponse.difficulty / BlockSeconds);
+                                responseObj.NetworkHashRate = (ulong)(getInfoResponse.difficulty / GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].BlockSeconds);
                                 responseObj.ConnectionCountOut = getInfoResponse.outgoing_connections_count;
                                 responseObj.ConnectionCountIn = getInfoResponse.incoming_connections_count;
                                 responseObj.StartTime = GlobalMethods.UnixTimeStampToDateTime(getInfoResponse.start_time);

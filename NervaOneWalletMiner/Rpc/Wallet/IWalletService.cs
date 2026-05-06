@@ -29,6 +29,8 @@ namespace NervaOneWalletMiner.Rpc.Wallet
 
         Task<ImportWalletResponse> ImportWallet(RpcBase rpc, ImportWalletRequest requestObj);
 
+        Task<EstimateFeeResponse> EstimateFee(RpcBase rpc, TransferRequest requestObj);
+
         Task<TransferResponse> Transfer(RpcBase rpc, TransferRequest requestObj);
 
         Task<TransferResponse> TransferSplit(RpcBase rpc, TransferRequest requestObj);

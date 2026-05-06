@@ -606,7 +606,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         }
         #endregion // Restore from Keys
 
-        #region Transfer
+        #region Transfer       
         /* RPC request params:
          *  std::list<transfer_destination> destinations;
          *  uint32_t account_index;
@@ -623,6 +623,11 @@ namespace NervaOneWalletMiner.Rpc.Wallet
          */
         public async Task<TransferResponse> Transfer(RpcBase rpc, TransferRequest requestObj)
         {
+            if (!string.IsNullOrEmpty(requestObj.TxData))
+            {
+                return await RelayTx(rpc, requestObj.TxData);
+            }
+
             TransferResponse responseObj = new();
 
             try
@@ -684,20 +689,138 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                         {
                             // We don't use response values
                             ResTransfer transferResponse = JsonConvert.DeserializeObject<ResTransfer>(resultToken.ToString())!;
-
                             responseObj.Error.IsError = false;
                         }
                     }
                 }
                 else
                 {
-                    // Set HTTP error
                     responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
                 }
             }
             catch (Exception ex)
             {
                 Logger.LogException(CoinPrefix + ".WTRA", ex);
+            }
+
+            return responseObj;
+        }
+
+        public async Task<EstimateFeeResponse> EstimateFee(RpcBase rpc, TransferRequest requestObj)
+        {
+            EstimateFeeResponse responseObj = new();
+
+            try
+            {
+                JArray destinationsJson = new JArray();
+                foreach (Common.TransferDestination destination in requestObj.Destinations)
+                {
+                    destinationsJson.Add(new JObject
+                    {
+                        ["amount"] = AtomicUnitsFromAmount(destination.Amount),
+                        ["address"] = destination.Address
+                    });
+                }
+
+                JObject paramsJson = new JObject
+                {
+                    ["destinations"] = destinationsJson,
+                    ["account_index"] = requestObj.AccountIndex,
+                    ["subaddr_indices"] = new JArray(requestObj.SubAddressIndices),
+                    ["priority"] = GetPriority(requestObj.Priority),
+                    ["unlock_time"] = requestObj.UnlockTime,
+                    ["payment_id"] = requestObj.PaymentId is null ? "" : requestObj.PaymentId,
+                    ["get_tx_key"] = false,
+                    ["do_not_relay"] = true,
+                    ["get_tx_hex"] = false,
+                    ["get_tx_metadata"] = true
+                };
+
+                var requestJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = "0",
+                    ["method"] = "transfer",
+                    ["params"] = paramsJson
+                };
+
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
+
+                    var error = jsonObject["error"];
+                    if (error != null)
+                    {
+                        responseObj.Error = GetServiceError(GetCallerName(), error);
+                    }
+                    else
+                    {
+                        var resultToken = jsonObject.SelectToken("result");
+                        if (resultToken == null)
+                        {
+                            responseObj.Error.IsError = true;
+                            responseObj.Error.Message = "Response missing 'result' field";
+                        }
+                        else
+                        {
+                            ResTransfer transferResponse = JsonConvert.DeserializeObject<ResTransfer>(resultToken.ToString())!;
+                            responseObj.Fee = AmountFromAtomicUnits(transferResponse.fee, 12);
+                            responseObj.TxData = transferResponse.tx_metadata;
+                            responseObj.Error.IsError = false;
+                        }
+                    }
+                }
+                else
+                {
+                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(CoinPrefix + ".ESFE", ex);
+            }
+
+            return responseObj;
+        }
+
+        private async Task<TransferResponse> RelayTx(RpcBase rpc, string txMetadata)
+        {
+            TransferResponse responseObj = new();
+
+            try
+            {
+                var requestJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = "0",
+                    ["method"] = "relay_tx",
+                    ["params"] = new JObject { ["hex"] = txMetadata }
+                };
+
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
+
+                    var error = jsonObject["error"];
+                    if (error != null)
+                    {
+                        responseObj.Error = GetServiceError(GetCallerName(), error);
+                    }
+                    else
+                    {
+                        responseObj.Error.IsError = false;
+                    }
+                }
+                else
+                {
+                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(CoinPrefix + ".RLTX", ex);
             }
 
             return responseObj;

@@ -6,6 +6,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
 {
     public class CoinSettingsWOW : ICoinSettings
     {
+        public double BlockSeconds { get; set; } = 300.0;
         public int DaemonPort { get; set; } = 34568;
         public string DisplayName { get; set; } = "Wownero (WOW)";
         public string DisplayUnits { get; set; } = "WOW";
@@ -60,7 +61,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public bool IsRestoreFromDumpFileSupported { get; set; } = false;
         public bool IsRescanSpentSupported { get; set; } = true;
         public bool IsSweepBelowSupported { get; set; } = true;
-        public bool IsWalletBtcStyle { get; set; } = false;
+        public bool IsWalletBtcStyle { get; set; } = false;        
 
 
         public string GenerateDaemonOptions(SettingsDaemon daemonSettings)

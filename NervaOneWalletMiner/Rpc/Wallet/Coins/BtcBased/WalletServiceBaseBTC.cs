@@ -1166,21 +1166,30 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         }
         #endregion // Restore From Seed
 
-        #region Transfer
+        #region Transfer       
         public async Task<TransferResponse> Transfer(RpcBase rpc, TransferRequest requestObj)
         {
+            if (!string.IsNullOrEmpty(requestObj.TxData))
+            {
+                return await SendFundedPsbt(rpc, requestObj.TxData);
+            }
+
+            // Fallback: sendtoaddress when no pre-built tx is available
             TransferResponse responseObj = new();
 
             try
             {
-                // Build request content json
+                var (confTarget, estimateMode) = GetConfTarget(requestObj.Priority);
+
                 var requestParams = new JObject
                 {
                     ["address"] = requestObj.Destinations.FirstOrDefault()!.Address,
                     ["amount"] = requestObj.Destinations.FirstOrDefault()!.Amount,
                     ["comment"] = requestObj.Comment,
                     ["comment_to"] = requestObj.CommentTo,
-                    ["subtractfeefromamount"] = requestObj.SubtractFeeFromAmount
+                    ["subtractfeefromamount"] = requestObj.SubtractFeeFromAmount,
+                    ["conf_target"] = confTarget,
+                    ["estimate_mode"] = estimateMode
                 };
 
                 var requestJson = new JObject
@@ -1191,7 +1200,6 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     ["params"] = requestParams
                 };
 
-                // Call service and process response
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
                 if (httpResponse.IsSuccessStatusCode)
                 {
@@ -1200,26 +1208,198 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     var error = jsonObject["error"];
                     if (error != null && error.Type != JTokenType.Null)
                     {
-                        // Set Service error
                         responseObj.Error = GetServiceError(GetCallerName(), error);
                     }
                     else
                     {
-                        // We don't use response values
-                        //ResTransfer transferResponse = JsonConvert.DeserializeObject<ResTransfer>(jsonObject.SelectToken("result")!.ToString())!;
-
                         responseObj.Error.IsError = false;
                     }
                 }
                 else
                 {
-                    // Set HTTP error
                     responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
                 }
             }
             catch (Exception ex)
             {
                 Logger.LogException(CoinPrefix + ".WTRA", ex);
+            }
+
+            return responseObj;
+        }
+
+        private static (int confTarget, string estimateMode) GetConfTarget(string priority) => priority switch
+        {
+            SendPriority.Low => (36, "economical"),
+            SendPriority.Normal => (6, "conservative"),
+            SendPriority.Fast => (3, "conservative"),
+            SendPriority.Urgent => (1, "conservative"),
+            _ => (144, "economical") // Economy / default
+        };
+
+        public async Task<EstimateFeeResponse> EstimateFee(RpcBase rpc, TransferRequest requestObj)
+        {
+            EstimateFeeResponse responseObj = new();
+
+            try
+            {
+                var destination = requestObj.Destinations.FirstOrDefault()!;
+                var (confTarget, estimateMode) = GetConfTarget(requestObj.Priority);
+
+                var outputsJson = new JArray { new JObject { [destination.Address] = destination.Amount } };
+                var optionsJson = new JObject
+                {
+                    ["conf_target"] = confTarget,
+                    ["estimate_mode"] = estimateMode
+                };
+
+                var requestJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = _id++,
+                    ["method"] = "walletcreatefundedpsbt",
+                    ["params"] = new JArray(new JArray(), outputsJson, 0, optionsJson)
+                };
+
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
+
+                    var error = jsonObject["error"];
+                    if (error != null && error.Type != JTokenType.Null)
+                    {
+                        responseObj.Error = GetServiceError(GetCallerName(), error);
+                    }
+                    else
+                    {
+                        var resultToken = jsonObject.SelectToken("result");
+                        if (resultToken == null)
+                        {
+                            responseObj.Error.IsError = true;
+                            responseObj.Error.Message = "Response missing 'result' field";
+                        }
+                        else
+                        {
+                            responseObj.Fee = resultToken["fee"]?.Value<decimal>() ?? 0;
+                            responseObj.TxData = resultToken["psbt"]?.ToString() ?? string.Empty;
+                            responseObj.Error.IsError = false;
+                        }
+                    }
+                }
+                else
+                {
+                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(CoinPrefix + ".ESFE", ex);
+            }
+
+            return responseObj;
+        }
+
+        private async Task<TransferResponse> SendFundedPsbt(RpcBase rpc, string fundedPsbt)
+        {
+            TransferResponse responseObj = new();
+
+            try
+            {
+                // Step 1: Sign
+                var processJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = _id++,
+                    ["method"] = "walletprocesspsbt",
+                    ["params"] = new JArray(fundedPsbt)
+                };
+
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), processJson.ToString(), rpc.UserName, rpc.Password);
+                if (!httpResponse.IsSuccessStatusCode)
+                {
+                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                    return responseObj;
+                }
+
+                JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
+                var error = jsonObject["error"];
+                if (error != null && error.Type != JTokenType.Null)
+                {
+                    responseObj.Error = GetServiceError(GetCallerName(), error);
+                    return responseObj;
+                }
+
+                string signedPsbt = jsonObject.SelectToken("result.psbt")?.ToString() ?? string.Empty;
+                if (string.IsNullOrEmpty(signedPsbt))
+                {
+                    responseObj.Error.IsError = true;
+                    responseObj.Error.Message = "Failed to sign transaction";
+                    return responseObj;
+                }
+
+                // Step 2: Finalize
+                var finalizeJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = _id++,
+                    ["method"] = "finalizepsbt",
+                    ["params"] = new JArray(signedPsbt)
+                };
+
+                httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), finalizeJson.ToString(), rpc.UserName, rpc.Password);
+                if (!httpResponse.IsSuccessStatusCode)
+                {
+                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                    return responseObj;
+                }
+
+                jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
+                error = jsonObject["error"];
+                if (error != null && error.Type != JTokenType.Null)
+                {
+                    responseObj.Error = GetServiceError(GetCallerName(), error);
+                    return responseObj;
+                }
+
+                string rawHex = jsonObject.SelectToken("result.hex")?.ToString() ?? string.Empty;
+                if (string.IsNullOrEmpty(rawHex))
+                {
+                    responseObj.Error.IsError = true;
+                    responseObj.Error.Message = "Failed to finalize transaction";
+                    return responseObj;
+                }
+
+                // Step 3: Broadcast
+                var broadcastJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = _id++,
+                    ["method"] = "sendrawtransaction",
+                    ["params"] = new JArray(rawHex)
+                };
+
+                httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), broadcastJson.ToString(), rpc.UserName, rpc.Password);
+                if (!httpResponse.IsSuccessStatusCode)
+                {
+                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                    return responseObj;
+                }
+
+                jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
+                error = jsonObject["error"];
+                if (error != null && error.Type != JTokenType.Null)
+                {
+                    responseObj.Error = GetServiceError(GetCallerName(), error);
+                }
+                else
+                {
+                    responseObj.Error.IsError = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(CoinPrefix + ".SFPS", ex);
             }
 
             return responseObj;
@@ -1366,6 +1546,34 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                 {
                                     responseObj.BalanceTotal += account.BalanceTotal;
                                     responseObj.BalanceUnlocked += account.BalanceUnlocked;
+                                }
+
+                                // Get pending (unconfirmed) balance: listunspent minconf=0,maxconf=0 returns only mempool UTXOs.
+                                // getwalletinfo.unconfirmed_balance excludes trusted change from own transactions, so it is not useful here.
+                                var pendingJson = new JObject
+                                {
+                                    ["jsonrpc"] = "2.0",
+                                    ["id"] = _id++,
+                                    ["method"] = "listunspent",
+                                    ["params"] = new JObject { ["minconf"] = 0, ["maxconf"] = 0 }
+                                };
+
+                                HttpResponseMessage pendingResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), pendingJson.ToString(), rpc.UserName, rpc.Password);
+                                if (pendingResponse.IsSuccessStatusCode)
+                                {
+                                    JObject pendingObject = JObject.Parse(await pendingResponse.Content.ReadAsStringAsync());
+                                    var pendingError = pendingObject["error"];
+                                    if (pendingError == null || pendingError.Type == JTokenType.Null)
+                                    {
+                                        var pendingResult = pendingObject.SelectToken("result") as JArray;
+                                        if (pendingResult != null)
+                                        {
+                                            foreach (var utxo in pendingResult)
+                                            {
+                                                responseObj.BalancePending += utxo["amount"]?.Value<decimal>() ?? 0;
+                                            }
+                                        }
+                                    }
                                 }
 
                                 responseObj.Error.IsError = false;

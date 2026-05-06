@@ -6,6 +6,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
 {
     public class CoinSettingsXNV : ICoinSettings
     {
+        public double BlockSeconds { get; set; } = 60.0;
         public int DaemonPort { get; set; } = 17566;
         public string DisplayName { get; set; } = "Nerva (XNV)";
         public string DisplayUnits { get; set; } = "XNV";

@@ -6,6 +6,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
 {
     public class CoinSettingsXMR : ICoinSettings
     {
+        public double BlockSeconds { get; set; } = 120.0;
         public int DaemonPort { get; set; } = 18081;
         public string DisplayName { get; set; } = "Monero (XMR)";
         public string DisplayUnits { get; set; } = "XMR";

@@ -7,6 +7,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
 {
     internal class CoinSettingsDASH : ICoinSettings
     {
+        public double BlockSeconds { get; set; } = 150.0;
         public int DaemonPort { get; set; } = 9998;
         public string DisplayName { get; set; } = "Dash (DASH)";
         public string DisplayUnits { get; set; } = "DASH";

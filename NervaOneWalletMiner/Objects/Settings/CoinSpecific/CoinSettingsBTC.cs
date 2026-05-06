@@ -7,6 +7,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
 {
     internal class CoinSettingsBTC : ICoinSettings
     {
+        public double BlockSeconds { get; set; } = 600.0;
         public int DaemonPort { get; set; } = 8332;
         public string DisplayName { get; set; } = "Bitcoin (BTC)";
         public string DisplayUnits { get; set; } = "BTC";
