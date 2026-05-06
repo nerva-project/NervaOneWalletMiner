@@ -5,5 +5,8 @@ namespace NervaOneWalletMiner.Rpc.Wallet
     internal class WalletServiceBTC : WalletServiceBaseBTC
     {
         protected override string CoinPrefix => "BTC";
+        protected override string CoinName => "Bitcoin";
+        protected override uint CoinType => 0;
+        protected override bool SupportMultipleScriptTypes => true;
     }
 }

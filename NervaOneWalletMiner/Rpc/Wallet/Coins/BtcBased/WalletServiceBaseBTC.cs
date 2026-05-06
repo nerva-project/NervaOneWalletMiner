@@ -1,3 +1,4 @@
+using NBitcoin;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Objects.DataGrid;
@@ -19,11 +20,17 @@ namespace NervaOneWalletMiner.Rpc.Wallet
     public abstract class WalletServiceBaseBTC : IWalletService
     {
         protected abstract string CoinPrefix { get; }
+        protected abstract string CoinName { get; }
+        protected abstract uint CoinType { get; }
+        protected abstract bool SupportMultipleScriptTypes { get; }
 
         private static int _id = 0;
 
         private static string GetCallerName([System.Runtime.CompilerServices.CallerMemberName] string name = "") => name;
 
+
+        #region Helper Methods
+        
         protected ServiceError GetServiceError(string source, JToken error)
         {
             ServiceError serviceError = new();
@@ -77,6 +84,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
 
             return returnType;
         }
+        #endregion // Helper Methods
 
         #region Open Wallet
         public async Task<OpenWalletResponse> OpenWallet(RpcBase rpc, OpenWalletRequest requestObj)
@@ -344,6 +352,218 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         }
         #endregion // Create Wallet
 
+        #region Create Wallet From Seed
+        public async Task<CreateWalletResponse> CreateWalletFromSeed(RpcBase rpc, CreateWalletRequest requestObj)
+        {
+            CreateWalletResponse responseObj = new();
+
+            try
+            {
+                // Step 1: Parse mnemonic and derive root key
+                string mnemonicPhrase = new string(requestObj.Seed);
+                Mnemonic mnemonic;
+                try
+                {
+                    mnemonic = new Mnemonic(mnemonicPhrase, Wordlist.English);
+                }
+                catch (Exception)
+                {
+                    responseObj.Error.IsError = true;
+                    responseObj.Error.Message = "Invalid seed phrase";
+                    return responseObj;
+                }
+
+                ExtKey masterKey = mnemonic.DeriveExtKey();
+                string fingerprintHex = masterKey.GetPublicKey().GetHDFingerPrint().ToString();
+
+                Logger.LogDebug(CoinPrefix + ".WCFS", "Creating " + requestObj.WalletName + " from seed (fingerprint: " + fingerprintHex + ")");
+
+                // Step 2: Get descriptor checksums from node
+                string baseUrl = HttpHelper.GetServiceUrl(rpc, string.Empty);
+                JArray importItems = new();
+
+                foreach (var (rawDescriptor, isInternal) in BuildSeedDescriptors(masterKey, fingerprintHex))
+                {
+                    var infoJson = new JObject
+                    {
+                        ["jsonrpc"] = "2.0",
+                        ["id"] = _id++,
+                        ["method"] = "getdescriptorinfo",
+                        ["params"] = new JObject { ["descriptor"] = rawDescriptor }
+                    };
+
+                    HttpResponseMessage infoResponse = await HttpHelper.GetPostFromService(baseUrl, infoJson.ToString(), rpc.UserName, rpc.Password);
+                    if (!infoResponse.IsSuccessStatusCode)
+                    {
+                        responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), infoResponse);
+                        return responseObj;
+                    }
+
+                    JObject infoResult = JObject.Parse(await infoResponse.Content.ReadAsStringAsync());
+                    var infoError = infoResult["error"];
+                    if (infoError != null && infoError.Type != JTokenType.Null)
+                    {
+                        responseObj.Error = GetServiceError(GetCallerName(), infoError);
+                        return responseObj;
+                    }
+
+                    // Use checksum of our private descriptor, not the returned "descriptor" field
+                    // (getdescriptorinfo strips private keys from "descriptor" but "checksum" is for the input)
+                    string? checksum = infoResult["result"]?["checksum"]?.ToString();
+                    if (string.IsNullOrEmpty(checksum))
+                    {
+                        responseObj.Error.IsError = true;
+                        responseObj.Error.Message = "getdescriptorinfo returned no checksum for: " + rawDescriptor;
+                        return responseObj;
+                    }
+
+                    importItems.Add(new JObject
+                    {
+                        ["desc"] = rawDescriptor + "#" + checksum,
+                        ["timestamp"] = "now",
+                        ["active"] = true,
+                        ["range"] = new JArray { 0, 1000 },
+                        ["internal"] = isInternal
+                    });
+                }
+
+                // Step 3: Create blank descriptor wallet
+                var createParams = new JObject
+                {
+                    ["wallet_name"] = requestObj.WalletName,
+                    ["blank"] = true,
+                    ["descriptors"] = true,
+                    ["load_on_startup"] = false,
+                    ["passphrase"] = requestObj.Password.Length > 0 ? new string(requestObj.Password) : string.Empty
+                };
+
+                var createJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = _id++,
+                    ["method"] = "createwallet",
+                    ["params"] = createParams
+                };
+
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(baseUrl, createJson.ToString(), rpc.UserName, rpc.Password);
+                if (!httpResponse.IsSuccessStatusCode)
+                {
+                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                    return responseObj;
+                }
+
+                JObject createResult = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
+                var createError = createResult["error"];
+                if (createError != null && createError.Type != JTokenType.Null)
+                {
+                    responseObj.Error = GetServiceError(GetCallerName(), createError);
+                    return responseObj;
+                }
+
+                // Step 4: Unlock wallet before importing if it has a password
+                string walletUrl = HttpHelper.GetServiceUrl(rpc, "wallet/" + requestObj.WalletName);
+                if (requestObj.Password.Length > 0)
+                {
+                    var unlockJson = new JObject
+                    {
+                        ["jsonrpc"] = "2.0",
+                        ["id"] = _id++,
+                        ["method"] = "walletpassphrase",
+                        ["params"] = new JObject
+                        {
+                            ["passphrase"] = new string(requestObj.Password),
+                            ["timeout"] = 300
+                        }
+                    };
+
+                    HttpResponseMessage unlockResponse = await HttpHelper.GetPostFromService(walletUrl, unlockJson.ToString(), rpc.UserName, rpc.Password);
+                    if (!unlockResponse.IsSuccessStatusCode)
+                    {
+                        responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), unlockResponse);
+                        return responseObj;
+                    }
+
+                    JObject unlockResult = JObject.Parse(await unlockResponse.Content.ReadAsStringAsync());
+                    var unlockError = unlockResult["error"];
+                    if (unlockError != null && unlockError.Type != JTokenType.Null)
+                    {
+                        responseObj.Error = GetServiceError(GetCallerName(), unlockError);
+                        return responseObj;
+                    }
+                }
+
+                // Step 5: Import seed-derived descriptors (timestamp:"now" — no history scan needed)
+                var importJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = _id++,
+                    ["method"] = "importdescriptors",
+                    ["params"] = new JArray { importItems }
+                };
+
+                httpResponse = await HttpHelper.GetPostFromService(walletUrl, importJson.ToString(), rpc.UserName, rpc.Password);
+                if (!httpResponse.IsSuccessStatusCode)
+                {
+                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                    return responseObj;
+                }
+
+                JObject importResult = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
+                var importTopError = importResult["error"];
+                if (importTopError != null && importTopError.Type != JTokenType.Null)
+                {
+                    responseObj.Error = GetServiceError(GetCallerName(), importTopError);
+                    return responseObj;
+                }
+
+                var results = importResult["result"] as JArray;
+                var failed = results?.FirstOrDefault(r => r["success"]?.Value<bool>() == false);
+                if (failed != null)
+                {
+                    responseObj.Error.IsError = true;
+                    responseObj.Error.Message = "Failed to import one or more descriptors: " + (failed["error"]?["message"]?.ToString() ?? "Unknown error");
+                    return responseObj;
+                }
+
+                // Step 6: Generate first receiving address so the wallet screen is not empty
+                var firstAddrJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = _id++,
+                    ["method"] = "getnewaddress",
+                    ["params"] = new JObject { ["label"] = "" }
+                };
+
+                HttpResponseMessage firstAddrResponse = await HttpHelper.GetPostFromService(walletUrl, firstAddrJson.ToString(), rpc.UserName, rpc.Password);
+                if (firstAddrResponse.IsSuccessStatusCode)
+                {
+                    JObject firstAddrResult = JObject.Parse(await firstAddrResponse.Content.ReadAsStringAsync());
+                    var firstAddrError = firstAddrResult["error"];
+                    if (firstAddrError != null && firstAddrError.Type != JTokenType.Null)
+                    {
+                        Logger.LogError(CoinPrefix + ".WCFS", "Wallet created but failed to generate first address: " + firstAddrError.ToString());
+                    }
+                }
+
+                responseObj.Error.IsError = false;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(CoinPrefix + ".WCFS", ex);
+            }
+            finally
+            {
+                Array.Clear(requestObj.Seed, 0, requestObj.Seed.Length);
+                if (requestObj.Password.Length > 0)
+                {
+                    Array.Clear(requestObj.Password, 0, requestObj.Password.Length);
+                }
+            }
+
+            return responseObj;
+        }
+        #endregion // Create Wallet From Seed
+
         #region Create Account
         public async Task<CreateAccountResponse> CreateAccount(RpcBase rpc, CreateAccountRequest requestObj)
         {
@@ -396,12 +616,6 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             return responseObj;
         }
         #endregion // Create Account
-
-        public Task<LabelAccountResponse> LabelAccount(RpcBase rpc, LabelAccountRequest requestObj)
-        {
-            // TODO: setlabel
-            throw new NotImplementedException();
-        }
 
         #region Import Wallet
         public async Task<ImportWalletResponse> ImportWallet(RpcBase rpc, ImportWalletRequest requestObj)
@@ -532,7 +746,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 ["params"] = new JObject { ["filename"] = requestObj.DumpFileWithPath }
             };
 
-            httpResponse = await HttpHelper.GetPostFromService(walletUrl, importJson.ToString(), rpc.UserName, rpc.Password, TimeSpan.FromMinutes(20));
+            httpResponse = await HttpHelper.GetPostFromService(walletUrl, importJson.ToString(), rpc.UserName, rpc.Password, TimeSpan.FromMinutes(60));
             if (httpResponse.IsSuccessStatusCode)
             {
                 string content = await httpResponse.Content.ReadAsStringAsync();
@@ -567,10 +781,13 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         {
             ImportWalletResponse responseObj = new();
 
-            // Step 1: Create a new descriptor wallet (default — no descriptors:false)
+            // Step 1: Create a new blank descriptor wallet
             var createParams = new JObject
             {
                 ["wallet_name"] = requestObj.WalletName,
+                ["blank"] = true,
+                ["descriptors"] = true,
+                ["load_on_startup"] = false,
                 ["passphrase"] = requestObj.Password.Length > 0 ? new string(requestObj.Password) : string.Empty
             };
 
@@ -666,7 +883,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 ["params"] = new JArray { descriptors }
             };
 
-            httpResponse = await HttpHelper.GetPostFromService(walletUrl, importJson.ToString(), rpc.UserName, rpc.Password, TimeSpan.FromMinutes(30));
+            httpResponse = await HttpHelper.GetPostFromService(walletUrl, importJson.ToString(), rpc.UserName, rpc.Password, TimeSpan.FromMinutes(60));
             if (httpResponse.IsSuccessStatusCode)
             {
                 string content = await httpResponse.Content.ReadAsStringAsync();
@@ -709,18 +926,245 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         }
         #endregion // Import Wallet
 
-        public Task<RestoreFromSeedResponse> RestoreFromSeed(RpcBase rpc, RestoreFromSeedRequest requestObj)
+        #region Restore From Seed
+        public async Task<RestoreFromSeedResponse> RestoreFromSeed(RpcBase rpc, RestoreFromSeedRequest requestObj)
         {
-            // TODO: Figure out how restoring works and make it work or change it so it's coin specific
-            throw new NotImplementedException();
+            RestoreFromSeedResponse responseObj = new();
+
+            try
+            {
+                // Step 1: Parse mnemonic and derive root key
+                string mnemonicPhrase = new string(requestObj.Seed);
+                Mnemonic mnemonic;
+                try
+                {
+                    mnemonic = new Mnemonic(mnemonicPhrase, Wordlist.English);
+                }
+                catch (Exception)
+                {
+                    responseObj.Error.IsError = true;
+                    responseObj.Error.Message = "Invalid seed phrase — must be 12, 15, 18, 21, or 24 BIP39 English words";
+                    return responseObj;
+                }
+
+                // SeedOffset is the optional BIP39 passphrase (25th word)
+                string bip39Passphrase = requestObj.SeedOffset ?? string.Empty;
+                ExtKey masterKey = mnemonic.DeriveExtKey(bip39Passphrase);
+                string fingerprintHex = masterKey.GetPublicKey().GetHDFingerPrint().ToString();
+
+                Logger.LogDebug(CoinPrefix + ".WRFS", "Restoring " + requestObj.WalletName + " from seed (fingerprint: " + fingerprintHex + ")");
+
+                // Step 2: Build raw descriptor strings for each address type
+                List<(string rawDescriptor, bool isInternal)> rawDescriptors = BuildSeedDescriptors(masterKey, fingerprintHex);
+
+                // Step 3: Get checksummed descriptors from the node and build importdescriptors items
+                string baseUrl = HttpHelper.GetServiceUrl(rpc, string.Empty);
+                JArray importItems = new();
+
+                foreach (var (rawDescriptor, isInternal) in rawDescriptors)
+                {
+                    var infoJson = new JObject
+                    {
+                        ["jsonrpc"] = "2.0",
+                        ["id"] = _id++,
+                        ["method"] = "getdescriptorinfo",
+                        ["params"] = new JObject { ["descriptor"] = rawDescriptor }
+                    };
+
+                    HttpResponseMessage infoResponse = await HttpHelper.GetPostFromService(baseUrl, infoJson.ToString(), rpc.UserName, rpc.Password);
+                    if (!infoResponse.IsSuccessStatusCode)
+                    {
+                        responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), infoResponse);
+                        return responseObj;
+                    }
+
+                    JObject infoResult = JObject.Parse(await infoResponse.Content.ReadAsStringAsync());
+                    var infoError = infoResult["error"];
+                    if (infoError != null && infoError.Type != JTokenType.Null)
+                    {
+                        responseObj.Error = GetServiceError(GetCallerName(), infoError);
+                        return responseObj;
+                    }
+
+                    // Use checksum of our private descriptor, not the returned "descriptor" field
+                    // (getdescriptorinfo strips private keys from "descriptor" but "checksum" is for the input)
+                    string? checksum = infoResult["result"]?["checksum"]?.ToString();
+                    if (string.IsNullOrEmpty(checksum))
+                    {
+                        responseObj.Error.IsError = true;
+                        responseObj.Error.Message = "getdescriptorinfo returned no checksum for: " + rawDescriptor;
+                        return responseObj;
+                    }
+
+                    importItems.Add(new JObject
+                    {
+                        ["desc"] = rawDescriptor + "#" + checksum,
+                        ["timestamp"] = 0,
+                        ["active"] = true,
+                        ["range"] = new JArray { 0, 1000 },
+                        ["internal"] = isInternal
+                    });
+                }
+
+                // Step 4: Create a blank wallet (no auto-generated keys — we will import our seed-derived ones)
+                var createParams = new JObject
+                {
+                    ["wallet_name"] = requestObj.WalletName,
+                    ["blank"] = true,
+                    ["descriptors"] = true,
+                    ["load_on_startup"] = false,
+                    ["passphrase"] = requestObj.Password.Length > 0 ? new string(requestObj.Password) : string.Empty
+                };
+
+                var createJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = _id++,
+                    ["method"] = "createwallet",
+                    ["params"] = createParams
+                };
+
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(baseUrl, createJson.ToString(), rpc.UserName, rpc.Password);
+                if (!httpResponse.IsSuccessStatusCode)
+                {
+                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                    return responseObj;
+                }
+
+                JObject createResult = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
+                var createError = createResult["error"];
+                if (createError != null && createError.Type != JTokenType.Null)
+                {
+                    responseObj.Error = GetServiceError(GetCallerName(), createError);
+                    return responseObj;
+                }
+
+                // Step 5: Unlock wallet before importing if it has a password
+                string walletUrl = HttpHelper.GetServiceUrl(rpc, "wallet/" + requestObj.WalletName);
+                if (requestObj.Password.Length > 0)
+                {
+                    var unlockJson = new JObject
+                    {
+                        ["jsonrpc"] = "2.0",
+                        ["id"] = _id++,
+                        ["method"] = "walletpassphrase",
+                        ["params"] = new JObject
+                        {
+                            ["passphrase"] = new string(requestObj.Password),
+                            ["timeout"] = 7200
+                        }
+                    };
+
+                    HttpResponseMessage unlockResponse = await HttpHelper.GetPostFromService(walletUrl, unlockJson.ToString(), rpc.UserName, rpc.Password);
+                    if (!unlockResponse.IsSuccessStatusCode)
+                    {
+                        responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), unlockResponse);
+                        return responseObj;
+                    }
+
+                    JObject unlockResult = JObject.Parse(await unlockResponse.Content.ReadAsStringAsync());
+                    var unlockError = unlockResult["error"];
+                    if (unlockError != null && unlockError.Type != JTokenType.Null)
+                    {
+                        responseObj.Error = GetServiceError(GetCallerName(), unlockError);
+                        return responseObj;
+                    }
+                }
+
+                // Step 6: Import all descriptors — timestamp:0 triggers a full rescan from genesis
+                var importJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = _id++,
+                    ["method"] = "importdescriptors",
+                    ["params"] = new JArray { importItems }
+                };
+
+                httpResponse = await HttpHelper.GetPostFromService(walletUrl, importJson.ToString(), rpc.UserName, rpc.Password, TimeSpan.FromMinutes(30));
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    string content = await httpResponse.Content.ReadAsStringAsync();
+                    if (string.IsNullOrWhiteSpace(content))
+                    {
+                        responseObj.Error.IsError = true;
+                        responseObj.Error.Message = "Empty response from importdescriptors";
+                    }
+                    else
+                    {
+                        JObject jsonObject = JObject.Parse(content);
+                        var topError = jsonObject["error"];
+                        if (topError != null && topError.Type != JTokenType.Null)
+                        {
+                            responseObj.Error = GetServiceError(GetCallerName(), topError);
+                        }
+                        else
+                        {
+                            var results = jsonObject["result"] as JArray;
+                            var failed = results?.FirstOrDefault(r => r["success"]?.Value<bool>() == false);
+                            if (failed != null)
+                            {
+                                responseObj.Error.IsError = true;
+                                responseObj.Error.Message = "Failed to import one or more descriptors: " + (failed["error"]?["message"]?.ToString() ?? "Unknown error");
+                            }
+                            else
+                            {
+                                responseObj.Error.IsError = false;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(CoinPrefix + ".WRFS", ex);
+            }
+            finally
+            {
+                Array.Clear(requestObj.Seed, 0, requestObj.Seed.Length);
+                if (requestObj.Password.Length > 0)
+                {
+                    Array.Clear(requestObj.Password, 0, requestObj.Password.Length);
+                }
+            }
+
+            return responseObj;
         }
 
-        public Task<RestoreFromKeysResponse> RestoreFromKeys(RpcBase rpc, RestoreFromKeysRequest requestObj)
+        private List<(string rawDescriptor, bool isInternal)> BuildSeedDescriptors(ExtKey masterKey, string fingerprintHex)
         {
-            // TODO: importelectrumwallet
-            // importwallet
-            throw new NotImplementedException();
+            var descriptors = new List<(string, bool)>();
+
+            // BIP44 — P2PKH (legacy addresses, coin type varies per chain)
+            var bip44Key = masterKey.Derive(KeyPath.Parse($"m/44'/{CoinType}'/0'"));
+            string bip44Xprv = bip44Key.ToString(Network.Main);
+            descriptors.Add(($"pkh([{fingerprintHex}/44'/{CoinType}'/0']{bip44Xprv}/0/*)", false));
+            descriptors.Add(($"pkh([{fingerprintHex}/44'/{CoinType}'/0']{bip44Xprv}/1/*)", true));
+
+            if (SupportMultipleScriptTypes)
+            {
+                // BIP49 — P2SH-P2WPKH (wrapped segwit)
+                string bip49Xprv = masterKey.Derive(KeyPath.Parse("m/49'/0'/0'")).ToString(Network.Main);
+                descriptors.Add(($"sh(wpkh([{fingerprintHex}/49'/0'/0']{bip49Xprv}/0/*))", false));
+                descriptors.Add(($"sh(wpkh([{fingerprintHex}/49'/0'/0']{bip49Xprv}/1/*))", true));
+
+                // BIP84 — P2WPKH (native segwit / bech32)
+                string bip84Xprv = masterKey.Derive(KeyPath.Parse("m/84'/0'/0'")).ToString(Network.Main);
+                descriptors.Add(($"wpkh([{fingerprintHex}/84'/0'/0']{bip84Xprv}/0/*)", false));
+                descriptors.Add(($"wpkh([{fingerprintHex}/84'/0'/0']{bip84Xprv}/1/*)", true));
+
+                // BIP86 — P2TR (taproot)
+                string bip86Xprv = masterKey.Derive(KeyPath.Parse("m/86'/0'/0'")).ToString(Network.Main);
+                descriptors.Add(($"tr([{fingerprintHex}/86'/0'/0']{bip86Xprv}/0/*)", false));
+                descriptors.Add(($"tr([{fingerprintHex}/86'/0'/0']{bip86Xprv}/1/*)", true));
+            }
+
+            return descriptors;
         }
+        #endregion // Restore From Seed
 
         #region Transfer
         public async Task<TransferResponse> Transfer(RpcBase rpc, TransferRequest requestObj)
@@ -781,18 +1225,6 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             return responseObj;
         }
         #endregion // Transfer
-
-        public Task<RescanSpentResponse> RescanSpent(RpcBase rpc, RescanSpentRequest requestObj)
-        {
-            // TODO: scantxoutset
-            throw new NotImplementedException();
-        }
-
-        public Task<RescanBlockchainResponse> RescanBlockchain(RpcBase rpc, RescanBlockchainRequest requestObj)
-        {
-            // TODO: rescanblockchain
-            throw new NotImplementedException();
-        }
 
         #region Get Accounts
         public async Task<GetAccountsResponse> GetAccounts(RpcBase rpc, GetAccountsRequest requestObj)
@@ -1176,11 +1608,11 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                         else
                         {
                             string fileContent =
-                                "# Bitcoin Wallet Descriptor Export\r\n" +
+                                "# " + CoinName + " Wallet Descriptor Export\r\n" +
                                 "# Wallet: " + GlobalData.OpenedWalletName + "\r\n" +
                                 "# Exported: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "\r\n" +
                                 "# WARNING: Keep this file secure. Anyone with access can steal your funds.\r\n" +
-                                "# To restore: use Bitcoin Core importdescriptors with the descriptors below.\r\n\r\n" +
+                                "# To restore: use " + CoinName + " Core importdescriptors with the descriptors below.\r\n\r\n" +
                                 resultToken.ToString(Formatting.Indented);
 
                             File.WriteAllText(requestObj.DumpFileWithPath, fileContent);
@@ -1313,6 +1745,31 @@ namespace NervaOneWalletMiner.Rpc.Wallet
 
         public Task<SweepBelowResponse> SweepBelow(RpcBase rpc, SweepBelowRequest requestObj)
         {
+            throw new NotImplementedException();
+        }
+
+        public Task<LabelAccountResponse> LabelAccount(RpcBase rpc, LabelAccountRequest requestObj)
+        {
+            // TODO: setlabel
+            throw new NotImplementedException();
+        }
+
+        public Task<RestoreFromKeysResponse> RestoreFromKeys(RpcBase rpc, RestoreFromKeysRequest requestObj)
+        {
+            // TODO: importelectrumwallet
+            // importwallet
+            throw new NotImplementedException();
+        }
+
+        public Task<RescanSpentResponse> RescanSpent(RpcBase rpc, RescanSpentRequest requestObj)
+        {
+            // TODO: scantxoutset
+            throw new NotImplementedException();
+        }
+
+        public Task<RescanBlockchainResponse> RescanBlockchain(RpcBase rpc, RescanBlockchainRequest requestObj)
+        {
+            // TODO: rescanblockchain
             throw new NotImplementedException();
         }
         #endregion // Unsupported Methods

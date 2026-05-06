@@ -243,6 +243,7 @@ namespace NervaOneWalletMiner.Helpers
         public static void NavigateToPage(string page)
         {
             ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[page];
+            ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).SelectNavItem(page);
         }
 
         public static void NavigateToDefaultPage()

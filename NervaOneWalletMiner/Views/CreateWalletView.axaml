@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:NervaOneWalletMiner.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="400"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="450"
              x:DataType="vm:CreateWalletViewModel"
              x:Class="NervaOneWalletMiner.Views.CreateWalletView">
 
@@ -21,42 +21,111 @@
 				<Image Grid.Column="0"
 					   Name="imgCoinIcon"/>
 				<Label Grid.Column="1"
+					   Name="lbTitle"
 					   Content="Create New Wallet"
 					   Height="24"
 					   Margin="5,0,0,0"/>
 			</Grid>
 
-			<Label Content="Wallet Name" Margin="0,10,0,0"/>
-			<TextBox Name="tbxWalletName"
-					 Watermark="Enter wallet name"/>
+			<!-- Step 1: Wallet name + password (all coins) -->
+			<StackPanel Name="pnlStep1">
 
-			<Label Content="Password" Margin="0,15,0,0"/>
-			<DockPanel>
-				<Button Name="btnShowHidePassword"
-						DockPanel.Dock="Right"
-						Content="Show"
-						Margin="10,0,0,0"
-						IsTabStop="False"
-						Click="ShowHidePassword_Clicked"/>
-				<TextBox Name="tbxPassword"
-						 Watermark="Enter wallet password"
-						 PasswordChar="*"
-						 RevealPassword="False"
-						 KeyDown="Password_KeyDown"/>
-			</DockPanel>
+				<Label Content="Wallet Name" Margin="0,10,0,0"/>
+				<TextBox Name="tbxWalletName"
+						 Watermark="Enter wallet name"/>
 
-			<StackPanel Name="pnlLanguage" Spacing="5">
-				<Label Content="Language" Margin="0,15,0,0"/>
-				<ComboBox Name="cbxLanguage" HorizontalAlignment="Stretch"/>
+				<Label Name="lbPassword" Content="Password" Margin="0,15,0,0"/>
+				<DockPanel>
+					<Button Name="btnShowHidePassword"
+							DockPanel.Dock="Right"
+							Content="Show"
+							Margin="10,0,0,0"
+							IsTabStop="False"
+							Click="ShowHidePassword_Clicked"/>
+					<TextBox Name="tbxPassword"
+							 Watermark="Enter wallet password"
+							 PasswordChar="*"
+							 RevealPassword="False"
+							 KeyDown="Password_KeyDown"/>
+				</DockPanel>
+
+				<StackPanel Name="pnlLanguage" Spacing="5">
+					<Label Content="Language" Margin="0,15,0,0"/>
+					<ComboBox Name="cbxLanguage" HorizontalAlignment="Stretch"/>
+				</StackPanel>
+
+				<StackPanel Orientation="Horizontal" Spacing="10" Margin="0,20,0,0">
+					<Button Name="btnOk"
+							Content="Create"
+							Click="OkButton_Clicked"/>
+					<Button Name="btnNext"
+							Content="Next →"
+							IsVisible="False"
+							Click="NextButton_Clicked"/>
+					<Button Name="btnCancel"
+							Content="Cancel"
+							Click="CancelButton_Clicked"/>
+				</StackPanel>
+
 			</StackPanel>
 
-			<StackPanel Orientation="Horizontal" Spacing="10" Margin="0,20,0,0">
-				<Button Name="btnOk"
-						Content="Create"
-						Click="OkButton_Clicked"/>
-				<Button Name="btnCancel"
-						Content="Cancel"
-						Click="CancelButton_Clicked"/>
+			<!-- Step 2: Display seed phrase (BTC/DASH only) -->
+			<StackPanel Name="pnlStep2" IsVisible="False">
+
+				<TextBlock Text="Your seed phrase is shown below. Write it down and store it somewhere safe — this is the only way to recover your wallet."
+						   TextWrapping="Wrap"
+						   Margin="0,10,0,0"/>
+
+				<TextBox Name="tbxSeedDisplay"
+						 IsReadOnly="True"
+						 AcceptsReturn="True"
+						 TextWrapping="Wrap"
+						 Height="90"
+						 FontSize="14"
+						 Margin="0,10,0,0"/>
+
+				<TextBlock Text="Warning: Never share your seed phrase. Anyone who has it has full access to your funds."
+						   Foreground="Orange"
+						   FontSize="12"
+						   TextWrapping="Wrap"
+						   Margin="0,8,0,0"/>
+
+				<StackPanel Orientation="Horizontal" Spacing="10" Margin="0,20,0,0">
+					<Button Name="btnConfirmSeed"
+							Content="I've Written It Down →"
+							Click="ConfirmSeed_Clicked"/>
+					<Button Name="btnBackToStep1"
+							Content="← Back"
+							Click="BackToStep1_Clicked"/>
+				</StackPanel>
+
+			</StackPanel>
+
+			<!-- Step 3: Verify seed words (BTC/DASH only) -->
+			<StackPanel Name="pnlStep3" IsVisible="False">
+
+				<TextBlock Text="Confirm your seed phrase by entering the words listed below."
+						   TextWrapping="Wrap"
+						   Margin="0,10,0,0"/>
+
+				<Label Name="lbWord1" Content="Word #1:" Margin="0,10,0,0"/>
+				<TextBox Name="tbxWord1" Watermark="Enter word"/>
+
+				<Label Name="lbWord2" Content="Word #2:" Margin="0,10,0,0"/>
+				<TextBox Name="tbxWord2" Watermark="Enter word"/>
+
+				<Label Name="lbWord3" Content="Word #3:" Margin="0,10,0,0"/>
+				<TextBox Name="tbxWord3" Watermark="Enter word"/>
+
+				<StackPanel Orientation="Horizontal" Spacing="10" Margin="0,20,0,0">
+					<Button Name="btnCreateFromSeed"
+							Content="Create Wallet"
+							Click="OkButton_Clicked"/>
+					<Button Name="btnBackToStep2"
+							Content="← Back"
+							Click="BackToStep2_Clicked"/>
+				</StackPanel>
+
 			</StackPanel>
 
 		</StackPanel>

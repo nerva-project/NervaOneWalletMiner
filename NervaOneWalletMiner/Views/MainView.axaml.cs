@@ -49,6 +49,7 @@ public partial class MainView : UserControl
             vm.CheckAndGetCliEvent += CheckAndDownloadCliIfNeeded;
             vm.SyncWithQuickSyncEvent += QuickSyncIfWanted;
             vm.ShowDaemonTabEvent += ShowDaemonTab;
+            vm.SelectNavItemEvent += SelectNavItem;
 
             CheckAndDownloadCliIfNeeded();
 
@@ -96,6 +97,28 @@ public partial class MainView : UserControl
         catch (Exception ex)
         {
             Logger.LogException("MAV.CDCN", ex);
+        }
+    }
+
+    public void SelectNavItem(string page)
+    {
+        try
+        {
+            switch (page)
+            {
+                case SplitViewPages.Daemon: daemon.IsSelected = true; break;
+                case SplitViewPages.Wallet: wallet.IsSelected = true; break;
+                case SplitViewPages.Transfers: transfers.IsSelected = true; break;
+                case SplitViewPages.AddressBook: address_book.IsSelected = true; break;
+                case SplitViewPages.DaemonSetup: daemon_setup.IsSelected = true; break;
+                case SplitViewPages.WalletSetup: wallet_setup.IsSelected = true; break;
+                case SplitViewPages.Settings: settings.IsSelected = true; break;
+                case SplitViewPages.About: about.IsSelected = true; break;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException("MAV.SNAV", ex);
         }
     }
 

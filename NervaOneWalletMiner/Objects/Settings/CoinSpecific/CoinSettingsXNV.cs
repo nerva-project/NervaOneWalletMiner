@@ -33,7 +33,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private bool _IsRestoreFromDumpFileSupported = false;
         private bool _IsRescanSpentSupported = true;
         private bool _IsSweepBelowSupported = true;
-        private bool _IsWalletLanguageSupported = true;
+        private bool _IsWalletBtcStyle = false;
 
         private int _LogLevelDaemon = 1;
         private int _LogLevelWallet = 1;
@@ -88,7 +88,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public bool IsRestoreFromDumpFileSupported { get => _IsRestoreFromDumpFileSupported; set => _IsRestoreFromDumpFileSupported = value; }
         public bool IsRescanSpentSupported { get => _IsRescanSpentSupported; set => _IsRescanSpentSupported = value; }
         public bool IsSweepBelowSupported { get => _IsSweepBelowSupported; set => _IsSweepBelowSupported = value; }
-        public bool IsWalletLanguageSupported { get => _IsWalletLanguageSupported; set => _IsWalletLanguageSupported = value; }
+        public bool IsWalletBtcStyle { get => _IsWalletBtcStyle; set => _IsWalletBtcStyle = value; }
 
         public int LogLevelDaemon { get => _LogLevelDaemon; set => _LogLevelDaemon = value; }
         public int LogLevelWallet { get => _LogLevelWallet; set => _LogLevelWallet = value; }

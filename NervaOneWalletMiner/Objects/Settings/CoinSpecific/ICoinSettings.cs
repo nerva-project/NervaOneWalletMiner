@@ -30,7 +30,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         bool IsRestoreFromDumpFileSupported { get; set; }
         bool IsRescanSpentSupported { get; set; }
         bool IsSweepBelowSupported { get; set; }
-        bool IsWalletLanguageSupported { get; set; }
+        bool IsWalletBtcStyle { get; set; }
 
         int LogLevelDaemon { get; set; }
         int LogLevelWallet { get; set; }

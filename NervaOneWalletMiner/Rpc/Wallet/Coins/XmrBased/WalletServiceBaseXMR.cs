@@ -1841,6 +1841,12 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             // Not used. ICoinSettings.IsRestoreFromDumpFileSupported
             throw new NotImplementedException();
         }
+
+        public Task<CreateWalletResponse> CreateWalletFromSeed(RpcBase rpc, CreateWalletRequest requestObj)
+        {
+            // Not used. ICoinSettings.IsWalletBtcStyle determines whether seed-based creation applies
+            throw new NotImplementedException();
+        }
         #endregion // Unsupported Methods
     }
 }

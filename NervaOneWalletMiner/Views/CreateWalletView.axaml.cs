@@ -7,11 +7,16 @@ using NervaOneWalletMiner.Rpc.Wallet.Requests;
 using NervaOneWalletMiner.Rpc.Wallet.Responses;
 using NervaOneWalletMiner.ViewsDialogs;
 using System;
+using System.Linq;
 
 namespace NervaOneWalletMiner.Views
 {
     public partial class CreateWalletView : UserControl
     {
+        private bool _isBtcStyle;
+        private NBitcoin.Mnemonic? _mnemonic;
+        private int[] _verifyIndices = [];
+
         public CreateWalletView()
         {
             try
@@ -19,12 +24,21 @@ namespace NervaOneWalletMiner.Views
                 InitializeComponent();
 
                 imgCoinIcon.Source = GlobalMethods.GetLogo();
-                cbxLanguage.ItemsSource = GlobalMethods.GetSupportedLanguages();
-                cbxLanguage.SelectedIndex = 0;
 
-                if (!GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletLanguageSupported)
+                _isBtcStyle = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletBtcStyle;
+
+                if (_isBtcStyle)
                 {
                     pnlLanguage.IsVisible = false;
+                    lbPassword.Content = "Password (Optional)";
+                    tbxPassword.Watermark = "Optional - encrypt the wallet with a password";
+                    btnOk.IsVisible = false;
+                    btnNext.IsVisible = true;
+                }
+                else
+                {
+                    cbxLanguage.ItemsSource = GlobalMethods.GetSupportedLanguages();
+                    cbxLanguage.SelectedIndex = 0;
                 }
 
                 Loaded += (_, _) => tbxWalletName.Focus();
@@ -43,15 +57,16 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
-        public async void OkButton_Clicked(object sender, RoutedEventArgs args)
+        // Step 1 → Step 2 (BTC/DASH only)
+        public async void NextButton_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
-                string walletName = tbxWalletName.Text == null ? string.Empty : tbxWalletName.Text;
+                string walletName = tbxWalletName.Text ?? string.Empty;
 
-                if (string.IsNullOrEmpty(walletName) || string.IsNullOrEmpty(tbxPassword.Text))
+                if (string.IsNullOrEmpty(walletName))
                 {
-                    await DialogService.ShowAsync(new MessageBoxView("Create Wallet", "Wallet Name and Password are required.", true));
+                    await DialogService.ShowAsync(new MessageBoxView("Create Wallet", "Wallet Name is required.", true));
                     return;
                 }
                 else if (walletName.Contains('/') || walletName.Contains('\\') || walletName.Contains(".."))
@@ -60,55 +75,94 @@ namespace NervaOneWalletMiner.Views
                     return;
                 }
 
-                char[] walletPassword = tbxPassword.Text.ToCharArray();
-                string walletLanguage = cbxLanguage.SelectedValue == null ? Language.English : cbxLanguage.SelectedValue.ToString()!;
+                // Generate 12-word BIP39 mnemonic
+                _mnemonic = new NBitcoin.Mnemonic(NBitcoin.Wordlist.English, NBitcoin.WordCount.Twelve);
+                string[] words = _mnemonic.Words;
+                tbxSeedDisplay.Text = string.Join(" ", words);
 
-                tbxPassword.Text = string.Empty;
-                btnOk.Content = "Creating...";
-                btnOk.IsEnabled = false;
-                btnCancel.IsEnabled = false;
-                tbxWalletName.IsEnabled = false;
-                cbxLanguage.IsEnabled = false;
-
-                Logger.LogDebug("CWV.OKBC", "Creating wallet: " + walletName);
-
-                // Hash before request as password array will be cleared
-                string walletPasswordHash = Hashing.Hash(walletPassword);
-
-                CreateWalletRequest request = new()
+                // Pick 3 distinct random positions to verify
+                Random rng = Random.Shared;
+                System.Collections.Generic.HashSet<int> picked = [];
+                while (picked.Count < 3)
                 {
-                    WalletName = walletName,
-                    Password = walletPassword,
-                    Language = walletLanguage
-                };
-
-                CreateWalletResponse response = await GlobalData.WalletService.CreateWallet(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
-
-                Array.Clear(walletPassword, 0, walletPassword.Length);
-
-                if (response.Error.IsError)
-                {
-                    GlobalMethods.WalletClosedOrErrored();
-                    Logger.LogError("CWV.OKBC", "Failed to create wallet " + walletName + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
-                    await DialogService.ShowAsync(new MessageBoxView("Create Wallet", "Error creating " + walletName + " wallet\r\n" + response.Error.Message, true));
-                    btnOk.Content = "Create";
-                    btnOk.IsEnabled = true;
-                    btnCancel.IsEnabled = true;
-                    tbxWalletName.IsEnabled = true;
-                    cbxLanguage.IsEnabled = true;
-                    return;
+                    picked.Add(rng.Next(0, words.Length));
                 }
+                _verifyIndices = [.. picked.OrderBy(x => x)];
 
-                GlobalMethods.WalletJustOpened(walletName);
+                lbWord1.Content = "Word #" + (_verifyIndices[0] + 1) + ":";
+                lbWord2.Content = "Word #" + (_verifyIndices[1] + 1) + ":";
+                lbWord3.Content = "Word #" + (_verifyIndices[2] + 1) + ":";
 
-                if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPassRequiredToOpenWallet)
+                tbxWord1.Text = string.Empty;
+                tbxWord2.Text = string.Empty;
+                tbxWord3.Text = string.Empty;
+
+                pnlStep1.IsVisible = false;
+                pnlStep2.IsVisible = true;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("CWV.NEXT", ex);
+            }
+        }
+
+        // Step 2 → Step 3
+        public void ConfirmSeed_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                pnlStep2.IsVisible = false;
+                pnlStep3.IsVisible = true;
+                tbxWord1.Focus();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("CWV.CNFS", ex);
+            }
+        }
+
+        // Step 2 → Step 1
+        public void BackToStep1_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                _mnemonic = null;
+                pnlStep2.IsVisible = false;
+                pnlStep1.IsVisible = true;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("CWV.BK1", ex);
+            }
+        }
+
+        // Step 3 → Step 2
+        public void BackToStep2_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                pnlStep3.IsVisible = false;
+                pnlStep2.IsVisible = true;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("CWV.BK2", ex);
+            }
+        }
+
+        // Create button — XMR goes directly here; BTC/DASH arrives from Step 3
+        public async void OkButton_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                if (_isBtcStyle)
                 {
-                    GlobalData.WalletPassProvidedTime = DateTime.Now;
-                    GlobalData.WalletPasswordHash = walletPasswordHash;
+                    await CreateBtcStyleWallet();
                 }
-                Logger.LogDebug("CWV.OKBC", "Wallet " + walletName + " created successfully");
-
-                UIManager.NavigateToDisplayKeysSeed("Wallet created and opened successfully! Save your seed phrase and keys to a safe place. You'll need them to restore your wallet. Keep them private - anyone with access can steal your funds!");
+                else
+                {
+                    await CreateXmrStyleWallet();
+                }
             }
             catch (Exception ex)
             {
@@ -116,11 +170,153 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
+        private async System.Threading.Tasks.Task CreateBtcStyleWallet()
+        {
+            if (_mnemonic == null)
+            {
+                return;
+            }
+
+            string[] words = _mnemonic.Words;
+
+            string w1 = (tbxWord1.Text ?? string.Empty).Trim().ToLowerInvariant();
+            string w2 = (tbxWord2.Text ?? string.Empty).Trim().ToLowerInvariant();
+            string w3 = (tbxWord3.Text ?? string.Empty).Trim().ToLowerInvariant();
+
+            if (w1 != words[_verifyIndices[0]] ||
+                w2 != words[_verifyIndices[1]] ||
+                w3 != words[_verifyIndices[2]])
+            {
+                await DialogService.ShowAsync(new MessageBoxView("Create Wallet", "One or more words did not match. Check your seed phrase and try again.", true));
+                return;
+            }
+
+            string walletName = tbxWalletName.Text ?? string.Empty;
+            char[] walletPassword = string.IsNullOrEmpty(tbxPassword.Text) ? [] : tbxPassword.Text.ToCharArray();
+            char[] seed = string.Join(" ", words).ToCharArray();
+
+            tbxPassword.Text = string.Empty;
+            tbxSeedDisplay.Text = string.Empty;
+            tbxWord1.Text = string.Empty;
+            tbxWord2.Text = string.Empty;
+            tbxWord3.Text = string.Empty;
+
+            btnCreateFromSeed.Content = "Creating...";
+            btnCreateFromSeed.IsEnabled = false;
+            btnBackToStep2.IsEnabled = false;
+
+            Logger.LogDebug("CWV.OKBC", "Creating wallet from seed: " + walletName);
+
+            string walletPasswordHash = Hashing.Hash(walletPassword);
+
+            CreateWalletRequest request = new()
+            {
+                WalletName = walletName,
+                Password = walletPassword,
+                Seed = seed
+            };
+
+            CreateWalletResponse response = await GlobalData.WalletService.CreateWalletFromSeed(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
+
+            Array.Clear(walletPassword, 0, walletPassword.Length);
+            Array.Clear(seed, 0, seed.Length);
+            _mnemonic = null;
+
+            if (response.Error.IsError)
+            {
+                GlobalMethods.WalletClosedOrErrored();
+                Logger.LogError("CWV.OKBC", "Failed to create wallet " + walletName + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
+                await DialogService.ShowAsync(new MessageBoxView("Create Wallet", "Error creating " + walletName + " wallet\r\n" + response.Error.Message, true));
+                btnCreateFromSeed.Content = "Create Wallet";
+                btnCreateFromSeed.IsEnabled = true;
+                btnBackToStep2.IsEnabled = true;
+                return;
+            }
+
+            GlobalMethods.WalletJustOpened(walletName);
+
+            if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPassRequiredToOpenWallet)
+            {
+                GlobalData.WalletPassProvidedTime = DateTime.Now;
+                GlobalData.WalletPasswordHash = walletPasswordHash;
+            }
+
+            Logger.LogDebug("CWV.OKBC", "Wallet " + walletName + " created from seed successfully");
+            await DialogService.ShowAsync(new MessageBoxView("Create Wallet", walletName + " wallet created and opened successfully!", true));
+            UIManager.NavigateToPage(SplitViewPages.Wallet);
+        }
+
+        private async System.Threading.Tasks.Task CreateXmrStyleWallet()
+        {
+            string walletName = tbxWalletName.Text == null ? string.Empty : tbxWalletName.Text;
+
+            if (string.IsNullOrEmpty(walletName) || string.IsNullOrEmpty(tbxPassword.Text))
+            {
+                await DialogService.ShowAsync(new MessageBoxView("Create Wallet", "Wallet Name and Password are required.", true));
+                return;
+            }
+            else if (walletName.Contains('/') || walletName.Contains('\\') || walletName.Contains(".."))
+            {
+                await DialogService.ShowAsync(new MessageBoxView("Create Wallet", "Wallet Name cannot contain path characters.", true));
+                return;
+            }
+
+            char[] walletPassword = tbxPassword.Text.ToCharArray();
+            string walletLanguage = cbxLanguage.SelectedValue == null ? Language.English : cbxLanguage.SelectedValue.ToString()!;
+
+            tbxPassword.Text = string.Empty;
+            btnOk.Content = "Creating...";
+            btnOk.IsEnabled = false;
+            btnCancel.IsEnabled = false;
+            tbxWalletName.IsEnabled = false;
+            cbxLanguage.IsEnabled = false;
+
+            Logger.LogDebug("CWV.OKBC", "Creating wallet: " + walletName);
+
+            string walletPasswordHash = Hashing.Hash(walletPassword);
+
+            CreateWalletRequest request = new()
+            {
+                WalletName = walletName,
+                Password = walletPassword,
+                Language = walletLanguage
+            };
+
+            CreateWalletResponse response = await GlobalData.WalletService.CreateWallet(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
+
+            Array.Clear(walletPassword, 0, walletPassword.Length);
+
+            if (response.Error.IsError)
+            {
+                GlobalMethods.WalletClosedOrErrored();
+                Logger.LogError("CWV.OKBC", "Failed to create wallet " + walletName + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
+                await DialogService.ShowAsync(new MessageBoxView("Create Wallet", "Error creating " + walletName + " wallet\r\n" + response.Error.Message, true));
+                btnOk.Content = "Create";
+                btnOk.IsEnabled = true;
+                btnCancel.IsEnabled = true;
+                tbxWalletName.IsEnabled = true;
+                cbxLanguage.IsEnabled = true;
+                return;
+            }
+
+            GlobalMethods.WalletJustOpened(walletName);
+
+            if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPassRequiredToOpenWallet)
+            {
+                GlobalData.WalletPassProvidedTime = DateTime.Now;
+                GlobalData.WalletPasswordHash = walletPasswordHash;
+            }
+
+            Logger.LogDebug("CWV.OKBC", "Wallet " + walletName + " created successfully");
+            UIManager.NavigateToDisplayKeysSeed("Wallet created and opened successfully! Save your seed phrase and keys to a safe place. You'll need them to restore your wallet. Keep them private - anyone with access can steal your funds!", SplitViewPages.Wallet);
+        }
+
         public void CancelButton_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
                 Logger.LogDebug("CWV.CNCL", "Create wallet cancelled");
+                _mnemonic = null;
                 UIManager.NavigateToPage(SplitViewPages.WalletSetup);
             }
             catch (Exception ex)

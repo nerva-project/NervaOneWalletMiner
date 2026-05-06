@@ -15,6 +15,8 @@ namespace NervaOneWalletMiner.Rpc.Wallet
 
         Task<CreateWalletResponse> CreateWallet(RpcBase rpc, CreateWalletRequest requestObj);
 
+        Task<CreateWalletResponse> CreateWalletFromSeed(RpcBase rpc, CreateWalletRequest requestObj);
+
         Task<CreateAccountResponse> CreateAccount(RpcBase rpc, CreateAccountRequest requestObj);
 
         Task<LabelAccountResponse> LabelAccount(RpcBase rpc, LabelAccountRequest requestObj);

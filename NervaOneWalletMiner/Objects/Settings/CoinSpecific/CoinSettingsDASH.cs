@@ -29,12 +29,12 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         private bool _IsSplitTransferSupported = false;
         private bool _IsSendFromSupported = false;
         private bool _IsPoppingBlocksSupported = false;
-        private bool _IsRestoreFromSeedSupported = false;
+        private bool _IsRestoreFromSeedSupported = true;
         private bool _IsRestoreFromKeysSupported = false;
         private bool _IsRestoreFromDumpFileSupported = true;
         private bool _IsRescanSpentSupported = false;
         private bool _IsSweepBelowSupported = false;
-        private bool _IsWalletLanguageSupported = false;
+        private bool _IsWalletBtcStyle = true;
 
         private int _LogLevelDaemon = 0;
         private int _LogLevelWallet = 0;
@@ -88,7 +88,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public bool IsRestoreFromDumpFileSupported { get => _IsRestoreFromDumpFileSupported; set => _IsRestoreFromDumpFileSupported = value; }
         public bool IsRescanSpentSupported { get => _IsRescanSpentSupported; set => _IsRescanSpentSupported = value; }
         public bool IsSweepBelowSupported { get => _IsSweepBelowSupported; set => _IsSweepBelowSupported = value; }
-        public bool IsWalletLanguageSupported { get => _IsWalletLanguageSupported; set => _IsWalletLanguageSupported = value; }
+        public bool IsWalletBtcStyle { get => _IsWalletBtcStyle; set => _IsWalletBtcStyle = value; }
 
         public int LogLevelDaemon { get => _LogLevelDaemon; set => _LogLevelDaemon = value; }
         public int LogLevelWallet { get => _LogLevelWallet; set => _LogLevelWallet = value; }

@@ -95,7 +95,7 @@ namespace NervaOneWalletMiner.Views
                 tbxWalletName.IsEnabled = false;
                 tbxDumpFilePath.IsEnabled = false;
                 btnBrowse.IsEnabled = false;
-                tbxDumpFilePath.IsEnabled = false;
+                tbxPassword.IsEnabled = false;
                 btnShowHidePassword.IsEnabled = false;
 
                 Logger.LogDebug("RDF.OKBC", "Restoring wallet from dump file: " + walletName);
@@ -126,6 +126,7 @@ namespace NervaOneWalletMiner.Views
                     tbxWalletName.IsEnabled = true;
                     tbxDumpFilePath.IsEnabled = true;
                     btnBrowse.IsEnabled = true;
+                    tbxPassword.IsEnabled = true;
                     btnShowHidePassword.IsEnabled = true;
                     return;
                 }

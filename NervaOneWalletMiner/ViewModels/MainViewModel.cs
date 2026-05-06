@@ -24,6 +24,13 @@ public class MainViewModel : ViewModelBase
         ShowDaemonTabEvent?.Invoke(isVisible);
     }
 
+    public delegate void SelectNavItemAction(string page);
+    public event SelectNavItemAction? SelectNavItemEvent;
+    public void SelectNavItem(string page)
+    {
+        SelectNavItemEvent?.Invoke(page);
+    }
+
     public delegate void SyncWithQuickSyncAction(double percentSynced);
     public event SyncWithQuickSyncAction? SyncWithQuickSyncEvent;
     public void AskIfSyncWithQuickSync(double percentSynced)
