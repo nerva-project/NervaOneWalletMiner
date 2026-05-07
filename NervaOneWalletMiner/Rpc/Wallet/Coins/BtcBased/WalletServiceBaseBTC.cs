@@ -1712,7 +1712,8 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                     Height = string.IsNullOrEmpty(entry.blockheight) ? 0 : Convert.ToUInt32(entry.blockheight),
                                     Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timereceived).ToLocalTime(),
                                     Amount = Math.Abs(Convert.ToDecimal(entry.amount)),
-                                    Type = GetTransactionType(entry.category)
+                                    Type = GetTransactionType(entry.category),
+                                    Confirmations = entry.confirmations
                                 };
 
                                 responseObj.Transfers.Add(newTransfer);
@@ -2015,10 +2016,50 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             throw new NotImplementedException();
         }
 
-        public Task<LabelAccountResponse> LabelAccount(RpcBase rpc, LabelAccountRequest requestObj)
+        public async Task<LabelAccountResponse> LabelAccount(RpcBase rpc, LabelAccountRequest requestObj)
         {
-            // TODO: setlabel
-            throw new NotImplementedException();
+            LabelAccountResponse responseObj = new();
+
+            try
+            {
+                var requestJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = _id++,
+                    ["method"] = "setlabel",
+                    ["params"] = new JObject
+                    {
+                        ["address"] = requestObj.Address,
+                        ["label"] = requestObj.Label
+                    }
+                };
+
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
+
+                    var error = jsonObject["error"];
+                    if (error != null && error.Type != JTokenType.Null)
+                    {
+                        responseObj.Error = GetServiceError(GetCallerName(), error);
+                    }
+                    else
+                    {
+                        responseObj.Error.IsError = false;
+                    }
+                }
+                else
+                {
+                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(CoinPrefix + ".WLBA", ex);
+            }
+
+            return responseObj;
         }
 
         public Task<RestoreFromKeysResponse> RestoreFromKeys(RpcBase rpc, RestoreFromKeysRequest requestObj)

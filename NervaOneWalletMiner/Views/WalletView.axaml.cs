@@ -246,7 +246,8 @@ namespace NervaOneWalletMiner.Views
                         LabelAccountRequest request = new()
                         {
                             AccountIndex = selectedItem.Index,
-                            Label = result.TextBoxValue
+                            Label = result.TextBoxValue,
+                            Address = selectedItem.AddressFull
                         };
 
                         LabelAccountResponse response = await GlobalData.WalletService.LabelAccount(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);

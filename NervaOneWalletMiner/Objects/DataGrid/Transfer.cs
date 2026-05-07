@@ -1,4 +1,4 @@
-﻿using Avalonia.Media.Imaging;
+using Avalonia.Media.Imaging;
 using System;
 
 namespace NervaOneWalletMiner.Objects.DataGrid
@@ -12,6 +12,7 @@ namespace NervaOneWalletMiner.Objects.DataGrid
         public string AddressLabel { get; set; } = string.Empty;
         public ulong Height { get; set; } = 0;
         public string HeightDisplay { get; set; } = string.Empty;
+        public long Confirmations { get; set; } = 0;
         public DateTime Timestamp { get; set; } = DateTime.MinValue;
         public decimal Amount { get; set; } = 0;
         public string Type { get; set; } = string.Empty;

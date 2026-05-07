@@ -1321,7 +1321,8 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                     Height = entry.height,
                                     Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp).ToLocalTime(),
                                     Amount = AmountFromAtomicUnits(entry.amount, 4),
-                                    Type = entry.type
+                                    Type = entry.type,
+                                    Confirmations = entry.confirmations
                                 };
 
                                 responseObj.Transfers.Add(newTransfer);
@@ -1337,7 +1338,8 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                     Height = entry.height,
                                     Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp).ToLocalTime(),
                                     Amount = AmountFromAtomicUnits(entry.amount, 4),
-                                    Type = entry.type
+                                    Type = entry.type,
+                                    Confirmations = entry.confirmations
                                 };
 
                                 responseObj.Transfers.Add(newTransfer);
@@ -1353,7 +1355,8 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                     Height = entry.height,
                                     Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp).ToLocalTime(),
                                     Amount = AmountFromAtomicUnits(entry.amount, 4),
-                                    Type = entry.type
+                                    Type = entry.type,
+                                    Confirmations = entry.confirmations
                                 };
 
                                 responseObj.Transfers.Add(newTransfer);

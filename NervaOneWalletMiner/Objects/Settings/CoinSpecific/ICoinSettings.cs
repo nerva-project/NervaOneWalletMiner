@@ -40,6 +40,8 @@
 
         // Wallet specific settings
         int LogLevelWallet { get; set; }
+        int CoinDecimalPlaces { get; set; }
+        int ConfirmationThreshold { get; set; }
         bool IsSavingWalletSupported { get; set; }
         bool IsWalletHeightSupported { get; set; }
         bool IsPassRequiredToOpenWallet { get; set; }
@@ -55,7 +57,7 @@
         bool IsRestoreFromDumpFileSupported { get; set; }
         bool IsRescanSpentSupported { get; set; }
         bool IsSweepBelowSupported { get; set; }
-        bool IsWalletBtcStyle { get; set; }        
+        bool IsWalletBtcStyle { get; set; }
 
 
         string GenerateWalletOptions(SettingsWallet walletSettings, SettingsDaemon daemonSettings);

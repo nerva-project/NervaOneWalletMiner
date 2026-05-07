@@ -489,16 +489,17 @@ namespace NervaOneWalletMiner.Helpers
                     string units = GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
                     string totalLockedLabel = "Total " + units + ":";
                     string totalUnlockedLabel = (isBtcStyle ? "Pending " : "Unlocked ") + units + ":";
-                    string statusBarMessage = GlobalData.OpenedWalletName + " | " + GlobalData.WalletStats.BalanceTotal.ToString("F2") + " " + units + (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletHeightSupported ? " | H: " + GlobalData.WalletHeight : string.Empty);
+                    string statusBarMessage = GlobalData.OpenedWalletName + " | " + GlobalMethods.FormatAmount(GlobalData.WalletStats.BalanceTotal) + " " + units + (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletHeightSupported ? " | H: " + GlobalData.WalletHeight : string.Empty);
 
                     Dispatcher.UIThread.Invoke(() =>
                     {
-                        if (!walletVm.TotalCoins.Equals(GlobalData.WalletStats.BalanceTotal.ToString()))
+                        string totalFormatted = GlobalMethods.FormatAmount(GlobalData.WalletStats.BalanceTotal);
+                        if (!walletVm.TotalCoins.Equals(totalFormatted))
                         {
-                            walletVm.TotalCoins = GlobalData.WalletStats.BalanceTotal.ToString();
+                            walletVm.TotalCoins = totalFormatted;
                         }
 
-                        string secondBalance = isBtcStyle ? GlobalData.WalletStats.BalancePending.ToString() : GlobalData.WalletStats.BalanceUnlocked.ToString();
+                        string secondBalance = isBtcStyle ? GlobalMethods.FormatAmount(GlobalData.WalletStats.BalancePending) : GlobalMethods.FormatAmount(GlobalData.WalletStats.BalanceUnlocked);
                         if (!walletVm.UnlockedCoins.Equals(secondBalance))
                         {
                             walletVm.UnlockedCoins = secondBalance;
@@ -628,6 +629,11 @@ namespace NervaOneWalletMiner.Helpers
 
                             // Need to clear transfers AFTER we process them otherwise we might clear them before we process them
                             GlobalData.TransfersStats.Transactions = [];
+
+                            // The initial load of a large wallet leaves significant heap pressure from JSON
+                            // deserialization intermediates. Hint GC to collect now rather than waiting for
+                            // organic pressure — blocking:false lets it run in the background.
+                            GC.Collect(2, GCCollectionMode.Forced, blocking: false, compacting: false);
                         }
 
                         if (transfersViewVm.Transactions.Count > 0)
@@ -638,33 +644,139 @@ namespace NervaOneWalletMiner.Helpers
                     }
                     else
                     {
-                        // Compute new transfers on timer thread before marshaling to UI thread
-                        List<Transfer> newTransfers = [];
-                        HashSet<string> existingKeys = [.. transfersViewVm.Transactions.Select(t => t.TransactionId + t.Type)];
+                        int confirmationThreshold = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].ConfirmationThreshold;
+                        bool isBtcStyle = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletBtcStyle;
 
-                        foreach (string newTransferKey in GlobalData.TransfersStats.Transactions.Keys)
+                        // Step 1: Classify incoming transactions from the RPC poll
+                        // For XMR based coins, get_transfers filters by MinHeight so this staging dict only contains brand-new transactions (transactions already in the UI are not returned again).
+                        // For BTC based coins, listsinceblock returns everything every poll, so this dict is always non-empty.
+                        // We skip building the lookup entirely when the staging dict is empty (common for XMR).
+                        if (GlobalData.TransfersStats.Transactions.Count > 0)
                         {
-                            if (!existingKeys.Contains(newTransferKey))
+                            // O(1) lookup of what is already visible in the UI
+                            Dictionary<string, Transfer> uiTransactionLookup = transfersViewVm.Transactions
+                                .ToDictionary(uiTx => uiTx.TransactionId + uiTx.Type, uiTx => uiTx);
+
+                            List<Transfer> brandNewTransactions = [];
+                            List<(Transfer UiEntry, Transfer RpcEntry)> pendingConfirmedUpdates = [];
+
+                            foreach (var rpcTx in GlobalData.TransfersStats.Transactions)
                             {
-                                newTransfers.Add(GlobalData.TransfersStats.Transactions[newTransferKey]);
+                                if (!uiTransactionLookup.TryGetValue(rpcTx.Key, out Transfer? uiEntry))
+                                {
+                                    // Transaction not in UI yet — add it
+                                    brandNewTransactions.Add(rpcTx.Value);
+                                }
+                                else if (uiEntry.Height == 0 && rpcTx.Value.Height > 0)
+                                {
+                                    // Was pending (Height == 0), now confirmed — update block height and display
+                                    pendingConfirmedUpdates.Add((uiEntry, rpcTx.Value));
+                                }
                             }
+
+                            if (brandNewTransactions.Count > 0 || pendingConfirmedUpdates.Count > 0)
+                            {
+                                // Sort new transactions oldest-first so Insert(0) ends up newest-on-top
+                                List<Transfer> orderedNewTransactions = brandNewTransactions.Count > 0
+                                    ? [.. brandNewTransactions.OrderBy(tx => tx.Height)]
+                                    : [];
+
+                                Dispatcher.UIThread.Invoke(() =>
+                                {
+                                    foreach (var (uiEntry, rpcEntry) in pendingConfirmedUpdates)
+                                    {
+                                        uiEntry.Height = rpcEntry.Height;
+                                        uiEntry.HeightDisplay = rpcEntry.HeightDisplay;
+                                        // Replace triggers ObservableCollection.Replace notification so the DataGrid
+                                        // refreshes that row without needing INotifyPropertyChanged on Transfer
+                                        int idx = transfersViewVm.Transactions.IndexOf(uiEntry);
+                                        if (idx >= 0)
+                                        {
+                                            transfersViewVm.Transactions[idx] = uiEntry;
+                                        }
+                                    }
+
+                                    foreach (Transfer newTransaction in orderedNewTransactions)
+                                    {
+                                        transfersViewVm.Transactions.Insert(0, newTransaction);
+                                    }
+                                });
+
+                                if (brandNewTransactions.Count > 0)
+                                {
+                                    // New transactions start unconfirmed — make sure the confirmation scan runs
+                                    GlobalData.HasUnconfirmedTransactions = true;
+                                    newTransfersCount = brandNewTransactions.Count;
+                                }
+                            }
+
+                            // Clear staging dict after processing so the next poll starts fresh
+                            GlobalData.TransfersStats.Transactions = [];
                         }
 
-                        if (newTransfers.Count > 0)
+                        // Step 2: Update confirmation counts for all coins
+                        // Confirmations are calculated locally from current chain height rather than taken from the
+                        // RPC response. This works for all coins and handles XMR wallet-only mode correctly:
+                        //  XMR Based: WalletHeight = block count from wallet RPC (always available, even without a local daemon). Formula: confirmations = WalletHeight - txHeight.
+                        //  BTC Based: NetworkStats.YourHeight = tip block height from daemon RPC. Adding 1 makes it a block count so the same formula applies to both coin styles.
+                        // HasUnconfirmedTransactions prevents iterating all rows every poll once all transactions are fully confirmed. It resets to true whenever new transactions arrive.
+                        ulong currentChainBlockCount = isBtcStyle
+                            ? GlobalData.NetworkStats.YourHeight + 1UL
+                            : GlobalData.WalletHeight;
+
+                        if (currentChainBlockCount > 0 && GlobalData.HasUnconfirmedTransactions)
                         {
-                            List<Transfer> ordered = [.. newTransfers.OrderBy(t => t.Height)];
+                            List<(Transfer UiEntry, long UpdatedConfirmations)> confirmationUpdates = [];
+                            bool anyTransactionStillUnconfirmed = false;
 
-                            Dispatcher.UIThread.Invoke(() =>
+                            foreach (Transfer uiTransaction in transfersViewVm.Transactions)
                             {
-                                foreach (Transfer transfer in ordered)
+                                if (uiTransaction.Height > 0 && currentChainBlockCount > uiTransaction.Height)
                                 {
-                                    transfersViewVm.Transactions.Insert(0, transfer);
-                                }
-                            });
+                                    // Transaction is in a known block — calculate how many blocks have built on top
+                                    if (uiTransaction.Confirmations < confirmationThreshold)
+                                    {
+                                        long calculatedConfirmations = (long)(currentChainBlockCount - uiTransaction.Height);
+                                        long cappedConfirmations = Math.Min(calculatedConfirmations, confirmationThreshold);
 
-                            // Need to clear transfers AFTER we process them otherwise we might clear them before we process them
-                            GlobalData.TransfersStats.Transactions = [];
-                            newTransfersCount = newTransfers.Count;
+                                        if (calculatedConfirmations > uiTransaction.Confirmations)
+                                        {
+                                            confirmationUpdates.Add((uiTransaction, cappedConfirmations));
+                                        }
+
+                                        if (cappedConfirmations < confirmationThreshold)
+                                        {
+                                            anyTransactionStillUnconfirmed = true;
+                                        }
+                                    }
+                                }
+                                else if (uiTransaction.Height == 0)
+                                {
+                                    // Height == 0 means the transaction is still in the mempool (pending)
+                                    anyTransactionStillUnconfirmed = true;
+                                }
+                            }
+
+                            // Update the flag before dispatching so the next poll can skip if everything is confirmed
+                            GlobalData.HasUnconfirmedTransactions = anyTransactionStillUnconfirmed;
+
+                            if (confirmationUpdates.Count > 0)
+                            {
+                                Dispatcher.UIThread.Invoke(() =>
+                                {
+                                    foreach (var (uiEntry, updatedConfirmations) in confirmationUpdates)
+                                    {
+                                        uiEntry.Confirmations = updatedConfirmations;
+                                        // Replace triggers ObservableCollection.Replace notification so the DataGrid
+                                        // refreshes that row without needing INotifyPropertyChanged on Transfer
+                                        int idx = transfersViewVm.Transactions.IndexOf(uiEntry);
+                                        if (idx >= 0)
+                                        {
+                                            transfersViewVm.Transactions[idx] = uiEntry;
+                                        }
+                                    }
+                                });
+                            }
                         }
                     }
 
@@ -686,6 +798,10 @@ namespace NervaOneWalletMiner.Helpers
                         {
                             transfersViewVm.Transactions = [];
                         });
+
+                        // The large Transfer collection is now eligible for GC. Hint the runtime to
+                        // collect immediately — without allocation pressure GC may not run for minutes.
+                        GC.Collect(2, GCCollectionMode.Forced, blocking: false, compacting: false);
                     }
                 }
             }

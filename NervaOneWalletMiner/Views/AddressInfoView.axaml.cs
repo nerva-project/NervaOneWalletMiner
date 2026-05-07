@@ -80,7 +80,8 @@ namespace NervaOneWalletMiner.Views
                     LabelAccountRequest request = new()
                     {
                         AccountIndex = account.Index,
-                        Label = tbxWalletLabel.Text ?? string.Empty
+                        Label = tbxWalletLabel.Text ?? string.Empty,
+                        Address = account.AddressFull
                     };
 
                     Logger.LogDebug("AIV.SVLC", "Saving label for account " + account.Index + ": " + request.Label);

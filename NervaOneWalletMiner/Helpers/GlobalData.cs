@@ -102,6 +102,7 @@ namespace NervaOneWalletMiner.Helpers
         public static ulong NewestTransactionHeight = 0;
         public static string NewestTransactionBlockHash = string.Empty;
         public static ulong WalletHeight = 0;
+        public static volatile bool HasUnconfirmedTransactions = false;
        
         public static string WalletProcessName = GlobalMethods.GetWalletProcessName(AppSettings.ActiveCoin);
         public static string DaemonProcessName = GlobalMethods.GetDaemonProcessName(AppSettings.ActiveCoin);

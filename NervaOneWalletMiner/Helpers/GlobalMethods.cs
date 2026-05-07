@@ -1252,6 +1252,9 @@ namespace NervaOneWalletMiner.Helpers
         #endregion // RPC Interface
 
         #region Data Manipulation
+        public static string FormatAmount(decimal amount) =>
+            amount.ToString("0." + new string('#', GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].CoinDecimalPlaces));
+
         public static string GetShorterString(string? text, int shorterLength)
         {
             if (string.IsNullOrEmpty(text))
@@ -1376,6 +1379,7 @@ namespace NervaOneWalletMiner.Helpers
             GlobalData.NewestTransactionHeight = 0;
             GlobalData.WalletHeight = 0;
             GlobalData.NewestTransactionBlockHash = string.Empty;
+            GlobalData.HasUnconfirmedTransactions = true;
         }
 
         public static void WalletClosedOrErrored()
@@ -1385,7 +1389,10 @@ namespace NervaOneWalletMiner.Helpers
             GlobalData.OpenedWalletName = string.Empty;
             GlobalData.WalletHeight = 0;
             GlobalData.NewestTransactionHeight = 0;
+            GlobalData.NewestTransactionBlockHash = string.Empty;
             GlobalData.WalletStats = new();
+            GlobalData.TransfersStats.Transactions = [];
+            GlobalData.HasUnconfirmedTransactions = false;
             GlobalData.WalletPassProvidedTime = DateTime.MinValue;
             GlobalData.WalletPasswordHash = string.Empty;
         }

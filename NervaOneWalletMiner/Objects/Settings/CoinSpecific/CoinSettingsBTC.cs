@@ -47,6 +47,8 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
 
         // Wallet specific settings
         public int LogLevelWallet { get; set; } = 0;
+        public int CoinDecimalPlaces { get; set; } = 8;
+        public int ConfirmationThreshold { get; set; } = 10;        
         public bool IsSavingWalletSupported { get; set; } = false;
         public bool IsWalletHeightSupported { get; set; } = false;
         public bool IsPassRequiredToOpenWallet { get; set; } = false;
@@ -62,7 +64,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public bool IsRestoreFromDumpFileSupported { get; set; } = true;
         public bool IsRescanSpentSupported { get; set; } = false;
         public bool IsSweepBelowSupported { get; set; } = false;
-        public bool IsWalletBtcStyle { get; set; } = true;        
+        public bool IsWalletBtcStyle { get; set; } = true;
 
 
         public string GenerateDaemonOptions(SettingsDaemon daemonSettings)
