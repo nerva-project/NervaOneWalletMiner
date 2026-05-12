@@ -25,7 +25,7 @@
 					   Margin="5,0,0,0"/>
 			</Grid>
 
-			<Label Content="Your Address" Margin="0,10,0,0"/>
+			<Label Name="lblYourAddressHeader" Content="Your Address" Margin="0,10,0,0"/>
 			<DockPanel>
 				<Button DockPanel.Dock="Right"
 						Name="btnCopyYourAddressToClipboard"
@@ -45,7 +45,7 @@
 				<TextBox Name="tbxTransactionId" IsReadOnly="True"/>
 			</DockPanel>
 
-			<Grid Margin="0,15,0,0">
+			<Grid Name="grdDetails" Margin="0,15,0,0">
 				<Grid.RowDefinitions>
 					<RowDefinition Height="26"/>
 					<RowDefinition Height="26"/>

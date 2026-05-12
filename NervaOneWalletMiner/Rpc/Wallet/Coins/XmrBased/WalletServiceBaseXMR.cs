@@ -22,6 +22,9 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         protected abstract string CoinPrefix { get; }
         protected virtual decimal CoinAtomicUnits => 1_000_000_000_000m;
 
+        // sweep_all can be slow when there are many inputs to consolidate
+        private static readonly TimeSpan _sweepTimeout = TimeSpan.FromMinutes(60);
+
         protected decimal AmountFromAtomicUnits(ulong value, int decimalPlaces) =>
             Math.Round(Convert.ToDecimal(value / (double)CoinAtomicUnits), decimalPlaces);
 
@@ -606,7 +609,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         }
         #endregion // Restore from Keys
 
-        #region Transfer
+        #region Transfer       
         /* RPC request params:
          *  std::list<transfer_destination> destinations;
          *  uint32_t account_index;
@@ -623,6 +626,11 @@ namespace NervaOneWalletMiner.Rpc.Wallet
          */
         public async Task<TransferResponse> Transfer(RpcBase rpc, TransferRequest requestObj)
         {
+            if (!string.IsNullOrEmpty(requestObj.TxData))
+            {
+                return await RelayTx(rpc, requestObj.TxData);
+            }
+
             TransferResponse responseObj = new();
 
             try
@@ -684,20 +692,138 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                         {
                             // We don't use response values
                             ResTransfer transferResponse = JsonConvert.DeserializeObject<ResTransfer>(resultToken.ToString())!;
-
                             responseObj.Error.IsError = false;
                         }
                     }
                 }
                 else
                 {
-                    // Set HTTP error
                     responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
                 }
             }
             catch (Exception ex)
             {
                 Logger.LogException(CoinPrefix + ".WTRA", ex);
+            }
+
+            return responseObj;
+        }
+
+        public async Task<EstimateFeeResponse> EstimateFee(RpcBase rpc, TransferRequest requestObj)
+        {
+            EstimateFeeResponse responseObj = new();
+
+            try
+            {
+                JArray destinationsJson = new JArray();
+                foreach (Common.TransferDestination destination in requestObj.Destinations)
+                {
+                    destinationsJson.Add(new JObject
+                    {
+                        ["amount"] = AtomicUnitsFromAmount(destination.Amount),
+                        ["address"] = destination.Address
+                    });
+                }
+
+                JObject paramsJson = new JObject
+                {
+                    ["destinations"] = destinationsJson,
+                    ["account_index"] = requestObj.AccountIndex,
+                    ["subaddr_indices"] = new JArray(requestObj.SubAddressIndices),
+                    ["priority"] = GetPriority(requestObj.Priority),
+                    ["unlock_time"] = requestObj.UnlockTime,
+                    ["payment_id"] = requestObj.PaymentId is null ? "" : requestObj.PaymentId,
+                    ["get_tx_key"] = false,
+                    ["do_not_relay"] = true,
+                    ["get_tx_hex"] = false,
+                    ["get_tx_metadata"] = true
+                };
+
+                var requestJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = "0",
+                    ["method"] = "transfer",
+                    ["params"] = paramsJson
+                };
+
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
+
+                    var error = jsonObject["error"];
+                    if (error != null)
+                    {
+                        responseObj.Error = GetServiceError(GetCallerName(), error);
+                    }
+                    else
+                    {
+                        var resultToken = jsonObject.SelectToken("result");
+                        if (resultToken == null)
+                        {
+                            responseObj.Error.IsError = true;
+                            responseObj.Error.Message = "Response missing 'result' field";
+                        }
+                        else
+                        {
+                            ResTransfer transferResponse = JsonConvert.DeserializeObject<ResTransfer>(resultToken.ToString())!;
+                            responseObj.Fee = AmountFromAtomicUnits(transferResponse.fee, 12);
+                            responseObj.TxData = transferResponse.tx_metadata;
+                            responseObj.Error.IsError = false;
+                        }
+                    }
+                }
+                else
+                {
+                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(CoinPrefix + ".ESFE", ex);
+            }
+
+            return responseObj;
+        }
+
+        private async Task<TransferResponse> RelayTx(RpcBase rpc, string txMetadata)
+        {
+            TransferResponse responseObj = new();
+
+            try
+            {
+                var requestJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = "0",
+                    ["method"] = "relay_tx",
+                    ["params"] = new JObject { ["hex"] = txMetadata }
+                };
+
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
+
+                    var error = jsonObject["error"];
+                    if (error != null)
+                    {
+                        responseObj.Error = GetServiceError(GetCallerName(), error);
+                    }
+                    else
+                    {
+                        responseObj.Error.IsError = false;
+                    }
+                }
+                else
+                {
+                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(CoinPrefix + ".RLTX", ex);
             }
 
             return responseObj;
@@ -1195,7 +1321,8 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                     Height = entry.height,
                                     Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp).ToLocalTime(),
                                     Amount = AmountFromAtomicUnits(entry.amount, 4),
-                                    Type = entry.type
+                                    Type = entry.type,
+                                    Confirmations = entry.confirmations
                                 };
 
                                 responseObj.Transfers.Add(newTransfer);
@@ -1211,7 +1338,8 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                     Height = entry.height,
                                     Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp).ToLocalTime(),
                                     Amount = AmountFromAtomicUnits(entry.amount, 4),
-                                    Type = entry.type
+                                    Type = entry.type,
+                                    Confirmations = entry.confirmations
                                 };
 
                                 responseObj.Transfers.Add(newTransfer);
@@ -1227,7 +1355,8 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                     Height = entry.height,
                                     Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp).ToLocalTime(),
                                     Amount = AmountFromAtomicUnits(entry.amount, 4),
-                                    Type = entry.type
+                                    Type = entry.type,
+                                    Confirmations = entry.confirmations
                                 };
 
                                 responseObj.Transfers.Add(newTransfer);
@@ -1764,7 +1893,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 };
 
                 Logger.LogDebug(CoinPrefix + ".SWBL", "Calling sweep_all with below_amount: " + requestObj.Amount);
-                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString(), TimeSpan.FromMinutes(60));
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString(), _sweepTimeout);
                 Logger.LogDebug(CoinPrefix + ".SWBL", "sweep_all returned.");
                 if (httpResponse.IsSuccessStatusCode)
                 {
@@ -1833,6 +1962,18 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         #region Unsupported Methods
         public Task<UnlockWithPassResponse> UnlockWithPass(RpcBase rpc, UnlockWithPassRequest requestObj)
         {
+            throw new NotImplementedException();
+        }
+
+        public Task<ImportWalletResponse> ImportWallet(RpcBase rpc, ImportWalletRequest requestObj)
+        {
+            // Not used. ICoinSettings.IsRestoreFromDumpFileSupported
+            throw new NotImplementedException();
+        }
+
+        public Task<CreateWalletResponse> CreateWalletFromSeed(RpcBase rpc, CreateWalletRequest requestObj)
+        {
+            // Not used. ICoinSettings.IsWalletBtcStyle determines whether seed-based creation applies
             throw new NotImplementedException();
         }
         #endregion // Unsupported Methods

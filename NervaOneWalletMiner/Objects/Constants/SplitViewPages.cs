@@ -20,6 +20,7 @@
         public const string AddressBookEntry = "address_book_entry";
         public const string RestoreFromKeys = "restore_from_keys";
         public const string RestoreFromSeed = "restore_from_seed";
+        public const string RestoreFromDumpFile = "restore_from_dump_file";
         public const string SweepBelow = "sweep_below";
         public const string DisplayKeysSeed = "display_keys_seed";
         public const string ViewLogs = "view_logs";

@@ -112,10 +112,10 @@ namespace NervaOneWalletMiner.Views
                     Grid.SetRow(grdWalletButtons, 0);
                     grdWalletButtons.HorizontalAlignment = HorizontalAlignment.Right;
                     
-                    // Wide: all columns
+                    // Wide: all columns (Unlocked hidden for BTC-style coins — per-address value equals Balance)
                     if (_colId != null) { _colId.IsVisible = true; }
                     if (_colAddress != null) { _colAddress.IsVisible = true; }
-                    if (_colUnlocked != null) { _colUnlocked.IsVisible = true; }
+                    if (_colUnlocked != null) { _colUnlocked.IsVisible = !GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletBtcStyle; }
                 }
             }
             catch (Exception ex)
@@ -151,12 +151,12 @@ namespace NervaOneWalletMiner.Views
 
                 if (btnOpenCloseWallet.Content!.ToString()!.Equals(StatusWallet.OpenWallet))
                 {
-                    if (!GlobalData.IsCliToolsFound)
+                    if (GlobalData.DaemonState == DaemonState.CliToolsMissing || GlobalData.DaemonState == DaemonState.Downloading)
                     {
                         Logger.LogDebug("WAL.OCWC", "Trying to open wallet but CLI tools not found");
                         await DialogService.ShowAsync(new MessageBoxView("Open Wallet", "Client tools missing. Cannot open wallet until client tools are downloaded and running", true));
                     }
-                    else if (!GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly && !GlobalData.IsInitialDaemonConnectionSuccess)
+                    else if (!GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly && GlobalData.DaemonState != DaemonState.Running)
                     {
                         Logger.LogDebug("WAL.OCWC", "Trying to open wallet but daemon not running");
                         await DialogService.ShowAsync(new MessageBoxView("Open Wallet", "Daemon not running. Cannot open wallet until connection is established", true));
@@ -246,7 +246,8 @@ namespace NervaOneWalletMiner.Views
                         LabelAccountRequest request = new()
                         {
                             AccountIndex = selectedItem.Index,
-                            Label = result.TextBoxValue
+                            Label = result.TextBoxValue,
+                            Address = selectedItem.AddressFull
                         };
 
                         LabelAccountResponse response = await GlobalData.WalletService.LabelAccount(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
@@ -365,18 +366,20 @@ namespace NervaOneWalletMiner.Views
 
             try
             {
+                // Capture name before WalletClosedOrErrored clears it — needed for coins like BTC that pass the name to the RPC
+                string walletToClose = GlobalData.OpenedWalletName;
                 GlobalMethods.WalletClosedOrErrored();
 
                 CloseWalletRequest request = new CloseWalletRequest
                 {
-                    WalletName = GlobalData.OpenedWalletName
+                    WalletName = walletToClose
                 };
 
                 CloseWalletResponse response = await GlobalData.WalletService.CloseWallet(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
 
                 if (response.Error.IsError)
                 {
-                    Logger.LogError("WAL.CLUW", "Error closing wallet " + GlobalData.OpenedWalletName + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
+                    Logger.LogError("WAL.CLUW", "Error closing wallet " + walletToClose + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
 
                     if (isUiThread)
                     {

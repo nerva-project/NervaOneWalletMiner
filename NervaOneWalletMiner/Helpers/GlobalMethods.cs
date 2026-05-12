@@ -4,6 +4,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using ICSharpCode.SharpZipLib.BZip2;
 using ICSharpCode.SharpZipLib.GZip;
+using NervaOneWalletMiner.Objects;
 using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Objects.Settings;
 using NervaOneWalletMiner.Objects.Settings.CoinSpecific;
@@ -332,6 +333,26 @@ namespace NervaOneWalletMiner.Helpers
         #endregion // Directories, Paths and Names
 
         #region Coin Specific
+        public static List<CoinListItem> BuildCoinList()
+        {
+            List<CoinListItem> coinList = [];
+
+            try
+            {
+                foreach (var kvp in GlobalData.CoinSettings)
+                {
+                    GlobalData.CoinLogoDictionary.TryGetValue(kvp.Key, out Bitmap? logo);
+                    coinList.Add(new CoinListItem { Key = kvp.Key, DisplayName = kvp.Value.DisplayName, Logo = logo });
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("GLM.BCLS", ex);
+            }
+
+            return coinList;
+        }
+
         public static Dictionary<string, ICoinSettings> GetDefaultCoinSettings()
         {
             Dictionary<string, ICoinSettings> defaultSettings = [];
@@ -339,6 +360,7 @@ namespace NervaOneWalletMiner.Helpers
             try
             {
                 defaultSettings.Add(Coin.XNV, new CoinSettingsXNV());
+                defaultSettings.Add(Coin.BTC, new CoinSettingsBTC());
                 defaultSettings.Add(Coin.XMR, new CoinSettingsXMR());
                 defaultSettings.Add(Coin.WOW, new CoinSettingsWOW());
                 defaultSettings.Add(Coin.DASH, new CoinSettingsDASH());
@@ -381,6 +403,26 @@ namespace NervaOneWalletMiner.Helpers
                         
                         GlobalData.DaemonService = new DaemonServiceDASH();
                         GlobalData.WalletService = new WalletServiceDASH();
+
+                        if (string.IsNullOrEmpty(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc.UserName))
+                        {
+                            GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc.UserName = GenerateRandomString(24);
+                            GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc.Password = GenerateRandomString(24);
+                        }
+
+                        if (string.IsNullOrEmpty(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc.UserName))
+                        {
+                            GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc.UserName = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc.UserName;
+                            GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc.Password = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc.Password;
+                        }
+                        break;
+
+                    case Coin.BTC:
+                        GlobalData.CoinDirName = Coin.BTC;
+                        GlobalData.AppSettings.ActiveCoin = Coin.BTC;
+
+                        GlobalData.DaemonService = new DaemonServiceBTC();
+                        GlobalData.WalletService = new WalletServiceBTC();
 
                         if (string.IsNullOrEmpty(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc.UserName))
                         {
@@ -442,6 +484,9 @@ namespace NervaOneWalletMiner.Helpers
                     case Coin.DASH:
                         daemonProcess = GlobalMethods.IsWindows() ? "dashd.exe" : "dashd";
                         break;
+                    case Coin.BTC:
+                        daemonProcess = GlobalMethods.IsWindows() ? "bitcoind.exe" : "bitcoind";
+                        break;
                     default:
                         // XNV or anything else not supported
                         daemonProcess = GlobalMethods.IsWindows() ? "nervad.exe" : "nervad";
@@ -472,6 +517,9 @@ namespace NervaOneWalletMiner.Helpers
                         break;
                     case Coin.DASH:
                         walletProcess = IsWindows() ? "dashd.exe" : "dashd";
+                        break;
+                    case Coin.BTC:
+                        walletProcess = IsWindows() ? "bitcoind.exe" : "bitcoind";
                         break;
                     default:
                         // XNV or anything else not supported
@@ -512,6 +560,11 @@ namespace NervaOneWalletMiner.Helpers
                 {
                     logoDictionary.Add(Coin.DASH, new Bitmap(AssetLoader.Open(new Uri("avares://" + GlobalData.AppAssemblyName + "/Assets/dash/logo.png"))));
                 }
+
+                if (!logoDictionary.ContainsKey(Coin.BTC))
+                {
+                    logoDictionary.Add(Coin.BTC, new Bitmap(AssetLoader.Open(new Uri("avares://" + GlobalData.AppAssemblyName + "/Assets/btc/logo.png"))));
+                }
             }
             catch (Exception ex)
             {
@@ -545,6 +598,11 @@ namespace NervaOneWalletMiner.Helpers
                 if (!iconDictionary.ContainsKey(Coin.DASH))
                 {
                     iconDictionary.Add(Coin.DASH, new WindowIcon(AssetLoader.Open(new Uri("avares://" + GlobalData.AppAssemblyName + "/Assets/dash/logo.png"))));
+                }
+
+                if (!iconDictionary.ContainsKey(Coin.BTC))
+                {
+                    iconDictionary.Add(Coin.BTC, new WindowIcon(AssetLoader.Open(new Uri("avares://" + GlobalData.AppAssemblyName + "/Assets/btc/logo.png"))));
                 }
             }
             catch (Exception ex)
@@ -671,7 +729,7 @@ namespace NervaOneWalletMiner.Helpers
             }
             finally
             {
-                GlobalData.IsCliToolsDownloading = false;
+                GlobalData.DaemonState = DaemonState.CliToolsMissing;
             }
         }
 
@@ -720,7 +778,7 @@ namespace NervaOneWalletMiner.Helpers
             }
             finally
             {
-                GlobalData.IsBlockchainDbDownloading = false;
+                GlobalData.DaemonState = DaemonState.Connecting;
             }
         }
 
@@ -1151,7 +1209,7 @@ namespace NervaOneWalletMiner.Helpers
 
                     await Task.Run(() => StopAndCloseDaemon());
 
-                    GlobalData.IsDaemonRestarting = true;
+                    GlobalData.DaemonState = DaemonState.Restarting;
                     string quickSyncFile = Path.Combine(GlobalData.CliToolsDir, Path.GetFileName(GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].QuickSyncUrl));
                     ProcessManager.StartExternalProcess(GetDaemonProcess(), GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].GenerateDaemonOptions(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]) + " --quicksync \"" + quickSyncFile + "\"");
                     return true;
@@ -1194,6 +1252,9 @@ namespace NervaOneWalletMiner.Helpers
         #endregion // RPC Interface
 
         #region Data Manipulation
+        public static string FormatAmount(decimal amount) =>
+            amount.ToString("0." + new string('#', GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].CoinDecimalPlaces));
+
         public static string GetShorterString(string? text, int shorterLength)
         {
             if (string.IsNullOrEmpty(text))
@@ -1318,6 +1379,7 @@ namespace NervaOneWalletMiner.Helpers
             GlobalData.NewestTransactionHeight = 0;
             GlobalData.WalletHeight = 0;
             GlobalData.NewestTransactionBlockHash = string.Empty;
+            GlobalData.HasUnconfirmedTransactions = true;
         }
 
         public static void WalletClosedOrErrored()
@@ -1327,7 +1389,10 @@ namespace NervaOneWalletMiner.Helpers
             GlobalData.OpenedWalletName = string.Empty;
             GlobalData.WalletHeight = 0;
             GlobalData.NewestTransactionHeight = 0;
+            GlobalData.NewestTransactionBlockHash = string.Empty;
             GlobalData.WalletStats = new();
+            GlobalData.TransfersStats.Transactions = [];
+            GlobalData.HasUnconfirmedTransactions = false;
             GlobalData.WalletPassProvidedTime = DateTime.MinValue;
             GlobalData.WalletPasswordHash = string.Empty;
         }
@@ -1339,11 +1404,10 @@ namespace NervaOneWalletMiner.Helpers
             GlobalData.IsNoConnectionsStoppedMining = false;
             GlobalData.IsHashRateMonitoringStoppedMining = false;
 
-            GlobalData.IsCliToolsFound = true;
-            GlobalData.IsCliToolsDownloading = false;
-            GlobalData.IsBlockchainDbDownloading = false;
+            GlobalData.DaemonState = DaemonState.Connecting;
             GlobalData.ConnectGuardLastGoodTime = DateTime.Now;
             GlobalData.ConnectGuardRestartCount = 1;
+            MasterProcess._cliToolsRunningLastCheck = DateTime.MinValue;
 
             if (GlobalData.ViewModelPages.ContainsKey(SplitViewPages.DaemonSetup))
             {

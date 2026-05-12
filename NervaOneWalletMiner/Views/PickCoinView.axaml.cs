@@ -1,6 +1,8 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Objects;
+using NervaOneWalletMiner.Objects.Constants;
 using System;
 
 namespace NervaOneWalletMiner.Views
@@ -18,7 +20,7 @@ namespace NervaOneWalletMiner.Views
         {
             try
             {
-                string selectedCoin = ((ComboBoxItem)cbxCoin.SelectedItem!).Name!;
+                string selectedCoin = ((CoinListItem)cbxCoin.SelectedItem!).Key;
                 GlobalMethods.SetCoin(selectedCoin);
                 GlobalMethods.SaveConfig();
 
@@ -28,7 +30,7 @@ namespace NervaOneWalletMiner.Views
 
                 if (!GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
                 {
-                    GlobalData.IsCliToolsFound = false;
+                    GlobalData.DaemonState = DaemonState.CliToolsMissing;
                     Logger.LogDebug("PIC.OKBC", "CLI tools not found. Navigating to Coin Setup View.");
                     UIManager.NavigateToCoinSetup();
                 }

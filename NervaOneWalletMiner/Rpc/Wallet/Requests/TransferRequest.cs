@@ -24,5 +24,8 @@ namespace NervaOneWalletMiner.Rpc.Wallet.Requests
         public string Comment { get; set; } = string.Empty;
         public string CommentTo { get; set; } = string.Empty;
         public bool SubtractFeeFromAmount { get; set;} = false;
+
+        // Pre-built transaction from EstimateFee: tx_metadata (XMR) or funded PSBT (BTC)
+        public string TxData { get; set; } = string.Empty;
     }
 }

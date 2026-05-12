@@ -59,6 +59,12 @@
 					Margin="0,10,0,0"
 					Click="RestoreFromKeys_Clicked"/>
 
+			<Button Name="btnRestoreFromDumpFile"
+					Content="Restore Wallet from Dump File"
+					DockPanel.Dock="Right"
+					Margin="0,10,0,0"
+					Click="RestoreFromDumpFile_Clicked"/>
+
 			<Separator Margin="0,20,0,0"/>
 
 			<Button Name="btnRescanSpent"
@@ -86,6 +92,12 @@
 					DockPanel.Dock="Right"
 					Margin="0,10,0,0"
 					Click="ViewKeysSeed_Clicked"/>
+
+			<Button Name="btnDumpKeysToFile"
+					Content="Dump Keys to File"
+					DockPanel.Dock="Right"
+					Margin="0,10,0,0"
+					Click="DumpKeysToFile_Clicked"/>
 
 			<Separator Margin="0,20,0,0"/>
 		

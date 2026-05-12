@@ -2,6 +2,7 @@
 using Avalonia.Threading;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects;
+using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.ViewModels;
 using NervaOneWalletMiner.ViewsDialogs;
 using System;
@@ -48,6 +49,7 @@ public partial class MainView : UserControl
             vm.CheckAndGetCliEvent += CheckAndDownloadCliIfNeeded;
             vm.SyncWithQuickSyncEvent += QuickSyncIfWanted;
             vm.ShowDaemonTabEvent += ShowDaemonTab;
+            vm.SelectNavItemEvent += SelectNavItem;
 
             CheckAndDownloadCliIfNeeded();
 
@@ -87,7 +89,7 @@ public partial class MainView : UserControl
         {
             if (GlobalData.IsConfigFound && !GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
             {
-                GlobalData.IsCliToolsFound = false;
+                GlobalData.DaemonState = DaemonState.CliToolsMissing;
                 Logger.LogDebug("MAV.CDCN", "CLI tools not found. Navigating to Coin Setup View.");
                 UIManager.NavigateToCoinSetup();
             }
@@ -95,6 +97,28 @@ public partial class MainView : UserControl
         catch (Exception ex)
         {
             Logger.LogException("MAV.CDCN", ex);
+        }
+    }
+
+    public void SelectNavItem(string page)
+    {
+        try
+        {
+            switch (page)
+            {
+                case SplitViewPages.Daemon: daemon.IsSelected = true; break;
+                case SplitViewPages.Wallet: wallet.IsSelected = true; break;
+                case SplitViewPages.Transfers: transfers.IsSelected = true; break;
+                case SplitViewPages.AddressBook: address_book.IsSelected = true; break;
+                case SplitViewPages.DaemonSetup: daemon_setup.IsSelected = true; break;
+                case SplitViewPages.WalletSetup: wallet_setup.IsSelected = true; break;
+                case SplitViewPages.Settings: settings.IsSelected = true; break;
+                case SplitViewPages.About: about.IsSelected = true; break;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException("MAV.SNAV", ex);
         }
     }
 

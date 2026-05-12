@@ -25,6 +25,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="ReactiveUI.Avalonia" Version="11.3.8" />
     <PackageReference Include="SharpZipLib" Version="1.4.2" />
+    <PackageReference Include="NBitcoin" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,6 +36,7 @@
 
   <ItemGroup>
     <Folder Include="Assets\dash\" />
+    <Folder Include="Assets\btc\" />
     <Folder Include="Assets\wow\" />
     <Folder Include="Assets\xmr\" />
     <Folder Include="Assets\xnv\" />

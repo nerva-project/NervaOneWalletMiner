@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Media.Imaging;
+using NervaOneWalletMiner.Objects;
 using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Objects.Settings;
 using NervaOneWalletMiner.Objects.Settings.CoinSpecific;
@@ -16,7 +17,7 @@ namespace NervaOneWalletMiner.Helpers
     {
         public const string AppNameMain = "NervaOne";
         public const string AppAssemblyName = "NervaOneWalletMiner";
-        public const string Version = "1.0.0";
+        public const string Version = "1.0.2";
 
         public const string CliToolsDirName = "cli";
         public const string WalletDirName = "wallets";
@@ -52,14 +53,15 @@ namespace NervaOneWalletMiner.Helpers
         public static IDaemonService DaemonService = new DaemonServiceXNV();
         public static Dictionary<string, ICoinSettings> CoinSettings = GlobalMethods.GetDefaultCoinSettings();
 
+        public static List<CoinListItem> CoinList = GlobalMethods.BuildCoinList();
+
         public static readonly string MainDataDir = GlobalMethods.GetDataDir();
         public static readonly string AppDataDir = GlobalMethods.GetAppDataDir();
         public static readonly string LogsDir = GlobalMethods.GetLogsDir();
         public static readonly string ExportsDir = GlobalMethods.GetExportsDir();
         public static readonly string ConfigFileNameWithPath = GlobalMethods.GetConfigFileNameWithPath();
 
-        public static volatile bool IsDaemonRestarting = false;
-        public static volatile bool IsInitialDaemonConnectionSuccess = false;
+        public static volatile DaemonState DaemonState = DaemonState.Connecting;
         public static DateTime LastDaemonResponseTime = DateTime.MinValue;
         public static DateTime LastDaemonRestartAttempt = DateTime.MinValue;
 
@@ -86,9 +88,6 @@ namespace NervaOneWalletMiner.Helpers
         public static volatile bool IsGetAndSetWalletDataComplete = true;
         public static volatile bool IsGetAndSetDaemonDataComplete = true;
 
-        public static volatile bool IsCliToolsFound = true;
-        public static volatile bool IsCliToolsDownloading = false;
-        public static volatile bool IsBlockchainDbDownloading = false;
 
         // Connections Guard
         public static DateTime ConnectGuardLastGoodTime = DateTime.Now;
@@ -103,6 +102,7 @@ namespace NervaOneWalletMiner.Helpers
         public static ulong NewestTransactionHeight = 0;
         public static string NewestTransactionBlockHash = string.Empty;
         public static ulong WalletHeight = 0;
+        public static volatile bool HasUnconfirmedTransactions = false;
        
         public static string WalletProcessName = GlobalMethods.GetWalletProcessName(AppSettings.ActiveCoin);
         public static string DaemonProcessName = GlobalMethods.GetDaemonProcessName(AppSettings.ActiveCoin);

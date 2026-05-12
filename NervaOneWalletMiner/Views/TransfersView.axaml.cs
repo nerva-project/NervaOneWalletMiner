@@ -14,6 +14,7 @@ namespace NervaOneWalletMiner.Views
     public partial class TransfersView : UserControl
     {
         private DataGridTextColumn? _colHeight;
+        private DataGridTextColumn? _colConf;
         private DataGridTextColumn? _colAddress;
 
         public TransfersView()
@@ -23,9 +24,10 @@ namespace NervaOneWalletMiner.Views
                 InitializeComponent();
                 imgCoinIcon.Source = GlobalMethods.GetLogo();
 
-                // Index 1=Height, 4=Address (icon=0, Time=2, Amount=3)
+                // Index 1=Height, 2=Conf., 5=Address (icon=0, Time=3, Amount=4)
                 _colHeight = (DataGridTextColumn)dtgTransactions.Columns[1];
-                _colAddress = (DataGridTextColumn)dtgTransactions.Columns[4];
+                _colConf = (DataGridTextColumn)dtgTransactions.Columns[2];
+                _colAddress = (DataGridTextColumn)dtgTransactions.Columns[5];
 
                 // Prevent row selection from triggering RequestBringIntoView
                 dtgTransactions.AddHandler(
@@ -53,6 +55,7 @@ namespace NervaOneWalletMiner.Views
 
                     // Narrow: icon + Time + Amount
                     if (_colHeight != null) { _colHeight.IsVisible = false; }
+                    if (_colConf != null) { _colConf.IsVisible = false; }
                     if (_colAddress != null) { _colAddress.IsVisible = false; }
                 }
                 else if (e.NewSize.Width < 700)
@@ -63,8 +66,9 @@ namespace NervaOneWalletMiner.Views
                     Grid.SetColumn(btnTransactionDetails, 2);
                     btnTransactionDetails.Margin = new Thickness(0, 0, 5, 0);
 
-                    // Medium: icon + Height + Time + Amount
+                    // Medium: icon + Height + Conf. + Time + Amount
                     if (_colHeight != null) { _colHeight.IsVisible = true; }
+                    if (_colConf != null) { _colConf.IsVisible = true; }
                     if (_colAddress != null) { _colAddress.IsVisible = false; }
                 }
                 else
@@ -77,6 +81,7 @@ namespace NervaOneWalletMiner.Views
 
                     // Wide: all columns
                     if (_colHeight != null) { _colHeight.IsVisible = true; }
+                    if (_colConf != null) { _colConf.IsVisible = true; }
                     if (_colAddress != null) { _colAddress.IsVisible = true; }
                 }
             }

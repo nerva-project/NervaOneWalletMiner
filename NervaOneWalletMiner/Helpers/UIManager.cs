@@ -60,6 +60,7 @@ namespace NervaOneWalletMiner.Helpers
                 { SplitViewPages.AddressBookEntry, new AddressBookEntryViewModel() },
                 { SplitViewPages.RestoreFromKeys, new RestoreFromKeysViewModel() },
                 { SplitViewPages.RestoreFromSeed, new RestoreFromSeedViewModel() },
+                { SplitViewPages.RestoreFromDumpFile, new RestoreFromDumpFileViewModel() },
                 { SplitViewPages.SweepBelow, new SweepBelowViewModel() },
                 { SplitViewPages.DisplayKeysSeed, new DisplayKeysSeedViewModel() },
                 { SplitViewPages.ViewLogs, new ViewLogsViewModel() },
@@ -93,6 +94,7 @@ namespace NervaOneWalletMiner.Helpers
                 { SplitViewPages.AddressBookEntry, new AddressBookEntryViewModel() },
                 { SplitViewPages.RestoreFromKeys, new RestoreFromKeysViewModel() },
                 { SplitViewPages.RestoreFromSeed, new RestoreFromSeedViewModel() },
+                { SplitViewPages.RestoreFromDumpFile, new RestoreFromDumpFileViewModel() },
                 { SplitViewPages.SweepBelow, new SweepBelowViewModel() },
                 { SplitViewPages.DisplayKeysSeed, new DisplayKeysSeedViewModel() },
                 { SplitViewPages.ViewLogs, new ViewLogsViewModel() },
@@ -208,6 +210,12 @@ namespace NervaOneWalletMiner.Helpers
             ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.RestoreFromSeed];
         }
 
+        public static void NavigateToRestoreFromDumpFile()
+        {
+            GlobalData.ViewModelPages[SplitViewPages.RestoreFromDumpFile] = new RestoreFromDumpFileViewModel();
+            ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[SplitViewPages.RestoreFromDumpFile];
+        }
+
         public static void NavigateToSweepBelow()
         {
             GlobalData.ViewModelPages[SplitViewPages.SweepBelow] = new SweepBelowViewModel();
@@ -235,6 +243,7 @@ namespace NervaOneWalletMiner.Helpers
         public static void NavigateToPage(string page)
         {
             ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).CurrentPage = GlobalData.ViewModelPages[page];
+            ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).SelectNavItem(page);
         }
 
         public static void NavigateToDefaultPage()
@@ -398,7 +407,7 @@ namespace NervaOneWalletMiner.Helpers
         {
             try
             {
-                if (GlobalData.IsCliToolsDownloading || GlobalData.IsBlockchainDbDownloading)
+                if (GlobalData.DaemonState == DaemonState.Downloading)
                 {
                     // Don't want to update
                     return;
@@ -411,7 +420,19 @@ namespace NervaOneWalletMiner.Helpers
                 }
                 else
                 {
-                    string rawVersion = GlobalData.NetworkStats.Version.ToLower().StartsWith("v") ? GlobalData.NetworkStats.Version : "v" + GlobalData.NetworkStats.Version;
+                    string rawVersion = GlobalData.NetworkStats.Version;
+
+                    // Handle Bitcoin's "/Satoshi:31.0.0/" format - extract part between ':' and trailing '/'
+                    int colonIndex = rawVersion.IndexOf(':');
+                    if (colonIndex >= 0)
+                    {
+                        rawVersion = rawVersion[(colonIndex + 1)..].TrimEnd('/');
+                    }
+
+                    if (!rawVersion.ToLower().StartsWith("v"))
+                    {
+                        rawVersion = "v" + rawVersion;
+                    }
 
                     // Keep only the numeric part: e.g. "v0.18.4.5-release" -> "v0.18.4.5"
                     int dashIndex = rawVersion.IndexOf('-');
@@ -464,19 +485,24 @@ namespace NervaOneWalletMiner.Helpers
                         }
                     }
 
-                    string totalLockedLabel = "Total " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits + ":";
-                    string totalUnlockedLabel = "Unlocked " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits + ":";
-                    string statusBarMessage = GlobalData.OpenedWalletName + " | " + GlobalData.WalletStats.BalanceTotal.ToString("F2") + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits + (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletHeightSupported ? " | H: " + GlobalData.WalletHeight : string.Empty);
+                    bool isBtcStyle = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletBtcStyle;
+                    string units = GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
+                    string totalLockedLabel = "Total " + units + ":";
+                    string totalUnlockedLabel = (isBtcStyle ? "Pending " : "Unlocked ") + units + ":";
+                    string statusBarMessage = GlobalData.OpenedWalletName + " | " + GlobalMethods.FormatAmount(GlobalData.WalletStats.BalanceTotal) + " " + units + (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletHeightSupported ? " | H: " + GlobalData.WalletHeight : string.Empty);
 
                     Dispatcher.UIThread.Invoke(() =>
                     {
-                        if (!walletVm.TotalCoins.Equals(GlobalData.WalletStats.BalanceTotal.ToString()))
+                        string totalFormatted = GlobalMethods.FormatAmount(GlobalData.WalletStats.BalanceTotal);
+                        if (!walletVm.TotalCoins.Equals(totalFormatted))
                         {
-                            walletVm.TotalCoins = GlobalData.WalletStats.BalanceTotal.ToString();
+                            walletVm.TotalCoins = totalFormatted;
                         }
-                        if (!walletVm.UnlockedCoins.Equals(GlobalData.WalletStats.BalanceUnlocked.ToString()))
+
+                        string secondBalance = isBtcStyle ? GlobalMethods.FormatAmount(GlobalData.WalletStats.BalancePending) : GlobalMethods.FormatAmount(GlobalData.WalletStats.BalanceUnlocked);
+                        if (!walletVm.UnlockedCoins.Equals(secondBalance))
                         {
-                            walletVm.UnlockedCoins = GlobalData.WalletStats.BalanceUnlocked.ToString();
+                            walletVm.UnlockedCoins = secondBalance;
                         }
                         if (!walletVm.TotalLockedLabel.Equals(totalLockedLabel))
                         {
@@ -603,6 +629,11 @@ namespace NervaOneWalletMiner.Helpers
 
                             // Need to clear transfers AFTER we process them otherwise we might clear them before we process them
                             GlobalData.TransfersStats.Transactions = [];
+
+                            // The initial load of a large wallet leaves significant heap pressure from JSON
+                            // deserialization intermediates. Hint GC to collect now rather than waiting for
+                            // organic pressure — blocking:false lets it run in the background.
+                            GC.Collect(2, GCCollectionMode.Forced, blocking: false, compacting: false);
                         }
 
                         if (transfersViewVm.Transactions.Count > 0)
@@ -613,33 +644,128 @@ namespace NervaOneWalletMiner.Helpers
                     }
                     else
                     {
-                        // Compute new transfers on timer thread before marshaling to UI thread
-                        List<Transfer> newTransfers = [];
-                        HashSet<string> existingKeys = [.. transfersViewVm.Transactions.Select(t => t.TransactionId + t.Type)];
+                        int confirmationThreshold = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].ConfirmationThreshold;
+                        bool isBtcStyle = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletBtcStyle;
 
-                        foreach (string newTransferKey in GlobalData.TransfersStats.Transactions.Keys)
+                        // Step 1: Classify incoming transactions from the RPC poll
+                        // For XMR based coins, get_transfers filters by MinHeight so this staging dict only contains brand-new transactions (transactions already in the UI are not returned again).
+                        // For BTC based coins, listsinceblock returns everything every poll, so this dict is always non-empty.
+                        // We skip building the lookup entirely when the staging dict is empty (common for XMR).
+                        if (GlobalData.TransfersStats.Transactions.Count > 0)
                         {
-                            if (!existingKeys.Contains(newTransferKey))
+                            // O(1) lookup of what is already visible in the UI
+                            Dictionary<string, Transfer> uiTransactionLookup = transfersViewVm.Transactions
+                                .ToDictionary(uiTx => uiTx.TransactionId + uiTx.Type, uiTx => uiTx);
+
+                            List<Transfer> brandNewTransactions = [];
+                            List<(Transfer UiEntry, Transfer RpcEntry)> pendingConfirmedUpdates = [];
+
+                            foreach (var rpcTx in GlobalData.TransfersStats.Transactions)
                             {
-                                newTransfers.Add(GlobalData.TransfersStats.Transactions[newTransferKey]);
+                                if (!uiTransactionLookup.TryGetValue(rpcTx.Key, out Transfer? uiEntry))
+                                {
+                                    // Transaction not in UI yet — add it
+                                    brandNewTransactions.Add(rpcTx.Value);
+                                }
+                                else if (uiEntry.Height == 0 && rpcTx.Value.Height > 0)
+                                {
+                                    // Was pending (Height == 0), now confirmed — update block height and display
+                                    pendingConfirmedUpdates.Add((uiEntry, rpcTx.Value));
+                                }
                             }
+
+                            if (brandNewTransactions.Count > 0 || pendingConfirmedUpdates.Count > 0)
+                            {
+                                // Sort new transactions oldest-first so Insert(0) ends up newest-on-top
+                                List<Transfer> orderedNewTransactions = brandNewTransactions.Count > 0
+                                    ? [.. brandNewTransactions.OrderBy(tx => tx.Height)]
+                                    : [];
+
+                                Dispatcher.UIThread.Invoke(() =>
+                                {
+                                    foreach (var (uiEntry, rpcEntry) in pendingConfirmedUpdates)
+                                    {
+                                        // INotifyPropertyChanged on Height, HeightDisplay, Confirmations fires individual cell refresh
+                                        uiEntry.Height = rpcEntry.Height;
+                                        uiEntry.HeightDisplay = rpcEntry.HeightDisplay;
+                                        uiEntry.Confirmations = rpcEntry.Confirmations;
+                                    }
+
+                                    foreach (Transfer newTransaction in orderedNewTransactions)
+                                    {
+                                        transfersViewVm.Transactions.Insert(0, newTransaction);
+                                    }
+                                });
+
+                                if (brandNewTransactions.Count > 0)
+                                {
+                                    // New transactions start unconfirmed — make sure the confirmation scan runs
+                                    GlobalData.HasUnconfirmedTransactions = true;
+                                    newTransfersCount = brandNewTransactions.Count;
+                                }
+                            }
+
+                            // Clear staging dict after processing so the next poll starts fresh
+                            GlobalData.TransfersStats.Transactions = [];
                         }
 
-                        if (newTransfers.Count > 0)
+                        // Step 2: Update confirmation counts for all coins
+                        // Confirmations are calculated locally from current chain height rather than taken from the
+                        // RPC response. This works for all coins and handles XMR wallet-only mode correctly:
+                        //  XMR Based: WalletHeight = block count from wallet RPC (always available, even without a local daemon). Formula: confirmations = WalletHeight - txHeight.
+                        //  BTC Based: NetworkStats.YourHeight = tip block height from daemon RPC. Adding 1 makes it a block count so the same formula applies to both coin styles.
+                        // HasUnconfirmedTransactions prevents iterating all rows every poll once all transactions are fully confirmed. It resets to true whenever new transactions arrive.
+                        ulong currentChainBlockCount = isBtcStyle
+                            ? GlobalData.NetworkStats.YourHeight + 1UL
+                            : GlobalData.WalletHeight;
+
+                        if (currentChainBlockCount > 0 && GlobalData.HasUnconfirmedTransactions)
                         {
-                            List<Transfer> ordered = [.. newTransfers.OrderBy(t => t.Height)];
+                            List<(Transfer UiEntry, long UpdatedConfirmations)> confirmationUpdates = [];
+                            bool anyTransactionStillUnconfirmed = false;
 
-                            Dispatcher.UIThread.Invoke(() =>
+                            foreach (Transfer uiTransaction in transfersViewVm.Transactions)
                             {
-                                foreach (Transfer transfer in ordered)
+                                if (uiTransaction.Height > 0 && currentChainBlockCount > uiTransaction.Height)
                                 {
-                                    transfersViewVm.Transactions.Insert(0, transfer);
-                                }
-                            });
+                                    // Transaction is in a known block — calculate how many blocks have built on top
+                                    if (uiTransaction.Confirmations < confirmationThreshold)
+                                    {
+                                        long calculatedConfirmations = (long)(currentChainBlockCount - uiTransaction.Height);
+                                        long cappedConfirmations = Math.Min(calculatedConfirmations, confirmationThreshold);
 
-                            // Need to clear transfers AFTER we process them otherwise we might clear them before we process them
-                            GlobalData.TransfersStats.Transactions = [];
-                            newTransfersCount = newTransfers.Count;
+                                        if (calculatedConfirmations > uiTransaction.Confirmations)
+                                        {
+                                            confirmationUpdates.Add((uiTransaction, cappedConfirmations));
+                                        }
+
+                                        if (cappedConfirmations < confirmationThreshold)
+                                        {
+                                            anyTransactionStillUnconfirmed = true;
+                                        }
+                                    }
+                                }
+                                else if (uiTransaction.Height == 0)
+                                {
+                                    // Height == 0 means the transaction is still in the mempool (pending)
+                                    anyTransactionStillUnconfirmed = true;
+                                }
+                            }
+
+                            // Update the flag before dispatching so the next poll can skip if everything is confirmed
+                            GlobalData.HasUnconfirmedTransactions = anyTransactionStillUnconfirmed;
+
+                            if (confirmationUpdates.Count > 0)
+                            {
+                                Dispatcher.UIThread.Invoke(() =>
+                                {
+                                    foreach (var (uiEntry, updatedConfirmations) in confirmationUpdates)
+                                    {
+                                        // INotifyPropertyChanged fires individual cell refresh
+                                        uiEntry.Confirmations = updatedConfirmations;
+                                    }
+                                });
+                            }
                         }
                     }
 
@@ -661,6 +787,10 @@ namespace NervaOneWalletMiner.Helpers
                         {
                             transfersViewVm.Transactions = [];
                         });
+
+                        // The large Transfer collection is now eligible for GC. Hint the runtime to
+                        // collect immediately — without allocation pressure GC may not run for minutes.
+                        GC.Collect(2, GCCollectionMode.Forced, blocking: false, compacting: false);
                     }
                 }
             }
@@ -676,45 +806,34 @@ namespace NervaOneWalletMiner.Helpers
         {
             try
             {
-                if (GlobalData.IsCliToolsDownloading || GlobalData.IsBlockchainDbDownloading)
-                {
-                    // Status bar is updated directly when downloading/extracting; just keep NetworkStats neutral
-                    GlobalData.NetworkStats = new()
-                    {
-                        Connections = []
-                    };
-                }
-                else if (!GlobalData.IsCliToolsFound)
-                {
-                    GlobalData.NetworkStats = new()
-                    {
-                        StatusSync = "Client tools missing.",
-                        Connections = []
-                    };
-                }
-                else if(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
+                if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
                 {
                     GlobalData.NetworkStats = new()
                     {
                         StatusSync = GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].PublicNodeAddress,
                         Connections = []
                     };
+                    return;
                 }
-                else if (GlobalData.IsDaemonRestarting)
+
+                switch (GlobalData.DaemonState)
                 {
-                    GlobalData.NetworkStats = new()
-                    {
-                        StatusSync = "Restarting daemon...",
-                        Connections = []
-                    };
-                }
-                else if (!GlobalData.IsInitialDaemonConnectionSuccess)
-                {
-                    GlobalData.NetworkStats = new()
-                    {
-                        StatusSync = "Connecting to daemon...",
-                        Connections = []
-                    };
+                    case DaemonState.Downloading:
+                        // Status bar is updated directly when downloading/extracting; just keep NetworkStats neutral
+                        GlobalData.NetworkStats = new() { Connections = [] };
+                        break;
+                    case DaemonState.CliToolsMissing:
+                        GlobalData.NetworkStats = new() { StatusSync = "Client tools missing.", Connections = [] };
+                        break;
+                    case DaemonState.Restarting:
+                        GlobalData.NetworkStats = new() { StatusSync = "Restarting daemon...", Connections = [] };
+                        break;
+                    case DaemonState.WarmingUp:
+                        GlobalData.NetworkStats = new() { StatusSync = "Loading...", Connections = [] };
+                        break;
+                    case DaemonState.Connecting:
+                        GlobalData.NetworkStats = new() { StatusSync = "Connecting to daemon...", Connections = [] };
+                        break;
                 }
             }
             catch (Exception ex)
@@ -733,29 +852,30 @@ namespace NervaOneWalletMiner.Helpers
 
                     GetInfoResponse infoRes = await GlobalData.DaemonService.GetInfo(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, new GetInfoRequest());
                     
-                    if(infoRes.Error.IsError)
+                    if(infoRes.Status == StatusDaemon.WarmingUp)
+                    {
+                        GlobalData.LastDaemonResponseTime = DateTime.Now;
+                        GlobalData.DaemonState = DaemonState.WarmingUp;
+                    }
+                    else if(infoRes.Error.IsError)
                     {
                         Logger.LogError("UIM.GSDD", "GetInfo Error | Code: " + infoRes.Error.Code + " | Message: " + infoRes.Error.Message + " | Content: " + infoRes.Error.Content);
                     }
                     else
                     {
                         GlobalData.LastDaemonResponseTime = DateTime.Now;
-                        if (GlobalData.IsInitialDaemonConnectionSuccess == false)
-                        {
-                            // This will be used to get rid of establishing connection message and to StartWalletUiUpdate 
-                            GlobalData.IsInitialDaemonConnectionSuccess = true;
-                        }
-
-                        if (GlobalData.IsDaemonRestarting)
-                        {
-                            GlobalData.IsDaemonRestarting = false;
-                        }
+                        // This will be used to get rid of establishing connection message and to StartWalletUiUpdate
+                        GlobalData.DaemonState = DaemonState.Running;
 
                         GlobalData.NetworkStats.NetHeight = (infoRes.TargetHeight > infoRes.Height ? infoRes.TargetHeight : infoRes.Height);
                         GlobalData.NetworkStats.YourHeight = infoRes.Height;
                         GlobalData.NetworkStats.NetHashRate = infoRes.NetworkHashRate;
 
-                        if ((infoRes.NetworkHashRate / 1000000000000000.0d) > 1)
+                        if ((infoRes.NetworkHashRate / 1000000000000000000.0d) > 1)
+                        {
+                            GlobalData.NetworkStats.NetHashString = Math.Round((infoRes.NetworkHashRate / 1000000000000000000.0d), 2) + " EH/s";
+                        }
+                        else if ((infoRes.NetworkHashRate / 1000000000000000.0d) > 1)
                         {
                             GlobalData.NetworkStats.NetHashString = Math.Round((infoRes.NetworkHashRate / 1000000000000000.0d), 2) + " PH/s";
                         }
@@ -943,6 +1063,7 @@ namespace NervaOneWalletMiner.Helpers
                     {
                         GlobalData.WalletStats.BalanceTotal = response.BalanceTotal;
                         GlobalData.WalletStats.BalanceUnlocked = response.BalanceUnlocked;
+                        GlobalData.WalletStats.BalancePending = response.BalancePending;
 
                         GlobalData.WalletStats.Subaddresses = [];
 
@@ -953,6 +1074,12 @@ namespace NervaOneWalletMiner.Helpers
                                 account.WalletIcon = _walletImage;
                                 GlobalData.WalletStats.Subaddresses.Add(account.Index, account);
                             }
+                        }
+
+                        if (response.SubAccounts.Count == 0 && GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsDefaultAddressAutoCreated)
+                        {
+                            Logger.LogDebug("UIM.GSWD", "Wallet has no addresses — generating default address");
+                            await GlobalData.WalletService.CreateAccount(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new CreateAccountRequest { Label = string.Empty });
                         }
                     }
 
@@ -997,8 +1124,11 @@ namespace NervaOneWalletMiner.Helpers
                     }
                     else
                     {
+                        bool isBtcStyle = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletBtcStyle;
                         foreach (Transfer transfer in response.Transfers)
                         {
+                            transfer.HeightDisplay = isBtcStyle && transfer.Height == 0 ? "Pending" : transfer.Height.ToString();
+
                             if (!GlobalData.TransfersStats.Transactions.ContainsKey(transfer.TransactionId + transfer.Type))
                             {
                                 if (transfer.Type.Equals(TransferType.In))

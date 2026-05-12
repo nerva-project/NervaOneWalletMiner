@@ -11,7 +11,7 @@ namespace NervaOneWalletMiner.Helpers
         public static DateTime _cliToolsRunningLastCheck = DateTime.MinValue;
         public static bool _killMasterProcess = false;
 
-        private static bool IsCliToolsSuspended => GlobalData.IsCliToolsDownloading || GlobalData.IsBlockchainDbDownloading;
+        private static bool IsCliToolsSuspended => GlobalData.DaemonState == DaemonState.Downloading;
 
         // Per-operation timestamps. It used to be _masterTimerCount but it's unreliable on Android as it gets throttled in the background
         public static DateTime _lastDaemonDataFetch = DateTime.MinValue;
@@ -85,11 +85,11 @@ namespace NervaOneWalletMiner.Helpers
                     _masterUpdateTimer.Stop();
                 }
 
-                if (!GlobalData.IsCliToolsDownloading && GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir) && !GlobalData.IsCliToolsFound)
+                if (GlobalData.DaemonState == DaemonState.CliToolsMissing && GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
                 {
                     // Client tools downloaded and found
                     Logger.LogDebug("MSP.MUPS", "Client tools found.");
-                    GlobalData.IsCliToolsFound = true;
+                    GlobalData.DaemonState = DaemonState.Connecting;
                 }
 
                 // If kill master process is issued at any point, skip everything else and do not restart master timer
@@ -217,7 +217,7 @@ namespace NervaOneWalletMiner.Helpers
 
                     // Get Wallets/Transfers data
                     if (!_killMasterProcess
-                        && (GlobalData.IsInitialDaemonConnectionSuccess || GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
+                        && (GlobalData.DaemonState == DaemonState.Running || GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
                         && GlobalData.IsWalletOpen)
                     {
                         if (GlobalData.IsWalletJustOpened || _lastWalletDataFetch.AddSeconds(_walletFetchSeconds) < DateTime.Now)
@@ -328,8 +328,7 @@ namespace NervaOneWalletMiner.Helpers
                                 GlobalData.LastDaemonRestartAttempt = DateTime.Now;
                                 ProcessManager.Kill(GlobalData.DaemonProcessName);
                                 ProcessManager.StartExternalProcess(GlobalMethods.GetDaemonProcess(), GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].GenerateDaemonOptions(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]));
-                                GlobalData.IsInitialDaemonConnectionSuccess = false;
-                                GlobalData.IsCliToolsFound = true;
+                                GlobalData.DaemonState = DaemonState.Connecting;
                             }
                             else
                             {
@@ -391,7 +390,7 @@ namespace NervaOneWalletMiner.Helpers
 
                     ProcessManager.Kill(GlobalData.WalletProcessName);
                     GlobalMethods.StopAndCloseDaemon();
-                    GlobalData.IsDaemonRestarting = true;
+                    GlobalData.DaemonState = DaemonState.Restarting;
 
                     Logger.LogDebug("MSP.CSGR", "Connections guard restaring using options: " + restartOptions);
                     ProcessManager.StartExternalProcess(GlobalMethods.GetDaemonProcess(), GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].GenerateDaemonOptions(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]) + " " + restartOptions);

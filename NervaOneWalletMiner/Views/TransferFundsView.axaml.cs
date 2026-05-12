@@ -44,16 +44,38 @@ namespace NervaOneWalletMiner.Views
                 string paymentId = DataContext is TransferFundsViewModel vm3 ? vm3.PaymentId : string.Empty;
                 _returnPage = DataContext is TransferFundsViewModel vm4 ? vm4.ReturnPage : SplitViewPages.Wallet;
 
-                foreach (Account account in GlobalData.WalletStats.Subaddresses.Values)
+                if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletBtcStyle)
                 {
-                    if (!_accounts.ContainsKey(account.Index))
-                    {
-                        _accounts.Add(account.Index, string.IsNullOrEmpty(account.Label) ? "No label" + " (" + account.AddressShort + ")" : account.Label + " (" + account.AddressShort + ")");
-                    }
+                    pnlUnlocked.IsVisible = false;
                 }
 
-                cbxSendFrom.ItemsSource = _accounts.Values;
-                cbxSendFrom.SelectedIndex = (int)selectedAccountIndex;
+                if (!GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPaymentIdSupported)
+                {
+                    pnlPaymentId.IsVisible = false;
+                }
+
+                if (!GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsSplitTransferSupported)
+                {
+                    cbxSplitTransfer.IsVisible = false;
+                }
+
+                if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsSendFromSupported)
+                {
+                    foreach (Account account in GlobalData.WalletStats.Subaddresses.Values)
+                    {
+                        if (!_accounts.ContainsKey(account.Index))
+                        {
+                            _accounts.Add(account.Index, string.IsNullOrEmpty(account.Label) ? "No label" + " (" + account.AddressShort + ")" : account.Label + " (" + account.AddressShort + ")");
+                        }
+                    }
+
+                    cbxSendFrom.ItemsSource = _accounts.Values;
+                    cbxSendFrom.SelectedIndex = (int)selectedAccountIndex;
+                }
+                else
+                {
+                    pnlSendFrom.IsVisible = false;
+                }
 
                 if (!string.IsNullOrEmpty(toAddress))
                 {
@@ -65,13 +87,9 @@ namespace NervaOneWalletMiner.Views
                     tbxPaymentId.Text = paymentId;
                 }
 
-                List<string> priorityList =
-                [
-                    SendPriority.Default,
-                    SendPriority.Low,
-                    SendPriority.Medium,
-                    SendPriority.High,
-                ];
+                List<string> priorityList = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletBtcStyle
+                    ? SendPriority.GetBtcPriorityList()
+                    : SendPriority.GetXmrPriorityList();
 
                 cbxPriority.ItemsSource = priorityList;
                 cbxPriority.SelectedIndex = 0;
@@ -86,21 +104,33 @@ namespace NervaOneWalletMiner.Views
 
         private void UpdateBalanceLabels(uint accountIndex)
         {
-            decimal balanceTotal = 0;
-            decimal balanceUnlocked = 0;
+            decimal balanceTotal;
+            decimal balanceUnlocked;
+            string units = GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
 
-            foreach (Account account in GlobalData.WalletStats.Subaddresses.Values)
+            if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsSendFromSupported)
             {
-                if (account.Index == accountIndex)
+                balanceTotal = 0;
+                balanceUnlocked = 0;
+
+                foreach (Account account in GlobalData.WalletStats.Subaddresses.Values)
                 {
-                    balanceTotal = account.BalanceTotal;
-                    balanceUnlocked = account.BalanceUnlocked;
-                    break;
+                    if (account.Index == accountIndex)
+                    {
+                        balanceTotal = account.BalanceTotal;
+                        balanceUnlocked = account.BalanceUnlocked;
+                        break;
+                    }
                 }
             }
+            else
+            {
+                balanceTotal = GlobalData.WalletStats.BalanceTotal;
+                balanceUnlocked = GlobalData.WalletStats.BalanceUnlocked;
+            }
 
-            lblBalance.Content = balanceTotal + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
-            lblUnlocked.Content = balanceUnlocked + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
+            lblBalance.Content = GlobalMethods.FormatAmount(balanceTotal) + " " + units;
+            lblUnlocked.Content = GlobalMethods.FormatAmount(balanceUnlocked) + " " + units;
         }
 
         private void Account_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -119,10 +149,21 @@ namespace NervaOneWalletMiner.Views
         {
             try
             {
-                if (string.IsNullOrEmpty(cbxSendFrom.SelectedValue?.ToString()) || string.IsNullOrEmpty(tbxSendTo.Text) || string.IsNullOrEmpty(tbxAmount.Text))
+                if(GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletBtcStyle)
                 {
-                    await DialogService.ShowAsync(new MessageBoxView("Transfer Funds", "From Address, To Address and Amount are required", true));
-                    return;
+                    if (string.IsNullOrEmpty(tbxSendTo.Text) || string.IsNullOrEmpty(tbxAmount.Text))
+                    {
+                        await DialogService.ShowAsync(new MessageBoxView("Transfer Funds", "Send To Address and Amount are required", true));
+                        return;
+                    }
+                }
+                else
+                {
+                    if (string.IsNullOrEmpty(cbxSendFrom.SelectedValue?.ToString()) || string.IsNullOrEmpty(tbxSendTo.Text) || string.IsNullOrEmpty(tbxAmount.Text))
+                    {
+                        await DialogService.ShowAsync(new MessageBoxView("Transfer Funds", "From Address, To Address and Amount are required", true));
+                        return;
+                    }
                 }
 
                 if (!decimal.TryParse(tbxAmount.Text, out decimal amount) || amount <= 0)
@@ -132,16 +173,78 @@ namespace NervaOneWalletMiner.Views
                 }
 
                 uint fromAccountIndex = (uint)cbxSendFrom.SelectedIndex;
+
+                decimal availableBalance;
+                if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsSendFromSupported)
+                {
+                    availableBalance = GlobalData.WalletStats.Subaddresses.TryGetValue(fromAccountIndex, out var acc) ? acc.BalanceUnlocked : 0;
+                }
+                else
+                {
+                    availableBalance = GlobalData.WalletStats.BalanceUnlocked;
+                }
+
+                if (amount > availableBalance)
+                {
+                    await DialogService.ShowAsync(new MessageBoxView("Transfer Funds", "Amount exceeds available balance of " + availableBalance, true));
+                    return;
+                }
                 string sendToAddress = tbxSendTo.Text;
                 string sendPaymentId = tbxPaymentId.Text ?? string.Empty;
                 string priority = (string)cbxPriority.SelectedValue!;
                 bool isSplit = (bool)cbxSplitTransfer.IsChecked!;
+                string units = GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
+                var walletRpc = GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc;
 
-                MessageBoxView confirmWindow = new("Confirm Transfer", "You're about to send " + tbxAmount.Text
-                    + " " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits
-                    + ". Once transfer is started, it cannot be stopped. Do you want to continue?",
-                    false, true);
-                DialogResult? confirmRes = await DialogService.ShowAsync<DialogResult>(confirmWindow);
+                // Estimate fee for regular transfers; skip for split (transfer_split may produce multiple txs)
+                EstimateFeeResponse feeResponse = new();
+                if (!isSplit)
+                {
+                    btnOk.Content = "Calculating...";
+                    btnOk.IsEnabled = false;
+                    btnCancel.IsEnabled = false;
+
+                    feeResponse = await GlobalData.WalletService.EstimateFee(walletRpc, new TransferRequest
+                    {
+                        Destinations = [new() { Amount = amount, Address = sendToAddress }],
+                        AccountIndex = fromAccountIndex,
+                        Priority = priority,
+                        PaymentId = sendPaymentId
+                    });
+
+                    btnOk.Content = "Transfer";
+                    btnOk.IsEnabled = true;
+                    btnCancel.IsEnabled = true;
+
+                    if (feeResponse.Error.IsError)
+                    {
+                        Logger.LogError("TFV.OKBC", "Fee estimation error | " + feeResponse.Error.Message);
+                        await DialogService.ShowAsync(new MessageBoxView("Transfer Funds", "Could not estimate fee\r\n\r\n" + feeResponse.Error.Message, true));
+                        return;
+                    }
+                }
+
+                string confirmMessage;
+                if (isSplit)
+                {
+                    confirmMessage = "You're about to send " + tbxAmount.Text + " " + units + ". Once transfer is started, it cannot be stopped. Do you want to continue?";
+                }
+                else
+                {
+                    confirmMessage = "Send To: " + GlobalMethods.GetShorterString(sendToAddress, 12) + "\r\n"
+                        + "Amount: " + tbxAmount.Text + " " + units + "\r\n"
+                        + "Fee: " + feeResponse.Fee + " " + units + "\r\n"
+                        + "Total: " + (amount + feeResponse.Fee) + " " + units + "\r\n";
+
+                    if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletBtcStyle)
+                    {
+                        confirmMessage += "Est. confirmation: " + SendPriority.GetBtcConfirmationTarget(priority) + "\r\n";
+                    }
+
+                    confirmMessage += "\r\nOnce transfer is started, it cannot be stopped. Do you want to continue?";
+                }
+
+                DialogResult? confirmRes = await DialogService.ShowAsync<DialogResult>(new MessageBoxView("Confirm Transfer", confirmMessage, false, true));
 
                 if (confirmRes == null || !confirmRes.IsOk)
                 {
@@ -174,7 +277,7 @@ namespace NervaOneWalletMiner.Views
                                 TimeoutInSeconds = GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].UnlockMinutes * 60
                             };
 
-                            UnlockWithPassResponse response = await GlobalData.WalletService.UnlockWithPass(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
+                            UnlockWithPassResponse response = await GlobalData.WalletService.UnlockWithPass(walletRpc, request);
 
                             if (response.Error.IsError)
                             {
@@ -210,7 +313,7 @@ namespace NervaOneWalletMiner.Views
                 }
                 else
                 {
-                    await MakeTransfer(fromAccountIndex, sendToAddress, amount, sendPaymentId, priority);
+                    await MakeTransfer(fromAccountIndex, sendToAddress, amount, sendPaymentId, priority, feeResponse.TxData);
                 }
 
                 UIManager.NavigateToPage(_returnPage);
@@ -264,7 +367,7 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
-        private async System.Threading.Tasks.Task MakeTransfer(uint fromAccountIndex, string sendToAddress, decimal amount, string paymentId, string priority)
+        private async System.Threading.Tasks.Task MakeTransfer(uint fromAccountIndex, string sendToAddress, decimal amount, string paymentId, string priority, string txData)
         {
             try
             {
@@ -273,7 +376,8 @@ namespace NervaOneWalletMiner.Views
                     Destinations = [new() { Amount = amount, Address = sendToAddress }],
                     AccountIndex = fromAccountIndex,
                     Priority = priority,
-                    PaymentId = paymentId
+                    PaymentId = paymentId,
+                    TxData = txData
                 };
 
                 TransferResponse response = await GlobalData.WalletService.Transfer(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
