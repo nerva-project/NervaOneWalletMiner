@@ -169,9 +169,21 @@ namespace NervaOneWalletMiner.ViewModels
 
                 if (SelectedNodeType != daemonSettings.NodeType)
                 {
+                    bool wasWalletOnly = daemonSettings.NodeType == NodeType.WalletOnly;
+                    bool isNowWalletOnly = SelectedNodeType == NodeType.WalletOnly;
                     daemonSettings.NodeType = SelectedNodeType;
+                                        
+                    if (wasWalletOnly || isNowWalletOnly)
+                    {
+                        isLocalRemoteNodeChange = true;
+                    }
+                    else
+                    {
+                        isRestartRequired = true;
+                    }
+
                     Logger.LogDebug("DSM.APST", "Switching to " + SelectedNodeType);
-                    isSaveSettingsNeeded = isLocalRemoteNodeChange = true;
+                    isSaveSettingsNeeded = true;
                 }
 
                 if (IsWalletOnly && walletSettings.PublicNodeAddress != RemoteNodeAddress.Trim())

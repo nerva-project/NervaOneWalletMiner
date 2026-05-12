@@ -1711,7 +1711,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                     AddressShort = GlobalMethods.GetShorterString(entry.address, 12),
                                     Height = string.IsNullOrEmpty(entry.blockheight) ? 0 : Convert.ToUInt32(entry.blockheight),
                                     Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timereceived).ToLocalTime(),
-                                    Amount = Math.Abs(Convert.ToDecimal(entry.amount)),
+                                    Amount = string.IsNullOrEmpty(entry.amount) ? 0 : Math.Abs(decimal.Parse(entry.amount, NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign)),
                                     Type = GetTransactionType(entry.category),
                                     Confirmations = entry.confirmations
                                 };

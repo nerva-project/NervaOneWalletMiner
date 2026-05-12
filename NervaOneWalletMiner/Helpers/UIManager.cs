@@ -685,15 +685,10 @@ namespace NervaOneWalletMiner.Helpers
                                 {
                                     foreach (var (uiEntry, rpcEntry) in pendingConfirmedUpdates)
                                     {
+                                        // INotifyPropertyChanged on Height, HeightDisplay, Confirmations fires individual cell refresh
                                         uiEntry.Height = rpcEntry.Height;
                                         uiEntry.HeightDisplay = rpcEntry.HeightDisplay;
-                                        // Replace triggers ObservableCollection.Replace notification so the DataGrid
-                                        // refreshes that row without needing INotifyPropertyChanged on Transfer
-                                        int idx = transfersViewVm.Transactions.IndexOf(uiEntry);
-                                        if (idx >= 0)
-                                        {
-                                            transfersViewVm.Transactions[idx] = uiEntry;
-                                        }
+                                        uiEntry.Confirmations = rpcEntry.Confirmations;
                                     }
 
                                     foreach (Transfer newTransaction in orderedNewTransactions)
@@ -766,14 +761,8 @@ namespace NervaOneWalletMiner.Helpers
                                 {
                                     foreach (var (uiEntry, updatedConfirmations) in confirmationUpdates)
                                     {
+                                        // INotifyPropertyChanged fires individual cell refresh
                                         uiEntry.Confirmations = updatedConfirmations;
-                                        // Replace triggers ObservableCollection.Replace notification so the DataGrid
-                                        // refreshes that row without needing INotifyPropertyChanged on Transfer
-                                        int idx = transfersViewVm.Transactions.IndexOf(uiEntry);
-                                        if (idx >= 0)
-                                        {
-                                            transfersViewVm.Transactions[idx] = uiEntry;
-                                        }
                                     }
                                 });
                             }
