@@ -6,6 +6,7 @@ using NervaOneWalletMiner.ViewModels;
 using NervaOneWalletMiner.ViewsDialogs;
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace NervaOneWalletMiner.Views
 {
@@ -27,6 +28,42 @@ namespace NervaOneWalletMiner.Views
                     btnOpenWalletsFolder.IsVisible = false;
                     btnOpenWalletExportsFolder.IsVisible = false;
                     sepOpenFolders.IsVisible = false;
+                }
+
+                var coinSettings = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin];
+
+                if (coinSettings.AreKeysDumpedToFile)
+                {
+                    btnViewKeysSeed.IsVisible = false;
+                }
+                else
+                {
+                    btnDumpKeysToFile.IsVisible = false;
+                }
+
+                if (!coinSettings.IsRestoreFromSeedSupported)
+                {
+                    btnRestoreFromSeed.IsVisible = false;
+                }
+
+                if (!coinSettings.IsRestoreFromKeysSupported)
+                {
+                    btnRestoreFromKeys.IsVisible = false;
+                }
+
+                if (!coinSettings.IsRestoreFromDumpFileSupported)
+                {
+                    btnRestoreFromDumpFile.IsVisible = false;
+                }
+
+                if (!coinSettings.IsRescanSpentSupported)
+                {
+                    btnRescanSpent.IsVisible = false;
+                }
+
+                if (!coinSettings.IsSweepBelowSupported)
+                {
+                    btnSweepBelow.IsVisible = false;
                 }
             }
             catch (Exception ex)
@@ -157,6 +194,27 @@ namespace NervaOneWalletMiner.Views
         }
         #endregion // Restore from Keys
 
+        #region Restore from Dump File
+        public async void RestoreFromDumpFile_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                var prereq = GetVm().CheckPrerequisites(false, "Restore Wallet from Dump File");
+                if (!prereq.IsSuccess)
+                {
+                    await DialogService.ShowAsync(new MessageBoxView(prereq.Title, prereq.Message, true));
+                    return;
+                }
+
+                UIManager.NavigateToRestoreFromDumpFile();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("WAS.RFDC", ex);
+            }
+        }
+        #endregion // Restore from Dump File
+
         #region Rescan Spent
         public async void RescanSpent_Clicked(object sender, RoutedEventArgs args)
         {
@@ -191,6 +249,15 @@ namespace NervaOneWalletMiner.Views
                     return;
                 }
 
+                if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletBtcStyle)
+                {
+                    DialogResult? confirmRes = await DialogService.ShowAsync<DialogResult>(new MessageBoxView("Rescan Blockchain", "Rescanning the blockchain can take a very long time depending on chain size. Wallet operations might be unresponsive until it completes.\r\n\r\nDo you want to continue?", false, true));
+                    if (confirmRes == null || !confirmRes.IsOk)
+                    {
+                        return;
+                    }
+                }
+
                 var opResult = await GetVm().RescanBlockchain();
                 await DialogService.ShowAsync(new MessageBoxView(opResult.Title, opResult.Message, true));
             }
@@ -217,61 +284,12 @@ namespace NervaOneWalletMiner.Views
                     return;
                 }
 
-                bool isAuthorized = false;
-                if (vm.IsPasswordStillValid())
-                {
-                    isAuthorized = true;
-                }
-                else
-                {
-                    TextBoxView textWindow = new(title: "Provide Wallet Password", labelValue: "Please provide wallet password", textValue: string.Empty, textWatermark: "Required - Wallet password", isTextRequired: true, isTextPassword: true, okButtonText: "Submit");
-                    DialogResult? passRes = await DialogService.ShowAsync<DialogResult>(textWindow);
-
-                    if (passRes == null || !passRes.IsOk)
-                    {
-                        return;
-                    }
-
-                    if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPassRequiredToOpenWallet)
-                    {
-                        isAuthorized = vm.VerifyPasswordLocally(passRes.TextBoxValue.ToCharArray());
-                        if (isAuthorized)
-                        {
-                            GlobalData.WalletPassProvidedTime = DateTime.Now;
-                        }
-                        else
-                        {
-                            await DialogService.ShowAsync(new MessageBoxView(title, "Incorrect password", true));
-                        }
-                    }
-                    else
-                    {
-                        var unlockResult = await vm.UnlockWithPassword(passRes.TextBoxValue);
-                        if (!unlockResult.IsSuccess && !string.IsNullOrEmpty(unlockResult.Message))
-                        {
-                            await DialogService.ShowAsync(new MessageBoxView(unlockResult.Title, unlockResult.Message, true));
-                        }
-                        isAuthorized = unlockResult.IsSuccess;
-                    }
-                }
-
-                if (!isAuthorized)
+                if (!await AuthorizeWithPassword(vm, title))
                 {
                     return;
                 }
 
-                if (vm.ShouldDumpKeysToFile())
-                {
-                    var (isSuccess, dumpPath) = await vm.DumpKeysToFile();
-                    if (isSuccess)
-                    {
-                        await DialogService.ShowAsync(new TextBoxView(title: "View Private Keys", labelValue: "Keys have been exported to below file", textValue: dumpPath, textWatermark: string.Empty));
-                    }
-                }
-                else
-                {
-                    UIManager.NavigateToDisplayKeysSeed("Save your seed phrase and keys to a safe place. You'll need them to restore your wallet. Keep them private - anyone with access can steal your funds!");
-                }
+                UIManager.NavigateToDisplayKeysSeed("Save your seed phrase and keys to a safe place. You'll need them to restore your wallet. Keep them private - anyone with access can steal your funds!");
             }
             catch (Exception ex)
             {
@@ -279,5 +297,91 @@ namespace NervaOneWalletMiner.Views
             }
         }
         #endregion // View Keys/Seed
+
+        #region Dump Keys to File
+        public async void DumpKeysToFile_Clicked(object sender, RoutedEventArgs args)
+        {
+            string title = "Dump Keys to File";
+
+            try
+            {
+                var vm = GetVm();
+
+                var prereq = vm.CheckPrerequisites(true, title);
+                if (!prereq.IsSuccess)
+                {
+                    await DialogService.ShowAsync(new MessageBoxView(prereq.Title, prereq.Message, true));
+                    return;
+                }
+
+                if (!await AuthorizeWithPassword(vm, title))
+                {
+                    return;
+                }
+
+                var (isSuccess, dumpPath) = await vm.DumpKeysToFile();
+                if (isSuccess)
+                {
+                    await DialogService.ShowAsync(new TextBoxView(title: title, labelValue: "Keys have been exported to below file", textValue: dumpPath, textWatermark: string.Empty));
+                }
+                else
+                {
+                    await DialogService.ShowAsync(new MessageBoxView(title, "Failed to export keys. Check log for details.", true));
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("WAS.DKTF", ex);
+            }
+        }
+        #endregion // Dump Keys to File
+
+        private async Task<bool> AuthorizeWithPassword(WalletSetupViewModel vm, string title)
+        {
+            try
+            {
+                if (vm.IsPasswordStillValid())
+                {
+                    return true;
+                }
+
+                TextBoxView textWindow = new(title: "Provide Wallet Password", labelValue: "Please provide wallet password", textValue: string.Empty, textWatermark: "Required - Wallet password", isTextRequired: true, isTextPassword: true, okButtonText: "Submit");
+                DialogResult? passRes = await DialogService.ShowAsync<DialogResult>(textWindow);
+
+                if (passRes == null || !passRes.IsOk)
+                {
+                    return false;
+                }
+
+                if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPassRequiredToOpenWallet)
+                {
+                    bool isAuthorized = vm.VerifyPasswordLocally(passRes.TextBoxValue.ToCharArray());
+                    if (isAuthorized)
+                    {
+                        GlobalData.WalletPassProvidedTime = DateTime.Now;
+                    }
+                    else
+                    {
+                        await DialogService.ShowAsync(new MessageBoxView(title, "Incorrect password", true));
+                    }
+                    return isAuthorized;
+                }
+                else
+                {
+                    var unlockResult = await vm.UnlockWithPassword(passRes.TextBoxValue);
+                    if (!unlockResult.IsSuccess && !string.IsNullOrEmpty(unlockResult.Message))
+                    {
+                        await DialogService.ShowAsync(new MessageBoxView(unlockResult.Title, unlockResult.Message, true));
+                    }
+                    return unlockResult.IsSuccess;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("WAS.AWPD", ex);
+            }
+
+            return false;
+        }
     }
 }

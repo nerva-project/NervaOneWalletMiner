@@ -5,5 +5,8 @@
         public string WalletName { get; set; } = string.Empty;
         public char[] Password { get; set; } = [];
         public string Language { get; set; } = string.Empty;
+
+        // Used for CreateWalletFromSeed
+        public char[] Seed { get; set; } = [];
     }
 }

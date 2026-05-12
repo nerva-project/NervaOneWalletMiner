@@ -1,13 +1,17 @@
 ﻿using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Objects;
 using ReactiveUI;
-using System.Diagnostics;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows.Input;
 
 namespace NervaOneWalletMiner.ViewModels
 {
     internal class SettingsViewModel : ViewModelBase
     {
+        public List<CoinListItem> CoinList => GlobalData.CoinList;
+
         public ICommand OpenLogsFolderCommand { get; }
 
         public SettingsViewModel()

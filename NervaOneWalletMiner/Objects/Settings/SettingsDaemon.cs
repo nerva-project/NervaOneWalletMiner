@@ -1,10 +1,14 @@
-﻿using NervaOneWalletMiner.Rpc.Common;
+﻿using Newtonsoft.Json;
+using NervaOneWalletMiner.Rpc.Common;
 
 namespace NervaOneWalletMiner.Objects.Settings
 {
     public class SettingsDaemon
     {
-        public bool IsWalletOnly { get; set; } = false;
+        public string NodeType { get; set; } = Constants.NodeType.FullNode;
+
+        [JsonIgnore]
+        public bool IsWalletOnly => NodeType == Constants.NodeType.WalletOnly;
 
         public RpcBase Rpc { get; set; } = new RpcBase();
 

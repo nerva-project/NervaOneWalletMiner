@@ -32,11 +32,7 @@ namespace NervaOneWalletMiner.Views
 
                 if (!GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].AreIntegratedAddressesSupported)
                 {
-                    btnMakeIntegratedAddress.IsEnabled = false;
-                    tbxIntegratedAddress.IsEnabled = false;
-                    btnCopyIntegratedAddressToClipboard.IsEnabled = false;
-                    tbxPaymentId.IsEnabled = false;
-                    btnCopyPaymentIdToClipboard.IsEnabled = false;
+                    pnlIntegratedAddress.IsVisible = false;
                 }
 
                 foreach (Account account in GlobalData.WalletStats.Subaddresses.Values)
@@ -84,7 +80,8 @@ namespace NervaOneWalletMiner.Views
                     LabelAccountRequest request = new()
                     {
                         AccountIndex = account.Index,
-                        Label = tbxWalletLabel.Text ?? string.Empty
+                        Label = tbxWalletLabel.Text ?? string.Empty,
+                        Address = account.AddressFull
                     };
 
                     Logger.LogDebug("AIV.SVLC", "Saving label for account " + account.Index + ": " + request.Label);

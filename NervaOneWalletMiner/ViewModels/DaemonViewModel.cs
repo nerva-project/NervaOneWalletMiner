@@ -1,4 +1,5 @@
-﻿using NervaOneWalletMiner.Objects.Constants;
+﻿using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Objects.DataGrid;
 using ReactiveUI;
 using System.Collections.ObjectModel;
@@ -112,6 +113,8 @@ namespace NervaOneWalletMiner.ViewModels
             get => _MiningAddress;
             set => this.RaiseAndSetIfChanged(ref _MiningAddress, value);
         }
+
+        public bool IsCpuMiningSupported => GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsCpuMiningSupported;
 
         private ObservableCollection<Connection> _Connections = new();
         public ObservableCollection<Connection> Connections

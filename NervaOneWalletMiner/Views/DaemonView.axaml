@@ -33,7 +33,8 @@
 
 					<!-- Component 2: Threads + Button together -->
 					<StackPanel Grid.Row="0" Grid.Column="2"
-								Name="spThreadsAndButton"								
+								Name="spThreadsAndButton"
+								IsVisible="{Binding IsCpuMiningSupported}"
 								Orientation="Horizontal"
 								Spacing="10"
 								Margin="0,0,5,0"
@@ -96,6 +97,7 @@
 					<!-- Component 4: Miner status -->
 					<Grid Grid.Row="0" Grid.Column="2"
 						  Name="grdMinerStats"
+						  IsVisible="{Binding IsCpuMiningSupported}"
 						  ColumnDefinitions="100,100"
 						  Margin="0,10,5,0">
 						<Grid.RowDefinitions>

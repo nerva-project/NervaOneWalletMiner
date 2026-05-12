@@ -1,4 +1,5 @@
 using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Rpc.Wallet.Requests;
 using NervaOneWalletMiner.Rpc.Wallet.Responses;
 using ReactiveUI;
@@ -50,12 +51,12 @@ namespace NervaOneWalletMiner.ViewModels
             {
                 WalletOperationResult result = new(true);
 
-                if (!GlobalData.IsCliToolsFound)
+                if (GlobalData.DaemonState == DaemonState.CliToolsMissing || GlobalData.DaemonState == DaemonState.Downloading)
                 {
                     Logger.LogDebug("WSM.CHKP", operationTitle + " but CLI tools not found");
                     result = new WalletOperationResult(false, operationTitle, "Client tools missing. Cannot perform operation until client tools are downloaded and running.");
                 }
-                else if (!GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly && !GlobalData.IsInitialDaemonConnectionSuccess)
+                else if (!GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly && GlobalData.DaemonState != DaemonState.Running)
                 {
                     Logger.LogDebug("WSM.CHKP", operationTitle + " but daemon not running");
                     result = new WalletOperationResult(false, operationTitle, "Daemon not running. Cannot perform operation until connection is established.");
@@ -108,6 +109,7 @@ namespace NervaOneWalletMiner.ViewModels
 
                 if (isChanged)
                 {
+                    Logger.LogDebug("WSM.VAPS", "Saving Settings");
                     GlobalMethods.SaveConfig();
                 }
 
@@ -134,6 +136,7 @@ namespace NervaOneWalletMiner.ViewModels
                     Language = walletLanguage
                 };
 
+                Logger.LogDebug("WSM.CNWL", "Calling Create Wallet");
                 CreateWalletResponse response = await GlobalData.WalletService.CreateWallet(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
                 request = new();
 
@@ -176,6 +179,7 @@ namespace NervaOneWalletMiner.ViewModels
                     Language = walletLanguage
                 };
 
+                Logger.LogDebug("WSM.RFSD", "Calling Restore from Seed");
                 RestoreFromSeedResponse response = await GlobalData.WalletService.RestoreFromSeed(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
 
                 if (response.Error.IsError)
@@ -219,6 +223,7 @@ namespace NervaOneWalletMiner.ViewModels
                     Language = walletLanguage
                 };
 
+                Logger.LogDebug("WSM.RFKY", "Calling Restore from Keys");
                 RestoreFromKeysResponse response = await GlobalData.WalletService.RestoreFromKeys(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
 
                 if (response.Error.IsError)
@@ -283,6 +288,7 @@ namespace NervaOneWalletMiner.ViewModels
 
             try
             {
+                Logger.LogDebug("WSM.RSPT", "Rescan Spent starting");
                 RescanSpentResponse response = await GlobalData.WalletService.RescanSpent(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new RescanSpentRequest());
 
                 if (response.Error.IsError)
@@ -307,6 +313,7 @@ namespace NervaOneWalletMiner.ViewModels
 
             try
             {
+                Logger.LogDebug("WSM.RSBC", "Rescan Blockchain starting");
                 RescanBlockchainResponse response = await GlobalData.WalletService.RescanBlockchain(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new RescanBlockchainRequest());
 
                 if (response.Error.IsError)
@@ -316,7 +323,9 @@ namespace NervaOneWalletMiner.ViewModels
                 }
 
                 Logger.LogDebug("WSM.RSBC", "Rescan Blockchain returned successfully");
-                return new WalletOperationResult(true, title, "Rescan Blockchain command submitted successfully.");
+                bool isBtcStyle = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletBtcStyle;
+                string successMessage = isBtcStyle ? "Rescan Blockchain completed successfully." : "Rescan Blockchain command submitted successfully.";
+                return new WalletOperationResult(true, title, successMessage);
             }
             catch (Exception ex)
             {

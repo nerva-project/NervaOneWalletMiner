@@ -34,8 +34,16 @@ namespace NervaOneWalletMiner.Views
                 string message = DataContext is DisplayKeysSeedViewModel vm ? vm.Message : string.Empty;
                 _returnPage = DataContext is DisplayKeysSeedViewModel vm2 ? vm2.ReturnPage : string.Empty;
 
-                tbkMessage.Text = message;
-                GetAndShowKeys();
+                if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].AreKeysDumpedToFile)
+                {
+                    pnlKeysSeed.IsVisible = false;
+                    tbkMessage.Text = message + "\r\n\r\nPrivate keys are not displayed on screen for this coin. Use 'Dump Keys to File' in Wallet Setup to export your keys to a secure file.";
+                }
+                else
+                {
+                    tbkMessage.Text = message;
+                    GetAndShowKeys();
+                }
             }
             catch (Exception ex)
             {
@@ -89,11 +97,15 @@ namespace NervaOneWalletMiner.Views
         {
             try
             {
-                tbxPublicViewKey.Text = string.Empty;
-                tbxPrivateViewKey.Text = string.Empty;
-                tbxPublicSpendKey.Text = string.Empty;
-                tbxPrivateSpendKey.Text = string.Empty;
-                tbxMnemonicSeed.Text = string.Empty;
+                if (pnlKeysSeed.IsVisible)
+                {
+                    tbxPublicViewKey.Text = string.Empty;
+                    tbxPrivateViewKey.Text = string.Empty;
+                    tbxPublicSpendKey.Text = string.Empty;
+                    tbxPrivateSpendKey.Text = string.Empty;
+                    tbxMnemonicSeed.Text = string.Empty;
+                }
+
                 TopLevel.GetTopLevel(this)?.Clipboard?.ClearAsync();
 
                 UIManager.NavigateToPage(_returnPage);

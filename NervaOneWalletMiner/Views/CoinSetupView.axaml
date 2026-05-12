@@ -29,8 +29,13 @@
 
 			<TextBlock TextWrapping="Wrap" Margin="0,10,0,0">
 				You can set up NervaOne as Full Node, in which case
-				blockchain is stored on your device. You're running
+				the blockchain is stored on your device. You're running
 				your own node and you can mine.
+			</TextBlock>
+
+			<TextBlock TextWrapping="Wrap" Margin="0,10,0,0">
+				Pruned Node stores only a portion of the blockchain to save disk space.
+				This option is only available for coins that support pruning.
 			</TextBlock>
 
 			<TextBlock TextWrapping="Wrap" Margin="0,10,0,0">
@@ -52,7 +57,14 @@
 			</RadioButton>
 
 			<RadioButton GroupName="NodeType"
-						 Name="RemoteNode"
+						 Name="PrunedNode"
+						 Margin="0,0,0,0"
+						 IsCheckedChanged="NodeType_IsCheckedChanged">
+				<TextBlock Text="Pruned Node: Blockchain runs on your device with pruning to save disk space" TextWrapping="Wrap"/>
+			</RadioButton>
+
+			<RadioButton GroupName="NodeType"
+						 Name="WalletOnly"
 						 Margin="0,0,0,0"
 						 IsCheckedChanged="NodeType_IsCheckedChanged">
 				<TextBlock Text="Wallet Only: Connect to remote node and get wallet functionality" TextWrapping="Wrap"/>

@@ -44,6 +44,14 @@ namespace NervaOneWalletMiner.Views
         {
             try
             {
+                bool isBtcStyle = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletBtcStyle;
+
+                if (isBtcStyle)
+                {
+                    lblYourAddressHeader.Content = "Address";
+                    grdDetails.RowDefinitions[6].Height = new GridLength(0);
+                }
+
                 GetTranserByTxIdRequest request = new()
                 {
                     TransactionId = transactionId,
@@ -62,8 +70,10 @@ namespace NervaOneWalletMiner.Views
                     tbxYourAddress.Text = response.Address;
                     tbxTransactionId.Text = response.TransactionId;
 
-                    lblType.Content = response.Type;
-                    lblHeight.Content = response.Height;
+                    lblType.Content = isBtcStyle && !string.IsNullOrEmpty(response.Type)
+                        ? char.ToUpper(response.Type[0]) + response.Type[1..]
+                        : response.Type;
+                    lblHeight.Content = isBtcStyle && response.Height == 0 ? "Pending" : response.Height;
                     lblAmount.Content = response.Amount;
                     lblFee.Content = response.Fee;
                     lblTime.Content = response.Timestamp;

@@ -4,6 +4,5 @@ namespace NervaOneWalletMiner.Rpc.Daemon
     public class DaemonServiceXNV : DaemonServiceBaseXMR
     {
         protected override string CoinPrefix => "XNV";
-        protected override double BlockSeconds => 60.0;
     }
 }

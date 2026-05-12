@@ -13,7 +13,7 @@ namespace NervaOneWalletMiner.Objects.Stats
         public ulong YourHeight { get; set; } = 0;
         public string NetHashString { get; set; } = "0 KH/s";
         public string RunTime { get; set; } = "00:00:00";
-        public ulong NetHashRate { get; set; } = 0;
+        public double NetHashRate { get; set; } = 0;
 
         public string MinerStatus { get; set; } = StatusMiner.Inactive;
         public string YourHash { get; set; } = "0 h/s";

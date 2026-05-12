@@ -33,6 +33,11 @@ namespace NervaOneWalletMiner.Views
         {
             try
             {
+                if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletBtcStyle)
+                {
+                    pnlPaymentId.IsVisible = false;
+                }
+
                 if (DataContext is AddressBookEntryViewModel vm)
                 {
                     _isNew = vm.IsNew;
