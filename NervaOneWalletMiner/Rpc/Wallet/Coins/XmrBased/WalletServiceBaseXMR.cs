@@ -21,6 +21,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
     {
         protected abstract string CoinPrefix { get; }
         protected virtual decimal CoinAtomicUnits => 1_000_000_000_000m;
+        protected int CoinFullDecimalPlaces => (int)Math.Log10((double)CoinAtomicUnits);
 
         // sweep_all can be slow when there are many inputs to consolidate
         private static readonly TimeSpan _sweepTimeout = TimeSpan.FromMinutes(60);
@@ -768,7 +769,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                         else
                         {
                             ResTransfer transferResponse = JsonConvert.DeserializeObject<ResTransfer>(resultToken.ToString())!;
-                            responseObj.Fee = AmountFromAtomicUnits(transferResponse.fee, 12);
+                            responseObj.Fee = AmountFromAtomicUnits(transferResponse.fee, CoinFullDecimalPlaces);
                             responseObj.TxData = transferResponse.tx_metadata;
                             responseObj.Error.IsError = false;
                         }
@@ -1188,8 +1189,8 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                         else
                         {
                             ResGetAccounts getAccountsResponse = JsonConvert.DeserializeObject<ResGetAccounts>(resultToken.ToString())!;
-                            responseObj.BalanceUnlocked = AmountFromAtomicUnits(getAccountsResponse.total_unlocked_balance, 4);
-                            responseObj.BalanceTotal = AmountFromAtomicUnits(getAccountsResponse.total_balance, 4);
+                            responseObj.BalanceUnlocked = AmountFromAtomicUnits(getAccountsResponse.total_unlocked_balance, CoinFullDecimalPlaces);
+                            responseObj.BalanceTotal = AmountFromAtomicUnits(getAccountsResponse.total_balance, CoinFullDecimalPlaces);
 
                             foreach (WalletAccount account in getAccountsResponse.subaddress_accounts)
                             {
@@ -1199,8 +1200,8 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                     Label = account.label,
                                     AddressFull = account.base_address,
                                     AddressShort = GlobalMethods.GetShorterString(account.base_address, 12),
-                                    BalanceTotal = AmountFromAtomicUnits(account.balance, 4),
-                                    BalanceUnlocked = AmountFromAtomicUnits(account.unlocked_balance, 4)
+                                    BalanceTotal = AmountFromAtomicUnits(account.balance, CoinFullDecimalPlaces),
+                                    BalanceUnlocked = AmountFromAtomicUnits(account.unlocked_balance, CoinFullDecimalPlaces)
                                 };
 
                                 responseObj.SubAccounts.Add(newAccount);
@@ -1320,7 +1321,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                     AddressShort = GlobalMethods.GetShorterString(entry.address, 12),
                                     Height = entry.height,
                                     Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp).ToLocalTime(),
-                                    Amount = AmountFromAtomicUnits(entry.amount, 4),
+                                    Amount = AmountFromAtomicUnits(entry.amount, CoinFullDecimalPlaces),
                                     Type = entry.type,
                                     Confirmations = entry.confirmations
                                 };
@@ -1337,7 +1338,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                     AddressShort = GlobalMethods.GetShorterString(entry.address, 12),
                                     Height = entry.height,
                                     Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp).ToLocalTime(),
-                                    Amount = AmountFromAtomicUnits(entry.amount, 4),
+                                    Amount = AmountFromAtomicUnits(entry.amount, CoinFullDecimalPlaces),
                                     Type = entry.type,
                                     Confirmations = entry.confirmations
                                 };
@@ -1354,7 +1355,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                     AddressShort = GlobalMethods.GetShorterString(entry.address, 12),
                                     Height = entry.height,
                                     Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp).ToLocalTime(),
-                                    Amount = AmountFromAtomicUnits(entry.amount, 4),
+                                    Amount = AmountFromAtomicUnits(entry.amount, CoinFullDecimalPlaces),
                                     Type = entry.type,
                                     Confirmations = entry.confirmations
                                 };
@@ -1447,14 +1448,14 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                             responseObj.Type = getTransfByTxIdResponse.transfer.type;
                             responseObj.Height = getTransfByTxIdResponse.transfer.height;
                             responseObj.Timestamp = GlobalMethods.UnixTimeStampToDateTime(getTransfByTxIdResponse.transfer.timestamp).ToLocalTime();
-                            responseObj.Amount = AmountFromAtomicUnits(getTransfByTxIdResponse.transfer.amount, 6);
-                            responseObj.Fee = AmountFromAtomicUnits(getTransfByTxIdResponse.transfer.fee, 6);
+                            responseObj.Amount = AmountFromAtomicUnits(getTransfByTxIdResponse.transfer.amount, CoinFullDecimalPlaces);
+                            responseObj.Fee = AmountFromAtomicUnits(getTransfByTxIdResponse.transfer.fee, CoinFullDecimalPlaces);
                             responseObj.Note = getTransfByTxIdResponse.transfer.note;
                             responseObj.Confirmations = getTransfByTxIdResponse.transfer.confirmations;
 
                             foreach (TransferDestination destination in getTransfByTxIdResponse.transfer.destinations)
                             {
-                                responseObj.Destinations.Add(destination.address + " | " + AmountFromAtomicUnits(destination.amount, 6));
+                                responseObj.Destinations.Add(destination.address + " | " + AmountFromAtomicUnits(destination.amount, CoinFullDecimalPlaces));
                             }
 
                             // There is also transfers but it seems to have the same info. Can you have more than 1 transfer for given transaction id?
@@ -1753,10 +1754,10 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                     Height = entry.height.ToString(),
                                     Type = entry.type,
                                     TimeStamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp),
-                                    Amount = AmountFromAtomicUnits(entry.amount, 12),
+                                    Amount = AmountFromAtomicUnits(entry.amount, CoinFullDecimalPlaces),
                                     TransactionId = entry.txid,
                                     PaymentId = entry.payment_id,
-                                    Fee = AmountFromAtomicUnits(entry.fee, 12),
+                                    Fee = AmountFromAtomicUnits(entry.fee, CoinFullDecimalPlaces),
                                     Note = entry.note
                                 };
 
@@ -1782,10 +1783,10 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                     Height = entry.height.ToString(),
                                     Type = entry.type,
                                     TimeStamp = GlobalMethods.UnixTimeStampToDateTime(entry.timestamp),
-                                    Amount = AmountFromAtomicUnits(entry.amount, 12),
+                                    Amount = AmountFromAtomicUnits(entry.amount, CoinFullDecimalPlaces),
                                     TransactionId = entry.txid,
                                     PaymentId = entry.payment_id,
-                                    Fee = AmountFromAtomicUnits(entry.fee, 12),
+                                    Fee = AmountFromAtomicUnits(entry.fee, CoinFullDecimalPlaces),
                                     Note = entry.note
                                 };
 

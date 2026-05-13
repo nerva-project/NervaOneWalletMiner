@@ -68,7 +68,7 @@
 										Width="*"
 										Binding="{Binding Timestamp}"/>
 					<DataGridTextColumn Header="Amount"
-										Binding="{Binding Amount}"/>
+										Binding="{Binding AmountDisplay}"/>
 					<DataGridTextColumn Header="Address"
 										Binding="{Binding AddressShort}"/>
 				</DataGrid.Columns>

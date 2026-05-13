@@ -128,9 +128,9 @@
 											Binding="{Binding AddressShort}"											
 											MinWidth="120" Width="*"/>
 						<DataGridTextColumn Header="Balance"
-											Binding="{Binding BalanceTotal}"/>
+											Binding="{Binding BalanceTotalDisplay}"/>
 						<DataGridTextColumn Header="Unlocked"
-											Binding="{Binding BalanceUnlocked}"/>
+											Binding="{Binding BalanceUnlockedDisplay}"/>
 					</DataGrid.Columns>
 					<DataGrid.ContextMenu>
 						<ContextMenu>

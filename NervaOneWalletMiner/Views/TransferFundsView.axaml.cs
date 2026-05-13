@@ -129,8 +129,8 @@ namespace NervaOneWalletMiner.Views
                 balanceUnlocked = GlobalData.WalletStats.BalanceUnlocked;
             }
 
-            lblBalance.Content = GlobalMethods.FormatAmount(balanceTotal) + " " + units;
-            lblUnlocked.Content = GlobalMethods.FormatAmount(balanceUnlocked) + " " + units;
+            lblBalance.Content = GlobalMethods.FormatAmountFull(balanceTotal) + " " + units;
+            lblUnlocked.Content = GlobalMethods.FormatAmountFull(balanceUnlocked) + " " + units;
         }
 
         private void Account_SelectionChanged(object sender, SelectionChangedEventArgs e)

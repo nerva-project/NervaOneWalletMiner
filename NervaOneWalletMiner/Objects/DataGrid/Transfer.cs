@@ -1,4 +1,5 @@
 using Avalonia.Media.Imaging;
+using NervaOneWalletMiner.Helpers;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -19,6 +20,7 @@ namespace NervaOneWalletMiner.Objects.DataGrid
         public string AddressLabel { get; set; } = string.Empty;
         public DateTime Timestamp { get; set; } = DateTime.MinValue;
         public decimal Amount { get; set; } = 0;
+        public string AmountDisplay => GlobalMethods.FormatAmount(Amount);
         public string Type { get; set; } = string.Empty;
         public string BlockHash { get; set; } = string.Empty;
         public Bitmap? Icon { get; set; }
