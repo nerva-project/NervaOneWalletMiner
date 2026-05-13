@@ -5,7 +5,6 @@ name: ci-build
 
 on:
   push:
-    branches: [ "main", "feature/**" ]
   pull_request:
 
 jobs:
