@@ -13,7 +13,7 @@ jobs:
         outputs:
             version: ${{ steps.get_version.outputs.version }}
         steps:
-          - uses: actions/checkout@v5
+          - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd  # v5.0.1
           - name: Extract NervaOne Version
             id: get_version
             shell: bash
@@ -34,10 +34,10 @@ jobs:
 
         steps:
           - name: Checkout Repository
-            uses: actions/checkout@v5
+            uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd  # v5.0.1
 
           - name: Setup .NET
-            uses: actions/setup-dotnet@v5
+            uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7  # v5.2.0
             with:
                 dotnet-version: 10.0.x
 
@@ -56,7 +56,7 @@ jobs:
             shell: pwsh
 
           - name: Upload Windows Artifacts
-            uses: actions/upload-artifact@v6
+            uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
             with:
                 name: nervaone-v${{ needs.setup.outputs.version }}-${{ matrix.rid }}
                 path: |
@@ -76,10 +76,10 @@ jobs:
 
         steps:
           - name: Checkout Repository
-            uses: actions/checkout@v5
+            uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd  # v5.0.1
 
           - name: Setup .NET
-            uses: actions/setup-dotnet@v5
+            uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7  # v5.2.0
             with:
                 dotnet-version: 10.0.x
 
@@ -116,7 +116,7 @@ jobs:
               chmod +x ./NervaOneWalletMiner.Desktop/bin/NervaOne/install
 
           - name: Upload Artifacts
-            uses: actions/upload-artifact@v6
+            uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
             with:
                 name: nervaone-v${{ needs.setup.outputs.version }}-${{ matrix.rid }}
                 path: ./NervaOneWalletMiner.Desktop/bin/NervaOne/*
@@ -139,10 +139,10 @@ jobs:
 
         steps:
           - name: Checkout Repository
-            uses: actions/checkout@v5
+            uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd  # v5.0.1
 
           - name: Setup .NET
-            uses: actions/setup-dotnet@v5
+            uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7  # v5.2.0
             with:
                 dotnet-version: 10.0.x
 
@@ -174,7 +174,7 @@ jobs:
               cp -R ./NervaOneWalletMiner.Desktop/bin/release/net10.0/${{ matrix.rid }}/publish/* ./NervaOneWalletMiner.Desktop/bin/NervaOne.app/Contents/MacOS/
 
           - name: Upload Artifacts
-            uses: actions/upload-artifact@v6
+            uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
             with:
                 name: nervaone-v${{ needs.setup.outputs.version }}-${{ matrix.artifact_rid }}
                 path: |
@@ -192,10 +192,10 @@ jobs:
 
         steps:
           - name: Checkout Repository
-            uses: actions/checkout@v5
+            uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd  # v5.0.1
 
           - name: Setup .NET
-            uses: actions/setup-dotnet@v5
+            uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7  # v5.2.0
             with:
                 dotnet-version: 10.0.x
 
@@ -228,7 +228,7 @@ jobs:
                 echo "apk_path=$APK" >> $GITHUB_OUTPUT
 
           - name: Upload Android Artifacts
-            uses: actions/upload-artifact@v6
+            uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
             with:
                 name: nervaone-v${{ needs.setup.outputs.version }}-android-arm64
                 path: ${{ steps.select_apk.outputs.apk_path }}

@@ -628,6 +628,14 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         {
             try
             {
+                if (!File.Exists(Path.GetFullPath(requestObj.DumpFileWithPath)))
+                {
+                    ImportWalletResponse errorResponse = new();
+                    errorResponse.Error.IsError = true;
+                    errorResponse.Error.Message = "Dump file not found";
+                    return errorResponse;
+                }
+
                 bool isDescriptorDump = IsDescriptorDumpFile(requestObj.DumpFileWithPath);
                 Logger.LogDebug(CoinPrefix + ".WIMW", "Restoring " + requestObj.WalletName + " from " + (isDescriptorDump ? "descriptor" : "legacy") + " dump");
 
