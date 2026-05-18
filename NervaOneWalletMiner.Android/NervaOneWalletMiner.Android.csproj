@@ -5,8 +5,8 @@
     <SupportedOSPlatformVersion>26</SupportedOSPlatformVersion>
     <Nullable>enable</Nullable>
     <ApplicationId>one.nerva.android</ApplicationId>
-    <ApplicationVersion>1002</ApplicationVersion>
-    <ApplicationDisplayVersion>1.0.2</ApplicationDisplayVersion>
+    <ApplicationVersion>1003</ApplicationVersion>
+    <ApplicationDisplayVersion>1.0.3</ApplicationDisplayVersion>
     <AndroidPackageFormat>apk</AndroidPackageFormat>
     <AndroidEnableProfiledAot>False</AndroidEnableProfiledAot>
     <RuntimeIdentifiers>android-arm64</RuntimeIdentifiers>
@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia.Android" Version="11.3.14" />
+    <PackageReference Include="Avalonia.Android" Version="11.3.15" />
     <PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.7.0.6" />
     <PackageReference Include="Xamarin.AndroidX.Core.SplashScreen" Version="1.0.1.6" />
   </ItemGroup>
