@@ -105,11 +105,21 @@ namespace NervaOneWalletMiner.ViewModels
                 this.RaiseAndSetIfChanged(ref _selectedNodeType, value);
                 this.RaisePropertyChanged(nameof(IsWalletOnly));
                 this.RaisePropertyChanged(nameof(IsLocalNode));
+                this.RaisePropertyChanged(nameof(IsPrunedNode));
             }
         }
 
+        private int _pruneSize;
+        public int PruneSize
+        {
+            get => _pruneSize;
+            set => this.RaiseAndSetIfChanged(ref _pruneSize, value);
+        }
+
+
         public bool IsWalletOnly => _selectedNodeType == NodeType.WalletOnly;
         public bool IsLocalNode => _selectedNodeType != NodeType.WalletOnly;
+        public bool IsPrunedNode => _selectedNodeType == NodeType.PrunedNode;
         public bool IsPruningSupported => GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPruningSupported;
         public bool IsWalletOnlySupported => GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletOnlySupported;
         public bool IsCpuMiningSupported => GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsCpuMiningSupported;
@@ -146,6 +156,7 @@ namespace NervaOneWalletMiner.ViewModels
                 ThresholdEnabled = daemonSettings.EnableMiningThreshold;
                 HashThreshold = daemonSettings.StopMiningThreshold;
                 SelectedNodeType = daemonSettings.NodeType;
+                PruneSize = daemonSettings.PruneSizeMB;
                 RemoteNodeAddress = string.IsNullOrEmpty(walletSettings.PublicNodeAddress)
                     ? GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].RemotePublicNodeUrlDefault
                     : walletSettings.PublicNodeAddress;
@@ -276,6 +287,13 @@ namespace NervaOneWalletMiner.ViewModels
                     daemonSettings.StopMiningThreshold = hashThreshold;
                     Logger.LogDebug("DSM.APST", "New Stop Mining Threshold: " + daemonSettings.StopMiningThreshold);
                     isSaveSettingsNeeded = true;
+                }
+
+                if (daemonSettings.PruneSizeMB != PruneSize)
+                {
+                    daemonSettings.PruneSizeMB = PruneSize;
+                    Logger.LogDebug("DSM.APST", "New Prune Size: " + daemonSettings.PruneSizeMB);
+                    isSaveSettingsNeeded = isRestartRequired = true;
                 }
 
                 if (isSaveSettingsNeeded)

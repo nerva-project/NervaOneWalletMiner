@@ -249,6 +249,7 @@ namespace NervaOneWalletMiner.Views
                     return;
                 }
 
+                char[] password = [];
                 if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletBtcStyle)
                 {
                     DialogResult? confirmRes = await DialogService.ShowAsync<DialogResult>(new MessageBoxView("Rescan Blockchain", "Rescanning the blockchain can take a very long time depending on chain size. Wallet operations might be unresponsive until it completes.\r\n\r\nDo you want to continue?", false, true));
@@ -256,9 +257,19 @@ namespace NervaOneWalletMiner.Views
                     {
                         return;
                     }
+
+                    TextBoxView passWindow = new(title: "Rescan Blockchain", labelValue: "Wallet password (leave blank if wallet is not encrypted)", textValue: string.Empty, textWatermark: "Optional - wallet password", isTextRequired: false, isTextPassword: true, okButtonText: "Submit");
+                    DialogResult? passRes = await DialogService.ShowAsync<DialogResult>(passWindow);
+                    if (passRes == null || !passRes.IsOk)
+                    {
+                        return;
+                    }
+
+                    password = string.IsNullOrEmpty(passRes.TextBoxValue) ? [] : passRes.TextBoxValue.ToCharArray();
                 }
 
-                var opResult = await GetVm().RescanBlockchain();
+                var opResult = await GetVm().RescanBlockchain(password);
+                Array.Clear(password, 0, password.Length);
                 await DialogService.ShowAsync(new MessageBoxView(opResult.Title, opResult.Message, true));
             }
             catch (Exception ex)

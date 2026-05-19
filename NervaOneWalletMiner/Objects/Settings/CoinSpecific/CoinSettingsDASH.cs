@@ -89,7 +89,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
 
             if (daemonSettings.NodeType == NodeType.PrunedNode)
             {
-                daemonCommand += " -prune=550";
+                daemonCommand += " -prune=" + daemonSettings.PruneSizeMB;
             }
 
             if (!string.IsNullOrEmpty(daemonSettings.AdditionalArguments))

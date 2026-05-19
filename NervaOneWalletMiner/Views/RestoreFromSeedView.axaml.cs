@@ -7,6 +7,7 @@ using NervaOneWalletMiner.Rpc.Wallet.Requests;
 using NervaOneWalletMiner.Rpc.Wallet.Responses;
 using NervaOneWalletMiner.ViewsDialogs;
 using System;
+using System.Globalization;
 
 namespace NervaOneWalletMiner.Views
 {
@@ -33,6 +34,7 @@ namespace NervaOneWalletMiner.Views
                 }
                 else
                 {
+                    pnlWalletBirthday.IsVisible = false;
                     cbxLanguage.ItemsSource = GlobalMethods.GetSupportedLanguages();
                     cbxLanguage.SelectedIndex = 0;
                 }
@@ -77,6 +79,17 @@ namespace NervaOneWalletMiner.Views
                     return;
                 }
 
+                DateTime? walletBirthday = null;
+                if (_isBtcStyle && !string.IsNullOrEmpty(tbxWalletBirthday.Text))
+                {
+                    if (!DateTime.TryParse(tbxWalletBirthday.Text, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDate))
+                    {
+                        await DialogService.ShowAsync(new MessageBoxView("Restore From Seed", "Wallet Birthday must be a valid date (e.g. 2024-01-15).", true));
+                        return;
+                    }
+                    walletBirthday = parsedDate;
+                }
+
                 char[] seed = tbxSeedPhrase.Text.ToCharArray();
                 string seedOffset = tbxSeedOffset.Text ?? string.Empty;
                 char[] walletPassword = string.IsNullOrEmpty(tbxPassword.Text) ? [] : tbxPassword.Text.ToCharArray();
@@ -93,7 +106,8 @@ namespace NervaOneWalletMiner.Views
                 btnCancel.IsEnabled = false;
                 tbxSeedPhrase.IsEnabled = false;
                 tbxSeedOffset.IsEnabled = false;
-                tbxWalletName.IsEnabled = false;                
+                tbxWalletName.IsEnabled = false;
+                tbxWalletBirthday.IsEnabled = false;
                 tbxPassword.IsEnabled = false;
                 btnShowHidePassword.IsEnabled = false;
 
@@ -116,7 +130,8 @@ namespace NervaOneWalletMiner.Views
                     SeedOffset = seedOffset,
                     WalletName = walletName,
                     Password = walletPassword,
-                    Language = walletLanguage
+                    Language = walletLanguage,
+                    WalletBirthday = walletBirthday
                 };
 
                 RestoreFromSeedResponse response = await GlobalData.WalletService.RestoreFromSeed(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
@@ -137,7 +152,8 @@ namespace NervaOneWalletMiner.Views
                     btnCancel.IsEnabled = true;
                     tbxSeedPhrase.IsEnabled = true;
                     tbxSeedOffset.IsEnabled = true;
-                    tbxWalletName.IsEnabled = true;                    
+                    tbxWalletName.IsEnabled = true;
+                    tbxWalletBirthday.IsEnabled = true;
                     tbxPassword.IsEnabled = true;
                     btnShowHidePassword.IsEnabled = true;
                     

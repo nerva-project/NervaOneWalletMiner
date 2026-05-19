@@ -27,7 +27,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         private static int _id = 0;
 
         // importdescriptors/importwallet and rescanblockchain are synchronous and block until the chain scan completes
-        private static readonly TimeSpan _blockchainScanTimeout = TimeSpan.FromHours(2);
+        private static readonly TimeSpan _blockchainScanTimeout = TimeSpan.FromHours(6);
         private static readonly int _blockchainScanTimeoutSeconds = (int)_blockchainScanTimeout.TotalSeconds;
         // timestamp:"now" imports — no chain scan, just key loading
         private const int _fastImportTimeoutSeconds = 300; 
@@ -973,6 +973,9 @@ namespace NervaOneWalletMiner.Rpc.Wallet
 
                 // Step 3: Get checksummed descriptors from the node and build importdescriptors items
                 string baseUrl = HttpHelper.GetServiceUrl(rpc, string.Empty);
+                long birthdayTimestamp = requestObj.WalletBirthday.HasValue
+                    ? new DateTimeOffset(requestObj.WalletBirthday.Value).ToUnixTimeSeconds()
+                    : 0;
                 JArray importItems = new();
 
                 foreach (var (rawDescriptor, isInternal) in rawDescriptors)
@@ -1013,7 +1016,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     importItems.Add(new JObject
                     {
                         ["desc"] = rawDescriptor + "#" + checksum,
-                        ["timestamp"] = 0,
+                        ["timestamp"] = birthdayTimestamp,
                         ["active"] = true,
                         ["range"] = new JArray { 0, 1000 },
                         ["internal"] = isInternal
@@ -1420,45 +1423,91 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         }
         #endregion // Transfer
 
-        #region Rescan Blockchain        
+        #region Rescan Blockchain
         public async Task<RescanBlockchainResponse> RescanBlockchain(RpcBase rpc, RescanBlockchainRequest requestObj)
         {
             RescanBlockchainResponse responseObj = new();
 
             try
             {
-                var requestJson = new JObject
-                {
-                    ["jsonrpc"] = "2.0",
-                    ["id"] = _id++,
-                    ["method"] = "rescanblockchain",
-                    ["params"] = new JArray()
-                };
+                bool proceedWithRescan = true;
 
-                // rescanblockchain is synchronous and can take a long time on large chains
-                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password, _blockchainScanTimeout);
-                if (httpResponse.IsSuccessStatusCode)
+                if (requestObj.Password.Length > 0)
                 {
-                    JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
-
-                    var error = jsonObject["error"];
-                    if (error != null && error.Type != JTokenType.Null)
+                    var unlockJson = new JObject
                     {
-                        responseObj.Error = GetServiceError(GetCallerName(), error);
+                        ["jsonrpc"] = "2.0",
+                        ["id"] = _id++,
+                        ["method"] = "walletpassphrase",
+                        ["params"] = new JObject
+                        {
+                            ["passphrase"] = new string(requestObj.Password),
+                            ["timeout"] = _blockchainScanTimeoutSeconds
+                        }
+                    };
+
+                    HttpResponseMessage unlockResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), unlockJson.ToString(), rpc.UserName, rpc.Password);
+                    if (unlockResponse.IsSuccessStatusCode)
+                    {
+                        JObject unlockResult = JObject.Parse(await unlockResponse.Content.ReadAsStringAsync());
+                        var unlockError = unlockResult["error"];
+                        if (unlockError != null && unlockError.Type != JTokenType.Null)
+                        {
+                            string errorCode = (unlockError as JObject)?["code"]?.ToString() ?? string.Empty;
+                            if (errorCode != "-15")
+                            {
+                                // -15 means wallet is not encrypted — not an error, proceed without unlock
+                                responseObj.Error = GetServiceError(GetCallerName(), unlockError);
+                                proceedWithRescan = false;
+                            }
+                        }
                     }
                     else
                     {
-                        responseObj.Error.IsError = false;
+                        responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), unlockResponse);
+                        proceedWithRescan = false;
                     }
                 }
-                else
+
+                if (proceedWithRescan)
                 {
-                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                    var requestJson = new JObject
+                    {
+                        ["jsonrpc"] = "2.0",
+                        ["id"] = _id++,
+                        ["method"] = "rescanblockchain",
+                        ["params"] = new JArray()
+                    };
+
+                    // rescanblockchain is synchronous and can take a long time on large chains
+                    HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password, _blockchainScanTimeout);
+                    if (httpResponse.IsSuccessStatusCode)
+                    {
+                        JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
+
+                        var error = jsonObject["error"];
+                        if (error != null && error.Type != JTokenType.Null)
+                        {
+                            responseObj.Error = GetServiceError(GetCallerName(), error);
+                        }
+                        else
+                        {
+                            responseObj.Error.IsError = false;
+                        }
+                    }
+                    else
+                    {
+                        responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                    }
                 }
             }
             catch (Exception ex)
             {
                 Logger.LogException(CoinPrefix + ".WRSB", ex);
+            }
+            finally
+            {
+                Array.Clear(requestObj.Password, 0, requestObj.Password.Length);
             }
 
             return responseObj;
