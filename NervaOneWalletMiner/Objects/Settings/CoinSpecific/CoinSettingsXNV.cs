@@ -18,14 +18,14 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public string BlockchainDbSubfolder { get; set; } = "lmdb";
 
         // https://github.com/nerva-project/nerva/releases
-        public string CliUrlWindows64 { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.2.1.0/nerva-windows-x64-v0.2.1.0.zip";
-        public string CliUrlWindows32 { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.2.1.0/nerva-windows-x32-v0.2.1.0.zip";
-        public string CliUrlLinux64 { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.2.1.0/nerva-linux-x86_64-v0.2.1.0.tar.bz2";
-        public string CliUrlLinux32 { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.2.1.0/nerva-linux-i686-v0.2.1.0.tar.bz2";
-        public string CliUrlLinuxArm { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.2.1.0/nerva-linux-armv8-v0.2.1.0.tar.bz2";
-        public string CliUrlMacIntel { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.2.1.0/nerva-macos-x64-v0.2.1.0.tar.bz2";
-        public string CliUrlMacArm { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.2.1.0/nerva-macos-armv8-v0.2.1.0.tar.bz2";
-        public string CliUrlAndroid { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.2.1.0/nerva-android-armv8-v0.2.1.0.tar.bz2";
+        public string CliUrlWindows64 { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.2.2.0-rc1/nerva-windows-x64-v0.2.2.0-rc1.zip";
+        public string CliUrlWindows32 { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.2.2.0-rc1/nerva-windows-x32-v0.2.2.0-rc1.zip";
+        public string CliUrlLinux64 { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.2.2.0-rc1/nerva-linux-x86_64-v0.2.2.0-rc1.tar.bz2";
+        public string CliUrlLinux32 { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.2.2.0-rc1/nerva-linux-i686-v0.2.2.0-rc1.tar.bz2";
+        public string CliUrlLinuxArm { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.2.2.0-rc1/nerva-linux-armv8-v0.2.2.0-rc1.tar.bz2";
+        public string CliUrlMacIntel { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.2.2.0-rc1/nerva-macos-x64-v0.2.2.0-rc1.tar.bz2";
+        public string CliUrlMacArm { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.2.2.0-rc1/nerva-macos-armv8-v0.2.2.0-rc1.tar.bz2";
+        public string CliUrlAndroid { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.2.2.0-rc1/nerva-android-armv8-v0.2.2.0-rc1.tar.bz2";
 
         public string RemotePublicNodeUrlDefault { get; set; } = "node.nerva.one:17566";
         public string LocalPublicNodeArgumentsDefault { get; set; } = "--rpc-bind-ip 0.0.0.0 --confirm-external-bind";

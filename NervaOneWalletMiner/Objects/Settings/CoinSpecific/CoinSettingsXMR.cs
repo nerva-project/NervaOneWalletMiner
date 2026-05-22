@@ -18,14 +18,14 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public string BlockchainDbSubfolder { get; set; } = "lmdb";
 
         // https://github.com/monero-project/monero/releases
-        public string CliUrlWindows64 { get; set; } = "https://downloads.getmonero.org/cli/monero-win-x64-v0.18.4.6.zip";
-        public string CliUrlWindows32 { get; set; } = "https://downloads.getmonero.org/cli/monero-win-x86-v0.18.4.6.zip";
-        public string CliUrlLinux64 { get; set; } = "https://downloads.getmonero.org/cli/monero-linux-x64-v0.18.4.6.tar.bz2";
-        public string CliUrlLinux32 { get; set; } = "https://downloads.getmonero.org/cli/monero-linux-x86-v0.18.4.6.tar.bz2";
-        public string CliUrlLinuxArm { get; set; } = "https://downloads.getmonero.org/cli/monero-linux-armv8-v0.18.4.6.tar.bz2";
-        public string CliUrlMacIntel { get; set; } = "https://downloads.getmonero.org/cli/monero-mac-x64-v0.18.4.6.tar.bz2";
-        public string CliUrlMacArm { get; set; } = "https://downloads.getmonero.org/cli/monero-mac-armv8-v0.18.4.6.tar.bz2";
-        public string CliUrlAndroid { get; set; } = "https://downloads.getmonero.org/cli/monero-android-armv8-v0.18.4.6.tar.bz2";
+        public string CliUrlWindows64 { get; set; } = "https://downloads.getmonero.org/cli/monero-win-x64-v0.18.5.0.zip";
+        public string CliUrlWindows32 { get; set; } = "https://downloads.getmonero.org/cli/monero-win-x86-v0.18.5.0.zip";
+        public string CliUrlLinux64 { get; set; } = "https://downloads.getmonero.org/cli/monero-linux-x64-v0.18.5.0.tar.bz2";
+        public string CliUrlLinux32 { get; set; } = "https://downloads.getmonero.org/cli/monero-linux-x86-v0.18.5.0.tar.bz2";
+        public string CliUrlLinuxArm { get; set; } = "https://downloads.getmonero.org/cli/monero-linux-armv8-v0.18.5.0.tar.bz2";
+        public string CliUrlMacIntel { get; set; } = "https://downloads.getmonero.org/cli/monero-mac-x64-v0.18.5.0.tar.bz2";
+        public string CliUrlMacArm { get; set; } = "https://downloads.getmonero.org/cli/monero-mac-armv8-v0.18.5.0.tar.bz2";
+        public string CliUrlAndroid { get; set; } = "https://downloads.getmonero.org/cli/monero-android-armv8-v0.18.5.0.tar.bz2";
 
         public string RemotePublicNodeUrlDefault { get; set; } = "xmr-node.cakewallet.com:18081";
         public string LocalPublicNodeArgumentsDefault { get; set; } = "--rpc-bind-ip 0.0.0.0 --confirm-external-bind --restricted-rpc";
