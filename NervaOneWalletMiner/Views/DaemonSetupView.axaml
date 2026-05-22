@@ -128,6 +128,16 @@
 							Click="ChangeDataDir_Clicked"/>
 				</Grid>
 
+				<StackPanel IsVisible="{Binding IsPrunedNode}">
+					<Label Content="Prune Size (MB)" Margin="0,10,0,0"/>
+					<NumericUpDown Name="pruneSize"
+								   Value="{Binding PruneSize, Mode=TwoWay}"
+								   Minimum="550"
+								   FormatString="N0"
+								   Width="160"
+								   HorizontalAlignment="Left"/>
+				</StackPanel>
+
 				<Label Content="Additional Startup Arguments" Margin="0,10,0,0"/>
 				<TextBox Name="tbxAdditionalArguments"
 						 Text="{Binding AdditionalArguments, Mode=TwoWay}"

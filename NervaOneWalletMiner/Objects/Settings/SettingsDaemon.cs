@@ -30,6 +30,8 @@ namespace NervaOneWalletMiner.Objects.Settings
 
         public string DataDir { get; set; } = string.Empty;
 
+        public int PruneSizeMB { get; set; } = 51200;
+
         public int LogLevel { get; set; } = -1;
 
         public bool IsTestnet { get; set; } = false;

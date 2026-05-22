@@ -9,10 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NervaOneWalletMiner.Android
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NervaOneWalletMiner.Desktop", "..\NervaOneWalletMiner.Desktop\NervaOneWalletMiner.Desktop.csproj", "{9B969F68-98AB-4846-BE47-85EFF46FE414}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NervaOneWalletMiner.iOS", "..\NervaOneWalletMiner.iOS\NervaOneWalletMiner.iOS.csproj", "{A65EFF7F-89A5-4527-9DE2-63500558EFC7}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NervaOneWalletMiner.Browser", "..\NervaOneWalletMiner.Browser\NervaOneWalletMiner.Browser.csproj", "{8221573C-F241-4070-B587-B8F0BA942EBA}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,16 +29,6 @@ Global
 		{9B969F68-98AB-4846-BE47-85EFF46FE414}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B969F68-98AB-4846-BE47-85EFF46FE414}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9B969F68-98AB-4846-BE47-85EFF46FE414}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A65EFF7F-89A5-4527-9DE2-63500558EFC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A65EFF7F-89A5-4527-9DE2-63500558EFC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A65EFF7F-89A5-4527-9DE2-63500558EFC7}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{A65EFF7F-89A5-4527-9DE2-63500558EFC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A65EFF7F-89A5-4527-9DE2-63500558EFC7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A65EFF7F-89A5-4527-9DE2-63500558EFC7}.Release|Any CPU.Deploy.0 = Release|Any CPU
-		{8221573C-F241-4070-B587-B8F0BA942EBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8221573C-F241-4070-B587-B8F0BA942EBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8221573C-F241-4070-B587-B8F0BA942EBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8221573C-F241-4070-B587-B8F0BA942EBA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

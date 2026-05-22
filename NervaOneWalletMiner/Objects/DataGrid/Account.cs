@@ -1,4 +1,5 @@
 ﻿using Avalonia.Media.Imaging;
+using NervaOneWalletMiner.Helpers;
 using System.ComponentModel;
 
 namespace NervaOneWalletMiner.Objects.DataGrid
@@ -42,13 +43,15 @@ namespace NervaOneWalletMiner.Objects.DataGrid
                 {
                     _balanceTotal = value;
                     OnPropertyChanged(nameof(BalanceTotal));
+                    OnPropertyChanged(nameof(BalanceTotalDisplay));
                 }
             }
         }
 
+        public string BalanceTotalDisplay => GlobalMethods.FormatAmount(BalanceTotal);
 
         private decimal _balanceUnlocked;
-        public decimal BalanceUnlocked 
+        public decimal BalanceUnlocked
         {
             get { return _balanceUnlocked; }
             set
@@ -56,10 +59,13 @@ namespace NervaOneWalletMiner.Objects.DataGrid
                 if(_balanceUnlocked != value)
                 {
                     _balanceUnlocked = value;
-                    OnPropertyChanged(nameof(BalanceTotal));
+                    OnPropertyChanged(nameof(BalanceUnlocked));
+                    OnPropertyChanged(nameof(BalanceUnlockedDisplay));
                 }
             }
         }
+
+        public string BalanceUnlockedDisplay => GlobalMethods.FormatAmount(BalanceUnlocked);
 
 
         // Properties that do not need to be refreshed

@@ -2,5 +2,6 @@
 {
     public class RescanBlockchainRequest
     {
+        public char[] Password { get; set; } = [];
     }
 }

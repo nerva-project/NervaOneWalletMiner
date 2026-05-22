@@ -1255,6 +1255,10 @@ namespace NervaOneWalletMiner.Helpers
         public static string FormatAmount(decimal amount) =>
             amount.ToString("0." + new string('#', GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].CoinDecimalPlaces));
 
+        // Full precision — no rounding. # suppresses trailing zeros.
+        public static string FormatAmountFull(decimal amount) =>
+            amount.ToString("0.############");
+
         public static string GetShorterString(string? text, int shorterLength)
         {
             if (string.IsNullOrEmpty(text))

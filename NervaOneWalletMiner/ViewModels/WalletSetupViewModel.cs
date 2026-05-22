@@ -307,14 +307,14 @@ namespace NervaOneWalletMiner.ViewModels
             }
         }
 
-        public async Task<WalletOperationResult> RescanBlockchain()
+        public async Task<WalletOperationResult> RescanBlockchain(char[] password)
         {
             string title = "Rescan Blockchain";
 
             try
             {
                 Logger.LogDebug("WSM.RSBC", "Rescan Blockchain starting");
-                RescanBlockchainResponse response = await GlobalData.WalletService.RescanBlockchain(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new RescanBlockchainRequest());
+                RescanBlockchainResponse response = await GlobalData.WalletService.RescanBlockchain(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, new RescanBlockchainRequest { Password = password });
 
                 if (response.Error.IsError)
                 {
