@@ -15,18 +15,27 @@
 
 ## ⓘ About NervaOne
 
-**NervaOne** is an open-source, non-custodial Wallet and CPU Miner. It runs on your desktop and Android devices and allows you to control daemon/wallet using modern graphical user interface.
+**NervaOne** is an open-source, non-custodial Wallet and CPU Miner for Windows, Linux, macOS, and Android.
 
-It can also be used as Wallet Only by connecting to remote node.
+- **Your keys, your coins** - NervaOne is fully non-custodial. Your keys never leave your device.
+- **Run a full or pruned node** - Stay in control of your own blockchain without relying on third parties.
+- **CPU Mining** - Mine directly from the app on supported coins.
+- **Wallet Only mode** - Looking for a quick wallet setup without running a blockchain? Connect to a remote node on supported coins.
+- **Modern GUI** - Clean, cross-platform interface for managing your wallets and daemon.
 
-NervaOne runs on Windows, Linux, macOS, and Android.
+NervaOne currently supports the following cryptocurrencies:
 
-NervaOne currently supports below cryptocurrencies:
+- <img src="./NervaOneWalletMiner/Assets/xnv/logo.png" height="16"> Nerva (XNV)
+- <img src="./NervaOneWalletMiner/Assets/btc/logo.png" height="16"> Bitcoin (BTC)
+- <img src="./NervaOneWalletMiner/Assets/xmr/logo.png" height="16"> Monero (XMR)
+- <img src="./NervaOneWalletMiner/Assets/wow/logo.png" height="16"> Wownero (WOW)
+- <img src="./NervaOneWalletMiner/Assets/dash/logo.png" height="16"> Dash (DASH)
 
-- Nerva (XNV)
-- Monero (XMR)
-- Wownero (WOW)
-- Dash (DASH) - unfinished
+---
+
+## 📥 Download
+
+Pre-built binaries for Windows, Linux, macOS, and Android are available on the [Releases][releases-link] page.
 
 ---
 
@@ -117,7 +126,7 @@ Pick below workloads when installing VS:
 
 Clone this repository (https://github.com/nerva-project/NervaOneWalletMiner.git)
 
-Unload .Browser and .iOS projects (keep .Android loaded if building for Android)
+Unload .Android project if not building for Android
 
 Set NervaOneWalletMiner.Desktop project as startup project
 
@@ -128,19 +137,15 @@ Debug > Start Debugging
 ---
 
 ## 🏃‍♂️‍➡️ Running Using Visual Studio Code (Windows/Linux/Mac)
-Install [Visual Studio Code][visual-studio]
+Install [Visual Studio Code][visual-studio-code]
 
-Go to Extensions and install: Avalonia for VSCode. More info:
-
-https://marketplace.visualstudio.com/items?itemName=AvaloniaTeam.vscode-avalonia
+Go to Extensions and install: [Avalonia for VSCode][avalonia-vscode]
 
 In VSCode, go to Explorer and choose Clone this repository:
 
 https://github.com/nerva-project/NervaOneWalletMiner.git
 
-If you cannot clone because you do not have Git installed, see this:
-
-https://code.visualstudio.com/docs/sourcecontrol/intro-to-git
+If you cannot clone because you do not have Git installed, see [Intro to Git in VSCode][vscode-git]
 
 Go to TERMINAL and cd into NervaOneWalletMiner.Desktop directory
 
@@ -166,6 +171,9 @@ This project is licensed under the terms of the [MIT License](https://github.com
 [releases-link]: https://github.com/nerva-project/NervaOneWalletMiner/releases
 [rid-catalog]: https://learn.microsoft.com/en-us/dotnet/core/rid-catalog
 [visual-studio]: https://visualstudio.microsoft.com/free-developer-offers/
+[visual-studio-code]: https://code.visualstudio.com/
+[avalonia-vscode]: https://marketplace.visualstudio.com/items?itemName=AvaloniaTeam.vscode-avalonia
+[vscode-git]: https://code.visualstudio.com/docs/sourcecontrol/intro-to-git
 [contributors]: https://github.com/nerva-project/NervaOneWalletMiner/graphs/contributors
 [license]: https://github.com/nerva-project/NervaOneWalletMiner?tab=MIT-1-ov-file
 [issues]: https://github.com/nerva-project/NervaOneWalletMiner/issues

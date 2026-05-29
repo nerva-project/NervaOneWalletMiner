@@ -19,13 +19,13 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public string BlockchainDbSubfolder { get; set; } = string.Empty;
 
         // https://github.com/dashpay/dash/releases
-        public string CliUrlWindows64 { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.2/dashcore-23.1.2-win64.zip";
-        public string CliUrlWindows32 { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.2/dashcore-23.1.2-win64.zip";
-        public string CliUrlLinux64 { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.2/dashcore-23.1.2-x86_64-linux-gnu.tar.gz";
-        public string CliUrlLinux32 { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.2/dashcore-23.1.2-x86_64-linux-gnu.tar.gz";
-        public string CliUrlLinuxArm { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.2/dashcore-23.1.2-aarch64-linux-gnu.tar.gz";
-        public string CliUrlMacIntel { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.2/dashcore-23.1.2-arm64-apple-darwin.tar.gz";
-        public string CliUrlMacArm { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.2/dashcore-23.1.2-arm64-apple-darwin.tar.gz";
+        public string CliUrlWindows64 { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.3/dashcore-23.1.3-win64.zip";
+        public string CliUrlWindows32 { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.3/dashcore-23.1.3-win64.zip";
+        public string CliUrlLinux64 { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.3/dashcore-23.1.3-x86_64-linux-gnu.tar.gz";
+        public string CliUrlLinux32 { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.3/dashcore-23.1.3-x86_64-linux-gnu.tar.gz";
+        public string CliUrlLinuxArm { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.3/dashcore-23.1.3-aarch64-linux-gnu.tar.gz";
+        public string CliUrlMacIntel { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.3/dashcore-23.1.3-x86_64-apple-darwin.tar.gz";
+        public string CliUrlMacArm { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.3/dashcore-23.1.3-arm64-apple-darwin.tar.gz";
         public string CliUrlAndroid { get; set; } = string.Empty;
 
         public string RemotePublicNodeUrlDefault { get; set; } = string.Empty;
