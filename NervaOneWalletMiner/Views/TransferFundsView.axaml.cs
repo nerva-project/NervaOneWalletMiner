@@ -255,12 +255,12 @@ namespace NervaOneWalletMiner.Views
 
                 if (DateTime.Now > GlobalData.WalletPassProvidedTime.AddMinutes(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].UnlockMinutes))
                 {
-                    TextBoxView textWindow = new(title: "Provide Wallet Password", labelValue: "Please provide wallet password", textValue: string.Empty, textWatermark: "Required - Wallet password", isTextRequired: true, isTextPassword: true, okButtonText: "Submit");
-                    DialogResult? passRes = await DialogService.ShowAsync<DialogResult>(textWindow);
-
-                    if (passRes != null && passRes.IsOk)
+                    if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPassRequiredToOpenWallet)
                     {
-                        if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPassRequiredToOpenWallet)
+                        TextBoxView textWindow = new(title: "Provide Wallet Password", labelValue: "Please provide wallet password", textValue: string.Empty, textWatermark: "Required - Wallet password", isTextRequired: true, isTextPassword: true, okButtonText: "Submit");
+                        DialogResult? passRes = await DialogService.ShowAsync<DialogResult>(textWindow);
+
+                        if (passRes != null && passRes.IsOk)
                         {
                             if (Hashing.Verify(passRes.TextBoxValue.ToCharArray(), GlobalData.WalletPasswordHash))
                             {
@@ -269,25 +269,41 @@ namespace NervaOneWalletMiner.Views
                                 passRes.TextBoxValue = string.Empty;
                             }
                         }
+                    }
+                    else
+                    {
+                        bool isEncrypted = await GlobalData.WalletService.GetIsEncrypted(walletRpc);
+
+                        if (!isEncrypted)
+                        {
+                            isAuthorized = true;
+                            GlobalData.WalletPassProvidedTime = DateTime.Now;
+                        }
                         else
                         {
-                            UnlockWithPassRequest request = new()
-                            {
-                                Password = passRes.TextBoxValue.ToCharArray(),
-                                TimeoutInSeconds = GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].UnlockMinutes * 60
-                            };
+                            TextBoxView textWindow = new(title: "Provide Wallet Password", labelValue: "Please provide wallet password", textValue: string.Empty, textWatermark: "Required - Wallet password", isTextRequired: true, isTextPassword: true, okButtonText: "Submit");
+                            DialogResult? passRes = await DialogService.ShowAsync<DialogResult>(textWindow);
 
-                            UnlockWithPassResponse response = await GlobalData.WalletService.UnlockWithPass(walletRpc, request);
+                            if (passRes != null && passRes.IsOk)
+                            {
+                                UnlockWithPassRequest request = new()
+                                {
+                                    Password = passRes.TextBoxValue.ToCharArray(),
+                                    TimeoutInSeconds = GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].UnlockMinutes * 60
+                                };
 
-                            if (response.Error.IsError)
-                            {
-                                Logger.LogError("TFV.OKBC", "Unlock error | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
-                                await DialogService.ShowAsync(new MessageBoxView("Unlock Wallet", "Unlock error\r\n\r\n" + response.Error.Message, true));
-                            }
-                            else
-                            {
-                                isAuthorized = true;
-                                GlobalData.WalletPassProvidedTime = DateTime.Now;
+                                UnlockWithPassResponse response = await GlobalData.WalletService.UnlockWithPass(walletRpc, request);
+
+                                if (response.Error.IsError)
+                                {
+                                    Logger.LogError("TFV.OKBC", "Unlock error | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
+                                    await DialogService.ShowAsync(new MessageBoxView("Unlock Wallet", "Unlock error\r\n\r\n" + response.Error.Message, true));
+                                }
+                                else
+                                {
+                                    isAuthorized = true;
+                                    GlobalData.WalletPassProvidedTime = DateTime.Now;
+                                }
                             }
                         }
                     }

@@ -678,7 +678,7 @@ namespace NervaOneWalletMiner.Helpers
                             {
                                 // Sort new transactions oldest-first so Insert(0) ends up newest-on-top
                                 List<Transfer> orderedNewTransactions = brandNewTransactions.Count > 0
-                                    ? [.. brandNewTransactions.OrderBy(tx => tx.Height)]
+                                    ? [.. brandNewTransactions.OrderBy(tx => tx.Timestamp)]
                                     : [];
 
                                 Dispatcher.UIThread.Invoke(() =>

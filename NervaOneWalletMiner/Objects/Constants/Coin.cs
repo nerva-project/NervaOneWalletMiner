@@ -7,5 +7,6 @@
         public const string WOW = "wow";
         public const string DASH = "dash";
         public const string BTC = "btc";
+        public const string LTC = "ltc";
     }
 }

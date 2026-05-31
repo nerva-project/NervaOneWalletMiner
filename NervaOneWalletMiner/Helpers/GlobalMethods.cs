@@ -361,6 +361,7 @@ namespace NervaOneWalletMiner.Helpers
             {
                 defaultSettings.Add(Coin.XNV, new CoinSettingsXNV());
                 defaultSettings.Add(Coin.BTC, new CoinSettingsBTC());
+                defaultSettings.Add(Coin.LTC, new CoinSettingsLTC());
                 defaultSettings.Add(Coin.XMR, new CoinSettingsXMR());
                 defaultSettings.Add(Coin.WOW, new CoinSettingsWOW());
                 defaultSettings.Add(Coin.DASH, new CoinSettingsDASH());
@@ -437,6 +438,26 @@ namespace NervaOneWalletMiner.Helpers
                         }
                         break;
 
+                    case Coin.LTC:
+                        GlobalData.CoinDirName = Coin.LTC;
+                        GlobalData.AppSettings.ActiveCoin = Coin.LTC;
+
+                        GlobalData.DaemonService = new DaemonServiceLTC();
+                        GlobalData.WalletService = new WalletServiceLTC();
+
+                        if (string.IsNullOrEmpty(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc.UserName))
+                        {
+                            GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc.UserName = GenerateRandomString(24);
+                            GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc.Password = GenerateRandomString(24);
+                        }
+
+                        if (string.IsNullOrEmpty(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc.UserName))
+                        {
+                            GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc.UserName = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc.UserName;
+                            GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc.Password = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc.Password;
+                        }
+                        break;
+
                     default:
                         // XNV or anything else not supported
                         GlobalData.CoinDirName = Coin.XNV;
@@ -487,6 +508,9 @@ namespace NervaOneWalletMiner.Helpers
                     case Coin.BTC:
                         daemonProcess = GlobalMethods.IsWindows() ? "bitcoind.exe" : "bitcoind";
                         break;
+                    case Coin.LTC:
+                        daemonProcess = GlobalMethods.IsWindows() ? "litecoind.exe" : "litecoind";
+                        break;
                     default:
                         // XNV or anything else not supported
                         daemonProcess = GlobalMethods.IsWindows() ? "nervad.exe" : "nervad";
@@ -520,6 +544,9 @@ namespace NervaOneWalletMiner.Helpers
                         break;
                     case Coin.BTC:
                         walletProcess = IsWindows() ? "bitcoind.exe" : "bitcoind";
+                        break;
+                    case Coin.LTC:
+                        walletProcess = IsWindows() ? "litecoind.exe" : "litecoind";
                         break;
                     default:
                         // XNV or anything else not supported
@@ -565,6 +592,11 @@ namespace NervaOneWalletMiner.Helpers
                 {
                     logoDictionary.Add(Coin.BTC, new Bitmap(AssetLoader.Open(new Uri("avares://" + GlobalData.AppAssemblyName + "/Assets/btc/logo.png"))));
                 }
+
+                if (!logoDictionary.ContainsKey(Coin.LTC))
+                {
+                    logoDictionary.Add(Coin.LTC, new Bitmap(AssetLoader.Open(new Uri("avares://" + GlobalData.AppAssemblyName + "/Assets/ltc/logo.png"))));
+                }
             }
             catch (Exception ex)
             {
@@ -603,6 +635,11 @@ namespace NervaOneWalletMiner.Helpers
                 if (!iconDictionary.ContainsKey(Coin.BTC))
                 {
                     iconDictionary.Add(Coin.BTC, new WindowIcon(AssetLoader.Open(new Uri("avares://" + GlobalData.AppAssemblyName + "/Assets/btc/logo.png"))));
+                }
+
+                if (!iconDictionary.ContainsKey(Coin.LTC))
+                {
+                    iconDictionary.Add(Coin.LTC, new WindowIcon(AssetLoader.Open(new Uri("avares://" + GlobalData.AppAssemblyName + "/Assets/ltc/logo.png"))));
                 }
             }
             catch (Exception ex)

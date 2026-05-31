@@ -23,6 +23,8 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         protected abstract string CoinName { get; }
         protected abstract uint CoinType { get; }
         protected abstract bool SupportMultipleScriptTypes { get; }
+        protected virtual bool SupportTaproot => true;
+        protected virtual bool UseDescriptorWallet => true;
 
         private static int _id = 0;
 
@@ -160,6 +162,34 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         }
         #endregion // Open Wallet
 
+        #region Get Is Encrypted
+        public async Task<bool> GetIsEncrypted(RpcBase rpc)
+        {
+            try
+            {
+                var requestJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = _id++,
+                    ["method"] = "getwalletinfo"
+                };
+
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
+                    return jsonObject.SelectToken("result.unlocked_until") != null;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(CoinPrefix + ".WGIE", ex);
+            }
+
+            return false;
+        }
+        #endregion // Get Is Encrypted
+
         #region Unlock with Passphrase
         public async Task<UnlockWithPassResponse> UnlockWithPass(RpcBase rpc, UnlockWithPassRequest requestObj)
         {
@@ -202,7 +232,6 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 }
                 else
                 {
-                    // Set HTTP error
                     responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
                 }
             }
@@ -1173,10 +1202,13 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 descriptors.Add(($"wpkh([{fingerprintHex}/84'/0'/0']{bip84Xprv}/0/*)", false));
                 descriptors.Add(($"wpkh([{fingerprintHex}/84'/0'/0']{bip84Xprv}/1/*)", true));
 
-                // BIP86 — P2TR (taproot)
-                string bip86Xprv = masterKey.Derive(KeyPath.Parse("m/86'/0'/0'")).ToString(Network.Main);
-                descriptors.Add(($"tr([{fingerprintHex}/86'/0'/0']{bip86Xprv}/0/*)", false));
-                descriptors.Add(($"tr([{fingerprintHex}/86'/0'/0']{bip86Xprv}/1/*)", true));
+                if (SupportTaproot)
+                {
+                    // BIP86 — P2TR (taproot)
+                    string bip86Xprv = masterKey.Derive(KeyPath.Parse("m/86'/0'/0'")).ToString(Network.Main);
+                    descriptors.Add(($"tr([{fingerprintHex}/86'/0'/0']{bip86Xprv}/0/*)", false));
+                    descriptors.Add(($"tr([{fingerprintHex}/86'/0'/0']{bip86Xprv}/1/*)", true));
+                }
             }
 
             return descriptors;
@@ -1899,11 +1931,16 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         #region Query Keys        
         public async Task<GetPrivateKeysResponse> GetPrivateKeys(RpcBase rpc, GetPrivateKeysRequest requestObj)
         {
+            if (!UseDescriptorWallet)
+            {
+                return await DumpLegacyWallet(rpc, requestObj);
+            }
+
             GetPrivateKeysResponse responseObj = new();
 
             try
             {
-                // listdescriptors replaces dumpwallet for descriptor wallets (Bitcoin Core 22+)
+                // listdescriptors for descriptor wallets (Bitcoin Core 22+)
                 var requestJson = new JObject
                 {
                     ["jsonrpc"] = "2.0",
@@ -1947,16 +1984,6 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 }
                 else
                 {
-                    string errorContent = await httpResponse.Content.ReadAsStringAsync();
-                    JObject? errorJson = null;
-                    try { errorJson = JObject.Parse(errorContent); } catch { }
-
-                    if (errorJson?.SelectToken("error.code")?.ToString() == "-4")
-                    {
-                        Logger.LogDebug(CoinPrefix + ".WGPK", "listdescriptors not available, falling back to dumpwallet for legacy wallet");
-                        return await DumpLegacyWallet(rpc, requestObj);
-                    }
-
                     responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
                 }
             }

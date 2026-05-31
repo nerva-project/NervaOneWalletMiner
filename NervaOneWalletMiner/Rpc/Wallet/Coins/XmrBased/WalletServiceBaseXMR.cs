@@ -1966,6 +1966,12 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             throw new NotImplementedException();
         }
 
+        public Task<bool> GetIsEncrypted(RpcBase rpc)
+        {
+            // Not used. XMR-based coins use IsPassRequiredToOpenWallet instead
+            throw new NotImplementedException();
+        }
+
         public Task<ImportWalletResponse> ImportWallet(RpcBase rpc, ImportWalletRequest requestObj)
         {
             // Not used. ICoinSettings.IsRestoreFromDumpFileSupported
