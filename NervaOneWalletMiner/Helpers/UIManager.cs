@@ -624,7 +624,7 @@ namespace NervaOneWalletMiner.Helpers
                         {
                             Dispatcher.UIThread.Invoke(() =>
                             {
-                                transfersViewVm.Transactions = [.. initialTransfers.OrderByDescending(t => t.Height)];
+                                transfersViewVm.Transactions = [.. initialTransfers.OrderByDescending(t => t.Timestamp)];
                             });
 
                             // Need to clear transfers AFTER we process them otherwise we might clear them before we process them
