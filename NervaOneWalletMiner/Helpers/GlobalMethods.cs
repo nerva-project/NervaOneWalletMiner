@@ -687,6 +687,11 @@ namespace NervaOneWalletMiner.Helpers
                         GlobalData.AppSettings.Daemon[coin].DataDir = GetDefaultDataDir(coin);
                     }
 
+                    if (GlobalData.AppSettings.Daemon[coin].PruneSizeMB == 0)
+                    {
+                        GlobalData.AppSettings.Daemon[coin].PruneSizeMB = GlobalData.CoinSettings[coin].DefaultPruneSizeMB;
+                    }
+
                     // Wallet
                     if (string.IsNullOrEmpty(GlobalData.AppSettings.Wallet[coin].DisplayUnits))
                     {

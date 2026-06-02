@@ -126,6 +126,7 @@ namespace NervaOneWalletMiner.ViewModels
         public bool IsQuickSyncSupported => GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsQuickSyncSupported;
         public bool IsPublicNodeSupported => GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPublicNodeSupported;
         public bool IsAnalyticsFlagSupported => GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsAnalyticsFlagSupported;
+        public bool IsBlockchainDbSupported => GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsDbDownloadSupported;
 
         private string _remoteNodeAddress = string.Empty;
         public string RemoteNodeAddress

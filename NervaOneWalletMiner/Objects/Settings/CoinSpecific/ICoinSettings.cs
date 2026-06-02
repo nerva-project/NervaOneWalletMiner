@@ -32,6 +32,8 @@
         int LogLevelDaemon { get; set; }
         bool IsCpuMiningSupported { get; set; }
         bool IsPruningSupported { get; set; }
+        int DefaultPruneSizeMB { get; set; }
+        bool IsDbDownloadSupported { get; set; }
         bool IsWalletOnlySupported { get; set; }
         bool IsQuickSyncSupported { get; set; }
         bool IsPublicNodeSupported { get; set; }
