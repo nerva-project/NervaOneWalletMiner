@@ -26,6 +26,9 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         protected virtual bool SupportTaproot => true;
         protected virtual bool UseDescriptorWallet => true;
 
+        private static string WalletPath(string walletName) => "wallet/" + walletName;
+        private static string CurrentWalletPath => WalletPath(GlobalData.OpenedWalletName);
+
         private static int _id = 0;
 
         // importdescriptors/importwallet and rescanblockchain are synchronous and block until the chain scan completes
@@ -141,9 +144,10 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     try { errorJson = JObject.Parse(errorContent); } catch { }
 
                     string? errorCode = errorJson?.SelectToken("error.code")?.ToString();
-                    if (errorCode == "-35")
+                    string? errorMessage = errorJson?.SelectToken("error.message")?.ToString();
+                    if (errorCode == "-35" || errorMessage?.Contains("already loaded") == true)
                     {
-                        // Wallet was auto-loaded by daemon on startup — already in the desired state
+                        // Wallet is already loaded in the daemon — already in the desired state
                         Logger.LogDebug(CoinPrefix + ".WOPW", "Wallet already loaded: " + requestObj.WalletName);
                         responseObj.Error.IsError = false;
                     }
@@ -174,7 +178,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     ["method"] = "getwalletinfo"
                 };
 
-                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, CurrentWalletPath), requestJson.ToString(), rpc.UserName, rpc.Password);
                 if (httpResponse.IsSuccessStatusCode)
                 {
                     JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
@@ -213,7 +217,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 };
 
                 // Call service and process response
-                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, CurrentWalletPath), requestJson.ToString(), rpc.UserName, rpc.Password);
                 if (httpResponse.IsSuccessStatusCode)
                 {
                     JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
@@ -271,7 +275,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     ["params"] = requestParams
                 };
 
-                // Call service and process response
+                // Call service and process response - wallet_name is in params so no wallet path needed in URL
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
                 if (httpResponse.IsSuccessStatusCode)
                 {
@@ -352,7 +356,8 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                             ["params"] = new JObject { ["label"] = "" }
                         };
 
-                        HttpResponseMessage firstAddrResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), firstAddrJson.ToString(), rpc.UserName, rpc.Password);
+                        string newWalletPath = WalletPath(requestObj.WalletName);
+                        HttpResponseMessage firstAddrResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, newWalletPath), firstAddrJson.ToString(), rpc.UserName, rpc.Password);
                         if (firstAddrResponse.IsSuccessStatusCode)
                         {
                             JObject firstAddrResult = JObject.Parse(await firstAddrResponse.Content.ReadAsStringAsync());
@@ -360,6 +365,17 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                             if (firstAddrError != null && firstAddrError.Type != JTokenType.Null)
                             {
                                 Logger.LogError(CoinPrefix + ".WCRW", "Wallet created but failed to generate first address: " + firstAddrError.ToString());
+                            }
+                            else
+                            {
+                                // Import the public key so the wallet tracks all address formats (legacy, P2SH, bech32)
+                                // for the same key. Without this, only the default bech32 format is watched and
+                                // incoming transactions to legacy or P2SH formats of the same key are missed.
+                                string? firstAddress = firstAddrResult["result"]?.ToString();
+                                if (!string.IsNullOrEmpty(firstAddress))
+                                {
+                                    await ImportPubKeyForAddress(rpc, newWalletPath, firstAddress);
+                                }
                             }
                         }
                         else
@@ -384,6 +400,67 @@ namespace NervaOneWalletMiner.Rpc.Wallet
             }
 
             return responseObj;
+        }
+
+        private async Task ImportPubKeyForAddress(RpcBase rpc, string walletPath, string address)
+        {
+            try
+            {
+                var addrInfoJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = _id++,
+                    ["method"] = "getaddressinfo",
+                    ["params"] = new JArray { address }
+                };
+
+                string walletUrl = HttpHelper.GetServiceUrl(rpc, walletPath);
+                HttpResponseMessage addrInfoResponse = await HttpHelper.GetPostFromService(walletUrl, addrInfoJson.ToString(), rpc.UserName, rpc.Password);
+                if (!addrInfoResponse.IsSuccessStatusCode)
+                {
+                    Logger.LogError(CoinPrefix + ".WIPK", "getaddressinfo failed for address: " + address);
+                    return;
+                }
+
+                JObject addrInfoResult = JObject.Parse(await addrInfoResponse.Content.ReadAsStringAsync());
+                string? pubKey = addrInfoResult.SelectToken("result.pubkey")?.ToString();
+                if (string.IsNullOrEmpty(pubKey))
+                {
+                    Logger.LogError(CoinPrefix + ".WIPK", "No pubkey returned for address: " + address);
+                    return;
+                }
+
+                var importPubKeyJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = _id++,
+                    ["method"] = "importpubkey",
+                    ["params"] = new JArray { pubKey, "", false }
+                };
+
+                HttpResponseMessage importResponse = await HttpHelper.GetPostFromService(walletUrl, importPubKeyJson.ToString(), rpc.UserName, rpc.Password);
+                if (importResponse.IsSuccessStatusCode)
+                {
+                    JObject importResult = JObject.Parse(await importResponse.Content.ReadAsStringAsync());
+                    var importError = importResult["error"];
+                    if (importError != null && importError.Type != JTokenType.Null)
+                    {
+                        Logger.LogError(CoinPrefix + ".WIPK", "importpubkey failed: " + importError.ToString());
+                    }
+                    else
+                    {
+                        Logger.LogDebug(CoinPrefix + ".WIPK", "All address formats registered for pubkey of: " + address);
+                    }
+                }
+                else
+                {
+                    Logger.LogError(CoinPrefix + ".WIPK", "importpubkey HTTP call failed");
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(CoinPrefix + ".WIPK", ex);
+            }
         }
         #endregion // Create Wallet
 
@@ -621,7 +698,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 };
 
                 // Call service and process response
-                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, CurrentWalletPath), requestJson.ToString(), rpc.UserName, rpc.Password);
                 if (httpResponse.IsSuccessStatusCode)
                 {
                     JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
@@ -1218,7 +1295,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         #region Transfer       
         public async Task<TransferResponse> Transfer(RpcBase rpc, TransferRequest requestObj)
         {
-            if (!string.IsNullOrEmpty(requestObj.TxData))
+            if (UseDescriptorWallet && !string.IsNullOrEmpty(requestObj.TxData))
             {
                 return await SendFundedPsbt(rpc, requestObj.TxData);
             }
@@ -1249,7 +1326,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     ["params"] = requestParams
                 };
 
-                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, CurrentWalletPath), requestJson.ToString(), rpc.UserName, rpc.Password);
                 if (httpResponse.IsSuccessStatusCode)
                 {
                     JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
@@ -1288,6 +1365,11 @@ namespace NervaOneWalletMiner.Rpc.Wallet
 
         public async Task<EstimateFeeResponse> EstimateFee(RpcBase rpc, TransferRequest requestObj)
         {
+            if (!UseDescriptorWallet)
+            {
+                return await EstimateFeeForLegacyWallet(rpc, requestObj);
+            }
+
             EstimateFeeResponse responseObj = new();
 
             try
@@ -1310,7 +1392,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     ["params"] = new JArray(new JArray(), outputsJson, 0, optionsJson)
                 };
 
-                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, CurrentWalletPath), requestJson.ToString(), rpc.UserName, rpc.Password);
                 if (httpResponse.IsSuccessStatusCode)
                 {
                     JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
@@ -1318,7 +1400,9 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     var error = jsonObject["error"];
                     if (error != null && error.Type != JTokenType.Null)
                     {
-                        responseObj.Error = GetServiceError(GetCallerName(), error);
+                        // walletcreatefundedpsbt fails for non-standard outputs (e.g. MWEB addresses) — fall back to smartfee
+                        Logger.LogDebug(CoinPrefix + ".ESFE", "walletcreatefundedpsbt failed, falling back to estimatesmartfee: " + error.ToString());
+                        return await EstimateFeeViaSmartFee(rpc, confTarget, estimateMode);
                     }
                     else
                     {
@@ -1338,12 +1422,150 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 }
                 else
                 {
-                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                    Logger.LogDebug(CoinPrefix + ".ESFE", "walletcreatefundedpsbt HTTP error, falling back to estimatesmartfee");
+                    return await EstimateFeeViaSmartFee(rpc, confTarget, estimateMode);
                 }
             }
             catch (Exception ex)
             {
                 Logger.LogException(CoinPrefix + ".ESFE", ex);
+            }
+
+            return responseObj;
+        }
+
+        private async Task<EstimateFeeResponse> EstimateFeeForLegacyWallet(RpcBase rpc, TransferRequest requestObj)
+        {
+            EstimateFeeResponse responseObj = new();
+
+            try
+            {
+                var destination = requestObj.Destinations.FirstOrDefault()!;
+                var (confTarget, estimateMode) = GetConfTarget(requestObj.Priority);
+
+                // Step 1: Create a minimal unsigned raw transaction (no inputs, just the output)
+                var createRawJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = _id++,
+                    ["method"] = "createrawtransaction",
+                    ["params"] = new JArray(new JArray(), new JArray { new JObject { [destination.Address] = destination.Amount } })
+                };
+
+                HttpResponseMessage createRawResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), createRawJson.ToString(), rpc.UserName, rpc.Password);
+                if (!createRawResponse.IsSuccessStatusCode)
+                {
+                    Logger.LogDebug(CoinPrefix + ".ESFL", "createrawtransaction failed, falling back to estimatesmartfee");
+                    return await EstimateFeeViaSmartFee(rpc, confTarget, estimateMode);
+                }
+
+                JObject createRawResult = JObject.Parse(await createRawResponse.Content.ReadAsStringAsync());
+                var createRawError = createRawResult["error"];
+                if (createRawError != null && createRawError.Type != JTokenType.Null)
+                {
+                    Logger.LogDebug(CoinPrefix + ".ESFL", "createrawtransaction error, falling back to estimatesmartfee: " + createRawError.ToString());
+                    return await EstimateFeeViaSmartFee(rpc, confTarget, estimateMode);
+                }
+
+                string rawHex = createRawResult["result"]?.ToString() ?? string.Empty;
+
+                // Step 2: Fund the raw transaction — uses the same coin selection as sendtoaddress
+                // so the fee returned here will match what sendtoaddress charges exactly
+                var fundRawJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = _id++,
+                    ["method"] = "fundrawtransaction",
+                    ["params"] = new JArray(rawHex, new JObject
+                    {
+                        ["conf_target"] = confTarget,
+                        ["estimate_mode"] = estimateMode
+                    })
+                };
+
+                HttpResponseMessage fundRawResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, CurrentWalletPath), fundRawJson.ToString(), rpc.UserName, rpc.Password);
+                if (fundRawResponse.IsSuccessStatusCode)
+                {
+                    JObject jsonObject = JObject.Parse(await fundRawResponse.Content.ReadAsStringAsync());
+
+                    var error = jsonObject["error"];
+                    if (error != null && error.Type != JTokenType.Null)
+                    {
+                        // fundrawtransaction doesn't support non-standard outputs (e.g. MWEB) — fall back to estimatesmartfee
+                        Logger.LogDebug(CoinPrefix + ".ESFL", "fundrawtransaction failed, falling back to estimatesmartfee: " + error.ToString());
+                        return await EstimateFeeViaSmartFee(rpc, confTarget, estimateMode);
+                    }
+                    else
+                    {
+                        var resultToken = jsonObject.SelectToken("result");
+                        if (resultToken == null)
+                        {
+                            responseObj.Error.IsError = true;
+                            responseObj.Error.Message = "Response missing 'result' field";
+                        }
+                        else
+                        {
+                            responseObj.Fee = resultToken["fee"]?.Value<decimal>() ?? 0;
+                            responseObj.Error.IsError = false;
+                        }
+                    }
+                }
+                else
+                {
+                    // Fall back to estimatesmartfee on HTTP error too
+                    Logger.LogDebug(CoinPrefix + ".ESFL", "fundrawtransaction HTTP error, falling back to estimatesmartfee");
+                    return await EstimateFeeViaSmartFee(rpc, confTarget, estimateMode);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(CoinPrefix + ".ESFL", ex);
+            }
+
+            return responseObj;
+        }
+
+        private async Task<EstimateFeeResponse> EstimateFeeViaSmartFee(RpcBase rpc, int confTarget, string estimateMode)
+        {
+            EstimateFeeResponse responseObj = new();
+
+            try
+            {
+                var requestJson = new JObject
+                {
+                    ["jsonrpc"] = "2.0",
+                    ["id"] = _id++,
+                    ["method"] = "estimatesmartfee",
+                    ["params"] = new JArray(confTarget, estimateMode)
+                };
+
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
+
+                    var error = jsonObject["error"];
+                    if (error != null && error.Type != JTokenType.Null)
+                    {
+                        responseObj.Error = GetServiceError(GetCallerName(), error);
+                    }
+                    else
+                    {
+                        decimal feeRatePerKb = jsonObject.SelectToken("result.feerate")?.Value<decimal>() ?? 0;
+
+                        // Estimate fee using typical transaction size of 250 bytes
+                        responseObj.Fee = Math.Round(feeRatePerKb * 0.25m, 8);
+                        responseObj.Error.IsError = false;
+                    }
+                }
+                else
+                {
+                    responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(CoinPrefix + ".ESFS", ex);
             }
 
             return responseObj;
@@ -1364,7 +1586,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     ["params"] = new JArray(fundedPsbt)
                 };
 
-                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), processJson.ToString(), rpc.UserName, rpc.Password);
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, CurrentWalletPath), processJson.ToString(), rpc.UserName, rpc.Password);
                 if (!httpResponse.IsSuccessStatusCode)
                 {
                     responseObj.Error = await HttpHelper.GetHttpError(GetCallerName(), httpResponse);
@@ -1478,7 +1700,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                         }
                     };
 
-                    HttpResponseMessage unlockResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), unlockJson.ToString(), rpc.UserName, rpc.Password);
+                    HttpResponseMessage unlockResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, CurrentWalletPath), unlockJson.ToString(), rpc.UserName, rpc.Password);
                     if (unlockResponse.IsSuccessStatusCode)
                     {
                         JObject unlockResult = JObject.Parse(await unlockResponse.Content.ReadAsStringAsync());
@@ -1503,16 +1725,36 @@ namespace NervaOneWalletMiner.Rpc.Wallet
 
                 if (proceedWithRescan)
                 {
+                    // On pruned nodes, rescanblockchain must start from pruneheight or later
+                    int startHeight = 0;
+                    var chainInfoJson = new JObject
+                    {
+                        ["jsonrpc"] = "2.0",
+                        ["id"] = _id++,
+                        ["method"] = "getblockchaininfo"
+                    };
+
+                    HttpResponseMessage chainInfoResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), chainInfoJson.ToString(), rpc.UserName, rpc.Password);
+                    if (chainInfoResponse.IsSuccessStatusCode)
+                    {
+                        JObject chainInfoResult = JObject.Parse(await chainInfoResponse.Content.ReadAsStringAsync());
+                        int? pruneHeight = chainInfoResult.SelectToken("result.pruneheight")?.Value<int>();
+                        if (pruneHeight.HasValue)
+                        {
+                            startHeight = pruneHeight.Value;
+                        }
+                    }
+
                     var requestJson = new JObject
                     {
                         ["jsonrpc"] = "2.0",
                         ["id"] = _id++,
                         ["method"] = "rescanblockchain",
-                        ["params"] = new JArray()
+                        ["params"] = new JArray { startHeight }
                     };
 
                     // rescanblockchain is synchronous and can take a long time on large chains
-                    HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password, _blockchainScanTimeout);
+                    HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, CurrentWalletPath), requestJson.ToString(), rpc.UserName, rpc.Password, _blockchainScanTimeout);
                     if (httpResponse.IsSuccessStatusCode)
                     {
                         JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
@@ -1575,7 +1817,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 };
 
                 // Call service and process response
-                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, CurrentWalletPath), requestJson.ToString(), rpc.UserName, rpc.Password);
                 if (httpResponse.IsSuccessStatusCode)
                 {
                     JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
@@ -1632,7 +1874,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     };
 
                     // Call service and process response
-                    httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
+                    httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, CurrentWalletPath), requestJson.ToString(), rpc.UserName, rpc.Password);
                     if (httpResponse.IsSuccessStatusCode)
                     {
                         JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
@@ -1698,7 +1940,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                     ["params"] = new JObject { ["minconf"] = 0, ["maxconf"] = 0 }
                                 };
 
-                                HttpResponseMessage pendingResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), pendingJson.ToString(), rpc.UserName, rpc.Password);
+                                HttpResponseMessage pendingResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, CurrentWalletPath), pendingJson.ToString(), rpc.UserName, rpc.Password);
                                 if (pendingResponse.IsSuccessStatusCode)
                                 {
                                     JObject pendingObject = JObject.Parse(await pendingResponse.Content.ReadAsStringAsync());
@@ -1753,11 +1995,15 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 // Build request content json
                 var requestParams = new JObject
                 {
-                    ["blockhash"] = requestObj.SinceBlockHash,
                     ["target_confirmations"] = 1,
                     ["include_watchonly"] = true,
                     ["include_removed"] = true
                 };
+
+                if (!string.IsNullOrEmpty(requestObj.SinceBlockHash))
+                {
+                    requestParams["blockhash"] = requestObj.SinceBlockHash;
+                }
 
                 var requestJson = new JObject
                 {
@@ -1768,7 +2014,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 };
 
                 // Call service and process response
-                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, CurrentWalletPath), requestJson.ToString(), rpc.UserName, rpc.Password);
                 if (httpResponse.IsSuccessStatusCode)
                 {
                     JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
@@ -1796,8 +2042,9 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                 Transfer newTransfer = new()
                                 {
                                     AccountIndex = -1,
-                                    TransactionId = entry.txid,
+                                    TransactionId = entry.txid ?? string.Empty,
                                     AddressShort = GlobalMethods.GetShorterString(entry.address, 12),
+                                    BlockHash = entry.blockhash ?? string.Empty,
                                     Height = string.IsNullOrEmpty(entry.blockheight) ? 0 : Convert.ToUInt32(entry.blockheight),
                                     Timestamp = GlobalMethods.UnixTimeStampToDateTime(entry.timereceived).ToLocalTime(),
                                     Amount = string.IsNullOrEmpty(entry.amount) ? 0 : Math.Abs(decimal.Parse(entry.amount, NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign)),
@@ -1851,7 +2098,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                 };
 
                 // Call service and process response
-                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, CurrentWalletPath), requestJson.ToString(), rpc.UserName, rpc.Password);
                 if (httpResponse.IsSuccessStatusCode)
                 {
                     JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
@@ -1949,7 +2196,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     ["params"] = new JObject { ["private"] = true }
                 };
 
-                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, CurrentWalletPath), requestJson.ToString(), rpc.UserName, rpc.Password);
                 if (httpResponse.IsSuccessStatusCode)
                 {
                     JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
@@ -2009,7 +2256,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     ["params"] = new JObject { ["filename"] = requestObj.DumpFileWithPath }
                 };
 
-                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, CurrentWalletPath), requestJson.ToString(), rpc.UserName, rpc.Password);
                 if (httpResponse.IsSuccessStatusCode)
                 {
                     JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
@@ -2118,7 +2365,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     }
                 };
 
-                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, CurrentWalletPath), requestJson.ToString(), rpc.UserName, rpc.Password);
                 if (httpResponse.IsSuccessStatusCode)
                 {
                     JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());

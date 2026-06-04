@@ -41,10 +41,7 @@ Pre-built binaries for Windows, Linux, macOS, and Android are available on the [
 ---
 
 ## 🛠️ Build Instructions
-We encourage you to build the project yourself but if you do not feel comfortable doing that, see [Releases][releases-link]
-
-
-To compile yourself, you'll need DOTNET SDK 10. You can install it for your operating system from Microsoft:
+We encourage you to build the project yourself. To compile you'll need DOTNET SDK 10. You can install it for your operating system from Microsoft:
 
 [DOTNET SDK 10][dotnet-sdk]
 

@@ -385,7 +385,7 @@ namespace NervaOneWalletMiner.Views
                     {
                         await Dispatcher.UIThread.InvokeAsync(async () =>
                         {
-                            await DialogService.ShowAsync(new MessageBoxView("Close Wallet", "Error closing wallet\r\n" + response.Error.Message, true));
+                            await DialogService.ShowAsync(new MessageBoxView("Close Wallet", "Error closing wallet\r\n" + GlobalMethods.GetRpcErrorMessage(response.Error.Content, response.Error.Message), true));
                         });
                     }
                 }

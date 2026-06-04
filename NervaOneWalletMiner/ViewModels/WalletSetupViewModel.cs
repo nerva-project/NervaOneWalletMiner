@@ -144,7 +144,7 @@ namespace NervaOneWalletMiner.ViewModels
                 {
                     GlobalMethods.WalletClosedOrErrored();
                     Logger.LogError("WSM.CNWL", "Failed to create wallet " + walletName + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
-                    return new WalletOperationResult(false, title, "Error creating " + walletName + " wallet\r\n" + response.Error.Message);
+                    return new WalletOperationResult(false, title, "Error creating " + walletName + " wallet\r\n" + GlobalMethods.GetRpcErrorMessage(response.Error.Content, response.Error.Message));
                 }
 
                 GlobalMethods.WalletJustOpened(walletName);
@@ -186,7 +186,7 @@ namespace NervaOneWalletMiner.ViewModels
                 {
                     GlobalMethods.WalletClosedOrErrored();
                     Logger.LogError("WSM.RFSD", "Failed to restore wallet " + walletName + " | Info: " + response.Info + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
-                    return new WalletOperationResult(false, title, "Error restoring " + walletName + " wallet\r\n" + response.Error.Message);
+                    return new WalletOperationResult(false, title, "Error restoring " + walletName + " wallet\r\n" + GlobalMethods.GetRpcErrorMessage(response.Error.Content, response.Error.Message));
                 }
 
                 GlobalMethods.WalletJustOpened(walletName);
@@ -230,7 +230,7 @@ namespace NervaOneWalletMiner.ViewModels
                 {
                     GlobalMethods.WalletClosedOrErrored();
                     Logger.LogError("WSM.RFKY", "Failed to restore wallet " + walletName + " | Info: " + response.Info + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
-                    return new WalletOperationResult(false, title, "Error restoring " + walletName + " wallet\r\n" + response.Error.Message);
+                    return new WalletOperationResult(false, title, "Error restoring " + walletName + " wallet\r\n" + GlobalMethods.GetRpcErrorMessage(response.Error.Content, response.Error.Message));
                 }
 
                 GlobalMethods.WalletJustOpened(walletName);
@@ -269,7 +269,7 @@ namespace NervaOneWalletMiner.ViewModels
                 if (response.Error.IsError)
                 {
                     Logger.LogError("WSM.SWBL", "Failed to sweep below | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
-                    return new WalletOperationResult(false, title, "Error running sweep below\r\n" + response.Error.Message);
+                    return new WalletOperationResult(false, title, "Error running sweep below\r\n" + GlobalMethods.GetRpcErrorMessage(response.Error.Content, response.Error.Message));
                 }
 
                 Logger.LogDebug("WSM.SWBL", "Sweep below returned successfully");
@@ -294,7 +294,7 @@ namespace NervaOneWalletMiner.ViewModels
                 if (response.Error.IsError)
                 {
                     Logger.LogError("WSM.RSPT", "Failed to rescan spent | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
-                    return new WalletOperationResult(false, title, "Error rescanning\r\n" + response.Error.Message);
+                    return new WalletOperationResult(false, title, "Error rescanning\r\n" + GlobalMethods.GetRpcErrorMessage(response.Error.Content, response.Error.Message));
                 }
 
                 Logger.LogDebug("WSM.RSPT", "Rescan spent returned successfully");
@@ -319,7 +319,7 @@ namespace NervaOneWalletMiner.ViewModels
                 if (response.Error.IsError)
                 {
                     Logger.LogError("WSM.RSBC", "Failed to rescan Blockchain | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
-                    return new WalletOperationResult(false, title, "Error rescanning\r\n" + response.Error.Message);
+                    return new WalletOperationResult(false, title, "Error rescanning\r\n" + GlobalMethods.GetRpcErrorMessage(response.Error.Content, response.Error.Message));
                 }
 
                 Logger.LogDebug("WSM.RSBC", "Rescan Blockchain returned successfully");
@@ -380,7 +380,7 @@ namespace NervaOneWalletMiner.ViewModels
                 if (response.Error.IsError)
                 {
                     Logger.LogError("WSM.ULKP", "Unlock error | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
-                    return new WalletOperationResult(false, title, "Unlock error\r\n\r\n" + response.Error.Message);
+                    return new WalletOperationResult(false, title, "Unlock error\r\n\r\n" + GlobalMethods.GetRpcErrorMessage(response.Error.Content, response.Error.Message));
                 }
 
                 GlobalData.WalletPassProvidedTime = DateTime.Now;

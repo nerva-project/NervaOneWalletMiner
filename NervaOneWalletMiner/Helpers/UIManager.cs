@@ -1153,11 +1153,10 @@ namespace NervaOneWalletMiner.Helpers
                                 if (transfer.Height > GlobalData.NewestTransactionHeight)
                                 {
                                     GlobalData.NewestTransactionHeight = transfer.Height;
-                                }
-
-                                if (transfer.BlockHash.Equals(GlobalData.NewestTransactionBlockHash))
-                                {
-                                    GlobalData.NewestTransactionBlockHash = transfer.BlockHash;
+                                    if (!string.IsNullOrEmpty(transfer.BlockHash))
+                                    {
+                                        GlobalData.NewestTransactionBlockHash = transfer.BlockHash;
+                                    }
                                 }
                             }
                         }                        

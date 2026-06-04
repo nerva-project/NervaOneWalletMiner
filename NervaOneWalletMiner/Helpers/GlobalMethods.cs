@@ -2,6 +2,7 @@
 using Avalonia.Input;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using Newtonsoft.Json.Linq;
 using ICSharpCode.SharpZipLib.BZip2;
 using ICSharpCode.SharpZipLib.GZip;
 using NervaOneWalletMiner.Objects;
@@ -1415,6 +1416,29 @@ namespace NervaOneWalletMiner.Helpers
             }
 
             return languages;
+        }
+
+        public static string GetRpcErrorMessage(string? content, string? fallback = null)
+        {
+            string result = fallback ?? content ?? string.Empty;
+
+            try
+            {
+                if (!string.IsNullOrEmpty(content))
+                {
+                    string? rpcMessage = JObject.Parse(content).SelectToken("error.message")?.ToString();
+                    if (!string.IsNullOrEmpty(rpcMessage))
+                    {
+                        result = rpcMessage;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("GLM.GREM", ex);
+            }
+
+            return result;
         }
 
         public static void WalletJustOpened(string walletName)
