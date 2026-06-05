@@ -14,6 +14,7 @@ namespace NervaOneWalletMiner.Views
     public partial class CreateWalletView : UserControl
     {
         private bool _isBtcStyle;
+        private bool _isSeedSupported;
         private NBitcoin.Mnemonic? _mnemonic;
         private int[] _verifyIndices = [];
 
@@ -26,14 +27,15 @@ namespace NervaOneWalletMiner.Views
                 imgCoinIcon.Source = GlobalMethods.GetLogo();
 
                 _isBtcStyle = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletBtcStyle;
+                _isSeedSupported = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsRestoreFromSeedSupported;
 
                 if (_isBtcStyle)
                 {
                     pnlLanguage.IsVisible = false;
                     lbPassword.Content = "Password (Optional)";
                     tbxPassword.Watermark = "Optional - encrypt the wallet with a password";
-                    btnOk.IsVisible = false;
-                    btnNext.IsVisible = true;
+                    btnOk.IsVisible = !_isSeedSupported;
+                    btnNext.IsVisible = _isSeedSupported;
                 }
                 else
                 {
@@ -150,12 +152,16 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
-        // Create button — XMR goes directly here; BTC/DASH arrives from Step 3
+        // Create button — XMR goes directly here; BTC/DASH arrives from Step 3; BTC-style without seed support goes directly here
         public async void OkButton_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
-                if (_isBtcStyle)
+                if (_isBtcStyle && !_isSeedSupported)
+                {
+                    await CreateBtcSimpleWallet();
+                }
+                else if (_isBtcStyle)
                 {
                     await CreateBtcStyleWallet();
                 }
@@ -243,6 +249,60 @@ namespace NervaOneWalletMiner.Views
 
             Logger.LogDebug("CWV.OKBC", "Wallet " + walletName + " created from seed successfully");
             await DialogService.ShowAsync(new MessageBoxView("Create Wallet", walletName + " wallet created and opened successfully!", true));
+            UIManager.NavigateToPage(SplitViewPages.Wallet);
+        }
+
+        private async System.Threading.Tasks.Task CreateBtcSimpleWallet()
+        {
+            string walletName = tbxWalletName.Text ?? string.Empty;
+
+            if (string.IsNullOrEmpty(walletName))
+            {
+                await DialogService.ShowAsync(new MessageBoxView("Create Wallet", "Wallet Name is required.", true));
+                return;
+            }
+            else if (walletName.Contains('/') || walletName.Contains('\\') || walletName.Contains(".."))
+            {
+                await DialogService.ShowAsync(new MessageBoxView("Create Wallet", "Wallet Name cannot contain path characters.", true));
+                return;
+            }
+
+            char[] walletPassword = string.IsNullOrEmpty(tbxPassword.Text) ? [] : tbxPassword.Text.ToCharArray();
+
+            tbxPassword.Text = string.Empty;
+            btnOk.Content = "Creating...";
+            btnOk.IsEnabled = false;
+            btnCancel.IsEnabled = false;
+            tbxWalletName.IsEnabled = false;
+
+            Logger.LogDebug("CWV.OKBC", "Creating wallet: " + walletName);
+
+            CreateWalletRequest request = new()
+            {
+                WalletName = walletName,
+                Password = walletPassword
+            };
+
+            CreateWalletResponse response = await GlobalData.WalletService.CreateWallet(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
+
+            Array.Clear(walletPassword, 0, walletPassword.Length);
+
+            if (response.Error.IsError)
+            {
+                GlobalMethods.WalletClosedOrErrored();
+                Logger.LogError("CWV.OKBC", "Failed to create wallet " + walletName + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
+                await DialogService.ShowAsync(new MessageBoxView("Create Wallet", "Error creating " + walletName + " wallet\r\n" + response.Error.Message, true));
+                btnOk.Content = "Create";
+                btnOk.IsEnabled = true;
+                btnCancel.IsEnabled = true;
+                tbxWalletName.IsEnabled = true;
+                return;
+            }
+
+            GlobalMethods.WalletJustOpened(walletName);
+
+            Logger.LogDebug("CWV.OKBC", "Wallet " + walletName + " created successfully");
+            await DialogService.ShowAsync(new MessageBoxView("Create Wallet", walletName + " wallet created and opened successfully!\n\nMake sure to back up your wallet folder. It is located in:\n" + System.IO.Path.Combine(GlobalData.WalletDir, walletName) + "\n\nYou can also use Wallet Setup > Dump Keys to File as an additional backup. To restore, use Wallet Setup > Restore from Dump File.", true));
             UIManager.NavigateToPage(SplitViewPages.Wallet);
         }
 

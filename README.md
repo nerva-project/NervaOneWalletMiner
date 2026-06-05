@@ -27,6 +27,7 @@ NervaOne currently supports the following cryptocurrencies:
 
 - <img src="./NervaOneWalletMiner/Assets/xnv/logo.png" height="16"> Nerva (XNV)
 - <img src="./NervaOneWalletMiner/Assets/btc/logo.png" height="16"> Bitcoin (BTC)
+<!-- - <img src="./NervaOneWalletMiner/Assets/ltc/logo.png" height="16"> Litecoin (LTC) -->
 - <img src="./NervaOneWalletMiner/Assets/xmr/logo.png" height="16"> Monero (XMR)
 - <img src="./NervaOneWalletMiner/Assets/wow/logo.png" height="16"> Wownero (WOW)
 - <img src="./NervaOneWalletMiner/Assets/dash/logo.png" height="16"> Dash (DASH)
@@ -40,10 +41,7 @@ Pre-built binaries for Windows, Linux, macOS, and Android are available on the [
 ---
 
 ## 🛠️ Build Instructions
-We encourage you to build the project yourself but if you do not feel comfortable doing that, see [Releases][releases-link]
-
-
-To compile yourself, you'll need DOTNET SDK 10. You can install it for your operating system from Microsoft:
+We encourage you to build the project yourself. To compile you'll need DOTNET SDK 10. You can install it for your operating system from Microsoft:
 
 [DOTNET SDK 10][dotnet-sdk]
 

@@ -119,7 +119,10 @@ namespace NervaOneWalletMiner.Views
                 {
                     GlobalMethods.WalletClosedOrErrored();
                     Logger.LogError("RDF.OKBC", "Failed to restore wallet " + walletName + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
-                    await DialogService.ShowAsync(new MessageBoxView("Restore From Dump File", "Error restoring " + walletName + "\r\n" + response.Error.Message, true));
+
+                    string errorMessage = "Error restoring " + walletName + "\r\n\r\n" + GlobalMethods.GetRpcErrorMessage(response.Error.Content, response.Error.Message);
+
+                    await DialogService.ShowAsync(new MessageBoxView("Restore From Dump File", errorMessage, true));
                     btnOk.Content = "Restore";
                     btnOk.IsEnabled = true;
                     btnCancel.IsEnabled = true;

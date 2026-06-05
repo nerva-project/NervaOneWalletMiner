@@ -65,7 +65,7 @@
 			</ComboBox.ItemTemplate>
 		</ComboBox>	
 
-		<Label Content="Applicaiton Theme" Margin="0,10,0,0"/>
+		<Label Content="Application Theme" Margin="0,10,0,0"/>
 		<ComboBox Name="cbxThemeVariants"
 				  DisplayMemberBinding="{Binding Key, x:DataType=ThemeVariant}"
 				  SelectedIndex="0">

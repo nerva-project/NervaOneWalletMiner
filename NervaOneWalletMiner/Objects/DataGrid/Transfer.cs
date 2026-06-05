@@ -16,8 +16,8 @@ namespace NervaOneWalletMiner.Objects.DataGrid
         // -1 means that given coin does not use Account Indexes
         public int AccountIndex { get; set; } = -1;
         public string TransactionId { get; set; } = string.Empty;
+        public string Address { get; set; } = string.Empty;
         public string AddressShort { get; set; } = string.Empty;
-        public string AddressLabel { get; set; } = string.Empty;
         public DateTime Timestamp { get; set; } = DateTime.MinValue;
         public decimal Amount { get; set; } = 0;
         public string AmountDisplay => GlobalMethods.FormatAmount(Amount);

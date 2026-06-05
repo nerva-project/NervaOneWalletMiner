@@ -38,6 +38,8 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public int LogLevelDaemon { get; set; } = 0;
         public bool IsCpuMiningSupported { get; set; } = true;
         public bool IsPruningSupported { get; set; } = true;
+        public int DefaultPruneSizeMB { get; set; } = 0;
+        public bool IsDbDownloadSupported { get; set; } = false;
         public bool IsWalletOnlySupported { get; set; } = true;
         public bool IsQuickSyncSupported { get; set; } = false;
         public bool IsPublicNodeSupported { get; set; } = true;

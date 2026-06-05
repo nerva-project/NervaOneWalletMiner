@@ -624,7 +624,7 @@ namespace NervaOneWalletMiner.Helpers
                         {
                             Dispatcher.UIThread.Invoke(() =>
                             {
-                                transfersViewVm.Transactions = [.. initialTransfers.OrderByDescending(t => t.Height)];
+                                transfersViewVm.Transactions = [.. initialTransfers.OrderByDescending(t => t.Timestamp)];
                             });
 
                             // Need to clear transfers AFTER we process them otherwise we might clear them before we process them
@@ -655,7 +655,7 @@ namespace NervaOneWalletMiner.Helpers
                         {
                             // O(1) lookup of what is already visible in the UI
                             Dictionary<string, Transfer> uiTransactionLookup = transfersViewVm.Transactions
-                                .ToDictionary(uiTx => uiTx.TransactionId + uiTx.Type, uiTx => uiTx);
+                                .ToDictionary(uiTx => uiTx.TransactionId + uiTx.Type + uiTx.AddressShort, uiTx => uiTx);
 
                             List<Transfer> brandNewTransactions = [];
                             List<(Transfer UiEntry, Transfer RpcEntry)> pendingConfirmedUpdates = [];
@@ -678,7 +678,7 @@ namespace NervaOneWalletMiner.Helpers
                             {
                                 // Sort new transactions oldest-first so Insert(0) ends up newest-on-top
                                 List<Transfer> orderedNewTransactions = brandNewTransactions.Count > 0
-                                    ? [.. brandNewTransactions.OrderBy(tx => tx.Height)]
+                                    ? [.. brandNewTransactions.OrderBy(tx => tx.Timestamp)]
                                     : [];
 
                                 Dispatcher.UIThread.Invoke(() =>
@@ -1129,7 +1129,8 @@ namespace NervaOneWalletMiner.Helpers
                         {
                             transfer.HeightDisplay = isBtcStyle && transfer.Height == 0 ? "Pending" : transfer.Height.ToString();
 
-                            if (!GlobalData.TransfersStats.Transactions.ContainsKey(transfer.TransactionId + transfer.Type))
+                            string txKey = transfer.TransactionId + transfer.Type + transfer.AddressShort;
+                            if (!GlobalData.TransfersStats.Transactions.ContainsKey(txKey))
                             {
                                 if (transfer.Type.Equals(TransferType.In))
                                 {
@@ -1148,16 +1149,15 @@ namespace NervaOneWalletMiner.Helpers
                                     transfer.Icon = _pendingImage;
                                 }
 
-                                GlobalData.TransfersStats.Transactions.Add(transfer.TransactionId + transfer.Type, transfer);
+                                GlobalData.TransfersStats.Transactions.Add(txKey, transfer);
 
                                 if (transfer.Height > GlobalData.NewestTransactionHeight)
                                 {
                                     GlobalData.NewestTransactionHeight = transfer.Height;
-                                }
-
-                                if (transfer.BlockHash.Equals(GlobalData.NewestTransactionBlockHash))
-                                {
-                                    GlobalData.NewestTransactionBlockHash = transfer.BlockHash;
+                                    if (!string.IsNullOrEmpty(transfer.BlockHash))
+                                    {
+                                        GlobalData.NewestTransactionBlockHash = transfer.BlockHash;
+                                    }
                                 }
                             }
                         }                        
