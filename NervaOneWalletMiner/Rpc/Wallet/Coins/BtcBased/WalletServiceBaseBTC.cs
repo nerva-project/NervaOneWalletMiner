@@ -1986,7 +1986,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         #endregion // Get Accounts
 
         #region Get Transfers
-        public async Task<GetTransfersResponse> GetTransfers(RpcBase rpc, GetTransfersRequest requestObj)
+        public virtual async Task<GetTransfersResponse> GetTransfers(RpcBase rpc, GetTransfersRequest requestObj)
         {
             GetTransfersResponse responseObj = new();
 
@@ -2043,6 +2043,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                                 {
                                     AccountIndex = -1,
                                     TransactionId = entry.txid ?? string.Empty,
+                                    Address = entry.address ?? string.Empty,
                                     AddressShort = GlobalMethods.GetShorterString(entry.address, 12),
                                     BlockHash = entry.blockhash ?? string.Empty,
                                     Height = string.IsNullOrEmpty(entry.blockheight) ? 0 : Convert.ToUInt32(entry.blockheight),

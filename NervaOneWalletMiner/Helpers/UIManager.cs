@@ -655,7 +655,7 @@ namespace NervaOneWalletMiner.Helpers
                         {
                             // O(1) lookup of what is already visible in the UI
                             Dictionary<string, Transfer> uiTransactionLookup = transfersViewVm.Transactions
-                                .ToDictionary(uiTx => uiTx.TransactionId + uiTx.Type, uiTx => uiTx);
+                                .ToDictionary(uiTx => uiTx.TransactionId + uiTx.Type + uiTx.AddressShort, uiTx => uiTx);
 
                             List<Transfer> brandNewTransactions = [];
                             List<(Transfer UiEntry, Transfer RpcEntry)> pendingConfirmedUpdates = [];
@@ -1129,7 +1129,8 @@ namespace NervaOneWalletMiner.Helpers
                         {
                             transfer.HeightDisplay = isBtcStyle && transfer.Height == 0 ? "Pending" : transfer.Height.ToString();
 
-                            if (!GlobalData.TransfersStats.Transactions.ContainsKey(transfer.TransactionId + transfer.Type))
+                            string txKey = transfer.TransactionId + transfer.Type + transfer.AddressShort;
+                            if (!GlobalData.TransfersStats.Transactions.ContainsKey(txKey))
                             {
                                 if (transfer.Type.Equals(TransferType.In))
                                 {
@@ -1148,7 +1149,7 @@ namespace NervaOneWalletMiner.Helpers
                                     transfer.Icon = _pendingImage;
                                 }
 
-                                GlobalData.TransfersStats.Transactions.Add(transfer.TransactionId + transfer.Type, transfer);
+                                GlobalData.TransfersStats.Transactions.Add(txKey, transfer);
 
                                 if (transfer.Height > GlobalData.NewestTransactionHeight)
                                 {
