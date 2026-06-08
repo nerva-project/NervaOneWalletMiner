@@ -1,0 +1,116 @@
+# Posts a comment on the triggering PR with artifact download links once the
+# ci-build workflow completes. Runs as a separate workflow_run-triggered job so
+# that it always executes in the base-repo context and has write access to PR
+# comments - even when the PR comes from a fork, where pull_request-triggered
+# jobs receive a read-only token.
+#
+# NOTE: The suffix list below is coupled to the matrix in dotnet.yml -
+# update both together.
+
+name: Post artifact links
+
+on:
+    workflow_run:
+        workflows: [ci-build]
+        types: [completed]
+
+jobs:
+    post-artifact-links:
+        if: github.event.workflow_run.event == 'pull_request'
+        runs-on: ubuntu-latest
+        permissions:
+            pull-requests: write
+        steps:
+            -   name: Post artifact links
+                uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea  # v7.0.1
+                with:
+                    script: |
+                        const suffixes = [
+                            'win-x64',
+                            'win-arm64',
+                            'linux-x64',
+                            'linux-arm64',
+                            'macos-x64',
+                            'macos-arm64',
+                            'android-arm64',
+                        ];
+
+                        const runId = context.payload.workflow_run.id;
+
+                        const { data: { artifacts } } = await github.rest.actions.listWorkflowRunArtifacts({
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            run_id: runId,
+                            per_page: 100,
+                        });
+
+                        let succeeded = 0;
+                        let failed = 0;
+
+                        const rows = suffixes.map(suffix => {
+                            const artifact = artifacts.find(a => a.name.endsWith('-' + suffix));
+                            if (artifact) {
+                                succeeded++;
+                                const url = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${runId}/artifacts/${artifact.id}`;
+                                return `| ${artifact.name} | :white_check_mark: | [Download](${url}) |`;
+                            } else {
+                                failed++;
+                                return `| nervaone-${suffix} | :x: | Build failed |`;
+                            }
+                        });
+
+                        const body = [
+                            '<!-- nervaone-artifact-links -->',
+                            '## Build Artifacts',
+                            '',
+                            '| Target | Status | Download |',
+                            '|--------|--------|----------|',
+                            ...rows,
+                            '',
+                            '---',
+                            `*${succeeded} succeeded, ${failed} failed* | [View workflow run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${runId})`,
+                        ].join('\n');
+
+                        if (!context.payload.workflow_run.head_repository) {
+                            core.warning('head_repository is null (fork deleted?); skipping comment.');
+                            return;
+                        }
+                        const headOwner = context.payload.workflow_run.head_repository.owner.login;
+                        const headBranch = context.payload.workflow_run.head_branch;
+                        const headSha = context.payload.workflow_run.head_sha;
+                        const { data: prs } = await github.rest.pulls.list({
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            state: 'open',
+                            head: `${headOwner}:${headBranch}`,
+                        });
+                        const pr = prs.find(p => p.head.sha === headSha);
+                        if (!pr) {
+                            core.warning('No open pull request found for this commit; skipping comment.');
+                            return;
+                        }
+                        const prNumber = pr.number;
+
+                        const { data: comments } = await github.rest.issues.listComments({
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            issue_number: prNumber,
+                            per_page: 100,
+                        });
+
+                        const existing = comments.find(c => c.body.includes('<!-- nervaone-artifact-links -->'));
+                        if (existing) {
+                            await github.rest.issues.updateComment({
+                                owner: context.repo.owner,
+                                repo: context.repo.repo,
+                                comment_id: existing.id,
+                                body,
+                            });
+                        } else {
+                            await github.rest.issues.createComment({
+                                owner: context.repo.owner,
+                                repo: context.repo.repo,
+                                issue_number: prNumber,
+                                body,
+                            });
+                        }
