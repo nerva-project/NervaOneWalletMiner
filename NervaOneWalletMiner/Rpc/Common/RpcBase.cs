@@ -10,7 +10,7 @@ namespace NervaOneWalletMiner.Rpc.Common
         public int Port { get; set; } = -1;
 
         // Required for some coins only
-        public string UserName { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
+        public virtual string UserName { get; set; } = string.Empty;
+        public virtual string Password { get; set; } = string.Empty;
     }
 }

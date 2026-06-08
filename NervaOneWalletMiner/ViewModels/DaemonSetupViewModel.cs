@@ -323,6 +323,15 @@ namespace NervaOneWalletMiner.ViewModels
                 if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
                 {
                     Logger.LogDebug("DSM.RWCM", "Running as Wallet Only");
+                    if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsDaemonWalletSeparateApp
+                        && GlobalMethods.DirectoryContainsCliTools(GlobalData.CliToolsDir))
+                    {
+                        ProcessManager.StartExternalProcess(
+                            GlobalMethods.GetRpcWalletProcess(),
+                            GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].GenerateWalletOptions(
+                                GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin],
+                                GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]));
+                    }
                 }
                 else
                 {

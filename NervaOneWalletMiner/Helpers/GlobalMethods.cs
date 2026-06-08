@@ -18,6 +18,7 @@ using NervaOneWalletMiner.Rpc.Wallet.Responses;
 using NervaOneWalletMiner.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Formats.Tar;
 using System.IO;
 using System.IO.Compression;
@@ -383,12 +384,15 @@ namespace NervaOneWalletMiner.Helpers
 
                 switch (newCoin)
                 {
-                    case Coin.XMR:                        
+                    case Coin.XMR:
                         GlobalData.CoinDirName = Coin.XMR;
                         GlobalData.AppSettings.ActiveCoin = Coin.XMR;
 
                         GlobalData.DaemonService = new DaemonServiceXMR();
                         GlobalData.WalletService = new WalletServiceXMR();
+
+                        GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc.UserName = GenerateRandomString(24);
+                        GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc.Password = GenerateRandomString(24);
                         break;
 
                     case Coin.WOW:
@@ -397,6 +401,9 @@ namespace NervaOneWalletMiner.Helpers
 
                         GlobalData.DaemonService = new DaemonServiceWOW();
                         GlobalData.WalletService = new WalletServiceWOW();
+
+                        GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc.UserName = GenerateRandomString(24);
+                        GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc.Password = GenerateRandomString(24);
                         break;
 
                     case Coin.DASH:                        
@@ -466,6 +473,9 @@ namespace NervaOneWalletMiner.Helpers
 
                         GlobalData.DaemonService = new DaemonServiceXNV();
                         GlobalData.WalletService = new WalletServiceXNV();
+
+                        GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc.UserName = GenerateRandomString(24);
+                        GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc.Password = GenerateRandomString(24);
                         break;
                 }
 
@@ -754,6 +764,10 @@ namespace NervaOneWalletMiner.Helpers
                     {
                         Logger.LogDebug("GLM.SUCT", "Deleting compressed file: " + destFileWithPath);
                         File.Delete(destFileWithPath);
+                        if (IsOsx())
+                        {
+                            RemoveMacOsQuarantine(cliToolsPath);
+                        }
                         UIManager.UpdateDaemonStatus("Client tools download complete");
                     }
                     else
@@ -989,6 +1003,26 @@ namespace NervaOneWalletMiner.Helpers
             catch (Exception ex)
             {
                 Logger.LogException("GLM.EXTR", ex); ;
+            }
+        }
+
+        private static void RemoveMacOsQuarantine(string path)
+        {
+            try
+            {
+                Logger.LogDebug("GLM.RMQT", "Attempting to remove macOS quarantine from: " + path);
+                using Process? proc = Process.Start(new ProcessStartInfo("xattr", "-dr com.apple.quarantine \"" + path + "\"")
+                {
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false
+                });
+                proc?.WaitForExit(5000);
+                Logger.LogDebug("GLM.RMQT", "Removed macOS quarantine from: " + path);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("GLM.RMQT", ex);
             }
         }
 
