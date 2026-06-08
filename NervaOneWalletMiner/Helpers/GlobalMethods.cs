@@ -18,6 +18,7 @@ using NervaOneWalletMiner.Rpc.Wallet.Responses;
 using NervaOneWalletMiner.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Formats.Tar;
 using System.IO;
 using System.IO.Compression;
@@ -763,6 +764,10 @@ namespace NervaOneWalletMiner.Helpers
                     {
                         Logger.LogDebug("GLM.SUCT", "Deleting compressed file: " + destFileWithPath);
                         File.Delete(destFileWithPath);
+                        if (IsOsx())
+                        {
+                            RemoveMacOsQuarantine(cliToolsPath);
+                        }
                         UIManager.UpdateDaemonStatus("Client tools download complete");
                     }
                     else
@@ -998,6 +1003,26 @@ namespace NervaOneWalletMiner.Helpers
             catch (Exception ex)
             {
                 Logger.LogException("GLM.EXTR", ex); ;
+            }
+        }
+
+        private static void RemoveMacOsQuarantine(string path)
+        {
+            try
+            {
+                Logger.LogDebug("GLM.RMQT", "Attempting to remove macOS quarantine from: " + path);
+                using Process? proc = Process.Start(new ProcessStartInfo("xattr", "-dr com.apple.quarantine \"" + path + "\"")
+                {
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false
+                });
+                proc?.WaitForExit(5000);
+                Logger.LogDebug("GLM.RMQT", "Removed macOS quarantine from: " + path);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("GLM.RMQT", ex);
             }
         }
 
