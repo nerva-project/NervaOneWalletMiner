@@ -132,8 +132,9 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
                 appCommand = "--daemon-address " + daemonSettings.Rpc.Host + ":" + daemonSettings.Rpc.Port;
             }
 
+            appCommand += " --rpc-bind-ip 127.0.0.1";
             appCommand += " --rpc-bind-port " + walletSettings.Rpc.Port;
-            appCommand += " --disable-rpc-login";
+            appCommand += " --rpc-login " + walletSettings.Rpc.UserName + ":" + walletSettings.Rpc.Password;
             appCommand += " --wallet-dir \"" + GlobalData.WalletDir + "\"";
             appCommand += " --log-level " + walletSettings.LogLevel;
             appCommand += " --log-file \"" + GlobalMethods.CycleLogFile(GlobalMethods.GetRpcWalletProcess()) + "\"";

@@ -4,7 +4,7 @@ namespace NervaOneWalletMiner.Objects.Settings
 {
     public class SettingsWallet
     {
-        public RpcBase Rpc { get; set; } = new RpcBase();
+        public TransientRpcBase Rpc { get; set; } = new TransientRpcBase();
 
         public string PublicNodeAddress { get; set; }  = string.Empty;
 

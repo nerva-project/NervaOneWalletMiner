@@ -383,12 +383,15 @@ namespace NervaOneWalletMiner.Helpers
 
                 switch (newCoin)
                 {
-                    case Coin.XMR:                        
+                    case Coin.XMR:
                         GlobalData.CoinDirName = Coin.XMR;
                         GlobalData.AppSettings.ActiveCoin = Coin.XMR;
 
                         GlobalData.DaemonService = new DaemonServiceXMR();
                         GlobalData.WalletService = new WalletServiceXMR();
+
+                        GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc.UserName = GenerateRandomString(24);
+                        GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc.Password = GenerateRandomString(24);
                         break;
 
                     case Coin.WOW:
@@ -397,6 +400,9 @@ namespace NervaOneWalletMiner.Helpers
 
                         GlobalData.DaemonService = new DaemonServiceWOW();
                         GlobalData.WalletService = new WalletServiceWOW();
+
+                        GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc.UserName = GenerateRandomString(24);
+                        GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc.Password = GenerateRandomString(24);
                         break;
 
                     case Coin.DASH:                        
@@ -466,6 +472,9 @@ namespace NervaOneWalletMiner.Helpers
 
                         GlobalData.DaemonService = new DaemonServiceXNV();
                         GlobalData.WalletService = new WalletServiceXNV();
+
+                        GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc.UserName = GenerateRandomString(24);
+                        GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc.Password = GenerateRandomString(24);
                         break;
                 }
 

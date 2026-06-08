@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace NervaOneWalletMiner.Helpers
 {
@@ -227,7 +228,10 @@ namespace NervaOneWalletMiner.Helpers
         {
             try
             {
-                Logger.LogDebug("PRM.STEP", "Starting process: " + ExeNameToProcessName(exePath) + " with args: " + args);
+                string safeArgs = Regex.Replace(args, @"--rpc-login\s+\S+", "--rpc-login ***");
+                safeArgs = Regex.Replace(safeArgs, @"-rpcuser=\S+", "-rpcuser=***");
+                safeArgs = Regex.Replace(safeArgs, @"-rpcpassword=\S+", "-rpcpassword=***");
+                Logger.LogDebug("PRM.STEP", "Starting process: " + ExeNameToProcessName(exePath) + " with args: " + safeArgs);
 
                 string fileName = exePath;
                 string arguments = args;
