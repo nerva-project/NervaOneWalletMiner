@@ -363,10 +363,10 @@ namespace NervaOneWalletMiner.Helpers
             {
                 defaultSettings.Add(Coin.XNV, new CoinSettingsXNV());
                 defaultSettings.Add(Coin.BTC, new CoinSettingsBTC());
-                defaultSettings.Add(Coin.LTC, new CoinSettingsLTC());
                 defaultSettings.Add(Coin.XMR, new CoinSettingsXMR());
-                defaultSettings.Add(Coin.WOW, new CoinSettingsWOW());
+                defaultSettings.Add(Coin.LTC, new CoinSettingsLTC());
                 defaultSettings.Add(Coin.DASH, new CoinSettingsDASH());
+                defaultSettings.Add(Coin.WOW, new CoinSettingsWOW());                
             }
             catch (Exception ex)
             {

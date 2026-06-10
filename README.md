@@ -13,7 +13,7 @@
 
 ---
 
-## ⓘ About NervaOne
+## ℹ️ About NervaOne
 
 **NervaOne** is an open-source, non-custodial Wallet and CPU Miner for Windows, Linux, macOS, and Android.
 
@@ -27,10 +27,10 @@ NervaOne currently supports the following cryptocurrencies:
 
 - <img src="./NervaOneWalletMiner/Assets/xnv/logo.png" height="16"> Nerva (XNV)
 - <img src="./NervaOneWalletMiner/Assets/btc/logo.png" height="16"> Bitcoin (BTC)
-<!-- - <img src="./NervaOneWalletMiner/Assets/ltc/logo.png" height="16"> Litecoin (LTC) -->
 - <img src="./NervaOneWalletMiner/Assets/xmr/logo.png" height="16"> Monero (XMR)
-- <img src="./NervaOneWalletMiner/Assets/wow/logo.png" height="16"> Wownero (WOW)
+- <img src="./NervaOneWalletMiner/Assets/ltc/logo.png" height="16"> Litecoin (LTC)
 - <img src="./NervaOneWalletMiner/Assets/dash/logo.png" height="16"> Dash (DASH)
+- <img src="./NervaOneWalletMiner/Assets/wow/logo.png" height="16"> Wownero (WOW)
 
 ---
 
