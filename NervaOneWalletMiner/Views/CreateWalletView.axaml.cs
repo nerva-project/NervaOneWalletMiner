@@ -232,7 +232,7 @@ namespace NervaOneWalletMiner.Views
             {
                 GlobalMethods.WalletClosedOrErrored();
                 Logger.LogError("CWV.OKBC", "Failed to create wallet " + walletName + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
-                await DialogService.ShowAsync(new MessageBoxView("Create Wallet", "Error creating " + walletName + " wallet\r\n" + response.Error.Message, true));
+                await DialogService.ShowAsync(new MessageBoxView("Create Wallet", "Error creating " + walletName + " wallet\r\n" + GlobalMethods.GetRpcErrorMessage(response.Error.Content, response.Error.Message), true));
                 btnCreateFromSeed.Content = "Create Wallet";
                 btnCreateFromSeed.IsEnabled = true;
                 btnBackToStep2.IsEnabled = true;
@@ -291,7 +291,7 @@ namespace NervaOneWalletMiner.Views
             {
                 GlobalMethods.WalletClosedOrErrored();
                 Logger.LogError("CWV.OKBC", "Failed to create wallet " + walletName + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
-                await DialogService.ShowAsync(new MessageBoxView("Create Wallet", "Error creating " + walletName + " wallet\r\n" + response.Error.Message, true));
+                await DialogService.ShowAsync(new MessageBoxView("Create Wallet", "Error creating " + walletName + " wallet\r\n" + GlobalMethods.GetRpcErrorMessage(response.Error.Content, response.Error.Message), true));
                 btnOk.Content = "Create";
                 btnOk.IsEnabled = true;
                 btnCancel.IsEnabled = true;
@@ -350,7 +350,7 @@ namespace NervaOneWalletMiner.Views
             {
                 GlobalMethods.WalletClosedOrErrored();
                 Logger.LogError("CWV.OKBC", "Failed to create wallet " + walletName + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
-                await DialogService.ShowAsync(new MessageBoxView("Create Wallet", "Error creating " + walletName + " wallet\r\n" + response.Error.Message, true));
+                await DialogService.ShowAsync(new MessageBoxView("Create Wallet", "Error creating " + walletName + " wallet\r\n" + GlobalMethods.GetRpcErrorMessage(response.Error.Content, response.Error.Message), true));
                 btnOk.Content = "Create";
                 btnOk.IsEnabled = true;
                 btnCancel.IsEnabled = true;
