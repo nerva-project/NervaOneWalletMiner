@@ -24,6 +24,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -1359,28 +1360,28 @@ namespace NervaOneWalletMiner.Helpers
 
         public static string GenerateRandomString(int length)
         {
-            Random random = new Random();
-
-            char[] charArray = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
-            string text = string.Empty;
+            // Used for RPC credentials, so use a cryptographically secure generator.
+            // RandomNumberGenerator.GetInt32 is unbiased (rejection sampling internally).
+            const string charSet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            char[] text = new char[length];
             for (int i = 0; i < length; i++)
             {
-                text += charArray[random.Next(0, charArray.Length)];
+                text[i] = charSet[RandomNumberGenerator.GetInt32(charSet.Length)];
             }
 
-            return text;
+            return new string(text);
         }
 
         public static string GenerateRandomHexString(int length, bool upperCase = false)
         {
-            char[] array = ("0123456789" + (upperCase ? "ABCDEF" : "abcdef")).ToCharArray();
-            string text = string.Empty;
+            string charSet = "0123456789" + (upperCase ? "ABCDEF" : "abcdef");
+            char[] text = new char[length];
             for (int i = 0; i < length; i++)
             {
-                text += array[GlobalData.RandomGenerator.Next(0, array.Length)];
+                text[i] = charSet[RandomNumberGenerator.GetInt32(charSet.Length)];
             }
 
-            return text;
+            return new string(text);
         }
         public static string RemoveLineBreaksAndSpaces(string stringToClean)
         {
