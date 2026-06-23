@@ -27,7 +27,7 @@ namespace NervaOneWalletMiner.Rpc.Wallet
         private static readonly TimeSpan _sweepTimeout = TimeSpan.FromMinutes(60);
 
         protected decimal AmountFromAtomicUnits(ulong value, int decimalPlaces) =>
-            Math.Round(Convert.ToDecimal(value / (double)CoinAtomicUnits), decimalPlaces);
+            Math.Round(value / CoinAtomicUnits, decimalPlaces);
 
         protected ulong AtomicUnitsFromAmount(decimal amount) =>
             (ulong)(amount * CoinAtomicUnits);
