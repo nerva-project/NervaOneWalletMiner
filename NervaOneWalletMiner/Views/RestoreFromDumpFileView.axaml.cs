@@ -79,6 +79,12 @@ namespace NervaOneWalletMiner.Views
                     return;
                 }
 
+                if (string.IsNullOrEmpty(tbxPassword.Text))
+                {
+                    await DialogService.ShowAsync(new MessageBoxView("Restore From Dump File", "Password is required.", true));
+                    return;
+                }
+
                 MessageBoxView confirmWindow = new("Restore Wallet", "This will create a new wallet '" + walletName + "' and import all keys from the dump file. A blockchain scan will be performed which may take some time. Continue?", false, true);
                 DialogResult? confirmRes = await DialogService.ShowAsync<DialogResult>(confirmWindow);
                 if (confirmRes == null || !confirmRes.IsOk)
@@ -86,7 +92,7 @@ namespace NervaOneWalletMiner.Views
                     return;
                 }
 
-                char[] walletPassword = string.IsNullOrEmpty(tbxPassword.Text) ? [] : tbxPassword.Text.ToCharArray();
+                char[] walletPassword = tbxPassword.Text.ToCharArray();
                 tbxPassword.Text = string.Empty;
 
                 btnOk.Content = "Restoring...";

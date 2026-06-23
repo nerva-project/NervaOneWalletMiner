@@ -32,8 +32,8 @@ namespace NervaOneWalletMiner.Views
                 if (_isBtcStyle)
                 {
                     pnlLanguage.IsVisible = false;
-                    lbPassword.Content = "Password (Optional)";
-                    tbxPassword.Watermark = "Optional - encrypt the wallet with a password";
+                    lbPassword.Content = "Password (Required)";
+                    tbxPassword.Watermark = "Required - encrypt the wallet with a password";
                     btnOk.IsVisible = !_isSeedSupported;
                     btnNext.IsVisible = _isSeedSupported;
                 }
@@ -74,6 +74,12 @@ namespace NervaOneWalletMiner.Views
                 else if (walletName.Contains('/') || walletName.Contains('\\') || walletName.Contains(".."))
                 {
                     await DialogService.ShowAsync(new MessageBoxView("Create Wallet", "Wallet Name cannot contain path characters.", true));
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(tbxPassword.Text))
+                {
+                    await DialogService.ShowAsync(new MessageBoxView("Create Wallet", "Password is required.", true));
                     return;
                 }
 
@@ -267,7 +273,13 @@ namespace NervaOneWalletMiner.Views
                 return;
             }
 
-            char[] walletPassword = string.IsNullOrEmpty(tbxPassword.Text) ? [] : tbxPassword.Text.ToCharArray();
+            if (string.IsNullOrEmpty(tbxPassword.Text))
+            {
+                await DialogService.ShowAsync(new MessageBoxView("Create Wallet", "Password is required.", true));
+                return;
+            }
+
+            char[] walletPassword = tbxPassword.Text.ToCharArray();
 
             tbxPassword.Text = string.Empty;
             btnOk.Content = "Creating...";
