@@ -42,7 +42,7 @@
 						 Watermark="Required - path to wallet dump file"/>
 			</DockPanel>
 
-			<Label Content="Password (Optional)" Margin="0,15,0,0"/>
+			<Label Content="Password (Required)" Margin="0,15,0,0"/>
 			<DockPanel>
 				<Button Name="btnShowHidePassword"
 						DockPanel.Dock="Right"
@@ -51,7 +51,7 @@
 						IsTabStop="False"
 						Click="ShowHidePassword_Clicked"/>
 				<TextBox Name="tbxPassword"
-						 Watermark="Optional - leave blank for no password"
+						 Watermark="Required - encrypt the wallet with a password"
 						 PasswordChar="*"
 						 RevealPassword="False"/>
 			</DockPanel>

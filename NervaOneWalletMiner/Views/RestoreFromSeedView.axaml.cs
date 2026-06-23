@@ -29,8 +29,8 @@ namespace NervaOneWalletMiner.Views
                     pnlLanguage.IsVisible = false;
                     lbSeedOffset.Content = "BIP39 Passphrase (optional 25th word)";
                     tbxSeedOffset.Watermark = "Optional - extra passphrase added to your seed phrase";
-                    lbPassword.Content = "Wallet Password (Optional)";
-                    tbxPassword.Watermark = "Optional - encrypt the wallet with a password";
+                    lbPassword.Content = "Wallet Password (Required)";
+                    tbxPassword.Watermark = "Required - encrypt the wallet with a password";
                 }
                 else
                 {
@@ -67,7 +67,7 @@ namespace NervaOneWalletMiner.Views
                     return;
                 }
 
-                if (!_isBtcStyle && string.IsNullOrEmpty(tbxPassword.Text))
+                if (string.IsNullOrEmpty(tbxPassword.Text))
                 {
                     await DialogService.ShowAsync(new MessageBoxView("Restore From Seed", "Seed Phrase, Wallet Name and Password are all required.", true));
                     return;
@@ -92,7 +92,7 @@ namespace NervaOneWalletMiner.Views
 
                 char[] seed = tbxSeedPhrase.Text.ToCharArray();
                 string seedOffset = tbxSeedOffset.Text ?? string.Empty;
-                char[] walletPassword = string.IsNullOrEmpty(tbxPassword.Text) ? [] : tbxPassword.Text.ToCharArray();
+                char[] walletPassword = tbxPassword.Text.ToCharArray();
                 string walletLanguage = _isBtcStyle
                     ? Language.English
                     : (cbxLanguage.SelectedValue == null ? Language.English : cbxLanguage.SelectedValue.ToString()!);
