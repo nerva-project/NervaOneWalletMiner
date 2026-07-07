@@ -43,6 +43,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
          *  uint64_t    threads_count;
          *  bool        do_background_mining;
          *  bool        ignore_battery;
+         *  bool        mining_affinity;        // Nerva only, optional
          */
         public async Task<StartMiningResponse> StartMining(RpcBase rpc, StartMiningRequest requestObj)
         {
@@ -56,6 +57,12 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                     ["miner_address"] = requestObj.MiningAddress,
                     ["threads_count"] = requestObj.ThreadCount
                 };
+
+                // Optional, Nerva only. Only send when the active coin supports it so other daemons never receive the field
+                if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsMiningAffinitySupported)
+                {
+                    requestJson["mining_affinity"] = requestObj.MiningAffinity;
+                }
 
                 // Call service and process response
                 HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "start_mining"), requestJson.ToString());

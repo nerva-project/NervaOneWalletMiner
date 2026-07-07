@@ -18,14 +18,14 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public string BlockchainDbSubfolder { get; set; } = "lmdb";
 
         // https://github.com/nerva-project/nerva/releases
-        public string CliUrlWindows64 { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.2.3.0/nerva-windows-x64-v0.2.3.0.zip";
-        public string CliUrlWindows32 { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.2.3.0/nerva-windows-x32-v0.2.3.0.zip";
-        public string CliUrlLinux64 { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.2.3.0/nerva-linux-x86_64-v0.2.3.0.tar.bz2";
-        public string CliUrlLinux32 { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.2.3.0/nerva-linux-i686-v0.2.3.0.tar.bz2";
-        public string CliUrlLinuxArm { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.2.3.0/nerva-linux-armv8-v0.2.3.0.tar.bz2";
-        public string CliUrlMacIntel { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.2.3.0/nerva-macos-x64-v0.2.3.0.tar.bz2";
-        public string CliUrlMacArm { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.2.3.0/nerva-macos-armv8-v0.2.3.0.tar.bz2";
-        public string CliUrlAndroid { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.2.3.0/nerva-android-armv8-v0.2.3.0.tar.bz2";
+        public string CliUrlWindows64 { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.3.0.0/nerva-windows-x64-v0.3.0.0.zip";
+        public string CliUrlWindows32 { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.3.0.0/nerva-windows-x32-v0.3.0.0.zip";
+        public string CliUrlLinux64 { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.3.0.0/nerva-linux-x86_64-v0.3.0.0.tar.bz2";
+        public string CliUrlLinux32 { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.3.0.0/nerva-linux-i686-v0.3.0.0.tar.bz2";
+        public string CliUrlLinuxArm { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.3.0.0/nerva-linux-armv8-v0.3.0.0.tar.bz2";
+        public string CliUrlMacIntel { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.3.0.0/nerva-macos-x64-v0.3.0.0.tar.bz2";
+        public string CliUrlMacArm { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.3.0.0/nerva-macos-armv8-v0.3.0.0.tar.bz2";
+        public string CliUrlAndroid { get; set; } = "https://github.com/nerva-project/nerva/releases/download/v0.3.0.0/nerva-android-armv8-v0.3.0.0.tar.bz2";
 
         public string RemotePublicNodeUrlDefault { get; set; } = "node.nerva.one:17566";
         public string LocalPublicNodeArgumentsDefault { get; set; } = "--rpc-bind-ip 0.0.0.0 --confirm-external-bind";
@@ -45,6 +45,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public bool IsPublicNodeSupported { get; set; } = true;
         public bool IsAnalyticsFlagSupported { get; set; } = true;
         public bool IsDaemonWalletSeparateApp { get; set; } = true;
+        public bool IsMiningAffinitySupported { get; set; } = true;
 
         // Wallet specific settings
         public int LogLevelWallet { get; set; } = 1;
@@ -89,6 +90,11 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
             {
                 Logger.LogDebug("XNV.CGDO", "Enabling startup mining @ " + daemonSettings.MiningAddress);
                 daemonCommand += " --start-mining " + daemonSettings.MiningAddress + " --mining-threads " + daemonSettings.MiningThreads;
+
+                if (daemonSettings.MiningAffinity)
+                {
+                    daemonCommand += " --mining-affinity";
+                }
             }
 
             if (GlobalMethods.IsAndroid() || GlobalMethods.IsLinux() || GlobalMethods.IsOsx())

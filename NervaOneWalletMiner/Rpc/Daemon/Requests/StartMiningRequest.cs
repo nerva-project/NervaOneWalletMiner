@@ -3,6 +3,7 @@
     public class StartMiningRequest
     {
         public string MiningAddress { get; set; } = string.Empty;
-        public int ThreadCount { get; set; } = 1;       
+        public int ThreadCount { get; set; } = 1;
+        public bool MiningAffinity { get; set; } = false;
     }
 }

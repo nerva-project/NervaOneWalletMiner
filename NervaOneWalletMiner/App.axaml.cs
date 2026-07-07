@@ -91,6 +91,9 @@ public partial class App : Application
                 {
                     // On mobile default to 1
                     GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningThreads = 1;
+
+                    // On mobile (big.LITTLE) pinning the single mining thread can land it on a slow core so default affinity off
+                    GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAffinity = false;
                 }
                 else
                 {

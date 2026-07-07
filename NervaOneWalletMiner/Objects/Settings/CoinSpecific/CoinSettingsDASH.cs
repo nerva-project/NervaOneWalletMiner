@@ -19,13 +19,13 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public string BlockchainDbSubfolder { get; set; } = string.Empty;
 
         // https://github.com/dashpay/dash/releases
-        public string CliUrlWindows64 { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.4/dashcore-23.1.4-win64.zip";
-        public string CliUrlWindows32 { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.4/dashcore-23.1.4-win64.zip";
-        public string CliUrlLinux64 { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.4/dashcore-23.1.4-x86_64-linux-gnu.tar.gz";
-        public string CliUrlLinux32 { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.4/dashcore-23.1.4-x86_64-linux-gnu.tar.gz";
-        public string CliUrlLinuxArm { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.4/dashcore-23.1.4-aarch64-linux-gnu.tar.gz";
-        public string CliUrlMacIntel { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.4/dashcore-23.1.4-x86_64-apple-darwin.tar.gz";
-        public string CliUrlMacArm { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.4/dashcore-23.1.4-arm64-apple-darwin.tar.gz";
+        public string CliUrlWindows64 { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.7/dashcore-23.1.7-win64.zip";
+        public string CliUrlWindows32 { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.7/dashcore-23.1.7-win64.zip";
+        public string CliUrlLinux64 { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.7/dashcore-23.1.7-x86_64-linux-gnu.tar.gz";
+        public string CliUrlLinux32 { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.7/dashcore-23.1.7-x86_64-linux-gnu.tar.gz";
+        public string CliUrlLinuxArm { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.7/dashcore-23.1.7-aarch64-linux-gnu.tar.gz";
+        public string CliUrlMacIntel { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.7/dashcore-23.1.7-x86_64-apple-darwin.tar.gz";
+        public string CliUrlMacArm { get; set; } = "https://github.com/dashpay/dash/releases/download/v23.1.7/dashcore-23.1.7-arm64-apple-darwin.tar.gz";
         public string CliUrlAndroid { get; set; } = string.Empty;
 
         public string RemotePublicNodeUrlDefault { get; set; } = string.Empty;
@@ -46,6 +46,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public bool IsPublicNodeSupported { get; set; } = false;
         public bool IsAnalyticsFlagSupported { get; set; } = false;
         public bool IsDaemonWalletSeparateApp { get; set; } = false;
+        public bool IsMiningAffinitySupported { get; set; } = false;
 
         // Wallet specific settings
         public int LogLevelWallet { get; set; } = 0;

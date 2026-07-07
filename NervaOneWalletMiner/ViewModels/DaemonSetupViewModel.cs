@@ -54,6 +54,13 @@ namespace NervaOneWalletMiner.ViewModels
             set => this.RaiseAndSetIfChanged(ref _autoStartMining, value);
         }
 
+        private bool _miningAffinity;
+        public bool MiningAffinity
+        {
+            get => _miningAffinity;
+            set => this.RaiseAndSetIfChanged(ref _miningAffinity, value);
+        }
+
         private bool _stopOnExit;
         public bool StopOnExit
         {
@@ -123,6 +130,7 @@ namespace NervaOneWalletMiner.ViewModels
         public bool IsPruningSupported => GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPruningSupported;
         public bool IsWalletOnlySupported => GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletOnlySupported;
         public bool IsCpuMiningSupported => GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsCpuMiningSupported;
+        public bool IsMiningAffinitySupported => GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsMiningAffinitySupported;
         public bool IsQuickSyncSupported => GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsQuickSyncSupported;
         public bool IsPublicNodeSupported => GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsPublicNodeSupported;
         public bool IsAnalyticsFlagSupported => GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsAnalyticsFlagSupported;
@@ -150,6 +158,7 @@ namespace NervaOneWalletMiner.ViewModels
                 PortNumber = daemonSettings.Rpc.Port.ToString();
                 LogLevel = daemonSettings.LogLevel.ToString();
                 AutoStartMining = daemonSettings.AutoStartMining;
+                MiningAffinity = daemonSettings.MiningAffinity;
                 StopOnExit = daemonSettings.StopOnExit;
                 EnableConnectionsGuard = daemonSettings.EnableConnectionsGuard;
                 UseNoAnalyticsFlag = daemonSettings.UseNoAnalyticsFlag;
@@ -245,6 +254,13 @@ namespace NervaOneWalletMiner.ViewModels
                     daemonSettings.AutoStartMining = AutoStartMining;
                     Logger.LogDebug("DSM.APST", "New Auto Start Mining: " + daemonSettings.AutoStartMining);
                     isSaveSettingsNeeded = true;
+                }
+
+                if (daemonSettings.MiningAffinity != MiningAffinity)
+                {
+                    daemonSettings.MiningAffinity = MiningAffinity;
+                    Logger.LogDebug("DSM.APST", "New Mining Affinity: " + daemonSettings.MiningAffinity);
+                    isSaveSettingsNeeded = isRestartRequired = true;
                 }
 
                 if (daemonSettings.StopOnExit != StopOnExit)

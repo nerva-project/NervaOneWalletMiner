@@ -45,6 +45,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public bool IsPublicNodeSupported { get; set; } = true;
         public bool IsAnalyticsFlagSupported { get; set; } = false;
         public bool IsDaemonWalletSeparateApp { get; set; } = true;
+        public bool IsMiningAffinitySupported { get; set; } = false;
 
         // Wallet specific settings
         public int LogLevelWallet { get; set; } = 0;

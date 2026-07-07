@@ -160,6 +160,12 @@
 						  IsVisible="{Binding IsCpuMiningSupported}"
 						  Margin="0,10,0,0"/>
 
+				<CheckBox Name="cbxMiningAffinity"
+						  Content="Pin mining threads to CPU cores (affinity)"
+						  IsChecked="{Binding MiningAffinity, Mode=TwoWay}"
+						  IsVisible="{Binding IsMiningAffinitySupported}"
+						  Margin="0,10,0,0"/>
+
 				<CheckBox Name="cbxStopOnExit"
 						  Content="Stop daemon on exit and coin switch"
 						  IsChecked="{Binding StopOnExit, Mode=TwoWay}"

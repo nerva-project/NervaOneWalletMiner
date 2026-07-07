@@ -241,10 +241,11 @@ namespace NervaOneWalletMiner.Views
                     StartMiningRequest request = new()
                     {
                         MiningAddress = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAddress,
-                        ThreadCount = threads
+                        ThreadCount = threads,
+                        MiningAffinity = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].MiningAffinity
                     };
 
-                    Logger.LogDebug("DMN.STMA", "Calling StartMining. Address: " + GlobalMethods.GetShorterString(request.MiningAddress, 12) + " | Threads: " + request.ThreadCount);
+                    Logger.LogDebug("DMN.STMA", "Calling StartMining. Address: " + GlobalMethods.GetShorterString(request.MiningAddress, 12) + " | Threads: " + request.ThreadCount + " | Mining Affinity: " + request.MiningAffinity);
                     StartMiningResponse response = await GlobalData.DaemonService.StartMining(
                             GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, request);
 

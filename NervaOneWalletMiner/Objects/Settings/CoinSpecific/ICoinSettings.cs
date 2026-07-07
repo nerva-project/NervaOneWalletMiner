@@ -39,6 +39,7 @@
         bool IsPublicNodeSupported { get; set; }
         bool IsAnalyticsFlagSupported { get; set; }
         bool IsDaemonWalletSeparateApp { get; set; }
+        bool IsMiningAffinitySupported { get; set; }
 
         // Wallet specific settings
         int LogLevelWallet { get; set; }

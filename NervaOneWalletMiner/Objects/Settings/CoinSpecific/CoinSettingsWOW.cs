@@ -18,13 +18,14 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public string BlockchainDbSubfolder { get; set; } = "lmdb";
 
         // https://codeberg.org/wownero/wownero/releases
-        public string CliUrlWindows64 { get; set; } = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-x86_64-w64-mingw32-v0.11.3.0.zip";
-        public string CliUrlWindows32 { get; set; } = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-i686-w64-mingw32-v0.11.3.0.zip";
-        public string CliUrlLinux64 { get; set; } = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-x86_64-linux-gnu-v0.11.3.0.tar.bz2";
-        public string CliUrlLinux32 { get; set; } = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-i686-linux-gnu-v0.11.3.0.tar.bz2";
-        public string CliUrlLinuxArm { get; set; } = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-aarch64-linux-gnu-v0.11.3.0.tar.bz2";
-        public string CliUrlMacIntel { get; set; } = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-x86_64-apple-darwin11-v0.11.3.0.tar.bz2";
-        public string CliUrlMacArm { get; set; } = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-aarch64-apple-darwin11-v0.11.3.0.tar.bz2";
+        public string CliUrlWindows64 { get; set; } = "https://codeberg.org/wownero/wownero/releases/download/v0.11.4.0/wownero-x86_64-w64-mingw32-v0.11.4.0.zip";
+        public string CliUrlWindows32 { get; set; } = "https://codeberg.org/wownero/wownero/releases/download/v0.11.4.0/wownero-i686-w64-mingw32-v0.11.4.0.zip";
+        public string CliUrlLinux64 { get; set; } = "https://codeberg.org/wownero/wownero/releases/download/v0.11.4.0/wownero-x86_64-linux-gnu-v0.11.4.0.tar.bz2";
+        public string CliUrlLinux32 { get; set; } = "https://codeberg.org/wownero/wownero/releases/download/v0.11.4.0/wownero-i686-linux-gnu-v0.11.4.0.tar.bz2";
+        public string CliUrlLinuxArm { get; set; } = "https://codeberg.org/wownero/wownero/releases/download/v0.11.4.0/wownero-aarch64-linux-gnu-v0.11.4.0.tar.bz2";
+        public string CliUrlMacIntel { get; set; } = "https://codeberg.org/wownero/wownero/releases/download/v0.11.4.0/wownero-x86_64-apple-darwin11-v0.11.4.0.tar.bz2";
+        public string CliUrlMacArm { get; set; } = "https://codeberg.org/wownero/wownero/releases/download/v0.11.4.0/wownero-aarch64-apple-darwin11-v0.11.4.0.tar.bz2";
+        // v0.11.3.0 is the latest WOW Android build (v0.11.4.0 shipped no Android binary)
         public string CliUrlAndroid { get; set; } = "https://codeberg.org/wownero/wownero/releases/download/v0.11.3.0/wownero-aarch64-linux-android-v0.11.3.0.tar.bz2";
 
         public string RemotePublicNodeUrlDefault { get; set; } = "node.monerodevs.org:34568";
@@ -45,6 +46,7 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public bool IsPublicNodeSupported { get; set; } = true;
         public bool IsAnalyticsFlagSupported { get; set; } = false;
         public bool IsDaemonWalletSeparateApp { get; set; } = true;
+        public bool IsMiningAffinitySupported { get; set; } = false;
 
         // Wallet specific settings
         public int LogLevelWallet { get; set; } = 0;
