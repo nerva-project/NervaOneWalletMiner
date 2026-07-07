@@ -47,15 +47,14 @@
 		</TextBlock>
 
 		<TextBlock TextWrapping="Wrap" Margin="0,10,0,0">
-			By using NervaOne, you are running your own nodes of the coins
-			you choose to support, decentralizing their blockchains.
-			Everything runs on your device and there are no 3rd parties involved.
-			You are your own bank.
+			By running a full node in NervaOne, you help decentralize
+			the blockchains of the coins you support. Your keys and wallet
+			stay on your device - you are your own bank.
 		</TextBlock>
 
 		<TextBlock TextWrapping="Wrap" Margin="0,10,0,0">
-			The software has modern design that's easy to use for new users
-			but also gives advanced users ability to customize.
+			NervaOne has a modern design that's easy to use for newcomers,
+			while giving advanced users the ability to customize.
 		</TextBlock>
 
 		<TextBlock TextWrapping="Wrap" Margin="0,10,0,0">
