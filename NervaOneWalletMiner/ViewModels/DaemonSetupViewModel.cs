@@ -333,6 +333,14 @@ namespace NervaOneWalletMiner.ViewModels
             try
             {
                 Logger.LogDebug("DSM.RWCM", "Restarting with command");
+
+                // Wallet lives in the process being stopped, so close it or the UI keeps showing it as open
+                if (GlobalData.IsWalletOpen)
+                {
+                    Logger.LogDebug("DSM.RWCM", "Closing wallet: " + GlobalData.OpenedWalletName);
+                    await ((WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet]).CloseWalletNonUi();
+                }
+
                 ProcessManager.Kill(GlobalData.WalletProcessName);
                 await Task.Run(() => GlobalMethods.StopAndCloseDaemon());
 
@@ -357,6 +365,10 @@ namespace NervaOneWalletMiner.ViewModels
                         GlobalMethods.GetDaemonProcess(),
                         GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].GenerateDaemonOptions(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin]) + " " + restartOptions);
                 }
+
+                // Run the master upkeep on the next tick instead of waiting up to a health check, so the wallet RPC
+                // comes back quickly. Otherwise a wallet open right after the switch fails against a process not up yet
+                MasterProcess._cliToolsRunningLastCheck = DateTime.MinValue;
             }
             catch (Exception ex)
             {

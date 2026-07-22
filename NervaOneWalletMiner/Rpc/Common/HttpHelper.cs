@@ -37,7 +37,8 @@ namespace NervaOneWalletMiner.Rpc.Common
 
         public static async Task<HttpResponseMessage> GetPostFromService(string serviceUrl, string postContent, TimeSpan timeout)
         {
-            HttpResponseMessage response = new HttpResponseMessage();
+            // Default to failure. A default constructed HttpResponseMessage is 200 OK, which callers read as success
+            HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
 
             try
             {
@@ -70,7 +71,8 @@ namespace NervaOneWalletMiner.Rpc.Common
 
         public static async Task<HttpResponseMessage> GetPostFromService(string serviceUrl, string postContent, string userName, string password, TimeSpan timeout)
         {
-            HttpResponseMessage response = new HttpResponseMessage();
+            // Default to failure. A default constructed HttpResponseMessage is 200 OK, which callers read as success
+            HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
 
             try
             {
@@ -108,7 +110,8 @@ namespace NervaOneWalletMiner.Rpc.Common
 
         public static async Task<HttpResponseMessage> GetPostFromServiceDigestAuth(RpcBase rpc, string path, string postContent, TimeSpan timeout)
         {
-            HttpResponseMessage response = new HttpResponseMessage();
+            // Default to failure. A default constructed HttpResponseMessage is 200 OK, which callers read as success
+            HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
 
             try
             {

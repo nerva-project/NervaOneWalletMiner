@@ -119,8 +119,8 @@ namespace NervaOneWalletMiner.Rpc.Wallet
                     ["params"] = requestParams
                 };
 
-                // Call service and process response
-                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
+                // Call service and process response. loadwallet rescans when the wallet has been idle, so it needs the scan timeout
+                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password, _blockchainScanTimeout);
                 if (httpResponse.IsSuccessStatusCode)
                 {
                     JObject jsonObject = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());

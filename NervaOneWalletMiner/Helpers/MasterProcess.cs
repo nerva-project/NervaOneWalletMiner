@@ -90,6 +90,9 @@ namespace NervaOneWalletMiner.Helpers
                     // Client tools downloaded and found
                     Logger.LogDebug("MSP.MUPS", "Client tools found.");
                     GlobalData.DaemonState = DaemonState.Connecting;
+
+                    // Tools update stopped both processes, so run upkeep now instead of waiting up to a health check
+                    _cliToolsRunningLastCheck = DateTime.MinValue;
                 }
 
                 // If kill master process is issued at any point, skip everything else and do not restart master timer
