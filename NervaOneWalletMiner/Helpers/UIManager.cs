@@ -258,15 +258,27 @@ namespace NervaOneWalletMiner.Helpers
             }
         }
 
+        // Messages that fit on a phone use the same text at both status bar widths
         public static void UpdateDaemonStatus(string message)
+        {
+            UpdateDaemonStatus(message, message);
+        }
+
+        public static void UpdateDaemonStatus(string message, string shortMessage)
         {
             if (GlobalData.ViewModelPages.ContainsKey(SplitViewPages.MainView))
             {
-                if (((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).DaemonStatus != message)
+                MainViewModel mainViewVm = (MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView];
+
+                if (mainViewVm.DaemonStatus != message)
                 {
-                    ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).DaemonStatus = message;
+                    mainViewVm.DaemonStatus = message;
                 }
-            }            
+                if (mainViewVm.DaemonStatusShort != shortMessage)
+                {
+                    mainViewVm.DaemonStatusShort = shortMessage;
+                }
+            }
         }
 
         public static void UpdateDaemonVersion(string version)
@@ -276,6 +288,40 @@ namespace NervaOneWalletMiner.Helpers
                 if (((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).DaemonVersion != version)
                 {
                     ((MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView]).DaemonVersion = version;
+                }
+            }
+        }
+
+        public static void UpdateDaemonSyncProgress(double progress, bool isSyncing)
+        {
+            if (GlobalData.ViewModelPages.ContainsKey(SplitViewPages.MainView))
+            {
+                MainViewModel mainViewVm = (MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView];
+
+                if (mainViewVm.DaemonSyncProgress != progress)
+                {
+                    mainViewVm.DaemonSyncProgress = progress;
+                }
+                if (mainViewVm.IsDaemonSyncing != isSyncing)
+                {
+                    mainViewVm.IsDaemonSyncing = isSyncing;
+                }
+            }
+        }
+
+        public static void UpdateWalletSyncProgress(double progress, bool isSyncing)
+        {
+            if (GlobalData.ViewModelPages.ContainsKey(SplitViewPages.MainView))
+            {
+                MainViewModel mainViewVm = (MainViewModel)GlobalData.ViewModelPages[SplitViewPages.MainView];
+
+                if (mainViewVm.WalletSyncProgress != progress)
+                {
+                    mainViewVm.WalletSyncProgress = progress;
+                }
+                if (mainViewVm.IsWalletSyncing != isSyncing)
+                {
+                    mainViewVm.IsWalletSyncing = isSyncing;
                 }
             }
         }
@@ -413,6 +459,14 @@ namespace NervaOneWalletMiner.Helpers
                     return;
                 }
 
+                // Daemon is still catching up to the network when it is behind the tip. Heights come from get_info
+                // so they are only known with a local daemon. Wallet only mode never fetches daemon data
+                ulong netHeight = GlobalData.NetworkStats.NetHeight;
+                ulong yourHeight = GlobalData.NetworkStats.YourHeight;
+                bool isDaemonSyncing = netHeight > 0 && yourHeight > 0 && yourHeight + GlobalData.SyncProgressMinBlocksBehind <= netHeight;
+                double daemonProgress = isDaemonSyncing ? GlobalMethods.GetSyncProgress(yourHeight, netHeight) : 0;
+                UpdateDaemonSyncProgress(daemonProgress, isDaemonSyncing);
+
                 if (GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly)
                 {
                     string remoteStatus = "Remote" + (string.IsNullOrEmpty(GlobalData.NetworkStats.StatusSync) ? "" : " | " + GlobalData.NetworkStats.StatusSync);
@@ -438,9 +492,27 @@ namespace NervaOneWalletMiner.Helpers
                     int dashIndex = rawVersion.IndexOf('-');
                     string version = dashIndex > 0 ? rawVersion[..dashIndex] : rawVersion;
                     string connections = "↑" + GlobalData.NetworkStats.ConnectionsOut + "  ↓" + GlobalData.NetworkStats.ConnectionsIn;
-                    string sync = " | " + (string.IsNullOrEmpty(GlobalData.NetworkStats.StatusSync) ? "Connecting to daemon..." : GlobalData.NetworkStats.StatusSync);
+                    string connectionsShort = "↑" + GlobalData.NetworkStats.ConnectionsOut + " ↓" + GlobalData.NetworkStats.ConnectionsIn;
                     string publicIndicator = GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsPublicNode ? " | Public" : string.Empty;
-                    UpdateDaemonStatus(version + " | " + connections + sync + publicIndicator);
+
+                    // While syncing the heights are rebuilt here instead of using StatusSync so the narrow width can drop them.
+                    // StatusSync still carries the transient messages like "Loading..." at both widths
+                    string sync;
+                    string syncShort;
+                    if (isDaemonSyncing)
+                    {
+                        string percent = GlobalMethods.GetSyncProgressText(daemonProgress);
+                        sync = "Sync (" + yourHeight + " of " + netHeight + ") " + percent;
+                        syncShort = "Sync " + percent;
+                    }
+                    else
+                    {
+                        sync = string.IsNullOrEmpty(GlobalData.NetworkStats.StatusSync) ? "Connecting to daemon..." : GlobalData.NetworkStats.StatusSync;
+                        syncShort = sync;
+                    }
+
+                    UpdateDaemonStatus(version + " | " + connections + " | " + sync + publicIndicator,
+                        version + " | " + connectionsShort + " | " + syncShort + publicIndicator);
                 }
             }
             catch (Exception ex)
@@ -489,7 +561,33 @@ namespace NervaOneWalletMiner.Helpers
                     string units = GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits;
                     string totalLockedLabel = "Total " + units + ":";
                     string totalUnlockedLabel = (isBtcStyle ? "Pending " : "Unlocked ") + units + ":";
-                    string statusBarMessage = GlobalData.OpenedWalletName + " | " + GlobalMethods.FormatAmount(GlobalData.WalletStats.BalanceTotal) + " " + units + (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletHeightSupported ? " | H: " + GlobalData.WalletHeight : string.Empty);
+                    bool isWalletHeightSupported = GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletHeightSupported;
+
+                    // Wallet is still scanning the chain when it is behind the tip. BTC based coins have no wallet
+                    // scan height and wallet only mode has no tip height, so neither shows scan progress
+                    ulong walletNetHeight = GlobalData.NetworkStats.NetHeight;
+                    bool isWalletSyncing = isWalletHeightSupported && walletNetHeight > 0 && GlobalData.WalletHeight > 0 && GlobalData.WalletHeight + GlobalData.SyncProgressMinBlocksBehind <= walletNetHeight;
+                    double walletProgress = isWalletSyncing ? GlobalMethods.GetSyncProgress(GlobalData.WalletHeight, walletNetHeight) : 0;
+
+                    // Name and balance always fit so they are the base for both widths. Height is spelled out when
+                    // there is room and abbreviated on a phone, where scanning drops it entirely for the percent
+                    string statusBarMessage = GlobalData.OpenedWalletName + " | " + GlobalMethods.FormatAmount(GlobalData.WalletStats.BalanceTotal) + " " + units;
+                    string statusBarMessageShort = statusBarMessage;
+
+                    if (isWalletHeightSupported)
+                    {
+                        if (isWalletSyncing)
+                        {
+                            string percent = GlobalMethods.GetSyncProgressText(walletProgress);
+                            statusBarMessage += " | Height: " + GlobalData.WalletHeight + " (" + percent + ")";
+                            statusBarMessageShort += " | " + percent;
+                        }
+                        else
+                        {
+                            statusBarMessage += " | Height: " + GlobalData.WalletHeight;
+                            statusBarMessageShort += " | H: " + GlobalData.WalletHeight;
+                        }
+                    }
 
                     Dispatcher.UIThread.Invoke(() =>
                     {
@@ -560,6 +658,12 @@ namespace NervaOneWalletMiner.Helpers
                         {
                             mainViewVm.WalletStatus = statusBarMessage;
                         }
+                        if (mainViewVm.WalletStatusShort != statusBarMessageShort)
+                        {
+                            mainViewVm.WalletStatusShort = statusBarMessageShort;
+                        }
+
+                        UpdateWalletSyncProgress(walletProgress, isWalletSyncing);
                     });
                 }
                 else
@@ -597,6 +701,12 @@ namespace NervaOneWalletMiner.Helpers
                         {
                             mainViewVm.WalletStatus = GlobalData.WalletClosedMessage;
                         }
+                        if (mainViewVm.WalletStatusShort != GlobalData.WalletClosedMessage)
+                        {
+                            mainViewVm.WalletStatusShort = GlobalData.WalletClosedMessage;
+                        }
+
+                        UpdateWalletSyncProgress(0, false);
                     });
                 }
             }

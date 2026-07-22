@@ -1337,6 +1337,22 @@ namespace NervaOneWalletMiner.Helpers
         public static string FormatAmountFull(decimal amount) =>
             amount.ToString("0.############");
 
+        // Sync progress as 0-100. Returns 0 when target height is not known. Max 100
+        public static double GetSyncProgress(ulong currentHeight, ulong targetHeight)
+        {
+            if (targetHeight == 0)
+            {
+                return 0;
+            }
+
+            double progress = currentHeight / (double)targetHeight * 100d;
+            return progress > 100d ? 100d : progress;
+        }
+
+        // Floor rather than round so a wallet at 99.6% does not display 100% before it is actually done
+        public static string GetSyncProgressText(double progress) =>
+            Math.Floor(progress).ToString("0") + "%";
+
         public static string GetShorterString(string? text, int shorterLength)
         {
             if (string.IsNullOrEmpty(text))

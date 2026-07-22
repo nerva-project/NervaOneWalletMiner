@@ -5,32 +5,75 @@
 			 xmlns:vm="clr-namespace:NervaOneWalletMiner.ViewModels"
              mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="50"
 			 x:DataType="vm:MainViewModel"
-             x:Class="NervaOneWalletMiner.Views.StatusBarView">
+             x:Class="NervaOneWalletMiner.Views.StatusBarView"
+             SizeChanged="StatusBarView_SizeChanged">
 
 	<Design.DataContext>
 		<vm:StatusBarViewModel/>
 	</Design.DataContext>
 	
-	<Grid ColumnDefinitions="32,*,140" Margin="10" Height="50">
+	<Grid ColumnDefinitions="32,*" Margin="10" Height="50">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="25"/>
 			<RowDefinition Height="25"/>
 		</Grid.RowDefinitions>
-		
+
 		<Image Grid.RowSpan="2"
 			   Grid.Column="0"
 			   Source="{Binding CoinIcon}"/>
-		
-		<Label Grid.Row="0"
+
+		<!-- One label per width. StatusBarView_SizeChanged shows exactly one of them -->
+		<Label Name="lblDaemonStatus"
+			   Grid.Row="0"
 			   Grid.Column="1"
-			   Grid.ColumnSpan="2"
 			   Margin="10,0,0,0"
 			   Content="{Binding DaemonStatus}"/>
-		<Label Grid.Row="1"
+		<Label Name="lblDaemonStatusShort"
+			   Grid.Row="0"
 			   Grid.Column="1"
-			   Grid.ColumnSpan="2"
+			   Margin="10,0,0,0"
+			   IsVisible="False"
+			   Content="{Binding DaemonStatusShort}"/>
+		<!-- Sits on the bottom edge of the status row so it takes no extra height and no text width. The track is
+			 transparent so only the filled part shows - a full width track reads as a horizontal scrollbar -->
+		<ProgressBar Grid.Row="0"
+					 Grid.Column="1"
+					 Margin="10,0,0,0"
+					 Height="4"
+					 MinHeight="4"
+					 VerticalAlignment="Bottom"
+					 Background="Transparent"
+					 BorderThickness="0"
+					 Minimum="0"
+					 Maximum="100"
+					 Value="{Binding DaemonSyncProgress}"
+					 IsVisible="{Binding IsDaemonSyncing}"
+					 ToolTip.Tip="Daemon is downloading the blockchain"/>
+
+		<Label Name="lblWalletStatus"
+			   Grid.Row="1"
+			   Grid.Column="1"
 			   Margin="10,0,0,0"
 			   Content="{Binding WalletStatus}"/>
+		<Label Name="lblWalletStatusShort"
+			   Grid.Row="1"
+			   Grid.Column="1"
+			   Margin="10,0,0,0"
+			   IsVisible="False"
+			   Content="{Binding WalletStatusShort}"/>
+		<ProgressBar Grid.Row="1"
+					 Grid.Column="1"
+					 Margin="10,0,0,0"
+					 Height="4"
+					 MinHeight="4"
+					 VerticalAlignment="Bottom"
+					 Background="Transparent"
+					 BorderThickness="0"
+					 Minimum="0"
+					 Maximum="100"
+					 Value="{Binding WalletSyncProgress}"
+					 IsVisible="{Binding IsWalletSyncing}"
+					 ToolTip.Tip="Wallet is scanning the blockchain"/>
 	</Grid>
 	
 </UserControl>

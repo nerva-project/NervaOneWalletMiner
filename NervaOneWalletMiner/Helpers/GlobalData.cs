@@ -17,7 +17,7 @@ namespace NervaOneWalletMiner.Helpers
     {
         public const string AppNameMain = "NervaOne";
         public const string AppAssemblyName = "NervaOneWalletMiner";
-        public const string Version = "1.3.0";
+        public const string Version = "1.3.1";
 
         public const string CliToolsDirName = "cli";
         public const string WalletDirName = "wallets";
@@ -76,6 +76,9 @@ namespace NervaOneWalletMiner.Helpers
         
         // This is used by UI to control if user needs to enter password before they do some sensitive wallet task. It stores password Hash
         public static string WalletPasswordHash = string.Empty;
+
+        // Daemon and wallet routinely trail the tip by a block while a new one propagates. Only count being further behind than this        
+        public const ulong SyncProgressMinBlocksBehind = 3;
 
         // Grid and other UI data
         public static StatsDaemon NetworkStats = new();
