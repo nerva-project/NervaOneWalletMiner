@@ -64,6 +64,13 @@ public class MainViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _DaemonStatus, value);
     }
 
+    private string _DaemonStatusShort = "";
+    public string DaemonStatusShort
+    {
+        get => _DaemonStatusShort;
+        set => this.RaiseAndSetIfChanged(ref _DaemonStatusShort, value);
+    }
+
     // Status Bar
     private string _DaemonVersion = "";
     public string DaemonVersion
@@ -77,6 +84,41 @@ public class MainViewModel : ViewModelBase
     {
         get => _WalletStatus;
         set => this.RaiseAndSetIfChanged(ref _WalletStatus, value);
+    }
+
+    private string _WalletStatusShort = "";
+    public string WalletStatusShort
+    {
+        get => _WalletStatusShort;
+        set => this.RaiseAndSetIfChanged(ref _WalletStatusShort, value);
+    }
+
+    private double _DaemonSyncProgress = 0;
+    public double DaemonSyncProgress
+    {
+        get => _DaemonSyncProgress;
+        set => this.RaiseAndSetIfChanged(ref _DaemonSyncProgress, value);
+    }
+
+    private bool _IsDaemonSyncing = false;
+    public bool IsDaemonSyncing
+    {
+        get => _IsDaemonSyncing;
+        set => this.RaiseAndSetIfChanged(ref _IsDaemonSyncing, value);
+    }
+
+    private double _WalletSyncProgress = 0;
+    public double WalletSyncProgress
+    {
+        get => _WalletSyncProgress;
+        set => this.RaiseAndSetIfChanged(ref _WalletSyncProgress, value);
+    }
+
+    private bool _IsWalletSyncing = false;
+    public bool IsWalletSyncing
+    {
+        get => _IsWalletSyncing;
+        set => this.RaiseAndSetIfChanged(ref _IsWalletSyncing, value);
     }
 
     private Bitmap _CoinIcon = GlobalData.Logo;
