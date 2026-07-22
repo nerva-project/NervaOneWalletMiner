@@ -1349,9 +1349,9 @@ namespace NervaOneWalletMiner.Helpers
             return progress > 100d ? 100d : progress;
         }
 
-        // Floor rather than round so a wallet at 99.6% does not display 100% before it is actually done
+        // One decimal because the last whole percent takes a long time. Floored so 99.99% never displays as 100%
         public static string GetSyncProgressText(double progress) =>
-            Math.Floor(progress).ToString("0") + "%";
+            (Math.Floor(progress * 10d) / 10d).ToString("0.0") + "%";
 
         public static string GetShorterString(string? text, int shorterLength)
         {
@@ -1604,7 +1604,7 @@ namespace NervaOneWalletMiner.Helpers
                     WalletName = GlobalData.OpenedWalletName
                 };
 
-                _ = await GlobalData.WalletService.CloseWallet(GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].Rpc, request);
+                _ = await GlobalData.WalletService.CloseWallet(GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].Rpc, request);
             }
             catch (Exception ex)
             {
