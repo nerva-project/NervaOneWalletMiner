@@ -3,6 +3,9 @@ using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using NervaOneWalletMiner.Helpers;
 using NervaOneWalletMiner.Objects;
+using NervaOneWalletMiner.Rpc.Common;
+using NervaOneWalletMiner.Rpc.Daemon.Requests;
+using NervaOneWalletMiner.Rpc.Daemon.Responses;
 using NervaOneWalletMiner.ViewModels;
 using NervaOneWalletMiner.ViewsDialogs;
 using System;
@@ -126,6 +129,81 @@ namespace NervaOneWalletMiner.Views
             }
         }
         #endregion // Restart With QuickSync
+
+        #region Test Connection
+        public async void TestConnection_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                string address = GetVm().RemoteNodeAddress.Trim();
+
+                if (string.IsNullOrEmpty(address))
+                {
+                    await DialogService.ShowAsync(new MessageBoxView("Test Connection", "Enter a remote node address first.", true));
+                    return;
+                }
+
+                if (!TryParseNodeAddress(address, out string host, out int port))
+                {
+                    await DialogService.ShowAsync(new MessageBoxView("Test Connection", "Enter the address as host or IP with a port number, for example 1.2.3.4:" + GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].DaemonPort, true));
+                    return;
+                }
+
+                // Test the daemon directly since a wallet can open locally even when the node is unreachable
+                btnTestConnection.IsEnabled = false;
+                btnTestConnection.Content = "Testing...";
+
+                RpcBase rpc = new() { Host = host, Port = port };
+                GetInfoResponse response = await GlobalData.DaemonService.GetInfo(rpc, new GetInfoRequest(), TimeSpan.FromSeconds(10));
+
+                btnTestConnection.Content = "Test Connection";
+                btnTestConnection.IsEnabled = true;
+
+                if (response.Error.IsError)
+                {
+                    Logger.LogError("DMS.TCON", "Test connection failed for " + host + ":" + port + " | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
+                    await DialogService.ShowAsync(new MessageBoxView("Test Connection", "Could not connect to " + host + ":" + port + ".\r\n\r\nMake sure the node is running and the port is open and forwarded.", true));
+                }
+                else
+                {
+                    Logger.LogDebug("DMS.TCON", "Test connection succeeded for " + host + ":" + port + " | Version: " + response.Version);
+
+                    // Public/restricted nodes blank the version in get_info, so only show it when the node returns one
+                    string versionLine = string.IsNullOrEmpty(response.Version) ? string.Empty : "Version: " + response.Version + "\r\n";
+                    await DialogService.ShowAsync(new MessageBoxView("Test Connection", "Connected successfully.\r\n\r\n" + versionLine + "Height: " + response.Height, true));
+                }
+            }
+            catch (Exception ex)
+            {
+                btnTestConnection.Content = "Test Connection";
+                btnTestConnection.IsEnabled = true;
+                Logger.LogException("DMS.TCON", ex);
+            }
+        }
+
+        // Parses host:port, with an optional http(s):// scheme. Expects a single colon, so IPv6 is not supported
+        private static bool TryParseNodeAddress(string address, out string host, out int port)
+        {
+            host = string.Empty;
+            port = 0;
+
+            if (address.Contains("://"))
+            {
+                address = address[(address.IndexOf("://") + 3)..];
+            }
+
+            address = address.Trim('/');
+
+            int lastColon = address.LastIndexOf(':');
+            if (lastColon <= 0 || lastColon == address.Length - 1)
+            {
+                return false;
+            }
+
+            host = address[..lastColon];
+            return int.TryParse(address[(lastColon + 1)..], out port) && port > 0 && port <= 65535;
+        }
+        #endregion // Test Connection
 
         #region Public Node Setup
         public void PublicNodeSetup_Clicked(object sender, RoutedEventArgs args)

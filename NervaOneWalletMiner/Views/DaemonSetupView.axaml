@@ -74,6 +74,10 @@
 						   Margin="0,10,0,10"/>
 				<TextBox Name="tbxRemoteNode"
 						 Text="{Binding RemoteNodeAddress, Mode=TwoWay}"/>
+				<Button Name="btnTestConnection"
+						Content="Test Connection"
+						Margin="0,10,0,0"
+						Click="TestConnection_Clicked"/>
 			</StackPanel>
 
 			<StackPanel Name="spFullNode" IsVisible="{Binding IsLocalNode}">

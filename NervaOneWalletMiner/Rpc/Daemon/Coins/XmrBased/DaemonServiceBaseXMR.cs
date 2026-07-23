@@ -196,7 +196,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
         #endregion // Stop Daemon
 
         #region Get Info
-        public async Task<GetInfoResponse> GetInfo(RpcBase rpc, GetInfoRequest requestObj)
+        public async Task<GetInfoResponse> GetInfo(RpcBase rpc, GetInfoRequest requestObj, TimeSpan? timeout = null)
         {
             GetInfoResponse responseObj = new();
 
@@ -211,7 +211,10 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                 };
 
                 // Call service and process response
-                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, "json_rpc"), requestJson.ToString());
+                string serviceUrl = HttpHelper.GetServiceUrl(rpc, "json_rpc");
+                HttpResponseMessage httpResponse = timeout.HasValue
+                    ? await HttpHelper.GetPostFromService(serviceUrl, requestJson.ToString(), timeout.Value)
+                    : await HttpHelper.GetPostFromService(serviceUrl, requestJson.ToString());
                 if (httpResponse.IsSuccessStatusCode)
                 {
                     string responseContent = await httpResponse.Content.ReadAsStringAsync();

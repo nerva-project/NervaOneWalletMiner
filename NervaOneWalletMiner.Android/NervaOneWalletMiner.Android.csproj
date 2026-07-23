@@ -5,8 +5,8 @@
     <SupportedOSPlatformVersion>26</SupportedOSPlatformVersion>
     <Nullable>enable</Nullable>
     <ApplicationId>one.nerva.android</ApplicationId>
-    <ApplicationVersion>1302</ApplicationVersion>
-    <ApplicationDisplayVersion>1.3.2</ApplicationDisplayVersion>
+    <ApplicationVersion>1303</ApplicationVersion>
+    <ApplicationDisplayVersion>1.3.3</ApplicationDisplayVersion>
     <AndroidPackageFormat>apk</AndroidPackageFormat>
     <AndroidEnableProfiledAot>False</AndroidEnableProfiledAot>
     <RuntimeIdentifiers>android-arm64</RuntimeIdentifiers>

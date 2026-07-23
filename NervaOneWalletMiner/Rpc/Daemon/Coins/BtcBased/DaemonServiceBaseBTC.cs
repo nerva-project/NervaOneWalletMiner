@@ -111,7 +111,7 @@ namespace NervaOneWalletMiner.Rpc.Daemon
         #endregion // Stop Daemon
 
         #region Get Info
-        public virtual async Task<GetInfoResponse> GetInfo(RpcBase rpc, GetInfoRequest requestObj)
+        public virtual async Task<GetInfoResponse> GetInfo(RpcBase rpc, GetInfoRequest requestObj, TimeSpan? timeout = null)
         {
             GetInfoResponse responseObj = new();
 
@@ -126,7 +126,10 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                     ["params"] = new JObject()
                 };
 
-                HttpResponseMessage httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
+                string serviceUrl = HttpHelper.GetServiceUrl(rpc, string.Empty);
+                HttpResponseMessage httpResponse = timeout.HasValue
+                    ? await HttpHelper.GetPostFromService(serviceUrl, requestJson.ToString(), rpc.UserName, rpc.Password, timeout.Value)
+                    : await HttpHelper.GetPostFromService(serviceUrl, requestJson.ToString(), rpc.UserName, rpc.Password);
                 if (httpResponse.IsSuccessStatusCode)
                 {
                     string responseContent = await httpResponse.Content.ReadAsStringAsync();
@@ -194,7 +197,9 @@ namespace NervaOneWalletMiner.Rpc.Daemon
                         ["params"] = new JObject()
                     };
 
-                    httpResponse = await HttpHelper.GetPostFromService(HttpHelper.GetServiceUrl(rpc, string.Empty), requestJson.ToString(), rpc.UserName, rpc.Password);
+                    httpResponse = timeout.HasValue
+                        ? await HttpHelper.GetPostFromService(serviceUrl, requestJson.ToString(), rpc.UserName, rpc.Password, timeout.Value)
+                        : await HttpHelper.GetPostFromService(serviceUrl, requestJson.ToString(), rpc.UserName, rpc.Password);
                     if (httpResponse.IsSuccessStatusCode)
                     {
                         string responseContent = await httpResponse.Content.ReadAsStringAsync();
