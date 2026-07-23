@@ -1,6 +1,7 @@
 ﻿using NervaOneWalletMiner.Rpc.Common;
 using NervaOneWalletMiner.Rpc.Daemon.Requests;
 using NervaOneWalletMiner.Rpc.Daemon.Responses;
+using System;
 using System.Threading.Tasks;
 
 namespace NervaOneWalletMiner.Rpc.Daemon
@@ -13,7 +14,8 @@ namespace NervaOneWalletMiner.Rpc.Daemon
         
         Task<StopDaemonResponse> StopDaemon(RpcBase rpc, StopDaemonRequest requestObj);
 
-        Task<GetInfoResponse> GetInfo(RpcBase rpc, GetInfoRequest requestObj);
+        // timeout overrides the default so a connection test can fail fast instead of hanging
+        Task<GetInfoResponse> GetInfo(RpcBase rpc, GetInfoRequest requestObj, TimeSpan? timeout = null);
 
         Task<GetConnectionsResponse> GetConnections(RpcBase rpc, GetConnectionsRequest requestObj);
 
