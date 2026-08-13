@@ -59,11 +59,11 @@ namespace NervaOneWalletMiner.Views
             {
                 if (e.NewSize.Width < 450)
                 {
-                    // Narrow: Open Wallet button below icon/label
+                    // Narrow: Close Wallet button below icon/label
                     grdHeader.ColumnDefinitions = ColumnDefinitions.Parse("Auto,*");
-                    Grid.SetRow(btnOpenCloseWallet, 1);
-                    Grid.SetColumn(btnOpenCloseWallet, 0);
-                    btnOpenCloseWallet.Margin = new Thickness(0, 10, 5, 0);
+                    Grid.SetRow(btnCloseWallet, 1);
+                    Grid.SetColumn(btnCloseWallet, 0);
+                    btnCloseWallet.Margin = new Thickness(0, 10, 5, 0);
 
                     // Narrow: Transfer/Address buttons below balances
                     grdStats.ColumnDefinitions = ColumnDefinitions.Parse("200,Auto");
@@ -76,14 +76,20 @@ namespace NervaOneWalletMiner.Views
                     if (_colId != null) { _colId.IsVisible = false; }
                     if (_colAddress != null) { _colAddress.IsVisible = false; }
                     if (_colUnlocked != null) { _colUnlocked.IsVisible = false; }
+
+                    // Narrow: full width empty state button, anchored to top so it stays put instead of
+                    // floating in middle of a tall phone screen
+                    spEmptyState.VerticalAlignment = VerticalAlignment.Top;
+                    spEmptyStateButtons.HorizontalAlignment = HorizontalAlignment.Stretch;
+                    SetEmptyStateButtonAlignment(HorizontalAlignment.Stretch);
                 }
                 else if (e.NewSize.Width < 700)
                 {
-                    // Medium: Open Wallet button on the right of icon/label
+                    // Medium: Close Wallet button on the right of icon/label
                     grdHeader.ColumnDefinitions = ColumnDefinitions.Parse("Auto,*,Auto");
-                    Grid.SetRow(btnOpenCloseWallet, 0);
-                    Grid.SetColumn(btnOpenCloseWallet, 2);
-                    btnOpenCloseWallet.Margin = new Thickness(0, 0, 5, 0);
+                    Grid.SetRow(btnCloseWallet, 0);
+                    Grid.SetColumn(btnCloseWallet, 2);
+                    btnCloseWallet.Margin = new Thickness(0, 0, 5, 0);
 
                     // Medium: Transfer/Address buttons on the right
                     grdStats.ColumnDefinitions = ColumnDefinitions.Parse("200,*,200");
@@ -96,14 +102,19 @@ namespace NervaOneWalletMiner.Views
                     if (_colId != null) { _colId.IsVisible = false; }
                     if (_colAddress != null) { _colAddress.IsVisible = true; }
                     if (_colUnlocked != null) { _colUnlocked.IsVisible = false; }
+
+                    // Medium: empty state button centered
+                    spEmptyState.VerticalAlignment = VerticalAlignment.Center;
+                    spEmptyStateButtons.HorizontalAlignment = HorizontalAlignment.Center;
+                    SetEmptyStateButtonAlignment(HorizontalAlignment.Center);
                 }
                 else
                 {
-                    // Wide: Open Wallet button on the right of icon/label
+                    // Wide: Close Wallet button on the right of icon/label
                     grdHeader.ColumnDefinitions = ColumnDefinitions.Parse("Auto,*,Auto");
-                    Grid.SetRow(btnOpenCloseWallet, 0);
-                    Grid.SetColumn(btnOpenCloseWallet, 2);
-                    btnOpenCloseWallet.Margin = new Thickness(0, 0, 5, 0);
+                    Grid.SetRow(btnCloseWallet, 0);
+                    Grid.SetColumn(btnCloseWallet, 2);
+                    btnCloseWallet.Margin = new Thickness(0, 0, 5, 0);
 
                     // Wide: Transfer/Address buttons on the right
                     grdStats.ColumnDefinitions = ColumnDefinitions.Parse("200,*,200");
@@ -116,6 +127,11 @@ namespace NervaOneWalletMiner.Views
                     if (_colId != null) { _colId.IsVisible = true; }
                     if (_colAddress != null) { _colAddress.IsVisible = true; }
                     if (_colUnlocked != null) { _colUnlocked.IsVisible = !GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].IsWalletBtcStyle; }
+
+                    // Wide: empty state button centered
+                    spEmptyState.VerticalAlignment = VerticalAlignment.Center;
+                    spEmptyStateButtons.HorizontalAlignment = HorizontalAlignment.Center;
+                    SetEmptyStateButtonAlignment(HorizontalAlignment.Center);
                 }
             }
             catch (Exception ex)
@@ -124,10 +140,22 @@ namespace NervaOneWalletMiner.Views
             }
         }
 
+        // Alignment has to be set on buttons themselves. Setting it on their panel is not enough as
+        // buttons keep their own width and end up sitting off to the side of centered message
+        private void SetEmptyStateButtonAlignment(HorizontalAlignment alignment)
+        {
+            btnEmptySetUpWallet.HorizontalAlignment = alignment;
+            btnEmptyOpenWallet.HorizontalAlignment = alignment;
+        }
+
         private void WalletView_Initialized(object? sender, EventArgs e)
         {
             try
             {
+                // Master timer refreshes this too but that can take a few seconds. New user landing here
+                // should not have to wait to find out they need to create a wallet
+                UIManager.RefreshWalletEmptyState();
+
                 if (!GlobalData.AreWalletEventsRegistered)
                 {
                     WalletViewModel vm = (WalletViewModel)DataContext!;
@@ -143,43 +171,61 @@ namespace NervaOneWalletMiner.Views
         }
 
         #region Open Wallet
-        public async void OpenCloseWallet_Clicked(object sender, RoutedEventArgs args)
+        // Only reachable from empty state. Once a wallet is open, empty state is replaced by accounts grid
+        public async void EmptyOpenWallet_Clicked(object sender, RoutedEventArgs args)
         {
             try
             {
-                var btnOpenCloseWallet = this.Get<Button>("btnOpenCloseWallet");
-
-                if (btnOpenCloseWallet.Content!.ToString()!.Equals(StatusWallet.OpenWallet))
+                if (GlobalData.DaemonState == DaemonState.CliToolsMissing || GlobalData.DaemonState == DaemonState.Downloading)
                 {
-                    if (GlobalData.DaemonState == DaemonState.CliToolsMissing || GlobalData.DaemonState == DaemonState.Downloading)
+                    Logger.LogDebug("WAL.EOWC", "Trying to open wallet but CLI tools not found");
+                    await DialogService.ShowAsync(new MessageBoxView("Open Wallet", "Client tools missing. Cannot open wallet until client tools are downloaded and running", true));
+                }
+                else if (!GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly && GlobalData.DaemonState != DaemonState.Running)
+                {
+                    Logger.LogDebug("WAL.EOWC", "Trying to open wallet but daemon not running");
+                    await DialogService.ShowAsync(new MessageBoxView("Open Wallet", "Daemon not running. Cannot open wallet until connection is established", true));
+                }
+                else if (GlobalMethods.GetWalletFileNames().Count == 0)
+                {
+                    // Empty state shows Wallet Setup button when there are no wallets, so this only happens
+                    // if wallets went missing since it was last checked. Open Wallet page would be empty
+                    Logger.LogDebug("WAL.EOWC", "Trying to open wallet but no wallets found");
+                    DialogResult? result = await DialogService.ShowAsync<DialogResult>(new MessageBoxView("Open Wallet", "No wallets were found.\r\n\r\nWould you like to set one up now?", false, true));
+                    if (result != null && result.IsOk)
                     {
-                        Logger.LogDebug("WAL.OCWC", "Trying to open wallet but CLI tools not found");
-                        await DialogService.ShowAsync(new MessageBoxView("Open Wallet", "Client tools missing. Cannot open wallet until client tools are downloaded and running", true));
-                    }
-                    else if (!GlobalData.AppSettings.Daemon[GlobalData.AppSettings.ActiveCoin].IsWalletOnly && GlobalData.DaemonState != DaemonState.Running)
-                    {
-                        Logger.LogDebug("WAL.OCWC", "Trying to open wallet but daemon not running");
-                        await DialogService.ShowAsync(new MessageBoxView("Open Wallet", "Daemon not running. Cannot open wallet until connection is established", true));
-                    }
-                    else
-                    {
-                        Logger.LogDebug("WAL.OCWC", "Navigating to Open Wallet page");
-                        UIManager.NavigateToOpenWallet();
+                        UIManager.NavigateToPage(SplitViewPages.WalletSetup);
                     }
                 }
                 else
                 {
-                    // Close wallet
-                    await CloseUserWallet();
-                    btnOpenCloseWallet.Content = StatusWallet.OpenWallet;
+                    Logger.LogDebug("WAL.EOWC", "Navigating to Open Wallet page");
+                    UIManager.NavigateToOpenWallet();
                 }
             }
             catch (Exception ex)
             {
-                Logger.LogException("WAL.OCWC", ex);
+                Logger.LogException("WAL.EOWC", ex);
             }
         }
         #endregion // Open Wallet
+
+        #region Empty State
+        // Wallet Setup is where wallets are created and restored, which is not obvious to a new user
+        // looking at Wallet page. Sending them there also keeps Cancel taking them back to same place
+        public void EmptySetUpWallet_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                Logger.LogDebug("WAL.ESWC", "Navigating to Wallet Setup page");
+                UIManager.NavigateToPage(SplitViewPages.WalletSetup);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("WAL.ESWC", ex);
+            }
+        }
+        #endregion // Empty State
 
         #region Create Account
         private void CreateAccount_Clicked(object sender, RoutedEventArgs args)
@@ -353,6 +399,21 @@ namespace NervaOneWalletMiner.Views
         #endregion // Address Info
 
         #region Close Wallet
+        public async void CloseWallet_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                await CloseUserWallet();
+
+                // Bring empty state up right away instead of waiting for next master timer tick
+                UIManager.RefreshWalletEmptyState();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("WAL.CLWC", ex);
+            }
+        }
+
         private async Task<bool> CloseUserWalletNonUi()
         {
             // Need to wait until wallet is closed or might as well not even attempt this

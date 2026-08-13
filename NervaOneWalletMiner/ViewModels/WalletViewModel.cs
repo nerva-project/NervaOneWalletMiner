@@ -1,5 +1,4 @@
-﻿using NervaOneWalletMiner.Objects.Constants;
-using NervaOneWalletMiner.Objects.DataGrid;
+﻿using NervaOneWalletMiner.Objects.DataGrid;
 using ReactiveUI;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
@@ -22,13 +21,6 @@ namespace NervaOneWalletMiner.ViewModels
             return CloseWalletNonUiEvent!.Invoke();
         }
 
-
-        private string _OpenCloseWallet = StatusWallet.OpenWallet;
-        public string OpenCloseWallet
-        {
-            get => _OpenCloseWallet;
-            set => this.RaiseAndSetIfChanged(ref _OpenCloseWallet, value);
-        }
 
         private string _TotalCoins = string.Empty;
         public string TotalCoins
@@ -56,6 +48,30 @@ namespace NervaOneWalletMiner.ViewModels
         {
             get => _TotalUnlockedLabel;
             set => this.RaiseAndSetIfChanged(ref _TotalUnlockedLabel, value);
+        }
+
+        // Empty state replaces accounts grid when no wallet is open. It tells new users what to do next
+        // instead of leaving them looking at empty grid. UIManager.UpdateWalletView keeps these in sync
+        private bool _IsEmptyStateVisible = true;
+        public bool IsEmptyStateVisible
+        {
+            get => _IsEmptyStateVisible;
+            set => this.RaiseAndSetIfChanged(ref _IsEmptyStateVisible, value);
+        }
+
+        private string _EmptyStateMessage = string.Empty;
+        public string EmptyStateMessage
+        {
+            get => _EmptyStateMessage;
+            set => this.RaiseAndSetIfChanged(ref _EmptyStateMessage, value);
+        }
+
+        // True when user has no wallets at all, which means they need Create/Restore instead of Open
+        private bool _IsNoWalletsState = false;
+        public bool IsNoWalletsState
+        {
+            get => _IsNoWalletsState;
+            set => this.RaiseAndSetIfChanged(ref _IsNoWalletsState, value);
         }
 
         private ObservableCollection<Account> _WalletAddresses = new();

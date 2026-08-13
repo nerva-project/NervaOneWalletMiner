@@ -32,16 +32,56 @@
 						   Height="24" Margin="5,0,0,0"/>
 				</Grid>
 
+				<!-- Nothing to get details on while empty state is up -->
 				<Button Grid.Row="0" Grid.Column="2"
 						Name="btnTransactionDetails"
 						Content="Transaction Details"
+						IsVisible="{Binding !IsEmptyStateVisible}"
 						Margin="0,0,5,0"
 						Click="TransactionDetails_Clicked"/>
 			</Grid>
 		</StackPanel>
 
+		<!-- Shown instead of transactions grid when no wallet is open. Wallets are opened on Wallet
+			 screen, so that is where users are sent unless they have no wallets at all -->
+		<ScrollViewer Grid.Row="1"
+					  Name="scrEmptyState"
+					  IsVisible="{Binding IsEmptyStateVisible}">
+			<StackPanel Name="spEmptyState"
+						Spacing="15"
+						Margin="20"
+						MaxWidth="650"
+						VerticalAlignment="Center">
+
+				<TextBlock Name="tbkEmptyState"
+						   Text="{Binding EmptyStateMessage}"
+						   TextWrapping="Wrap"
+						   TextAlignment="Center"/>
+
+				<!-- Only one of these is ever visible -->
+				<StackPanel Name="spEmptyStateButtons"
+							Spacing="10"
+							HorizontalAlignment="Center">
+					<Button Name="btnEmptySetUpWallet"
+							Content="Go to Wallet Setup"
+							MinWidth="120"
+							HorizontalContentAlignment="Center"
+							IsVisible="{Binding IsNoWalletsState}"
+							Click="EmptySetUpWallet_Clicked"/>
+					<Button Name="btnEmptyGoToWallet"
+							Content="Go to Wallet"
+							MinWidth="120"
+							HorizontalContentAlignment="Center"
+							IsVisible="{Binding !IsNoWalletsState}"
+							Click="EmptyGoToWallet_Clicked"/>
+				</StackPanel>
+
+			</StackPanel>
+		</ScrollViewer>
+
 		<DataGrid Grid.Row="1" ItemsSource="{Binding Transactions}"
 					  Name="dtgTransactions"
+					  IsVisible="{Binding !IsEmptyStateVisible}"
 					  AutoGenerateColumns="False"
 					  GridLinesVisibility="Horizontal"
 					  IsReadOnly="True"

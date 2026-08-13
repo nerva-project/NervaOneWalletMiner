@@ -1,8 +1,10 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Layout;
 using Avalonia.Threading;
 using NervaOneWalletMiner.Helpers;
+using NervaOneWalletMiner.Objects.Constants;
 using NervaOneWalletMiner.Objects.DataGrid;
 using NervaOneWalletMiner.Rpc.Wallet.Requests;
 using NervaOneWalletMiner.Rpc.Wallet.Responses;
@@ -34,12 +36,65 @@ namespace NervaOneWalletMiner.Views
                     RequestBringIntoViewEvent,
                     (object? sender, RequestBringIntoViewEventArgs e) => { e.Handled = true; },
                     RoutingStrategies.Bubble);
+
+                Initialized += TransfersView_Initialized;
             }
             catch (Exception ex)
             {
                 Logger.LogException("TRA.CONS", ex);
             }
         }
+
+        private void TransfersView_Initialized(object? sender, EventArgs e)
+        {
+            try
+            {
+                // Master timer refreshes this too but that can take a few seconds
+                UIManager.RefreshTransfersEmptyState();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("TRA.TRVI", ex);
+            }
+        }
+
+        #region Empty State
+        // Wallets are created and restored on Wallet Setup, and opened on Wallet screen. Transfers has
+        // nothing of its own to offer here, so it just points at whichever one user needs
+        public void EmptySetUpWallet_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                Logger.LogDebug("TRA.ESWC", "Navigating to Wallet Setup page");
+                UIManager.NavigateToPage(SplitViewPages.WalletSetup);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("TRA.ESWC", ex);
+            }
+        }
+
+        public void EmptyGoToWallet_Clicked(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                Logger.LogDebug("TRA.EGWC", "Navigating to Wallet page");
+                UIManager.NavigateToPage(SplitViewPages.Wallet);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("TRA.EGWC", ex);
+            }
+        }
+
+        // Alignment has to be set on buttons themselves. Setting it on their panel is not enough as
+        // buttons keep their own width and end up sitting off to the side of centered message
+        private void SetEmptyStateButtonAlignment(HorizontalAlignment alignment)
+        {
+            btnEmptySetUpWallet.HorizontalAlignment = alignment;
+            btnEmptyGoToWallet.HorizontalAlignment = alignment;
+        }
+        #endregion // Empty State
 
         private void TransfersView_SizeChanged(object? sender, SizeChangedEventArgs e)
         {
@@ -57,6 +112,12 @@ namespace NervaOneWalletMiner.Views
                     if (_colHeight != null) { _colHeight.IsVisible = false; }
                     if (_colConf != null) { _colConf.IsVisible = false; }
                     if (_colAddress != null) { _colAddress.IsVisible = false; }
+
+                    // Narrow: full width empty state button, anchored to top so it stays put instead of
+                    // floating in middle of a tall phone screen
+                    spEmptyState.VerticalAlignment = VerticalAlignment.Top;
+                    spEmptyStateButtons.HorizontalAlignment = HorizontalAlignment.Stretch;
+                    SetEmptyStateButtonAlignment(HorizontalAlignment.Stretch);
                 }
                 else if (e.NewSize.Width < 700)
                 {
@@ -70,6 +131,11 @@ namespace NervaOneWalletMiner.Views
                     if (_colHeight != null) { _colHeight.IsVisible = true; }
                     if (_colConf != null) { _colConf.IsVisible = true; }
                     if (_colAddress != null) { _colAddress.IsVisible = false; }
+
+                    // Medium: empty state button centered
+                    spEmptyState.VerticalAlignment = VerticalAlignment.Center;
+                    spEmptyStateButtons.HorizontalAlignment = HorizontalAlignment.Center;
+                    SetEmptyStateButtonAlignment(HorizontalAlignment.Center);
                 }
                 else
                 {
@@ -83,6 +149,11 @@ namespace NervaOneWalletMiner.Views
                     if (_colHeight != null) { _colHeight.IsVisible = true; }
                     if (_colConf != null) { _colConf.IsVisible = true; }
                     if (_colAddress != null) { _colAddress.IsVisible = true; }
+
+                    // Wide: empty state button centered
+                    spEmptyState.VerticalAlignment = VerticalAlignment.Center;
+                    spEmptyStateButtons.HorizontalAlignment = HorizontalAlignment.Center;
+                    SetEmptyStateButtonAlignment(HorizontalAlignment.Center);
                 }
             }
             catch (Exception ex)
