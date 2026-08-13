@@ -8,8 +8,6 @@ using NervaOneWalletMiner.Rpc.Wallet.Requests;
 using NervaOneWalletMiner.Rpc.Wallet.Responses;
 using NervaOneWalletMiner.ViewsDialogs;
 using System;
-using System.Collections.Generic;
-using System.IO;
 
 namespace NervaOneWalletMiner.Views
 {
@@ -30,7 +28,7 @@ namespace NervaOneWalletMiner.Views
                     btnShowHidePassword.IsEnabled = false;
                 }
 
-                cbxWalletName.ItemsSource = GetWalletFileNames();
+                cbxWalletName.ItemsSource = GlobalMethods.GetWalletFileNames();
                 cbxWalletName.SelectedIndex = 0;
 
                 Loaded += (_, _) => cbxWalletName.Focus();
@@ -39,37 +37,6 @@ namespace NervaOneWalletMiner.Views
             {
                 Logger.LogException("OWV.CONS", ex);
             }
-        }
-
-        private List<string> GetWalletFileNames()
-        {
-            List<string> wallets = [];
-
-            try
-            {
-                DirectoryInfo walletsDir = new(GlobalMethods.GetWalletDir());
-                if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].WalletExtension.Equals("directory"))
-                {
-                    foreach (DirectoryInfo dir in walletsDir.GetDirectories())
-                    {
-                        wallets.Add(dir.Name);
-                    }
-                }
-                else
-                {
-                    FileInfo[] files = walletsDir.GetFiles("*" + GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].WalletExtension, SearchOption.TopDirectoryOnly);
-                    foreach (FileInfo file in files)
-                    {
-                        wallets.Add(Path.GetFileNameWithoutExtension(file.FullName));
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException("OWV.GWFN", ex);
-            }
-
-            return wallets;
         }
 
         public void Password_KeyDown(object sender, KeyEventArgs args)

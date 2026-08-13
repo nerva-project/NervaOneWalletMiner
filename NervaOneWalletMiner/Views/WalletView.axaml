@@ -33,16 +33,21 @@
 							   Height="24" Margin="5,0,0,0"/>
 					</Grid>
 
-					<!-- Component 2: Open/Close Wallet button -->
+					<!-- Component 2: Close Wallet button. Only shown while a wallet is open, which is exactly
+						 when empty state is hidden. Opening is done from empty state instead -->
 					<Button Grid.Row="0" Grid.Column="2"
-							Name="btnOpenCloseWallet"
-							Content="{Binding OpenCloseWallet}"														
+							Name="btnCloseWallet"
+							Content="Close Wallet"
+							IsVisible="{Binding !IsEmptyStateVisible}"
 							Width="120"
-							Margin="0,0,5,0"							
-							Click="OpenCloseWallet_Clicked"/>
+							Margin="0,0,5,0"
+							Click="CloseWallet_Clicked"/>
 				</Grid>
 
+				<!-- Balances and wallet actions are meaningless with no wallet open. Hiding them frees up
+					 vertical space for empty state, which matters on a phone -->
 				<Grid Name="grdStats"
+					  IsVisible="{Binding !IsEmptyStateVisible}"
 					  ColumnDefinitions="200,*,200" Margin="0,10,5,0">
 					<Grid.RowDefinitions>
 						<RowDefinition Height="Auto"/>
@@ -100,7 +105,46 @@
 
 		</StackPanel>
 
+		<!-- Shown instead of accounts grid when no wallet is open. ScrollViewer keeps buttons reachable
+			 on short screens, like a phone in landscape -->
+		<ScrollViewer Grid.Row="1"
+					  Name="scrEmptyState"
+					  IsVisible="{Binding IsEmptyStateVisible}">
+			<StackPanel Name="spEmptyState"
+						Spacing="15"
+						Margin="20"
+						MaxWidth="650"
+						VerticalAlignment="Center">
+
+				<TextBlock Name="tbkEmptyState"
+						   Text="{Binding EmptyStateMessage}"
+						   TextWrapping="Wrap"
+						   TextAlignment="Center"/>
+
+				<!-- Only one of these is ever visible. Create and restore both live on Wallet Setup, so
+					 new users are sent there instead of being asked to pick between them here -->
+				<StackPanel Name="spEmptyStateButtons"
+							Spacing="10"
+							HorizontalAlignment="Center">
+					<Button Name="btnEmptySetUpWallet"
+							Content="Go to Wallet Setup"
+							MinWidth="120"
+							HorizontalContentAlignment="Center"
+							IsVisible="{Binding IsNoWalletsState}"
+							Click="EmptySetUpWallet_Clicked"/>
+					<Button Name="btnEmptyOpenWallet"
+							Content="Open Wallet"
+							MinWidth="120"
+							HorizontalContentAlignment="Center"
+							IsVisible="{Binding !IsNoWalletsState}"
+							Click="EmptyOpenWallet_Clicked"/>
+				</StackPanel>
+
+			</StackPanel>
+		</ScrollViewer>
+
 		<DataGrid Grid.Row="1" Name="dtgAccounts"
+					  IsVisible="{Binding !IsEmptyStateVisible}"
 					  ItemsSource="{Binding WalletAddresses, Mode=OneWay}"
 					  GridLinesVisibility="Horizontal"
 					  AutoGenerateColumns="False"

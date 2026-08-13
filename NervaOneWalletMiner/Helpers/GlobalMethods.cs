@@ -155,6 +155,38 @@ namespace NervaOneWalletMiner.Helpers
             return walletDirectory;
         }
 
+        // Names of wallets that exist on disk for active coin. Some coins store wallet as directory, others as file
+        public static List<string> GetWalletFileNames()
+        {
+            List<string> wallets = [];
+
+            try
+            {
+                DirectoryInfo walletsDir = new(GetWalletDir());
+                if (GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].WalletExtension.Equals("directory"))
+                {
+                    foreach (DirectoryInfo dir in walletsDir.GetDirectories())
+                    {
+                        wallets.Add(dir.Name);
+                    }
+                }
+                else
+                {
+                    FileInfo[] files = walletsDir.GetFiles("*" + GlobalData.CoinSettings[GlobalData.AppSettings.ActiveCoin].WalletExtension, SearchOption.TopDirectoryOnly);
+                    foreach (FileInfo file in files)
+                    {
+                        wallets.Add(Path.GetFileNameWithoutExtension(file.FullName));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("GLM.GWFN", ex);
+            }
+
+            return wallets;
+        }
+
         public static string GetCliToolsDir()
         {
             string cliToolsDirectory = string.Empty;

@@ -31,6 +31,13 @@ namespace NervaOneWalletMiner.Helpers
 
         private static ViewModelBase _mainView = new();
 
+        // Wallet and Transfers empty states both need to know if any wallets exist on disk. Master timer
+        // runs every few seconds so directory is scanned periodically, and right away when wallet closes
+        private static readonly int _walletFilesScanSeconds = 10;
+        private static DateTime _lastWalletFilesScan = DateTime.MinValue;
+        private static volatile bool _isWalletFilesScanNeeded = true;
+        private static volatile int _walletFilesCount = 0;
+
 
         // TODO: I don't like this. Come up with a different way
         public static void SetMainView(ViewModelBase mainView)
@@ -521,6 +528,97 @@ namespace NervaOneWalletMiner.Helpers
             }
         }
         
+        // Cached so Wallet and Transfers updates in same timer tick do not both hit the file system
+        private static int GetWalletFilesCount()
+        {
+            if (_isWalletFilesScanNeeded || _lastWalletFilesScan.AddSeconds(_walletFilesScanSeconds) < DateTime.Now)
+            {
+                _isWalletFilesScanNeeded = false;
+                _lastWalletFilesScan = DateTime.Now;
+                _walletFilesCount = GlobalMethods.GetWalletFileNames().Count;
+            }
+
+            return _walletFilesCount;
+        }
+
+        // Message and button to show on Wallet page when no wallet is open. Brand new users have no wallets
+        // and need to create one. Everyone else just needs to open one of theirs
+        private static (bool IsNoWallets, string Message) GetWalletEmptyState()
+        {
+            int walletCount = GetWalletFilesCount();
+            string message;
+
+            if (walletCount == 0)
+            {
+                message = "You do not have a wallet yet.\r\n\r\nCreate a new wallet or restore an existing one to get started.";
+            }
+            else if (walletCount == 1)
+            {
+                message = "Your wallet is closed.\r\n\r\nOpen it to see your balance and addresses.";
+            }
+            else
+            {
+                message = "You have " + walletCount + " wallets.\r\n\r\nOpen one to see your balance and addresses.";
+            }
+
+            return (walletCount == 0, message);
+        }
+
+        // Transfers has nothing to show without an open wallet either, but opening one lives on Wallet page
+        // so users are pointed there instead of at Wallet Setup, unless they have no wallets at all
+        private static (bool IsNoWallets, string Message) GetTransfersEmptyState()
+        {
+            int walletCount = GetWalletFilesCount();
+            string message;
+
+            if (walletCount == 0)
+            {
+                message = "You do not have a wallet yet.\r\n\r\nSet one up to start sending and receiving.";
+            }
+            else
+            {
+                message = "No wallet is open.\r\n\r\nOpen one on Wallet screen to see your transactions.";
+            }
+
+            return (walletCount == 0, message);
+        }
+
+        // Called when Wallet page is shown so new user sees what to do next without waiting for master timer
+        public static void RefreshWalletEmptyState()
+        {
+            try
+            {
+                WalletViewModel walletVm = (WalletViewModel)GlobalData.ViewModelPages[SplitViewPages.Wallet];
+                (bool isNoWallets, string message) = GetWalletEmptyState();
+
+                walletVm.IsNoWalletsState = isNoWallets;
+                walletVm.EmptyStateMessage = message;
+                walletVm.IsEmptyStateVisible = !GlobalData.IsWalletOpen;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("UIM.RWES", ex);
+            }
+        }
+
+        // Same as above but for Transfers page
+        public static void RefreshTransfersEmptyState()
+        {
+            try
+            {
+                TransfersViewModel transfersVm = (TransfersViewModel)GlobalData.ViewModelPages[SplitViewPages.Transfers];
+                (bool isNoWallets, string message) = GetTransfersEmptyState();
+
+                transfersVm.IsNoWalletsState = isNoWallets;
+                transfersVm.EmptyStateMessage = message;
+                transfersVm.IsEmptyStateVisible = !GlobalData.IsWalletOpen;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("UIM.RTES", ex);
+            }
+        }
+
         public static void UpdateWalletView()
         {
             try
@@ -530,6 +628,9 @@ namespace NervaOneWalletMiner.Helpers
 
                 if (GlobalData.IsWalletOpen)
                 {
+                    // Wallet files will need to be rescanned as soon as this wallet closes
+                    _isWalletFilesScanNeeded = true;
+
                     // Compute collection changes on timer thread before marshaling to UI thread
                     List<Account> deleteAccounts = [];
                     List<Account> addAccounts = [];
@@ -652,7 +753,10 @@ namespace NervaOneWalletMiner.Helpers
                             }
                         }
 
-                        walletVm.OpenCloseWallet = StatusWallet.CloseWallet;
+                        if (walletVm.IsEmptyStateVisible)
+                        {
+                            walletVm.IsEmptyStateVisible = false;
+                        }
 
                         if (mainViewVm.WalletStatus != statusBarMessage)
                         {
@@ -671,6 +775,9 @@ namespace NervaOneWalletMiner.Helpers
                     // If wallet is closed/was closed by the user, clear fields
                     string totalLockedLabel = "Total " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits + ":";
                     string totalUnlockedLabel = "Unlocked " + GlobalData.AppSettings.Wallet[GlobalData.AppSettings.ActiveCoin].DisplayUnits + ":";
+
+                    // Work out empty state on timer thread before marshaling to UI thread
+                    (bool isNoWalletsState, string emptyStateMessage) = GetWalletEmptyState();
 
                     Dispatcher.UIThread.Invoke(() =>
                     {
@@ -695,7 +802,18 @@ namespace NervaOneWalletMiner.Helpers
                             walletVm.WalletAddresses = [];
                         }
 
-                        walletVm.OpenCloseWallet = StatusWallet.OpenWallet;
+                        if (walletVm.IsNoWalletsState != isNoWalletsState)
+                        {
+                            walletVm.IsNoWalletsState = isNoWalletsState;
+                        }
+                        if (!walletVm.EmptyStateMessage.Equals(emptyStateMessage))
+                        {
+                            walletVm.EmptyStateMessage = emptyStateMessage;
+                        }
+                        if (!walletVm.IsEmptyStateVisible)
+                        {
+                            walletVm.IsEmptyStateVisible = true;
+                        }
 
                         if (mainViewVm.WalletStatus != GlobalData.WalletClosedMessage)
                         {
@@ -726,6 +844,14 @@ namespace NervaOneWalletMiner.Helpers
 
                 if (GlobalData.IsWalletOpen)
                 {
+                    if (transfersViewVm.IsEmptyStateVisible)
+                    {
+                        Dispatcher.UIThread.Invoke(() =>
+                        {
+                            transfersViewVm.IsEmptyStateVisible = false;
+                        });
+                    }
+
                     if (transfersViewVm.Transactions.Count == 0)
                     {
                         ObservableCollection<Transfer> initialTransfers = [.. GlobalData.TransfersStats.Transactions.Values];
@@ -890,6 +1016,25 @@ namespace NervaOneWalletMiner.Helpers
                 }
                 else
                 {
+                    // Work out empty state on timer thread before marshaling to UI thread
+                    (bool isNoWalletsState, string emptyStateMessage) = GetTransfersEmptyState();
+
+                    Dispatcher.UIThread.Invoke(() =>
+                    {
+                        if (transfersViewVm.IsNoWalletsState != isNoWalletsState)
+                        {
+                            transfersViewVm.IsNoWalletsState = isNoWalletsState;
+                        }
+                        if (!transfersViewVm.EmptyStateMessage.Equals(emptyStateMessage))
+                        {
+                            transfersViewVm.EmptyStateMessage = emptyStateMessage;
+                        }
+                        if (!transfersViewVm.IsEmptyStateVisible)
+                        {
+                            transfersViewVm.IsEmptyStateVisible = true;
+                        }
+                    });
+
                     // If wallet is closed/was closed by the user, clear fields
                     if (transfersViewVm.Transactions.Count != 0)
                     {
