@@ -294,7 +294,14 @@ namespace NervaOneWalletMiner.ViewModels
                 if (response.Error.IsError)
                 {
                     Logger.LogError("WSM.RSPT", "Failed to rescan spent | Code: " + response.Error.Code + " | Message: " + response.Error.Message + " | Content: " + response.Error.Content);
-                    return new WalletOperationResult(false, title, "Error rescanning\r\n" + GlobalMethods.GetRpcErrorMessage(response.Error.Content, response.Error.Message));
+
+                    string errorMessage = GlobalMethods.GetRpcErrorMessage(response.Error.Content, response.Error.Message);
+                    if (errorMessage.Contains("trusted daemon", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return new WalletOperationResult(false, title, "Rescan Spent needs your own local node. With a remote node, use Rescan Blockchain instead.");
+                    }
+
+                    return new WalletOperationResult(false, title, "Error rescanning\r\n" + errorMessage);
                 }
 
                 Logger.LogDebug("WSM.RSPT", "Rescan spent returned successfully");

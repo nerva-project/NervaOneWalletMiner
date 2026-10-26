@@ -19,13 +19,13 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public string BlockchainDbSubfolder { get; set; } = string.Empty;
 
         // https://github.com/litecoin-project/litecoin/releases
-        public string CliUrlWindows64 { get; set; } = "https://github.com/litecoin-project/litecoin/releases/download/v0.21.5.5/litecoin-0.21.5.5-win64.zip";
-        public string CliUrlWindows32 { get; set; } = "https://github.com/litecoin-project/litecoin/releases/download/v0.21.5.5/litecoin-0.21.5.5-win64.zip";
-        public string CliUrlLinux64 { get; set; } = "https://github.com/litecoin-project/litecoin/releases/download/v0.21.5.5/litecoin-0.21.5.5-x86_64-linux-gnu.tar.gz";
-        public string CliUrlLinux32 { get; set; } = "https://github.com/litecoin-project/litecoin/releases/download/v0.21.5.5/litecoin-0.21.5.5-x86_64-linux-gnu.tar.gz";
-        public string CliUrlLinuxArm { get; set; } = "https://github.com/litecoin-project/litecoin/releases/download/v0.21.5.5/litecoin-0.21.5.5-aarch64-linux-gnu.tar.gz";
-        public string CliUrlMacIntel { get; set; } = "https://github.com/litecoin-project/litecoin/releases/download/v0.21.5.5/litecoin-0.21.5.5-osx64.tar.gz";
-        public string CliUrlMacArm { get; set; } = "https://github.com/litecoin-project/litecoin/releases/download/v0.21.5.5/litecoin-0.21.5.5-osx64.tar.gz";
+        public string CliUrlWindows64 { get; set; } = "https://github.com/litecoin-project/litecoin/releases/download/v0.21.5.8/litecoin-0.21.5.8-win64.zip";
+        public string CliUrlWindows32 { get; set; } = "https://github.com/litecoin-project/litecoin/releases/download/v0.21.5.8/litecoin-0.21.5.8-win64.zip";
+        public string CliUrlLinux64 { get; set; } = "https://github.com/litecoin-project/litecoin/releases/download/v0.21.5.8/litecoin-0.21.5.8-x86_64-linux-gnu.tar.gz";
+        public string CliUrlLinux32 { get; set; } = "https://github.com/litecoin-project/litecoin/releases/download/v0.21.5.8/litecoin-0.21.5.8-x86_64-linux-gnu.tar.gz";
+        public string CliUrlLinuxArm { get; set; } = "https://github.com/litecoin-project/litecoin/releases/download/v0.21.5.8/litecoin-0.21.5.8-aarch64-linux-gnu.tar.gz";
+        public string CliUrlMacIntel { get; set; } = "https://github.com/litecoin-project/litecoin/releases/download/v0.21.5.8/litecoin-0.21.5.8-osx64.tar.gz";
+        public string CliUrlMacArm { get; set; } = "https://github.com/litecoin-project/litecoin/releases/download/v0.21.5.8/litecoin-0.21.5.8-osx64.tar.gz";
         public string CliUrlAndroid { get; set; } = string.Empty;
 
         public string RemotePublicNodeUrlDefault { get; set; } = string.Empty;

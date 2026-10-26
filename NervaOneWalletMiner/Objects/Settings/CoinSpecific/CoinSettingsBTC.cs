@@ -19,13 +19,13 @@ namespace NervaOneWalletMiner.Objects.Settings.CoinSpecific
         public string BlockchainDbSubfolder { get; set; } = string.Empty;
 
         // https://bitcoincore.org/en/releases/
-        public string CliUrlWindows64 { get; set; } = "https://bitcoincore.org/bin/bitcoin-core-31.0/bitcoin-31.0-win64.zip";
-        public string CliUrlWindows32 { get; set; } = "https://bitcoincore.org/bin/bitcoin-core-31.0/bitcoin-31.0-win64.zip";
-        public string CliUrlLinux64 { get; set; } = "https://bitcoincore.org/bin/bitcoin-core-31.0/bitcoin-31.0-x86_64-linux-gnu.tar.gz";
-        public string CliUrlLinux32 { get; set; } = "https://bitcoincore.org/bin/bitcoin-core-31.0/bitcoin-31.0-x86_64-linux-gnu.tar.gz";
-        public string CliUrlLinuxArm { get; set; } = "https://bitcoincore.org/bin/bitcoin-core-31.0/bitcoin-31.0-arm-linux-gnueabihf.tar.gz";
-        public string CliUrlMacIntel { get; set; } = "https://bitcoincore.org/bin/bitcoin-core-31.0/bitcoin-31.0-x86_64-apple-darwin.tar.gz";
-        public string CliUrlMacArm { get; set; } = "https://bitcoincore.org/bin/bitcoin-core-31.0/bitcoin-31.0-arm64-apple-darwin.tar.gz";
+        public string CliUrlWindows64 { get; set; } = "https://bitcoincore.org/bin/bitcoin-core-31.1/bitcoin-31.1-win64.zip";
+        public string CliUrlWindows32 { get; set; } = "https://bitcoincore.org/bin/bitcoin-core-31.1/bitcoin-31.1-win64.zip";
+        public string CliUrlLinux64 { get; set; } = "https://bitcoincore.org/bin/bitcoin-core-31.1/bitcoin-31.1-x86_64-linux-gnu.tar.gz";
+        public string CliUrlLinux32 { get; set; } = "https://bitcoincore.org/bin/bitcoin-core-31.1/bitcoin-31.1-x86_64-linux-gnu.tar.gz";
+        public string CliUrlLinuxArm { get; set; } = "https://bitcoincore.org/bin/bitcoin-core-31.1/bitcoin-31.1-arm-linux-gnueabihf.tar.gz";
+        public string CliUrlMacIntel { get; set; } = "https://bitcoincore.org/bin/bitcoin-core-31.1/bitcoin-31.1-x86_64-apple-darwin.tar.gz";
+        public string CliUrlMacArm { get; set; } = "https://bitcoincore.org/bin/bitcoin-core-31.1/bitcoin-31.1-arm64-apple-darwin.tar.gz";
         public string CliUrlAndroid { get; set; } = string.Empty;
 
         public string RemotePublicNodeUrlDefault { get; set; } = string.Empty;
