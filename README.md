@@ -87,7 +87,7 @@ dotnet publish .\NervaOneWalletMiner.Desktop.csproj -r osx-x64 -c Release -p:pub
 Compiled files will be inside:  ...\NervaOneWalletMiner\NervaOneWalletMiner.Desktop\bin\Release\net10.0\osx-x64\publish\
 
 You'll need to replace "osx-x64" with your operating system. Other common values: 
-win-x64, win-x86, linux-x64, linux-arm, osx-x64,osx-arm64
+win-x64, win-x86, linux-x64, linux-arm64, osx-x64, osx-arm64
 
 Here is full list: [.NET RID Catalog][rid-catalog]
 
